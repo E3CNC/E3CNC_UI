@@ -46,7 +46,8 @@ const items = ref([])
 const rows = computed(() => gcode.value?.split('\n').length ?? 1)
 
 function getCurrentLine(): number {
-    const textarea = gcodeCommandField.value!.$refs.input as HTMLTextAreaElement
+    const textarea = gcodeCommandField.value?.$refs?.input as HTMLTextAreaElement | undefined
+    if (!textarea) return 1
     const textBeforeCursor = textarea.value.substring(0, textarea.selectionStart)
     return textBeforeCursor.split('\n').length
 }
