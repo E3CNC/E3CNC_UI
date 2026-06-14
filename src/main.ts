@@ -106,21 +106,24 @@ initLoad().then(() => {
     app.use(store)
     app.mount('#app')
 
-    // Restore body scroll position after DOM renders
-    const savedScroll = Number(localStorage.getItem('cncBodyScrollTop'))
+    // Restore main content scroll position after DOM renders
+    const savedScroll = Number(localStorage.getItem('cncMainScrollTop'))
     if (savedScroll) {
-        nextTick(() => {
-            document.documentElement.scrollTop = savedScroll
-            // Fallback if content rendered after nextTick
-            setTimeout(() => {
-                document.documentElement.scrollTop = savedScroll
-            }, 500)
-        })
+        const mainEl = document.getElementById('content')
+        if (mainEl) {
+            nextTick(() => {
+                mainEl.scrollTop = savedScroll
+                setTimeout(() => {
+                    mainEl.scrollTop = savedScroll
+                }, 500)
+            })
+        }
     }
 
-    // Persist body scroll position on unload
+    // Persist main content scroll position on unload
     window.addEventListener('beforeunload', () => {
-        localStorage.setItem('cncBodyScrollTop', String(document.documentElement.scrollTop))
+        const mainEl = document.getElementById('content')
+        if (mainEl) localStorage.setItem('cncMainScrollTop', String(mainEl.scrollTop))
     })
 }).catch((e) => {
     window.console.error('Init failed:', e)
