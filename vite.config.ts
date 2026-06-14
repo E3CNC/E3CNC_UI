@@ -1,11 +1,9 @@
-import vue from '@vitejs/plugin-vue2'
+import vue from '@vitejs/plugin-vue'
 import version from 'vite-plugin-package-version'
 import { defineConfig } from 'vite'
 
 import Components from 'unplugin-vue-components/vite'
-import { VuetifyResolver } from 'unplugin-vue-components/resolvers'
-import { checker } from 'vite-plugin-checker'
-
+import { Vuetify3Resolver } from 'unplugin-vue-components/resolvers'
 import path from 'path'
 import buildVersion from './src/plugins/build-version'
 import buildReleaseInfo from './src/plugins/build-release_info'
@@ -81,15 +79,9 @@ export default defineConfig({
         buildReleaseInfo(),
         vue(),
         version(),
-        checker({
-            typescript: {
-                root: path.resolve(__dirname),
-                buildMode: false,
-            },
-        }),
         Components({
-            dts: true, // enabled by default if `typescript` is installed
-            resolvers: [VuetifyResolver()],
+            dts: true,
+            resolvers: [Vuetify3Resolver()],
         }),
     ],
 
@@ -160,7 +152,32 @@ export default defineConfig({
     },
 
     test: {
-        environment: 'node',
+        environment: 'happy-dom',
         include: ['tests/**/*.spec.ts'],
+        globals: true,
+        setupFiles: ['tests/setup.ts'],
+        coverage: {
+            provider: 'v8',
+            reporter: ['text', 'text-summary'],
+            include: ['src/**/*.{ts,vue}'],
+            exclude: [
+                'node_modules/',
+                'tests/',
+                '**/*.d.ts',
+                '**/*.config.ts',
+                'src/main.ts',
+                'src/plugins/**',
+                'src/types/**',
+                'src/routes/**',
+                'src/store/runtime.ts',
+                'src/store/variables.ts',
+            ],
+            thresholds: {
+                lines: 80,
+                functions: 80,
+                branches: 80,
+                statements: 80,
+            },
+        },
     },
 })

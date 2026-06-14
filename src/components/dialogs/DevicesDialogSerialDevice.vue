@@ -1,14 +1,14 @@
 <template>
-    <v-card outlined class="mt-3 w-100">
-        <v-list-item three-line>
-            <v-list-item-content>
-                <div class="text-overline mb-2 d-flex flex-row">
-                    <span>{{ device.device_type.toUpperCase().replaceAll('_', ' ') }}</span>
-                    <v-spacer />
-                    <span>{{ device.driver_name }}</span>
-                </div>
-                <v-list-item-title class="text-h5 mb-0">{{ device.device_name }}</v-list-item-title>
-            </v-list-item-content>
+    <v-card variant="outlined" class="mt-3 w-100">
+        <v-list-item lines="three">
+            <div class="text-overline mb-2 d-flex flex-row">
+                <span>{{ device.device_type.toUpperCase().replaceAll('_', ' ') }}</span>
+                <v-spacer />
+                <span>{{ device.driver_name }}</span>
+            </div>
+            <template #title>
+                <span class="text-h5 mb-0">{{ device.device_name }}</span>
+            </template>
         </v-list-item>
         <v-card-text>
             <v-row>
@@ -30,16 +30,11 @@
     </v-card>
 </template>
 
-<script lang="ts">
-import { Component, Mixins, Prop } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
+<script setup lang="ts">
 import TextfieldWithCopy from '@/components/inputs/TextfieldWithCopy.vue'
 import type { SerialDevice } from '@/types/moonraker/MachineRPC'
 
-@Component({
-    components: { TextfieldWithCopy },
+defineProps({
+    device: { type: Object as () => SerialDevice, required: true },
 })
-export default class DevicesDialogSerialDevice extends Mixins(BaseMixin) {
-    @Prop({ type: Object, required: true }) device!: SerialDevice
-}
 </script>

@@ -1,14 +1,14 @@
 <template>
-    <v-row :dense="dense">
+ <v-row>
         <v-col :class="firstColClasses">
             <v-row class="d-flex flex-row">
-                <v-col v-if="loading" class="col-auto d-flex justify-center align-center pr-0">
+                <v-col v-if="loading" class="v-col-auto d-flex justify-center align-center pr-0">
                     <v-progress-circular indeterminate color="primary" :size="24" />
                 </v-col>
-                <v-col v-else-if="icon" class="col-auto d-flex justify-center align-center pr-0">
+                <v-col v-else-if="icon" class="v-col-auto d-flex justify-center align-center pr-0">
                     <v-icon>{{ icon }}</v-icon>
                 </v-col>
-                <v-col class="col d-flex justify-center flex-column">
+                <v-col class="v-col d-flex justify-center flex-column">
                     <span class="settings-row-title">{{ title }}</span>
                     <span v-if="subTitle" class="settings-row-subtitle">{{ subTitle }}</span>
                 </v-col>
@@ -20,41 +20,39 @@
     </v-row>
 </template>
 
-<script lang="ts">
-import { Component, Mixins, Prop } from 'vue-property-decorator'
-import BaseMixin from '../mixins/base'
-import { TranslateResult } from 'vue-i18n'
+<script setup lang="ts">
+import { computed } from 'vue'
+import type { TranslateResult } from 'vue-i18n'
 
-@Component
-export default class SettingsRow extends Mixins(BaseMixin) {
-    @Prop({ required: false, default: false }) readonly loading!: boolean
-    @Prop({ required: false, default: '' }) readonly icon!: string
-    @Prop({ required: true }) readonly title!: string | TranslateResult
-    @Prop({ required: false }) readonly subTitle!: string | TranslateResult
-    @Prop({ required: false, default: false }) readonly dynamicSlotWidth!: boolean
-    @Prop({ required: false, default: false }) readonly mobileSecondRow!: boolean
-    @Prop({ default: false }) readonly dense!: boolean
+const props = defineProps({
+    loading: { required: false, default: false },
+    icon: { required: false, default: '' },
+    title: { required: true },
+    subTitle: { required: false, default: null },
+    dynamicSlotWidth: { required: false, default: false },
+    mobileSecondRow: { required: false, default: false },
+    dense: { default: false },
+})
 
-    get firstColClasses() {
-        const dense = this.dense ? ' py-1' : ''
-        const defaultClasses = ' d-flex justify-center' + dense
+const firstColClasses = computed(() => {
+    const dense = props.dense ? ' py-1' : ''
+    const defaultClasses = ' d-flex justify-center' + dense
 
-        if (this.dynamicSlotWidth) return 'col' + defaultClasses
-        else if (this.mobileSecondRow) return 'col-12 col-md-6' + defaultClasses
+    if (props.dynamicSlotWidth) return 'v-col' + defaultClasses
+    else if (props.mobileSecondRow) return 'v-col-12 v-col-md-6' + defaultClasses
 
-        return 'col-6' + defaultClasses
-    }
+    return 'v-col-6' + defaultClasses
+})
 
-    get secondColClasses() {
-        const dense = this.dense ? ' py-1' : ' settings-row-slot'
-        const defaultClasses = ' d-flex justify-end align-center' + dense
+const secondColClasses = computed(() => {
+    const dense = props.dense ? ' py-1' : ' settings-row-slot'
+    const defaultClasses = ' d-flex justify-end align-center' + dense
 
-        if (this.dynamicSlotWidth) return 'col-auto' + defaultClasses
-        else if (this.mobileSecondRow) return 'col-12 col-md-6 pt-0 pt-md-3' + defaultClasses
+    if (props.dynamicSlotWidth) return 'v-col-auto' + defaultClasses
+    else if (props.mobileSecondRow) return 'v-col-12 v-col-md-6 pt-0 pt-md-3' + defaultClasses
 
-        return 'col-6' + defaultClasses
-    }
-}
+    return 'v-col-6' + defaultClasses
+})
 </script>
 
 <style scoped>

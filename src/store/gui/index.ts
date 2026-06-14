@@ -17,13 +17,12 @@ import { console } from '@/store/gui/console'
 import { gcodehistory } from '@/store/gui/gcodehistory'
 import { macros } from '@/store/gui/macros'
 import { miscellaneous } from '@/store/gui/miscellaneous'
-import { navigation } from '@/store/gui/navigation'
+import { navigation as sidebarNavigation } from '@/store/gui/navigation'
 import { notifications } from '@/store/gui/notifications'
 import { presets } from '@/store/gui/presets'
 import { remoteprinters } from '@/store/gui/remoteprinters'
 import { maintenance } from '@/store/gui/maintenance'
 import { webcams } from '@/store/gui/webcams'
-import { heightmap } from '@/store/gui/heightmap'
 
 export const getDefaultState = (): GuiState => {
     return {
@@ -76,6 +75,7 @@ export const getDefaultState = (): GuiState => {
             ],
             tabletLayout1: [
                 { name: 'webcam', visible: true },
+                { name: 'cnc-status', visible: true },
                 { name: 'dro', visible: true },
                 { name: 'jog', visible: true },
                 { name: 'toolhead-control', visible: true },
@@ -85,10 +85,15 @@ export const getDefaultState = (): GuiState => {
             ],
             tabletLayout2: [
                 { name: 'temperature', visible: true },
+                { name: 'offsets', visible: true },
+                { name: 'offset-preview', visible: true },
+                { name: 'spindle-coolant', visible: true },
+                { name: 'mdi', visible: true },
                 { name: 'miniconsole', visible: true },
             ],
             desktopLayout1: [
                 { name: 'webcam', visible: true },
+                { name: 'cnc-status', visible: true },
                 { name: 'dro', visible: true },
                 { name: 'jog', visible: true },
                 { name: 'toolhead-control', visible: true },
@@ -98,9 +103,14 @@ export const getDefaultState = (): GuiState => {
             ],
             desktopLayout2: [
                 { name: 'temperature', visible: true },
+                { name: 'offsets', visible: true },
+                { name: 'offset-preview', visible: true },
+                { name: 'spindle-coolant', visible: true },
+                { name: 'mdi', visible: true },
                 { name: 'miniconsole', visible: true },
             ],
             widescreenLayout1: [
+                { name: 'cnc-status', visible: true },
                 { name: 'dro', visible: true },
                 { name: 'jog', visible: true },
                 { name: 'toolhead-control', visible: true },
@@ -109,10 +119,14 @@ export const getDefaultState = (): GuiState => {
             ],
             widescreenLayout2: [
                 { name: 'temperature', visible: true },
+                { name: 'offsets', visible: true },
+                { name: 'offset-preview', visible: true },
+                { name: 'spindle-coolant', visible: true },
                 { name: 'machine-settings', visible: true },
             ],
             widescreenLayout3: [
                 { name: 'webcam', visible: true },
+                { name: 'mdi', visible: true },
                 { name: 'miniconsole', visible: true },
             ],
         },
@@ -152,7 +166,7 @@ export const getDefaultState = (): GuiState => {
             showGCodePanel: false,
             cncMode: true,
         },
-        navigation: {
+        navigationSettings: {
             entries: [],
         },
         uiSettings: {
@@ -233,14 +247,6 @@ export const getDefaultState = (): GuiState => {
                 ],
                 currentPath: '',
                 selectedFiles: [],
-            },
-            heightmap: {
-                probed: true,
-                mesh: false,
-                flat: false,
-                wireframe: true,
-                scaleGradient: false,
-                scaleZMax: 0.5,
             },
             history: {
                 countPerPage: 10,
@@ -324,11 +330,10 @@ export const gui: Module<GuiState, RootState> = {
         macros,
         maintenance,
         miscellaneous,
-        navigation,
+        sidebarNavigation,
         notifications,
         presets,
         remoteprinters,
         webcams,
-        heightmap,
     },
 }

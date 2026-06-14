@@ -7,14 +7,13 @@
                 </settings-row>
                 <v-divider class="my-2"></v-divider>
                 <settings-row :title="$t('Settings.GCodeViewerTab.BackgroundColor')">
-                    <v-menu :close-on-content-click="false" bottom left offset-y>
-                        <template #activator="{ on, attrs }">
-                            <v-btn
+                    <v-menu :close-on-content-click="false" location="bottom end">
+                        <template #activator="{ props: activatorProps }">
+ <v-btn
                                 :color="backgroundColor"
-                                class="minwidth-0 px-5"
-                                small
-                                v-bind="attrs"
-                                v-on="on"></v-btn>
+                                class="color-swatch"
+                                variant="flat"
+                                v-bind="activatorProps"></v-btn>
                         </template>
                         <v-color-picker
                             :value="backgroundColor"
@@ -25,9 +24,9 @@
                 </settings-row>
                 <v-divider class="my-2"></v-divider>
                 <settings-row :title="$t('Settings.GCodeViewerTab.GridColor')">
-                    <v-menu :close-on-content-click="false" bottom left offset-y>
-                        <template #activator="{ on, attrs }">
-                            <v-btn :color="gridColor" class="minwidth-0 px-5" small v-bind="attrs" v-on="on"></v-btn>
+                    <v-menu :close-on-content-click="false" location="bottom end">
+                        <template #activator="{ props: activatorProps }">
+ <v-btn :color="gridColor" class="color-swatch" variant="flat" v-bind="activatorProps"></v-btn>
                         </template>
                         <v-color-picker
                             :value="gridColor"
@@ -38,14 +37,13 @@
                 </settings-row>
                 <v-divider class="my-2"></v-divider>
                 <settings-row :title="$t('Settings.GCodeViewerTab.ProgressColor')">
-                    <v-menu :close-on-content-click="false" bottom left offset-y>
-                        <template #activator="{ on, attrs }">
-                            <v-btn
+                    <v-menu :close-on-content-click="false" location="bottom end">
+                        <template #activator="{ props: activatorProps }">
+ <v-btn
                                 :color="progressColor"
-                                class="minwidth-0 px-5"
-                                small
-                                v-bind="attrs"
-                                v-on="on"></v-btn>
+                                class="color-swatch"
+                                variant="flat"
+                                v-bind="activatorProps"></v-btn>
                         </template>
                         <v-color-picker
                             :value="progressColor"
@@ -55,44 +53,15 @@
                     </v-menu>
                 </settings-row>
                 <v-divider class="my-2"></v-divider>
-                <settings-row :title="$t('Settings.GCodeViewerTab.ExtruderColor')">
-                    <v-row no-gutters>
-                        <v-menu
-                            v-for="(extruderColor, index) in extruderColors"
-                            :key="index"
-                            :close-on-content-click="false"
-                            bottom
-                            left
-                            offset-y>
-                            <template #activator="{ on, attrs }">
-                                <v-col align="right" class="mt-1" cols="12">
-                                    <span class="mr-2">{{ index }}</span>
-                                    <v-btn
-                                        :color="extruderColors[index]"
-                                        class="minwidth-0 px-5"
-                                        small
-                                        v-bind="attrs"
-                                        v-on="on"></v-btn>
-                                </v-col>
-                            </template>
-                            <v-color-picker
-                                :value="extruderColors[index]"
-                                hide-mode-switch
-                                mode="rgba"
-                                @update:color="colorsUpdated($event, index)"></v-color-picker>
-                        </v-menu>
-                    </v-row>
-                </settings-row>
                 <v-divider class="my-2"></v-divider>
                 <settings-row :title="$t('Settings.GCodeViewerTab.MinFeed')">
-                    <v-menu :close-on-content-click="false" bottom left offset-y>
-                        <template #activator="{ on, attrs }">
-                            <v-btn
+                    <v-menu :close-on-content-click="false" location="bottom end">
+                        <template #activator="{ props: activatorProps }">
+ <v-btn
                                 :color="minFeedColor"
-                                class="minwidth-0 px-5 mr-3"
-                                small
-                                v-bind="attrs"
-                                v-on="on"></v-btn>
+                                class="color-swatch mr-3"
+                                variant="flat"
+                                v-bind="activatorProps"></v-btn>
                         </template>
                         <v-color-picker
                             :value="minFeedColor"
@@ -103,9 +72,9 @@
                     <v-text-field
                         v-model="minFeed"
                         :rules="[(v) => v > 0 || 'Minimum speed is 1']"
-                        dense
+                        density="compact"
                         hide-details="auto"
-                        outlined
+                        variant="outlined"
                         suffix="mm/s"
                         type="number"
                         hide-spin-buttons
@@ -113,14 +82,13 @@
                 </settings-row>
                 <v-divider class="my-2"></v-divider>
                 <settings-row :title="$t('Settings.GCodeViewerTab.MaxFeed')">
-                    <v-menu :close-on-content-click="false" bottom left offset-y>
-                        <template #activator="{ on, attrs }">
-                            <v-btn
+                    <v-menu :close-on-content-click="false" location="bottom end">
+                        <template #activator="{ props: activatorProps }">
+ <v-btn
                                 :color="maxFeedColor"
-                                class="minwidth-0 px-5 mr-3"
-                                small
-                                v-bind="attrs"
-                                v-on="on"></v-btn>
+                                class="color-swatch mr-3"
+                                variant="flat"
+                                v-bind="activatorProps"></v-btn>
                         </template>
                         <v-color-picker
                             :value="maxFeedColor"
@@ -131,9 +99,9 @@
                     <v-text-field
                         v-model="maxFeed"
                         :rules="[(v) => v > 0 || 'Minimum speed is 1']"
-                        dense
+                        density="compact"
                         hide-details="auto"
-                        outlined
+                        variant="outlined"
                         suffix="mm/s"
                         type="number"
                         hide-spin-buttons
@@ -144,101 +112,91 @@
     </div>
 </template>
 
-<script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useStore } from 'vuex'
 import SettingsRow from '@/components/settings/SettingsRow.vue'
-import { Debounce } from 'vue-debounce-decorator'
-import Vue from 'vue'
-import { clearColorObject, ColorPickerValue } from '@/plugins/helpers'
+import { clearColorObject } from '@/plugins/helpers'
+import type { ColorPickerValue } from '@/plugins/helpers'
 
-@Component({
-    components: { SettingsRow },
+const store = useStore()
+
+const showAxes = computed({
+    get: () => store.state.gui.gcodeViewer.showAxes,
+    set: (newVal: boolean) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.showAxes', value: newVal })
+    },
 })
-export default class SettingsGCodeViewerTab extends Mixins(BaseMixin) {
-    get showAxes(): boolean {
-        return this.$store.state.gui.gcodeViewer.showAxes
-    }
 
-    set showAxes(newVal: boolean) {
-        this.$store.dispatch('gui/saveSetting', { name: 'gcodeViewer.showAxes', value: newVal })
-    }
+const backgroundColor = computed({
+    get: () => store.state.gui.gcodeViewer.backgroundColor,
+    set: (newVal: string) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.backgroundColor', value: newVal })
+    },
+})
 
-    get extruderColors(): Array<string> {
-        return this.$store.state.gui.gcodeViewer.extruderColors
-    }
+const gridColor = computed({
+    get: () => store.state.gui.gcodeViewer.gridColor,
+    set: (newVal: string) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.gridColor', value: newVal })
+    },
+})
 
-    @Debounce(500)
-    colorsUpdated(value: ColorPickerValue, index: number): void {
-        const colors = [...this.extruderColors]
-        colors[index] = clearColorObject(value)
-        this.$store.dispatch('gui/saveSetting', { name: 'gcodeViewer.extruderColors', value: colors })
-    }
+const progressColor = computed({
+    get: () => store.state.gui.gcodeViewer.progressColor,
+    set: (newVal: string) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.progressColor', value: newVal })
+    },
+})
 
-    get backgroundColor(): string {
-        return this.$store.state.gui.gcodeViewer.backgroundColor
-    }
+let updateColorDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
-    set backgroundColor(newVal: string) {
-        this.$store.dispatch('gui/saveSetting', { name: 'gcodeViewer.backgroundColor', value: newVal })
-    }
+function updateColorValue(colorElement: string, newVal: ColorPickerValue): void {
+    if (updateColorDebounceTimer) clearTimeout(updateColorDebounceTimer)
+    updateColorDebounceTimer = setTimeout(() => {
+        store.dispatch('gui/saveSetting', { name: `gcodeViewer.${colorElement}`, value: clearColorObject(newVal) })
+    }, 500)
+}
 
-    get gridColor(): string {
-        return this.$store.state.gui.gcodeViewer.gridColor
-    }
+const minFeed = computed({
+    get: () => store.state.gui.gcodeViewer.minFeed,
+    set: (newVal: number) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.minFeed', value: newVal })
+    },
+})
 
-    set gridColor(newVal: string) {
-        this.$store.dispatch('gui/saveSetting', { name: 'gcodeViewer.gridColor', value: newVal })
-    }
+const maxFeed = computed({
+    get: () => store.state.gui.gcodeViewer.maxFeed,
+    set: (newVal: number) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.maxFeed', value: newVal })
+    },
+})
 
-    get progressColor(): string {
-        return this.$store.state.gui.gcodeViewer.progressColor
-    }
+const minFeedColor = computed({
+    get: () => store.state.gui.gcodeViewer.minFeedColor,
+    set: (newVal: string) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.minFeedColor', value: newVal })
+    },
+})
 
-    set progressColor(newVal: string) {
-        this.$store.dispatch('gui/saveSetting', { name: 'gcodeViewer.progressColor', value: newVal })
-    }
+const maxFeedColor = computed({
+    get: () => store.state.gui.gcodeViewer.maxFeedColor,
+    set: (newVal: string) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.maxFeedColor', value: newVal })
+    },
+})
 
-    @Debounce(500)
-    updateColorValue(colorElement: string, newVal: ColorPickerValue): void {
-        Vue.set(this, colorElement, clearColorObject(newVal))
-    }
-
-    get minFeed(): number {
-        return this.$store.state.gui.gcodeViewer.minFeed
-    }
-
-    set minFeed(newVal: number) {
-        this.$store.dispatch('gui/saveSetting', { name: 'gcodeViewer.minFeed', value: newVal })
-    }
-
-    get maxFeed(): number {
-        return this.$store.state.gui.gcodeViewer.maxFeed
-    }
-
-    set maxFeed(newVal: number) {
-        this.$store.dispatch('gui/saveSetting', { name: 'gcodeViewer.maxFeed', value: newVal })
-    }
-
-    get minFeedColor(): string {
-        return this.$store.state.gui.gcodeViewer.minFeedColor
-    }
-
-    set minFeedColor(newVal: string) {
-        this.$store.dispatch('gui/saveSetting', { name: 'gcodeViewer.minFeedColor', value: newVal })
-    }
-
-    get maxFeedColor(): string {
-        return this.$store.state.gui.gcodeViewer.maxFeedColor
-    }
-
-    set maxFeedColor(newVal: string) {
-        this.$store.dispatch('gui/saveSetting', { name: 'gcodeViewer.maxFeedColor', value: newVal })
-    }
-
-    feedBlur(): void {
-        if (this.minFeed < 1) this.minFeed = 1
-        if (this.maxFeed < this.minFeed) this.maxFeed = this.minFeed + 1
-    }
+function feedBlur(): void {
+    if (minFeed.value < 1) minFeed.value = 1
+    if (maxFeed.value < minFeed.value) maxFeed.value = minFeed.value + 1
 }
 </script>
+
+<style scoped>
+.color-swatch {
+    min-width: 42px;
+    width: 42px;
+    height: 28px;
+    padding: 0;
+}
+</style>

@@ -9,8 +9,9 @@ This directory contains CNC-focused dashboard panels for the Mainsail fork.
 | `CncStatusPanel.vue` | native Mainsail store (`printer.print_stats`, `printer.gcode_move`, `printer.toolhead`, `printer.system_stats`) | wired, renders |
 | `JogPanel.vue` | native store + `ControlMixin.doSend` | wired, renders |
 | `OffsetsPanel.vue` | `printer.gcode_move.gcode_position` + `G10 L20` work-zero actions (WCS plugin) | wired, renders |
+| `OffsetPreview.vue` | interactive WCS preview with crosshairs/labels, click-to-move, hover tooltips, and grid-size selector | wired, renders |
 | `SpindleCoolantPanel.vue` | `doSend` (`M3`/`M4`/`M5`/`M7`/`M8`/`M9`) | wired, renders |
-| `MdiPanel.vue` | — | stub, placeholder only |
+| `MdiPanel.vue` | `ConsoleTextarea` + quick commands for G20/G21/G90/G91 and WCS shortcuts | wired, renders |
 | `DroPanel.vue` | `printer.motion_report`, `printer.gcode_move`, `printer.toolhead` | wired, renders |
 
 ## Integration points
@@ -33,5 +34,5 @@ This directory contains CNC-focused dashboard panels for the Mainsail fork.
 files in this directory are imported from `src/pages/Dashboard.vue` and
 listed in the layout definitions under `src/store/gui/` like any other
 Mainsail panel. To add a new panel, follow the same pattern as the existing
-files (Vue Class Component, `klipperReadyForGui` gate, mixins from
-`@/components/mixins/base` and `@/components/mixins/control`).
+files (Vue 3 `<script setup>`, `klipperReadyForGui` gate, composables from
+`@/composables/useBase` and `@/composables/useControl`).

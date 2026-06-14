@@ -2,9 +2,9 @@ import { GuiMacrosState } from '@/store/gui/macros/types'
 import { GuiConsoleState } from '@/store/gui/console/types'
 import { GuiPresetsState } from '@/store/gui/presets/types'
 import { GuiRemoteprintersState } from '@/store/gui/remoteprinters/types'
-import { ServerHistoryStateJob } from '@/store/server/history/types'
+import type { ServerHistoryStateJob } from '@/store/server/history/types'
 import { GuiNotificationState } from '@/store/gui/notifications/types'
-import { FileStateFile, FileStateGcodefile } from '@/store/files/types'
+import type { FileStateFile, FileStateGcodefile } from '@/store/files/types'
 import { GuiNavigationState } from '@/store/gui/navigation/types'
 
 export interface GuiState {
@@ -78,7 +78,7 @@ export interface GuiState {
         cncMode: boolean
     }
     macros?: GuiMacrosState
-    navigation: GuiNavigationState
+    navigationSettings: GuiNavigationState
     notifications?: GuiNotificationState
     presets?: GuiPresetsState
     remoteprinters?: GuiRemoteprintersState
@@ -146,14 +146,6 @@ export interface GuiState {
             orderMetadataColumns: string[]
             currentPath: string
             selectedFiles: FileStateGcodefile[]
-        }
-        heightmap: {
-            probed: boolean
-            mesh: boolean
-            flat: boolean
-            wireframe: boolean
-            scaleGradient: boolean
-            scaleZMax: number
         }
         history: {
             countPerPage: number

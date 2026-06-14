@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-btn :loading="loadings.includes('backupDbButton')" small @click="openDialog">
+ <v-btn :loading="loadings.includes('backupDbButton')" size="small" @click="openDialog">
             {{ $t('Settings.GeneralTab.Backup') }}
         </v-btn>
         <v-dialog v-model="showDialog" persistent :width="360">
@@ -10,9 +10,7 @@
                 :margin-bottom="false"
                 :icon="mdiHelpCircle">
                 <template #buttons>
-                    <v-btn icon tile @click="closeDialog">
-                        <v-icon>{{ mdiCloseThick }}</v-icon>
-                    </v-btn>
+ <v-btn :icon="mdiCloseThick" rounded="0" @click="closeDialog"/>
                 </template>
                 <v-card-text>
                     <v-row>
@@ -28,7 +26,7 @@
                     </v-row>
                     <v-row>
                         <v-col class="text-center">
-                            <v-btn color="red" :loading="loadings.includes('backupMainsail')" @click="backupMainsail">
+ <v-btn color="red" :loading="loadings.includes('backupMainsail')" @click="backupMainsail">
                                 {{ $t('Settings.GeneralTab.Backup') }}
                             </v-btn>
                         </v-col>
@@ -39,50 +37,43 @@
     </div>
 </template>
 
-<script lang="ts">
-import Component from 'vue-class-component'
-import { Mixins } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
-import SettingsRow from '@/components/settings/SettingsRow.vue'
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useStore } from 'vuex'
+import { useSettingsDatabase } from '@/composables/useSettingsDatabase'
 import Panel from '@/components/ui/Panel.vue'
 import { mdiCloseThick, mdiHelpCircle } from '@mdi/js'
 import CheckboxList from '@/components/inputs/CheckboxList.vue'
-import { TranslateResult } from 'vue-i18n'
-import SettingsGeneralDatabase from '@/components/mixins/settingsGeneralDatabase'
+import type { TranslateResult } from 'vue-i18n'
 
-@Component({
-    components: { Panel, SettingsRow, CheckboxList },
+const store = useStore()
+const { loadings, loadBackupableNamespaces } = useSettingsDatabase()
+
+const showDialog = ref(false)
+const backupableNamespaces = ref<{ value: string; label: string | TranslateResult }[]>([])
+const backupCheckboxes = ref<string[]>([])
+
+onMounted(async () => {
+    backupableNamespaces.value = await loadBackupableNamespaces()
 })
-export default class SettingsGeneralTabBackupDatabase extends Mixins(BaseMixin, SettingsGeneralDatabase) {
-    mdiHelpCircle = mdiHelpCircle
-    mdiCloseThick = mdiCloseThick
 
-    showDialog = false
-    backupableNamespaces: { value: string; label: string | TranslateResult }[] = []
-    backupCheckboxes: string[] = []
+function onSelectBackupCheckboxes(selected: string[]) {
+    backupCheckboxes.value = selected
+}
 
-    async mounted() {
-        this.backupableNamespaces = await this.loadBackupableNamespaces()
-    }
+async function backupMainsail() {
+    await store.dispatch('socket/addLoading', 'backupMainsail')
+    await store.dispatch('gui/backupMoonrakerDB', backupCheckboxes.value)
+    await store.dispatch('socket/removeLoading', 'backupMainsail')
+    closeDialog()
+}
 
-    onSelectBackupCheckboxes(backupCheckboxes: string[]) {
-        this.backupCheckboxes = backupCheckboxes
-    }
+async function openDialog() {
+    backupableNamespaces.value = await loadBackupableNamespaces()
+    showDialog.value = true
+}
 
-    async backupMainsail() {
-        await this.$store.dispatch('socket/addLoading', 'backupMainsail')
-        await this.$store.dispatch('gui/backupMoonrakerDB', this.backupCheckboxes)
-        await this.$store.dispatch('socket/removeLoading', 'backupMainsail')
-        this.closeDialog()
-    }
-
-    async openDialog() {
-        this.backupableNamespaces = await this.loadBackupableNamespaces()
-        this.showDialog = true
-    }
-
-    closeDialog() {
-        this.showDialog = false
-    }
+function closeDialog() {
+    showDialog.value = false
 }
 </script>

@@ -1,4 +1,4 @@
-import { FileStateFile } from '@/store/files/types'
+import type { FileStateFile } from '@/store/files/types'
 import { PrinterStateMacroParams } from '@/store/printer/types'
 import {
     mdiAlertOutline,
@@ -12,7 +12,6 @@ import {
     mdiScale,
     mdiThermometer,
 } from '@mdi/js'
-import Vue from 'vue'
 import { VColorPickerColor } from '@/types/vuetify'
 
 export const isRecord = (value: unknown): value is Record<string, unknown> => {
@@ -55,7 +54,7 @@ export const setDataDeep = (currentState: unknown, payload: unknown): void => {
             return
         }
 
-        Vue.set(currentState, key, value)
+        currentState[key] = value
     })
 }
 
@@ -365,7 +364,7 @@ export const unitToSymbol = (unit: string): string => {
 export const convertPrintStatusIconColor = (status: string): string => {
     switch (status) {
         case 'in_progress':
-            return 'blue accent-3' //'blue-grey darken-1'
+            return '#2979ff'
         case 'completed':
             return 'green' //'green'
         case 'cancelled':

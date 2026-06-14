@@ -4,7 +4,7 @@ CNC-focused control stack built around Klipper, Moonraker, and a maintained Main
 
 ## Overview
 
-A real [Mainsail](https://github.com/mainsail-prusa/mainsail) fork extended with CNC-native dashboard panels, CNC-specific navigation terminology, file-card metadata enrichment, and a Moonraker-side CNC agent for normalized CNC state and guarded command endpoints.
+A real [Mainsail](https://github.com/mainsail-prusa/mainsail) fork built on Vue 3.5 + Vuetify 3, extended with CNC-native dashboard panels, CNC-specific navigation terminology, file-card metadata enrichment, interactive offset preview tools, and a Moonraker-side CNC agent for normalized CNC state and guarded command endpoints.
 
 ## Installation
 
@@ -51,9 +51,9 @@ Six CNC panels registered in the dashboard system and visible when `cncMode` is 
 | **CNC Status** | Printer state, active job filename, feed override %, requested feed speed, max velocity, host load, free RAM. Auto-loads CAM metadata sidecar for the active file. |
 | **DRO** | Three-axis digital readout showing machine position, work position, computed offset, axis limits, homed flags, absolute/relative mode, and live velocity. Also rendered in compact form in the app header toolbar. |
 | **Jog** | Jog/homing controls — Home All / XY / Z, XY directional pad (cross layout), Z ± buttons, step-size selector (100 µm … 25 mm), configurable X/Y/Z feedrates, keyboard navigation, emergency stop (M112). |
-| **Offsets** | Work coordinate system manager — G54 … G59 selector, current work position, per-WCS origin offsets, per-axis Set Zero, manual offset entry with Apply / Reset (all via `G10 L20`). |
+| **Offsets** | Work coordinate system manager — G54 … G59 selector, current work position, per-WCS origin offsets, per-axis Set Zero, manual offset entry with Apply / Reset (all via `G10 L20`). The panel includes an interactive OffsetPreview with hover tooltips, WCS crosshairs/labels, click-to-move, and a grid-size selector. |
 | **Spindle & Coolant** | Spindle ON/OFF/CCW, RPM input (0–24 000), SET button. Flood and Mist coolant toggles. All commands sent through `/server/cnc/*` API. |
-| **MDI** *(placeholder)* | Dedicated CNC-native MDI panel stub. Full console/MDI functionality is available via the existing console page; a proper MDI panel is planned for V2. |
+| **MDI** | CNC-native MDI panel with console-style entry, quick commands, and WCS shortcuts. |
 
 ### Work Coordinate Systems (WCS)
 
@@ -102,6 +102,7 @@ All navigation routes are gated behind `klipperIsConnected`.
 
 - `gui.gcodeViewer.cncMode` defaults to `true` in this fork. When disabled, all six CNC panels are filtered from the dashboard. Panels can also be individually re-ordered or hidden via the existing dashboard layout settings.
 - The G-code viewer sets `forceWireMode` and `g1AsExtrusion = true` when `cncMode` is on so G1 moves render as extrusion paths instead of rapid moves.
+- Dashboard scroll position, grid/snap state, and settings-menu state persist across reloads so the CNC UI feels stable during editing and tuning.
 
 ### Job Files — card grid with CAM metadata
 
@@ -134,7 +135,7 @@ Registered under `/server/cnc/...`:
 | POST | `/server/cnc/settings` | Update persisted CNC dashboard settings |
 | POST | `/server/cnc/jog` | Distance-based jog command |
 
-GET handlers return authoritative CNC state. POST handlers currently persist agent state (stubs); full machine actuation wiring requires Moonraker/Klipper integration.
+GET handlers return authoritative CNC state. POST handlers execute guarded G-code actions and persist the resulting CNC state in the agent so the frontend can stay in sync.
 
 ### Frontend architecture
 
@@ -159,16 +160,18 @@ This repository has progressed well beyond its initial scaffold. The fork is dep
 
 ### Mainsail fork features implemented
 
-- ✅ Six CNC dashboard panels (CNC Status, DRO, Jog, Offsets, Spindle & Coolant, MDI placeholder)
+- ✅ Six CNC dashboard panels (CNC Status, DRO, Jog, Offsets, Spindle & Coolant, MDI)
 - ✅ Dashboard registration, labels, icons, responsive layouts
 - ✅ CNC panels gateable via `cncMode` setting (on by default)
 - ✅ Navigation relabelling: G-Code → Job Files, Console → MDI
 - ✅ G-Code Files card grid with CAM metadata sidecar rendering
-- ✅ Moonraker CNC agent component with 11 REST endpoints
+- ✅ Moonraker CNC agent component with `/server/cnc/...` REST endpoints
 - ✅ Metadata extractor CLI (`scripts/cnc_metadata_extractor.py`)
 - ✅ Deploy script + Moonraker update-manager integration
-- ✅ Klipper G-code caveats documented (G10 unsupported, G92 for work-zero)
+- ✅ Klipper G-code caveats documented
 - ✅ Compact DRO readout in app header toolbar (machine position, homed state, live velocity, G90/G91 mode)
+- ✅ Interactive OffsetPreview in the Offsets panel (hover tooltips, WCS crosshairs/labels, click-to-move, grid-size selector)
+- ✅ Scroll position, grid/snap state, and settings-menu URL state persist across reloads
 - ✅ Jog console log suppression — `SAVE_GCODE_STATE`/`G91`/`G1`/`RESTORE_GCODE_STATE` no longer spams the terminal
 - ✅ Homing override fix — corrected uppercase param keys (`'X'`/`'Y'`/`'Z'`) so `G28 X Y` no longer homes Z
 - ✅ **WCS Klipper plugin** — G10 L2/L20 support, G54–G59 offset tables with JSON persistence (`klipper-extras/work_coordinate_systems.py`)
@@ -180,8 +183,35 @@ This repository has progressed well beyond its initial scaffold. The fork is dep
 - ✅ CNC-specific state stores: spindle, coolant, units, WCS offsets
 - ✅ Guarded command endpoints: jog, set-zero, WCS select, spindle, coolant
 - ✅ Settings persistence: runtime store + GET/POST at `/server/cnc/settings`
-- ⏳ Machine actuation wiring (POST handlers persist agent state; Klipper/Moonraker layer needed)
-- ⏳ `[cnc_agent]` section removed from moonraker.conf (agent endpoints not actively wired)
+- ✅ Machine actuation wiring via guarded G-code execution in the agent
+- ✅ `[cnc_agent]` section wired in `moonraker.conf` by the install script
+
+### Moonraker MCP server
+
+The same `moonraker-cnc-agent/` package also ships an MCP server for
+assistant integrations.
+
+- `moonraker-cnc-mcp` console script
+- Tools for Moonraker server info, printer info, printer objects, G-code,
+  history, webcams, and host system data
+- Environment variables:
+  - `MOONRAKER_URL` — Moonraker base URL, default `http://127.0.0.1:7125`
+  - `MOONRAKER_API_KEY` — optional `X-Api-Key` header value
+  - `MOONRAKER_TIMEOUT` — request timeout in seconds, default `15`
+
+Run it locally from the agent package:
+
+```bash
+cd moonraker-cnc-agent
+PYTHONPATH=src python -m moonraker_cnc_agent.mcp_server
+```
+
+Or install it as a console script:
+
+```bash
+pip install -e moonraker-cnc-agent
+moonraker-cnc-mcp
+```
 
 ### Klipper macros
 

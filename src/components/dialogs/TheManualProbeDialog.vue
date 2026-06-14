@@ -8,9 +8,7 @@
             style="overflow: hidden"
             :height="isMobile ? 0 : 548">
             <template #buttons>
-                <v-btn icon tile @click="sendAbort">
-                    <v-icon>{{ mdiCloseThick }}</v-icon>
-                </v-btn>
+ <v-btn :icon="mdiCloseThick" rounded="0" @click="sendAbort"/>
             </template>
             <v-container>
                 <v-row>
@@ -24,25 +22,25 @@
                 </v-row>
                 <v-row>
                     <v-col class="text-left">
-                        <v-btn class="" color="primary" @click="sendTestZ('--')">
-                            <v-icon small>{{ mdiMinusThick }}</v-icon>
-                            <v-icon small>{{ mdiMinusThick }}</v-icon>
+ <v-btn class="" color="primary" @click="sendTestZ('--')">
+                            <v-icon size="small">{{ mdiMinusThick }}</v-icon>
+                            <v-icon size="small">{{ mdiMinusThick }}</v-icon>
                         </v-btn>
                     </v-col>
                     <v-col class="text-left">
-                        <v-btn class="" color="primary" @click="sendTestZ('-')">
-                            <v-icon small>{{ mdiMinusThick }}</v-icon>
+ <v-btn class="" color="primary" @click="sendTestZ('-')">
+                            <v-icon size="small">{{ mdiMinusThick }}</v-icon>
                         </v-btn>
                     </v-col>
                     <v-col class="text-right">
-                        <v-btn class="" color="primary" @click="sendTestZ('+')">
-                            <v-icon small>{{ mdiPlusThick }}</v-icon>
+ <v-btn class="" color="primary" @click="sendTestZ('+')">
+                            <v-icon size="small">{{ mdiPlusThick }}</v-icon>
                         </v-btn>
                     </v-col>
                     <v-col class="text-right">
-                        <v-btn class="" color="primary" @click="sendTestZ('++')">
-                            <v-icon small>{{ mdiPlusThick }}</v-icon>
-                            <v-icon small>{{ mdiPlusThick }}</v-icon>
+ <v-btn class="" color="primary" @click="sendTestZ('++')">
+                            <v-icon size="small">{{ mdiPlusThick }}</v-icon>
+                            <v-icon size="small">{{ mdiPlusThick }}</v-icon>
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -50,26 +48,26 @@
             <sub-panel :title="$t('ManualProbe.Advanced')" sub-panel-class="manual-probe-dialog-advanced" class="mb-n2">
                 <v-container>
                     <v-item-group class="_btn-group">
-                        <v-btn
+ <v-btn
                             v-for="(offset, index) in offsetsZ"
                             :key="`offsetsUp-${index}`"
-                            small
+                            size="small"
                             class="_btn-qs flex-grow-1 px-1"
                             @click="sendTestZ(offset.toString())">
-                            <v-icon v-if="index === 0" left small class="mr-1 ml-n1">
+                            <v-icon v-if="index === 0" start size="small" class="mr-1 ml-n1">
                                 {{ mdiArrowExpandUp }}
                             </v-icon>
                             <span>&plus;{{ offset }}</span>
                         </v-btn>
                     </v-item-group>
                     <v-item-group class="_btn-group mt-6 mt-sm-3">
-                        <v-btn
+ <v-btn
                             v-for="(offset, index) in offsetsZ"
                             :key="`offsetsDown-${index}`"
-                            small
+                            size="small"
                             class="_btn-qs flex-grow-1 px-1"
                             @click="sendTestZ((offset * -1).toString())">
-                            <v-icon v-if="index === 0" left small class="mr-1 ml-n1">
+                            <v-icon v-if="index === 0" start size="small" class="mr-1 ml-n1">
                                 {{ mdiArrowCollapseDown }}
                             </v-icon>
                             <span>&minus;{{ offset }}</span>
@@ -79,10 +77,10 @@
             </sub-panel>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn text :loading="loadingAbort" @click="sendAbort">
+ <v-btn variant="text" :loading="loadingAbort" @click="sendAbort">
                     {{ $t('ManualProbe.Abort') }}
                 </v-btn>
-                <v-btn color="primary" text :loading="loadingAccept" @click="sendAccept">
+ <v-btn color="primary" variant="text" :loading="loadingAccept" @click="sendAccept">
                     {{ $t('ManualProbe.Accept') }}
                 </v-btn>
             </v-card-actions>
@@ -90,94 +88,77 @@
     </v-dialog>
 </template>
 
-<script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import { useBase } from '@/composables/useBase'
+import { useSocket } from '@/composables/useSocket'
 import Panel from '@/components/ui/Panel.vue'
-import Responsive from '@/components/ui/Responsive.vue'
 
 import {
     mdiArrowCollapseDown,
     mdiArrowExpandUp,
-    mdiInformation,
     mdiPlusThick,
     mdiMinusThick,
     mdiChevronTripleLeft,
     mdiChevronTripleRight,
     mdiCloseThick,
 } from '@mdi/js'
-@Component({
-    components: { Panel, Responsive },
+
+const store = useStore()
+const { isMobile, loadings } = useBase()
+const socket = useSocket()
+
+const showDialog = computed(() => {
+    if (!boolManualProbeDialog.value) return false
+
+    return store.state.printer.manual_probe?.is_active ?? false
 })
-export default class TheManualProbeDialog extends Mixins(BaseMixin) {
-    mdiArrowCollapseDown = mdiArrowCollapseDown
-    mdiArrowExpandUp = mdiArrowExpandUp
-    mdiInformation = mdiInformation
-    mdiPlusThick = mdiPlusThick
-    mdiMinusThick = mdiMinusThick
-    mdiChevronTripleLeft = mdiChevronTripleLeft
-    mdiChevronTripleRight = mdiChevronTripleRight
-    mdiCloseThick = mdiCloseThick
 
-    get showDialog() {
-        if (!this.boolManualProbeDialog) return false
+const boolManualProbeDialog = computed(() => store.state.gui.uiSettings.boolManualProbeDialog ?? true)
 
-        return this.$store.state.printer.manual_probe?.is_active ?? false
-    }
+const offsetsZ = computed(() => {
+    const offsets = [1, 0.1, 0.05, 0.01, 0.005]
 
-    get boolManualProbeDialog() {
-        return this.$store.state.gui.uiSettings.boolManualProbeDialog ?? true
-    }
+    return offsets.sort()
+})
 
-    get offsetsZ() {
-        const offsets = [1, 0.1, 0.05, 0.01, 0.005]
+const z_position = computed(() => (store.state.printer.manual_probe?.z_position ?? 0).toFixed(3))
 
-        return offsets.sort()
-    }
+const z_position_lower = computed(() => {
+    const value = store.state.printer.manual_probe?.z_position_lower ?? null
+    if (value === null) return '??????'
 
-    get z_position() {
-        return (this.$store.state.printer.manual_probe?.z_position ?? 0).toFixed(3)
-    }
+    return value.toFixed(3)
+})
 
-    get z_position_lower() {
-        const value = this.$store.state.printer.manual_probe?.z_position_lower ?? null
-        if (value === null) return '??????'
+const z_position_upper = computed(() => {
+    const value = store.state.printer.manual_probe?.z_position_upper ?? null
+    if (value === null) return '??????'
 
-        return value.toFixed(3)
-    }
+    return value.toFixed(3)
+})
 
-    get z_position_upper() {
-        const value = this.$store.state.printer.manual_probe?.z_position_upper ?? null
-        if (value === null) return '??????'
+const loadingAbort = computed(() => loadings.value.includes('manualProbeAbort'))
 
-        return value.toFixed(3)
-    }
+const loadingAccept = computed(() => loadings.value.includes('manualProbeAccept'))
 
-    get loadingAbort() {
-        return this.loadings.includes('manualProbeAbort')
-    }
+function sendTestZ(offset: string) {
+    const gcode = `TESTZ Z=${offset}`
+    store.dispatch('server/addEvent', { message: gcode, type: 'command' })
+    socket.emit('printer.gcode.script', { script: gcode })
+}
 
-    get loadingAccept() {
-        return this.loadings.includes('manualProbeAccept')
-    }
+function sendAbort() {
+    const gcode = `ABORT`
+    store.dispatch('server/addEvent', { message: gcode, type: 'command' })
+    socket.emit('printer.gcode.script', { script: gcode }, { loading: 'manualProbeAbort' })
+}
 
-    sendTestZ(offset: string) {
-        const gcode = `TESTZ Z=${offset}`
-        this.$store.dispatch('server/addEvent', { message: gcode, type: 'command' })
-        this.$socket.emit('printer.gcode.script', { script: gcode })
-    }
-
-    sendAbort() {
-        const gcode = `ABORT`
-        this.$store.dispatch('server/addEvent', { message: gcode, type: 'command' })
-        this.$socket.emit('printer.gcode.script', { script: gcode }, { loading: 'manualProbeAbort' })
-    }
-
-    sendAccept() {
-        const gcode = `ACCEPT`
-        this.$store.dispatch('server/addEvent', { message: gcode, type: 'command' })
-        this.$socket.emit('printer.gcode.script', { script: gcode }, { loading: 'manualProbeAccept' })
-    }
+function sendAccept() {
+    const gcode = `ACCEPT`
+    store.dispatch('server/addEvent', { message: gcode, type: 'command' })
+    socket.emit('printer.gcode.script', { script: gcode }, { loading: 'manualProbeAccept' })
 }
 </script>
 

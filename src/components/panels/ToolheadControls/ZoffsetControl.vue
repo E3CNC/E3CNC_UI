@@ -7,50 +7,48 @@
         <template #default="{ el }">
             <v-container class="pa-0">
                 <v-row>
-                    <v-col class="v-subheader text--secondary pr-0">
-                        <v-icon small class="mr-2">
+                    <v-col class="text-subtitle-2 text-medium-emphasis pr-0 d-flex align-center">
+                        <v-icon size="small" class="mr-2">
                             {{ mdiLayersOutline }}
                         </v-icon>
                         <span>{{ $t('Panels.ZoffsetPanel.Headline') }}: {{ zOffset }}</span>
                     </v-col>
-                    <v-col class="v-subheader justify-end pl-0">
+                    <v-col class="text-subtitle-2 justify-end pl-0 d-flex align-center">
                         <div class="d-flex align-center">
-                            <v-btn
+ <v-btn
                                 v-if="z_gcode_offset !== 0"
                                 :loading="loadings.includes('babySteppingClear')"
-                                text
-                                small
-                                plain
+                                variant="text"
+                                size="small"
                                 class="px-2 mr-1"
                                 @click="clearZOffset()">
-                                <v-icon small>{{ mdiBroom }}</v-icon>
+                                <v-icon size="small">{{ mdiBroom }}</v-icon>
                                 <span v-if="!el.is.xsmall" class="ml-1">{{ $t('Panels.ZoffsetPanel.Clear') }}</span>
                             </v-btn>
-                            <v-btn
+ <v-btn
                                 v-if="showSaveButton"
                                 color="primary"
-                                text
-                                small
-                                plain
+                                variant="text"
+                                size="small"
                                 class="px-2"
                                 @click="saveZOffset">
-                                <v-icon small>{{ mdiContentSave }}</v-icon>
+                                <v-icon size="small">{{ mdiContentSave }}</v-icon>
                                 <span v-if="!el.is.xsmall" class="ml-1">{{ $t('Buttons.Save') }}</span>
                             </v-btn>
                         </div>
                     </v-col>
                 </v-row>
-                <v-row dense>
-                    <v-col :class="!el.is.medium ? 'order-1 col-6' : 'col-12'">
+                <v-row density="compact">
+                    <v-col :class="!el.is.medium ? 'order-1 v-col-6' : 'v-col-12'">
                         <div class="d-flex align-center">
                             <v-item-group class="_btn-group">
-                                <v-btn
+ <v-btn
                                     v-for="(offset, index) in offsetsZ"
                                     :key="`offsetsUp-${index}`"
-                                    small
+                                    size="small"
                                     class="_btn-qs flex-grow-1 px-1"
                                     @click="sendBabyStepUp(offset)">
-                                    <v-icon v-if="index === 0 && !el.is.xsmall" left small class="mr-1 ml-n1">
+                                    <v-icon v-if="index === 0 && !el.is.xsmall" start size="small" class="mr-1 ml-n1">
                                         {{ mdiArrowExpandUp }}
                                     </v-icon>
                                     <span>&plus;{{ offset }}</span>
@@ -58,32 +56,32 @@
                             </v-item-group>
                         </div>
                     </v-col>
-                    <v-col :class="!el.is.medium ? 'order-0 col-6' : 'col-12'">
+                    <v-col :class="!el.is.medium ? 'order-0 v-col-6' : 'v-col-12'">
                         <v-item-group v-if="!el.is.medium" class="_btn-group">
-                            <v-btn
+ <v-btn
                                 v-for="(offset, index) in offsetsZ.slice().reverse()"
                                 :key="`offsetsDown-${index}`"
-                                small
+                                size="small"
                                 class="_btn-qs flex-grow-1 px-1"
                                 @click="sendBabyStepDown(offset)">
                                 <span>&minus;{{ offset }}</span>
                                 <v-icon
                                     v-if="index === offsetsZ.length - 1 && !el.is.xsmall"
-                                    left
-                                    small
+                                    start
+                                    size="small"
                                     class="mr-n1 ml-1">
                                     {{ mdiArrowCollapseDown }}
                                 </v-icon>
                             </v-btn>
                         </v-item-group>
                         <v-item-group v-else class="_btn-group">
-                            <v-btn
+ <v-btn
                                 v-for="(offset, index) in offsetsZ"
                                 :key="`offsetsDown-${index}`"
-                                small
+                                size="small"
                                 class="_btn-qs flex-grow-1 px-1"
                                 @click="sendBabyStepDown(offset)">
-                                <v-icon v-if="index === 0 && !el.is.xsmall" left small class="mr-1 ml-n1">
+                                <v-icon v-if="index === 0 && !el.is.xsmall" start size="small" class="mr-1 ml-n1">
                                     {{ mdiArrowCollapseDown }}
                                 </v-icon>
                                 <span>&minus;{{ offset }}</span>
@@ -106,14 +104,14 @@
                         </v-card-text>
                         <v-card-actions v-if="printerIsPrinting">
                             <v-spacer></v-spacer>
-                            <v-btn text @click="saveOffsetDialog = false">{{ $t('Panels.ZoffsetPanel.Ok') }}</v-btn>
+ <v-btn variant="text" @click="saveOffsetDialog = false">{{ $t('Panels.ZoffsetPanel.Ok') }}</v-btn>
                         </v-card-actions>
                         <v-card-actions v-else>
                             <v-spacer></v-spacer>
-                            <v-btn color="primary" text @click="saveConfig">
+ <v-btn color="primary" variant="text" @click="saveConfig">
                                 {{ $t('Panels.ZoffsetPanel.SaveConfig') }}
                             </v-btn>
-                            <v-btn text @click="saveOffsetDialog = false">{{ $t('Panels.ZoffsetPanel.Later') }}</v-btn>
+ <v-btn variant="text" @click="saveOffsetDialog = false">{{ $t('Panels.ZoffsetPanel.Later') }}</v-btn>
                         </v-card-actions>
                     </panel>
                 </v-dialog>
@@ -122,12 +120,14 @@
     </responsive>
 </template>
 
-<script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { useStore } from 'vuex'
+import { useBase } from '@/composables/useBase'
+import { useZOffset } from '@/composables/useZOffset'
+import { useSocket } from '@/composables/useSocket'
 import Panel from '@/components/ui/Panel.vue'
 import Responsive from '@/components/ui/Responsive.vue'
-
 import {
     mdiBroom,
     mdiContentSave,
@@ -136,65 +136,54 @@ import {
     mdiArrowExpandUp,
     mdiLayersOutline,
 } from '@mdi/js'
-import ZoffsetMixin from '@/components/mixins/zoffset'
-@Component({
-    components: { Panel, Responsive },
-})
-export default class ZoffsetControl extends Mixins(BaseMixin, ZoffsetMixin) {
-    mdiBroom = mdiBroom
-    mdiContentSave = mdiContentSave
-    mdiArrowCollapseDown = mdiArrowCollapseDown
-    mdiInformation = mdiInformation
-    mdiArrowExpandUp = mdiArrowExpandUp
-    mdiLayersOutline = mdiLayersOutline
 
-    saveOffsetDialog = false
+const { loadings, printerIsPrinting } = useBase()
+const {
+    zOffset, z_gcode_offset, showSaveButton, autoSaveZOffsetOption,
+} = useZOffset()
+const store = useStore()
+const socket = useSocket()
 
-    get offsetsZ() {
-        return this.$store.state.gui.control.offsetsZ
-    }
+const saveOffsetDialog = ref(false)
 
-    get homed_axis() {
-        return this.$store.state.printer.toolhead?.homed_axes ?? ''
-    }
+const offsetsZ = computed(() => store.state.gui.control.offsetsZ)
 
-    get offsetZSaveOption() {
-        return this.$store.state.gui.control.offsetZSaveOption ?? null
-    }
+const homed_axis = computed(() => store.state.printer.toolhead?.homed_axes ?? '')
 
-    sendBabyStepDown(offset: number): void {
-        const gcode = `SET_GCODE_OFFSET Z_ADJUST=-${offset} ${this.homed_axis === 'xyz' ? 'MOVE=1' : ''}`
-        this.$store.dispatch('server/addEvent', { message: gcode, type: 'command' })
-        this.$socket.emit('printer.gcode.script', { script: gcode }, { loading: 'babyStepDown' })
-    }
+const offsetZSaveOption = computed(() => store.state.gui.control.offsetZSaveOption ?? null)
 
-    sendBabyStepUp(offset: number): void {
-        const gcode = `SET_GCODE_OFFSET Z_ADJUST=+${offset} ${this.homed_axis === 'xyz' ? 'MOVE=1' : ''}`
-        this.$store.dispatch('server/addEvent', { message: gcode, type: 'command' })
-        this.$socket.emit('printer.gcode.script', { script: gcode }, { loading: 'babyStepUp' })
-    }
+function sendBabyStepDown(offset: number): void {
+    const gcode = `SET_GCODE_OFFSET Z_ADJUST=-${offset} ${homed_axis.value === 'xyz' ? 'MOVE=1' : ''}`
+    store.dispatch('server/addEvent', { message: gcode, type: 'command' })
+    socket.emit('printer.gcode.script', { script: gcode }, { loading: 'babyStepDown' })
+}
 
-    clearZOffset(): void {
-        const gcode = 'SET_GCODE_OFFSET Z=0' + (this.homed_axis === 'xyz' ? ' MOVE=1' : '')
-        this.$store.dispatch('server/addEvent', { message: gcode, type: 'command' })
-        this.$socket.emit('printer.gcode.script', { script: gcode }, { loading: 'babySteppingClear' })
-    }
+function sendBabyStepUp(offset: number): void {
+    const gcode = `SET_GCODE_OFFSET Z_ADJUST=+${offset} ${homed_axis.value === 'xyz' ? 'MOVE=1' : ''}`
+    store.dispatch('server/addEvent', { message: gcode, type: 'command' })
+    socket.emit('printer.gcode.script', { script: gcode }, { loading: 'babyStepUp' })
+}
 
-    saveZOffset(): void {
-        let gcode = this.offsetZSaveOption
-        if (gcode === null) gcode = this.autoSaveZOffsetOption
+function clearZOffset(): void {
+    const gcode = 'SET_GCODE_OFFSET Z=0' + (homed_axis.value === 'xyz' ? ' MOVE=1' : '')
+    store.dispatch('server/addEvent', { message: gcode, type: 'command' })
+    socket.emit('printer.gcode.script', { script: gcode }, { loading: 'babySteppingClear' })
+}
 
-        this.$store.dispatch('server/addEvent', { message: gcode, type: 'command' })
-        this.$socket.emit('printer.gcode.script', { script: gcode })
-        this.saveOffsetDialog = true
-    }
+function saveZOffset(): void {
+    let gcode = offsetZSaveOption.value
+    if (gcode === null) gcode = autoSaveZOffsetOption.value
 
-    saveConfig(): void {
-        const gcode = 'SAVE_CONFIG'
-        this.$store.dispatch('server/addEvent', { message: gcode, type: 'command' })
-        this.$socket.emit('printer.gcode.script', { script: gcode }, { loading: 'topbarSaveConfig' })
-        this.saveOffsetDialog = false
-    }
+    store.dispatch('server/addEvent', { message: gcode, type: 'command' })
+    socket.emit('printer.gcode.script', { script: gcode })
+    saveOffsetDialog.value = true
+}
+
+function saveConfig(): void {
+    const gcode = 'SAVE_CONFIG'
+    store.dispatch('server/addEvent', { message: gcode, type: 'command' })
+    socket.emit('printer.gcode.script', { script: gcode }, { loading: 'topbarSaveConfig' })
+    saveOffsetDialog.value = false
 }
 </script>
 

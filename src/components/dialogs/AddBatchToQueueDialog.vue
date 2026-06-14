@@ -6,9 +6,7 @@
             :icon="mdiPlaylistPlus"
             :margin-bottom="false">
             <template #buttons>
-                <v-btn icon tile @click="closeDialog">
-                    <v-icon>{{ mdiCloseThick }}</v-icon>
-                </v-btn>
+ <v-btn :icon="mdiCloseThick" rounded="0" @click="closeDialog"/>
             </template>
 
             <v-form v-model="isValid" @submit.prevent="addBatchToQueueAction">
@@ -23,20 +21,16 @@
                         :rules="rules.count">
                         <template #append-outer>
                             <div class="_spin_button_group">
-                                <v-btn class="mt-n3" icon plain small @click="input++">
-                                    <v-icon>{{ mdiChevronUp }}</v-icon>
-                                </v-btn>
-                                <v-btn :disabled="input <= 1" class="mb-n3" icon plain small @click="input--">
-                                    <v-icon>{{ mdiChevronDown }}</v-icon>
-                                </v-btn>
+ <v-btn class="mt-n3" :icon="mdiChevronUp" variant="plain" size="small" @click="input++"/>
+ <v-btn :disabled="input <= 1" class="mb-n3" :icon="mdiChevronDown" variant="plain" size="small" @click="input--"/>
                             </div>
                         </template>
                     </v-text-field>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer />
-                    <v-btn text @click="closeDialog">{{ $t('Buttons.Cancel') }}</v-btn>
-                    <v-btn color="primary" text type="submit" :disabled="!isValid">
+ <v-btn variant="text" @click="closeDialog">{{ $t('Buttons.Cancel') }}</v-btn>
+ <v-btn color="primary" variant="text" type="submit" :disabled="!isValid">
                         {{ $t('Files.AddToQueue') }}
                     </v-btn>
                 </v-card-actions>
@@ -45,65 +39,69 @@
     </v-dialog>
 </template>
 
-<script lang="ts">
-import Component from 'vue-class-component'
-import { Mixins, Prop, Ref, VModel, Watch } from 'vue-property-decorator'
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import { useStore } from 'vuex'
+import { useI18n } from 'vue-i18n'
+import { getCurrentInstance } from 'vue'
 import type { FocusableRef } from '@/types/vuetify'
-import BaseMixin from '@/components/mixins/base'
 import { mdiChevronDown, mdiChevronUp, mdiPlaylistPlus, mdiCloseThick } from '@mdi/js'
 
-@Component
-export default class AddBatchToQueueDialog extends Mixins(BaseMixin) {
-    mdiChevronDown = mdiChevronDown
-    mdiChevronUp = mdiChevronUp
-    mdiPlaylistPlus = mdiPlaylistPlus
-    mdiCloseThick = mdiCloseThick
+const store = useStore()
+const { t } = useI18n()
+const { proxy } = getCurrentInstance()!
 
-    @VModel({ type: Boolean }) showDialog!: boolean
-    @Prop({ type: Boolean, default: false }) readonly showToast!: boolean
-    @Prop({ type: String, required: true }) readonly filename!: string
-    @Ref() readonly inputField!: FocusableRef
+const props = defineProps({
+    modelValue: { type: Boolean, default: false },
+    showToast: { type: Boolean, default: false },
+    filename: { type: String, required: true },
+})
+const emit = defineEmits(['update:modelValue'])
 
-    isValid = false
-    // because of the text field, the input is always a string
-    input: string = '1'
+const showDialog = computed({
+    get: () => props.modelValue,
+    set: (val) => emit('update:modelValue', val),
+})
 
-    rules = {
-        count: [
-            (value: string) => !!value || this.$t('JobQueue.InvalidCountEmpty'),
-            (value: string) => parseInt(value, 10) > 0 || this.$t('JobQueue.InvalidCountGreaterZero'),
-        ],
-    }
+const inputField = ref<FocusableRef | null>(null)
 
-    async addBatchToQueueAction() {
-        const array = Array(parseInt(this.input)).fill(this.filename)
+const isValid = ref(false)
+const input = ref('1')
 
-        await this.$store.dispatch('server/jobQueue/addToQueue', array)
-
-        if (this.showToast)
-            this.$toast.info(this.$t('History.AddToQueueSuccessful', { filename: this.filename }).toString())
-
-        this.closeDialog()
-    }
-
-    closeDialog() {
-        this.showDialog = false
-    }
-
-    resetFormState() {
-        this.input = '1'
-    }
-
-    @Watch('showDialog')
-    onShowDialogChanged(newVal: boolean) {
-        if (!newVal) return
-
-        this.resetFormState()
-        setTimeout(() => {
-            this.inputField?.focus()
-        })
-    }
+const rules = {
+    count: [
+        (value: string) => !!value || t('JobQueue.InvalidCountEmpty'),
+        (value: string) => parseInt(value, 10) > 0 || t('JobQueue.InvalidCountGreaterZero'),
+    ],
 }
+
+async function addBatchToQueueAction() {
+    const array = Array(parseInt(input.value)).fill(props.filename)
+
+    await store.dispatch('server/jobQueue/addToQueue', array)
+
+    if (props.showToast)
+        proxy!.$toast.info(t('History.AddToQueueSuccessful', { filename: props.filename }).toString())
+
+    closeDialog()
+}
+
+function closeDialog() {
+    showDialog.value = false
+}
+
+function resetFormState() {
+    input.value = '1'
+}
+
+watch(showDialog, (newVal: boolean) => {
+    if (!newVal) return
+
+    resetFormState()
+    setTimeout(() => {
+        inputField.value?.focus()
+    })
+})
 </script>
 
 <style scoped>

@@ -1,6 +1,20 @@
 # Vue 2 → Vue 3 + Composition API — Migration Plan
 
-> **Status:** Proposed.
+> **Status:** Archived / complete.
+>
+> This is the original migration plan kept as a historical record.
+> The codebase is now on Vue 3.5 + Vuetify 3 + Vuex 4 + vue-router 4 + vue-i18n 11 + TypeScript 5.7 + Vite 7.
+> See `specs/vuetify3-migration-completion.md` for the completion snapshot.
+>
+> Recent follow-up work on this branch after the main migration landed:
+> - Dashboard panel resolution now uses an explicit component registry in `src/pages/Dashboard.vue`.
+> - `JogPanel` now uses the shared GUI readiness gate and the imported MDI icon path.
+> - `MoveToControl` now passes the correct `position` prop into `MoveToInput`, clearing the console warning.
+> - The remaining Vuetify shade-string cleanup was tightened in panels, settings, and shared helpers (`grey lighten-*`, `grey darken-*`, `blue accent-*`).
+> - The latest Vuetify 2-era template audit found one duplicate-attribute regression in `ZoffsetControl.vue`, which was fixed and revalidated.
+> - A follow-up sweep rechecked legacy Vuetify props and left the active codebase build-clean.
+> - The local Vue 3 dashboard was compared against the remote `http://192.168.0.239/` reference page for layout parity.
+> - `bun run build` still passes after the latest parity and styling cleanup.
 
 ## Problem
 
@@ -34,7 +48,9 @@ Staying on Vue 2 blocks:
 | `Vue.directive` registrations | 2 |
 | Global component registrations | 2 |
 
-## Current Dependency Versions
+## Historical Dependency Baseline
+
+This table reflects the pre-migration stack and intended targets from the original plan.
 
 | Package | Current | Target |
 |---------|---------|--------|
@@ -217,6 +233,23 @@ onMounted(() => { ... })
 
 Vuetify 2 → 3 is the single highest-effort upgrade due to pervasive API
 changes. Every template must be reviewed.
+
+Completed in this workspace:
+
+- Replaced remaining Vue 2 utility classes in `src/` (`primary--text`,
+  `error--text`, `text--disabled`, `text--secondary`, `text--primary`,
+  `red--text`, etc.) with Vuetify 3 text color classes.
+- Replaced the explicit layout leftovers found by search:
+  `v-row dense`, `v-list dense`, `v-col col-12`, and `v-subheader` wrappers.
+- Converted a large batch of Vuetify 2 `v-btn text` usages to
+  `variant="text"` in dialogs, settings, topbar, editor, and file-management
+  flows.
+- Verified the codebase build passes after those replacements.
+
+Still pending:
+
+- Remaining Vuetify 2 button API cleanup, mostly `v-btn text` and a few
+  related button variations in panels and utility components.
 
 **Major template changes:**
 

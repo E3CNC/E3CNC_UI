@@ -1,23 +1,20 @@
 <template>
     <div>
-        <v-tooltip right :open-delay="500" :disabled="navigationStyle !== 'iconsOnly'">
-            <template #activator="{ on, attrs }">
+        <v-tooltip location="right" :open-delay="500" :disabled="navigationStyle !== 'iconsOnly'">
+            <template #activator="{ props: activatorProps }">
                 <v-list-item
                     :router="to !== undefined"
                     :to="to"
                     :href="href"
                     :target="target"
                     :class="itemClass"
-                    v-bind="attrs"
-                    v-on="on">
-                    <v-list-item-icon class="my-3 mr-3 menu-item-icon">
-                        <v-icon>{{ icon }}</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                        <v-list-item-title tile class="menu-item-title">
-                            {{ title }}
-                        </v-list-item-title>
-                    </v-list-item-content>
+                    v-bind="activatorProps">
+                    <template #prepend>
+                        <v-icon class="menu-item-icon">{{ icon }}</v-icon>
+                    </template>
+                    <template #title>
+                        <span class="menu-item-title">{{ title }}</span>
+                    </template>
                 </v-list-item>
             </template>
             <span>{{ title }}</span>
@@ -26,57 +23,35 @@
     </div>
 </template>
 
-<script lang="ts">
-import Component from 'vue-class-component'
-import { Mixins, Prop } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
-import { NaviPoint } from '@/components/mixins/navigation'
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
+import type { NaviPoint } from '@/composables/useNavigation'
 
-@Component
-export default class SidebarItem extends Mixins(BaseMixin) {
-    @Prop({ type: Object, required: true }) item!: NaviPoint
+const props = defineProps({
+    item: { type: Object, required: true },
+})
 
-    get navigationStyle() {
-        return this.$store.state.gui.uiSettings.navigationStyle
-    }
+const store = useStore()
+const route = useRoute()
 
-    get icon() {
-        return this.item.icon
-    }
-
-    get title() {
-        return this.item.title
-    }
-
-    get to() {
-        return this.item.to ?? undefined
-    }
-
-    get href() {
-        return this.item.href ?? undefined
-    }
-
-    get target() {
-        return this.item.target ?? undefined
-    }
-
-    get borderBottom() {
-        return this.item.to === '/allPrinters'
-    }
-
-    get isActive(): boolean {
-        if (this.item.target === '_blank' || !this.item.to) return false
-
-        return this.$route.path === this.item.to
-    }
-
-    get itemClass() {
-        return {
-            'small-list-item': true,
-            'active-nav-item': this.isActive,
-        }
-    }
-}
+const navigationStyle = computed(() => store.state.gui.uiSettings.navigationStyle)
+const icon = computed(() => (props.item as NaviPoint).icon)
+const title = computed(() => (props.item as NaviPoint).title)
+const to = computed(() => (props.item as NaviPoint).to ?? undefined)
+const href = computed(() => (props.item as NaviPoint).href ?? undefined)
+const target = computed(() => (props.item as NaviPoint).target ?? undefined)
+const borderBottom = computed(() => (props.item as NaviPoint).to === '/allPrinters')
+const isActive = computed(() => {
+    const item = props.item as NaviPoint
+    if (item.target === '_blank' || !item.to) return false
+    return route.path === item.to
+})
+const itemClass = computed(() => ({
+    'small-list-item': true,
+    'active-nav-item': isActive.value,
+}))
 </script>
 
 <style scoped>
@@ -85,18 +60,19 @@ export default class SidebarItem extends Mixins(BaseMixin) {
 }
 
 .active-nav-item {
-    border-right: 4px solid var(--v-primary-base);
+    background-color: rgba(255, 255, 255, 0.12);
 }
 
 .menu-item-icon {
-    opacity: 0.85;
+    opacity: 0.92;
 }
 
 .menu-item-title {
-    line-height: 30px;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1;
     text-transform: uppercase;
-    opacity: 0.85;
+    opacity: 0.88;
 }
 </style>

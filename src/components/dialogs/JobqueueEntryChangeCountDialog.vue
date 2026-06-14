@@ -6,9 +6,7 @@
             card-class="jobqueue-change-count-dialog"
             :margin-bottom="false">
             <template #buttons>
-                <v-btn icon tile @click="closeDialog">
-                    <v-icon>{{ mdiCloseThick }}</v-icon>
-                </v-btn>
+ <v-btn :icon="mdiCloseThick" rounded="0" @click="closeDialog"/>
             </template>
 
             <v-card-text>
@@ -23,73 +21,71 @@
                     @keyup.enter="update">
                     <template #append-outer>
                         <div class="_spin_button_group">
-                            <v-btn class="mt-n3" icon plain small @click="count++">
-                                <v-icon>{{ mdiChevronUp }}</v-icon>
-                            </v-btn>
-                            <v-btn :disabled="count <= 1" class="mb-n3" icon plain small @click="count--">
-                                <v-icon>{{ mdiChevronDown }}</v-icon>
-                            </v-btn>
+ <v-btn class="mt-n3" :icon="mdiChevronUp" variant="plain" size="small" @click="count++"/>
+ <v-btn :disabled="count <= 1" class="mb-n3" :icon="mdiChevronDown" variant="plain" size="small" @click="count--"/>
                         </div>
                     </template>
                 </v-text-field>
             </v-card-text>
             <v-card-actions>
                 <v-spacer />
-                <v-btn text @click="closeDialog">{{ $t('Buttons.Cancel') }}</v-btn>
-                <v-btn color="primary" text @click="update">{{ $t('JobQueue.ChangeCount') }}</v-btn>
+ <v-btn variant="text" @click="closeDialog">{{ $t('Buttons.Cancel') }}</v-btn>
+ <v-btn color="primary" variant="text" @click="update">{{ $t('JobQueue.ChangeCount') }}</v-btn>
             </v-card-actions>
         </panel>
     </v-dialog>
 </template>
-<script lang="ts">
-import { Component, Mixins, Prop, Ref, VModel, Watch } from 'vue-property-decorator'
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import { useStore } from 'vuex'
+import { useI18n } from 'vue-i18n'
 import type { FocusableRef } from '@/types/vuetify'
-import BaseMixin from '@/components/mixins/base'
 import Panel from '@/components/ui/Panel.vue'
 import { mdiCloseThick, mdiChevronUp, mdiChevronDown, mdiCounter } from '@mdi/js'
-import { ServerJobQueueStateJob } from '@/store/server/jobQueue/types'
+import type { ServerJobQueueStateJob } from '@/store/server/jobQueue/types'
 
-@Component({
-    components: { Panel },
+const store = useStore()
+const { t } = useI18n()
+
+const props = defineProps({
+    modelValue: { type: Boolean },
+    job: { type: Object as () => ServerJobQueueStateJob, required: true },
 })
-export default class JobqueueEntryChangeCountDialog extends Mixins(BaseMixin) {
-    mdiCloseThick = mdiCloseThick
-    mdiChevronUp = mdiChevronUp
-    mdiChevronDown = mdiChevronDown
-    mdiCounter = mdiCounter
+const emit = defineEmits(['update:modelValue'])
 
-    @VModel({ type: Boolean }) showDialog!: boolean
-    @Prop({ type: Object, required: true }) job!: ServerJobQueueStateJob
-    @Ref() readonly inputField!: FocusableRef
+const showDialog = computed({
+    get: () => props.modelValue,
+    set: (val) => emit('update:modelValue', val),
+})
 
-    count = 1
+const inputField = ref<FocusableRef | null>(null)
 
-    countInputRules = [
-        (value: string) => !!value || this.$t('JobQueue.InvalidCountEmpty'),
-        (value: string) => parseInt(value) > 0 || this.$t('JobQueue.InvalidCountGreaterZero'),
-    ]
+const count = ref(1)
 
-    update() {
-        this.$store.dispatch('server/jobQueue/changeCount', {
-            job_id: this.job.job_id,
-            count: this.count,
-        })
+const countInputRules = [
+    (value: string) => !!value || t('JobQueue.InvalidCountEmpty'),
+    (value: string) => parseInt(value) > 0 || t('JobQueue.InvalidCountGreaterZero'),
+]
 
-        this.closeDialog()
-    }
+function update() {
+    store.dispatch('server/jobQueue/changeCount', {
+        job_id: props.job.job_id,
+        count: count.value,
+    })
 
-    closeDialog() {
-        this.showDialog = false
-    }
-
-    @Watch('showDialog')
-    onShowDialogChanged(newVal: boolean) {
-        if (!newVal) return
-
-        this.count = (this.job.combinedIds?.length ?? 0) + 1
-        setTimeout(() => {
-            this.inputField.focus()
-        })
-    }
+    closeDialog()
 }
+
+function closeDialog() {
+    showDialog.value = false
+}
+
+watch(showDialog, (newVal: boolean) => {
+    if (!newVal) return
+
+    count.value = (props.job.combinedIds?.length ?? 0) + 1
+    setTimeout(() => {
+        inputField.value?.focus()
+    })
+})
 </script>

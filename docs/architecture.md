@@ -30,8 +30,8 @@ The system is split into four layers:
 - A Mainsail fork (`upstream-mainsail/`) with CNC-native panels.
 - Renders CNC-native panels and consumes Moonraker + agent APIs.
 - Surfaces CNC workflows without overloading generic macro lists.
-- Read-only state comes from the existing `printer` Vuex store. CNC-
-  specific state and commands are fetched from the agent.
+- Read-only state comes from the existing `printer` Vuex store. CNC-specific state and commands are fetched from the agent.
+- Recent UX polish keeps dashboard scroll position, grid/snap state, and settings-menu state stable across reloads.
 
 4. `Machine Profile`
 - Describes optional capabilities such as spindle mode, coolant channels,
@@ -65,8 +65,9 @@ plugin's G10 handler.
 | `CncStatusPanel` | `printer.print_stats`, `printer.gcode_move`, `printer.toolhead`, `printer.system_stats` | wired, renders |
 | `JogPanel` | `gui.control`, `printer.print_stats`, `printer.toolhead.homed_axes` + `doSend` | wired, renders |
 | `OffsetsPanel` | `printer.gcode_move.gcode_position` + `G10 L20` work-zero actions (WCS plugin) | wired, renders |
+| `OffsetPreview` | interactive WCS preview with crosshairs/labels, click-to-move, hover tooltips, and grid-size selector | wired, renders |
 | `SpindleCoolantPanel` | `doSend` (raw `M3`/`M4`/`M5`/`M7`/`M8`/`M9`) | wired, renders |
-| `MdiPanel` | — | stub, placeholder only |
+| `MdiPanel` | `ConsoleTextarea` + quick commands for G20/G21/G90/G91 and WCS shortcuts | wired, renders |
 | `DroPanel` | `printer.motion_report.live_position`, `printer.gcode_move.gcode_position`, `printer.toolhead.axis_minimum`/`axis_maximum`, `printer.toolhead.homed_axes`, `printer.motion_report.live_velocity` | wired, renders |
 
 All wired panels read Klipper state directly from the existing Mainsail

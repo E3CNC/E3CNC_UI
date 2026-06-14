@@ -1,9 +1,9 @@
 <template>
-    <overlay-scrollbars style="max-height: 400px; overflow-x: hidden">
+    <OverlayScrollbarsComponent style="max-height: 400px; overflow-x: hidden">
         <v-card-text>
             <v-row>
                 <v-col class="text-center">
-                    <v-btn :loading="loading" color="primary" @click="refresh">{{ $t('DevicesDialog.Refresh') }}</v-btn>
+ <v-btn :loading="loading" color="primary" @click="refresh">{{ $t('DevicesDialog.Refresh') }}</v-btn>
                 </v-col>
             </v-row>
             <v-row v-if="devices.length" class="mt-0">
@@ -12,27 +12,26 @@
                 </v-col>
             </v-row>
             <v-row v-else-if="loaded" class="mt-0">
-                <v-col class="col-8 mx-auto">
-                    <p class="text-center text--disabled mb-0">{{ $t('DevicesDialog.NoDeviceFound') }}</p>
+                <v-col class="v-col-8 mx-auto">
+                    <p class="text-center text-disabled mb-0">{{ $t('DevicesDialog.NoDeviceFound') }}</p>
                 </v-col>
             </v-row>
             <v-row v-else class="mt-0">
-                <v-col class="col-8 mx-auto">
-                    <p class="text-center text--disabled mb-0">{{ $t('DevicesDialog.ClickRefresh') }}</p>
+                <v-col class="v-col-8 mx-auto">
+                    <p class="text-center text-disabled mb-0">{{ $t('DevicesDialog.ClickRefresh') }}</p>
                 </v-col>
             </v-row>
             <v-row v-if="devices.length === 0">
                 <v-col>
-                    <v-alert dense outlined type="info" :icon="mdiInformationVariantCircle">
+                    <v-alert density="compact" variant="outlined" color="info" :icon="mdiInformationVariantCircle">
                         {{ $t('DevicesDialog.CanBusInfo') }}
                         <v-row class="my-0">
                             <v-col class="text-center">
-                                <v-btn
+ <v-btn
                                     href="https://docs.mainsail.xyz/overview/features/query-devices#can-devices"
                                     color="info"
-                                    outlined
-                                    text
-                                    small>
+                                    variant="outlined"
+                                    size="small">
                                     open guide
                                 </v-btn>
                             </v-col>
@@ -41,40 +40,38 @@
                 </v-col>
             </v-row>
         </v-card-text>
-    </overlay-scrollbars>
+    </OverlayScrollbarsComponent>
 </template>
 
-<script lang="ts">
-import { Component, Mixins, Prop } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useBase } from '@/composables/useBase'
 import DevicesDialogCanDevice from '@/components/dialogs/DevicesDialogCanDevice.vue'
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 import { mdiInformationVariantCircle } from '@mdi/js'
 import type { RPCResult } from '@/types/moonraker'
 import type { CanDevice } from '@/types/moonraker/MachineRPC'
 
-@Component({
-    components: { DevicesDialogCanDevice },
+const { apiUrl } = useBase()
+
+const props = defineProps({
+    name: { type: String, required: true },
+    hideSystemEntries: { type: Boolean, default: false },
 })
-export default class DevicesDialogCan extends Mixins(BaseMixin) {
-    mdiInformationVariantCircle = mdiInformationVariantCircle
 
-    devices: CanDevice[] = []
-    loading = false
-    loaded = false
+const devices = ref<CanDevice[]>([])
+const loading = ref(false)
+const loaded = ref(false)
 
-    @Prop({ type: String, required: true }) name!: string
-    @Prop({ type: Boolean, default: false }) hideSystemEntries!: boolean
+async function refresh() {
+    loading.value = true
 
-    async refresh() {
-        this.loading = true
+    devices.value = await fetch(`${apiUrl.value}/machine/peripherals/canbus?interface=${props.name}`)
+        .then((res) => res.json())
+        .then((res: { result?: RPCResult<'machine.peripherals.canbus'> }) => res.result?.can_uuids ?? [])
 
-        this.devices = await fetch(`${this.apiUrl}/machine/peripherals/canbus?interface=${this.name}`)
-            .then((res) => res.json())
-            .then((res: { result?: RPCResult<'machine.peripherals.canbus'> }) => res.result?.can_uuids ?? [])
-
-        this.loading = false
-        this.loaded = true
-    }
+    loading.value = false
+    loaded.value = true
 }
 </script>
 

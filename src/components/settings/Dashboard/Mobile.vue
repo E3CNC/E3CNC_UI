@@ -8,28 +8,21 @@
             </v-row>
             <v-row>
                 <v-col class="text-center">
-                    <v-btn color="error" @click="resetLayout">{{ $t('Settings.DashboardTab.ResetLayout') }}</v-btn>
+ <v-btn color="error" @click="resetLayout">{{ $t('Settings.DashboardTab.ResetLayout') }}</v-btn>
                 </v-col>
             </v-row>
         </v-card-text>
     </v-card>
 </template>
 
-<script lang="ts">
-import Component from 'vue-class-component'
-import { Mixins } from 'vue-property-decorator'
-import DashboardMixin from '@/components/mixins/dashboard'
+<script setup lang="ts">
+import { useStore } from 'vuex'
 import SettingsDashboardSortable from '@/components/settings/Dashboard/Sortable.vue'
 
-@Component({
-    components: {
-        SettingsDashboardSortable,
-    },
-})
-export default class SettingsDashboardTabMobile extends Mixins(DashboardMixin) {
-    resetLayout() {
-        this.$store.dispatch('gui/resetLayout', 'mobileLayout')
-    }
+const store = useStore()
+
+function resetLayout() {
+    store.dispatch('gui/resetLayout', 'mobileLayout')
 }
 </script>
 

@@ -1,11 +1,13 @@
 <template>
-    <v-card outlined class="mt-3 w-100">
-        <v-list-item three-line>
-            <v-list-item-content>
-                <div class="text-overline mb-2 d-flex flex-row">V4L2</div>
-                <v-list-item-title class="text-h5 mb-0">{{ device.camera_name }}</v-list-item-title>
-                <v-list-item-subtitle v-if="show_alt_name">{{ device.alt_name }}</v-list-item-subtitle>
-            </v-list-item-content>
+    <v-card variant="outlined" class="mt-3 w-100">
+        <v-list-item lines="three">
+            <div class="text-overline mb-2 d-flex flex-row">V4L2</div>
+            <template #title>
+                <span class="text-h5 mb-0">{{ device.camera_name }}</span>
+            </template>
+            <template #subtitle v-if="show_alt_name">
+                <span>{{ device.alt_name }}</span>
+            </template>
         </v-list-item>
         <v-card-text>
             <v-row>
@@ -49,36 +51,32 @@
     </v-card>
 </template>
 
-<script lang="ts">
-import { Component, Mixins, Prop } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
+<script setup lang="ts">
+import { computed } from 'vue'
 import { sortResolutions } from '@/plugins/helpers'
 import TextfieldWithCopy from '@/components/inputs/TextfieldWithCopy.vue'
 import type { V4l2Device } from '@/types/moonraker/MachineRPC'
 
-@Component({
-    components: { TextfieldWithCopy },
+const props = defineProps({
+    device: { type: Object as () => V4l2Device, required: true },
 })
-export default class DevicesDialogVideoDeviceV4l2 extends Mixins(BaseMixin) {
-    @Prop({ type: Object, required: true }) device!: V4l2Device
 
-    get identicalResolutions() {
-        const resolutions = this.device.modes.map((mode) => mode.resolutions.sort(sortResolutions).join(','))
-        return resolutions.every((resolution) => resolution === resolutions[0])
-    }
+const identicalResolutions = computed(() => {
+    const resolutions = props.device.modes.map((mode) => mode.resolutions.sort(sortResolutions).join(','))
+    return resolutions.every((resolution) => resolution === resolutions[0])
+})
 
-    get resolutions() {
-        return this.device.modes[0]?.resolutions?.join(', ') ?? ''
-    }
+const resolutions = computed(() => {
+    return props.device.modes[0]?.resolutions?.join(', ') ?? ''
+})
 
-    get formats() {
-        return this.device.modes.map((mode) => `${mode.description} (${mode.format})`).join(', ')
-    }
+const formats = computed(() => {
+    return props.device.modes.map((mode) => `${mode.description} (${mode.format})`).join(', ')
+})
 
-    get show_alt_name() {
-        if (this.device.alt_name === null) return false
+const show_alt_name = computed(() => {
+    if (props.device.alt_name === null) return false
 
-        return this.device.alt_name !== this.device.camera_name
-    }
-}
+    return props.device.alt_name !== props.device.camera_name
+})
 </script>

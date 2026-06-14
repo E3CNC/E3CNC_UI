@@ -1,31 +1,31 @@
 <template>
     <panel :icon="mdiTrayFull" :title="$t('JobQueue.JobQueue')" card-class="jobqueue-panel">
         <template #buttons>
-            <v-btn
+ <v-btn
                 v-if="queueState === 'paused'"
                 color="success"
                 :loading="loadings.includes('startJobqueue')"
                 icon
-                tile
+                rounded="0"
                 :disabled="!klipperReadyForGui"
                 @click="startJobqueue">
                 <v-tooltip top>
-                    <template #activator="{ on, attrs }">
-                        <v-icon v-bind="attrs" v-on="on">{{ mdiPlay }}</v-icon>
+                    <template #activator="{ props }">
+                        <v-icon v-bind="props">{{ mdiPlay }}</v-icon>
                     </template>
                     <span>{{ $t('JobQueue.Start') }}</span>
                 </v-tooltip>
             </v-btn>
-            <v-btn
+ <v-btn
                 v-if="['ready', 'loading'].includes(queueState)"
                 color="warning"
                 :loading="loadings.includes('pauseJobqueue')"
                 icon
-                tile
+                rounded="0"
                 @click="pauseJobqueue">
                 <v-tooltip top>
-                    <template #activator="{ on, attrs }">
-                        <v-icon v-bind="attrs" v-on="on">{{ mdiPause }}</v-icon>
+                    <template #activator="{ props }">
+                        <v-icon v-bind="props">{{ mdiPause }}</v-icon>
                     </template>
                     <span>{{ $t('JobQueue.Pause') }}</span>
                 </v-tooltip>
@@ -52,47 +52,40 @@
     </panel>
 </template>
 
-<script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { useStore } from 'vuex'
+import { useBase } from '@/composables/useBase'
 import Panel from '@/components/ui/Panel.vue'
 import { mdiPlay, mdiPause, mdiTrayFull } from '@mdi/js'
 import JobqueueEntry from '@/components/panels/Status/JobqueueEntry.vue'
 import draggable from 'vuedraggable'
 import JobqueueEntrySum from '@/components/panels/Status/JobqueueEntrySum.vue'
-import { DraggableEndEvent } from '@/types/vuedraggable'
-@Component({
-    components: { JobqueueEntrySum, draggable, JobqueueEntry, Panel },
-})
-export default class JobqueuePanel extends Mixins(BaseMixin) {
-    mdiPlay = mdiPlay
-    mdiPause = mdiPause
-    mdiTrayFull = mdiTrayFull
+import type { DraggableEndEvent } from '@/types/vuedraggable'
 
-    joblist = []
+const { klipperReadyForGui, loadings } = useBase()
 
-    get jobs() {
-        return this.$store.getters['server/jobQueue/getJobs']
-    }
+const store = useStore()
 
-    get queueState() {
-        return this.$store.state.server.jobQueue.queue_state ?? ''
-    }
+const jobs = computed(() => store.getters['server/jobQueue/getJobs'])
 
-    startJobqueue() {
-        this.$store.dispatch('server/jobQueue/start')
-    }
+const queueState = computed(() => store.state.server.jobQueue.queue_state ?? '')
 
-    pauseJobqueue() {
-        this.$store.dispatch('server/jobQueue/pause')
-    }
+const joblist = ref([])
 
-    updateOrder(event: DraggableEndEvent) {
-        this.$store.dispatch('server/jobQueue/changePosition', {
-            newIndex: event.newIndex,
-            oldIndex: event.oldIndex,
-        })
-    }
+function startJobqueue() {
+    store.dispatch('server/jobQueue/start')
+}
+
+function pauseJobqueue() {
+    store.dispatch('server/jobQueue/pause')
+}
+
+function updateOrder(event: DraggableEndEvent) {
+    store.dispatch('server/jobQueue/changePosition', {
+        newIndex: event.newIndex,
+        oldIndex: event.oldIndex,
+    })
 }
 </script>
 

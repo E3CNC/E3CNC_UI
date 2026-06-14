@@ -6,8 +6,8 @@ description: Learn how to install Mainsail-CNC — a CNC-focused fork of Mainsai
 # Installing Mainsail-CNC
 
 Mainsail-CNC is a maintained fork of [Mainsail](https://github.com/mainsail-crew/mainsail) extended with CNC-native
-dashboard panels, CNC-specific navigation terminology, file-card CAM metadata enrichment, and a Moonraker-side CNC
-agent for spindle, coolant, WCS, and jog management.
+dashboard panels, CNC-specific navigation terminology, file-card CAM metadata enrichment, an interactive offset preview
+for WCS tuning, and a Moonraker-side CNC agent for spindle, coolant, WCS, jog, and assistant-integration workflows.
 
 This guide covers two installation paths:
 
@@ -93,6 +93,16 @@ This script:
 - Appends `[cnc_agent]` and `[cnc_metadata]` sections to your `moonraker.conf`.
 - Registers the fork in Moonraker's update manager.
 - Restarts Moonraker and verifies the agent loaded cleanly.
+
+Optional: the same `moonraker-cnc-agent/` package also ships a Moonraker MCP server.
+If you want assistant tooling against the printer host, you can run:
+
+```bash
+cd ~/mainsail-cnc/moonraker-cnc-agent
+PYTHONPATH=src python -m moonraker_cnc_agent.mcp_server
+```
+
+or install the console script with `pip install -e .` and use `moonraker-cnc-mcp`.
 
 ### 6. Reload Moonraker
 
@@ -522,6 +532,8 @@ safety:
 ```
 
 An example is available at `config/examples/machine-profile.example.yaml` in the repository.
+By default the agent looks for `~/printer_data/config/machine_profile.yaml`; set
+`machine_profile_path` in `[cnc_agent]` to override it.
 
 ### G-Code Metadata Extractor
 

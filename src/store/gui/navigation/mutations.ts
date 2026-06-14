@@ -1,8 +1,7 @@
 import { getDefaultState } from './index'
 import { MutationTree } from 'vuex'
 import { GuiNavigationState, GuiNavigationStateEntry } from './types'
-import Vue from 'vue'
-import { NaviPoint } from '@/components/mixins/navigation'
+import type { NaviPoint } from '@/composables/useNavigation'
 
 export const mutations: MutationTree<GuiNavigationState> = {
     reset(state) {
@@ -32,7 +31,7 @@ export const mutations: MutationTree<GuiNavigationState> = {
         // add new entry
         entries.push(newEntry)
         // set new array
-        Vue.set(state, 'entries', entries)
+        state.entries = entries
     },
 
     changeVisibility(state, payload: NaviPoint) {
@@ -60,6 +59,6 @@ export const mutations: MutationTree<GuiNavigationState> = {
         // add new entry
         entries.push(newEntry)
         // set new array
-        Vue.set(state, 'entries', entries)
+        state.entries = entries
     },
 }

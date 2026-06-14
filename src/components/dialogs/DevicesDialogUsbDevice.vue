@@ -1,15 +1,17 @@
 <template>
-    <v-card outlined class="mt-3">
-        <v-list-item three-line>
-            <v-list-item-content>
-                <div class="text-overline mb-2 d-flex flex-row">
-                    <span>{{ device.manufacturer ?? 'Unknown' }}</span>
-                    <v-spacer />
-                    <span>{{ device.vendor_id }}:{{ device.product_id }}</span>
-                </div>
-                <v-list-item-title class="text-h5 mb-1">{{ device.product ?? 'Unknown' }}</v-list-item-title>
-                <v-list-item-subtitle v-if="device.description">{{ device.description }}</v-list-item-subtitle>
-            </v-list-item-content>
+    <v-card variant="outlined" class="mt-3">
+        <v-list-item lines="three">
+            <div class="text-overline mb-2 d-flex flex-row">
+                <span>{{ device.manufacturer ?? 'Unknown' }}</span>
+                <v-spacer />
+                <span>{{ device.vendor_id }}:{{ device.product_id }}</span>
+            </div>
+            <template #title>
+                <span class="text-h5 mb-1">{{ device.product ?? 'Unknown' }}</span>
+            </template>
+            <template #subtitle v-if="device.description">
+                <span>{{ device.description }}</span>
+            </template>
         </v-list-item>
         <v-card-text class="pt-0">
             <v-row v-for="item in details" :key="item.key" class="mt-0">
@@ -20,31 +22,29 @@
     </v-card>
 </template>
 
-<script lang="ts">
-import { Component, Mixins, Prop } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
+<script setup lang="ts">
+import { computed } from 'vue'
 import type { UsbDevice } from '@/types/moonraker/MachineRPC'
 
-@Component
-export default class DevicesDialogUsbDevice extends Mixins(BaseMixin) {
-    @Prop({ type: Object, required: true }) device!: UsbDevice
+const props = defineProps({
+    device: { type: Object as () => UsbDevice, required: true },
+})
 
-    get details() {
-        const keys = ['protocol', 'class', 'serial', 'usb_location'] as const
-        const output: { key: string; value: string }[] = []
+const details = computed(() => {
+    const keys = ['protocol', 'class', 'serial', 'usb_location'] as const
+    const output: { key: string; value: string }[] = []
 
-        keys.forEach((key) => {
-            let value = this.device[key]
-            if (value === null) return
+    keys.forEach((key) => {
+        let value = props.device[key]
+        if (value === null) return
 
-            if (key === 'class' && this.device.subclass !== null) {
-                value += `, ${this.device.subclass}`
-            }
+        if (key === 'class' && props.device.subclass !== null) {
+            value += `, ${props.device.subclass}`
+        }
 
-            output.push({ key, value })
-        })
+        output.push({ key, value })
+    })
 
-        return output
-    }
-}
+    return output
+})
 </script>

@@ -6,12 +6,12 @@
 
 <template v-if="hostStats">
     <div>
-        <v-row class="py-0 pr-4">
-            <v-col class="pl-6">
+        <v-row class="system-load-row py-0 pr-4 flex-nowrap" align="center">
+            <v-col class="v-col system-load-row__info pl-6 pr-4">
                 <strong style="cursor: pointer" @click="hostDetailsDialog = true">Host</strong>
                 <v-tooltip top>
-                    <template #activator="{ on, attrs }">
-                        <small v-if="hostStats.cpuName" class="ml-2" v-bind="attrs" v-on="on">({{ cpuName }})</small>
+                    <template #activator="{ props: activatorProps }">
+                        <small v-if="hostStats.cpuName" class="ml-2" v-bind="activatorProps">({{ cpuName }})</small>
                     </template>
                     <span>{{ cpuDesc }}</span>
                 </v-tooltip>
@@ -49,8 +49,8 @@
                                         hostStats.tempSensor.measured_max_temp !== null
                                     ">
                                     <v-tooltip top>
-                                        <template #activator="{ on, attrs }">
-                                            <span v-bind="attrs" v-on="on">
+                                        <template #activator="{ props: activatorProps }">
+                                            <span v-bind="activatorProps">
                                                 ,
                                                 {{
                                                     $t('Machine.SystemPanel.Values.Temp', {
@@ -121,35 +121,47 @@
                     </template>
                 </div>
             </v-col>
-            <v-col v-if="cpuUsage !== null" class="px-2 col-auto d-flex flex-column justify-center align-center">
-                <v-progress-circular :rotate="-90" :size="55" :width="7" :value="cpuUsage" :color="cpuUsageColor">
-                    {{ cpuUsage }}
-                </v-progress-circular>
-                <span class="mt-2">{{ $t('Machine.SystemPanel.Cpu') }}</span>
-            </v-col>
-            <v-col v-else class="px-2 col-auto d-flex flex-column justify-center align-center">
-                <v-progress-circular
-                    :rotate="-90"
-                    :size="55"
-                    :width="7"
-                    :value="hostStats.loadPercent"
-                    :color="hostStats.loadProgressColor">
-                    {{ hostStats.loadPercent }}
-                </v-progress-circular>
-                <span class="mt-2">{{ $t('Machine.SystemPanel.Load') }}</span>
-            </v-col>
-            <v-col
-                v-if="hostStats.memUsage !== null"
-                class="px-2 col-auto d-flex flex-column justify-center align-center">
-                <v-progress-circular
-                    :rotate="-90"
-                    :size="55"
-                    :width="7"
-                    :value="hostStats.memUsage"
-                    :color="hostStats.memUsageColor">
-                    {{ hostStats.memUsage }}
-                </v-progress-circular>
-                <span class="mt-2">{{ $t('Machine.SystemPanel.Memory') }}</span>
+            <v-col class="system-load-row__gauges v-col-auto px-2">
+                <div class="system-load-gauges">
+                    <div v-if="cpuUsage !== null" class="system-load-gauge d-flex flex-column align-center justify-center">
+                        <v-progress-circular
+                            :rotate="-90"
+                            :size="55"
+                            :width="7"
+                            :value="cpuUsage"
+                            :color="cpuUsageColor"
+                            :aria-label="`${$t('Machine.SystemPanel.Cpu')} ${cpuUsage}%`">
+                            {{ cpuUsage }}
+                        </v-progress-circular>
+                        <span class="mt-2">{{ $t('Machine.SystemPanel.Cpu') }}</span>
+                    </div>
+                    <div v-else class="system-load-gauge d-flex flex-column align-center justify-center">
+                        <v-progress-circular
+                            :rotate="-90"
+                            :size="55"
+                            :width="7"
+                            :value="hostStats.loadPercent"
+                            :color="hostStats.loadProgressColor"
+                            :aria-label="`${$t('Machine.SystemPanel.Load')} ${hostStats.loadPercent}%`">
+                            {{ hostStats.loadPercent }}
+                        </v-progress-circular>
+                        <span class="mt-2">{{ $t('Machine.SystemPanel.Load') }}</span>
+                    </div>
+                    <div
+                        v-if="hostStats.memUsage !== null"
+                        class="system-load-gauge d-flex flex-column align-center justify-center">
+                        <v-progress-circular
+                            :rotate="-90"
+                            :size="55"
+                            :width="7"
+                            :value="hostStats.memUsage"
+                            :color="hostStats.memUsageColor"
+                            :aria-label="`${$t('Machine.SystemPanel.Memory')} ${hostStats.memUsage}%`">
+                            {{ hostStats.memUsage }}
+                        </v-progress-circular>
+                        <span class="mt-2">{{ $t('Machine.SystemPanel.Memory') }}</span>
+                    </div>
+                </div>
             </v-col>
         </v-row>
         <v-dialog v-model="hostDetailsDialog" :max-width="600" :max-height="500" scrollable>
@@ -159,12 +171,10 @@
                 card-class="machine-systemload-host-details-dialog"
                 :margin-bottom="false">
                 <template #buttons>
-                    <v-btn icon tile @click="hostDetailsDialog = false">
-                        <v-icon>{{ mdiCloseThick }}</v-icon>
-                    </v-btn>
+ <v-btn :icon="mdiCloseThick" rounded="0" @click="hostDetailsDialog = false"/>
                 </template>
                 <v-card-text class="pt-5 px-0">
-                    <overlay-scrollbars style="height: 350px" class="px-6">
+                    <OverlayScrollbarsComponent style="height: 350px" class="px-6">
                         <template v-if="Object.keys(systemInfo).length">
                             <div v-for="(infoGroup, key, index) of systemInfo" :key="key">
                                 <template v-if="key !== 'available_services'">
@@ -190,94 +200,97 @@
                                 </v-col>
                             </v-row>
                         </template>
-                    </overlay-scrollbars>
+                    </OverlayScrollbarsComponent>
                 </v-card-text>
             </panel>
         </v-dialog>
     </div>
 </template>
 
-<script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator'
-import BaseMixin from '../../mixins/base'
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import { useStore } from 'vuex'
+import { useBase } from '@/composables/useBase'
 import Panel from '@/components/ui/Panel.vue'
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 import { formatFilesize } from '@/plugins/helpers'
 import { mdiTextBoxSearchOutline, mdiCloseThick } from '@mdi/js'
-@Component({
-    components: { Panel },
+
+const { klipperReadyForGui } = useBase()
+const store = useStore()
+
+const hostDetailsDialog = ref(false)
+
+const hostStats = computed(() => store.getters['server/getHostStats'] ?? null)
+
+const systemInfo = computed(() => store.state.server?.system_info ?? {})
+
+const releaseName = computed(() => {
+    const stats = hostStats.value
+    if (!stats) return null
+    const name = stats.release_info?.name ?? ''
+    if (name.startsWith('#')) return stats.release_info?.id ?? null
+    if (name.startsWith('0.')) return null
+    return name
 })
-export default class SystemPanelHost extends Mixins(BaseMixin) {
-    formatFilesize = formatFilesize
-    mdiCloseThick = mdiCloseThick
-    mdiTextBoxSearchOutline = mdiTextBoxSearchOutline
 
-    private hostDetailsDialog = false
+const directory = computed(() => store.getters['files/getDirectory']('gcodes'))
 
-    get hostStats() {
-        return this.$store.getters['server/getHostStats'] ?? null
-    }
+const disk_usage = computed(() => directory.value?.disk_usage ?? { used: 0, free: 0, total: 0 })
 
-    get systemInfo() {
-        return this.$store.state.server?.system_info ?? {}
-    }
+const cpuUsage = computed(() => store.getters['server/getCpuUsage'] ?? null)
 
-    get releaseName() {
-        const name = this.hostStats.release_info?.name ?? ''
+const cpuUsageColor = computed(() => {
+    let color = 'primary'
+    if (cpuUsage.value > 95) color = 'error'
+    else if (cpuUsage.value > 80) color = 'warning'
+    return color
+})
 
-        if (name.startsWith('#')) return this.hostStats.release_info?.id ?? null
-        if (name.startsWith('0.')) return null
+const networkInterfaces = computed(() => store.getters['server/getNetworkInterfaces'] ?? null)
 
-        return name
-    }
-
-    get directory() {
-        return this.$store.getters['files/getDirectory']('gcodes')
-    }
-
-    get disk_usage() {
-        return this.directory?.disk_usage ?? { used: 0, free: 0, total: 0 }
-    }
-
-    get cpuUsage() {
-        return this.$store.getters['server/getCpuUsage'] ?? null
-    }
-
-    get cpuUsageColor() {
-        let color = 'primary'
-        if (this.cpuUsage > 95) color = 'error'
-        else if (this.cpuUsage > 80) color = 'warning'
-
-        return color
-    }
-
-    get networkInterfaces() {
-        return this.$store.getters['server/getNetworkInterfaces'] ?? null
-    }
-
-    getIpAddress(ip_addresses: { family: string; address: string }[]) {
-        const ipv4 = ip_addresses.find((address) => address.family === 'ipv4')
-        if (ipv4) return ` (${ipv4.address})`
-
-        const ipv6 = ip_addresses.find((address) => address.family === 'ipv6')
-        if (ipv6) return ` (${ipv6.address})`
-
-        return null
-    }
-
-    get cpuDesc() {
-        const output = this.hostStats.cpuDesc
-
-        return output
-    }
-
-    get cpuName() {
-        let output = this.hostStats.cpuName
-
-        if (this.hostStats.bits) {
-            output += `, ${this.hostStats.bits}`
-        }
-
-        return output
-    }
+function getIpAddress(ip_addresses: { family: string; address: string }[]) {
+    const ipv4 = ip_addresses.find((address) => address.family === 'ipv4')
+    if (ipv4) return ` (${ipv4.address})`
+    const ipv6 = ip_addresses.find((address) => address.family === 'ipv6')
+    if (ipv6) return ` (${ipv6.address})`
+    return null
 }
+
+const cpuDesc = computed(() => hostStats.value?.cpuDesc ?? '')
+
+const cpuName = computed(() => {
+    const stats = hostStats.value
+    if (!stats) return ''
+    let output = stats.cpuName
+    if (stats.bits) output += `, ${stats.bits}`
+    return output
+})
 </script>
+
+<style scoped>
+.system-load-row {
+    width: 100%;
+}
+
+.system-load-row__info {
+    min-width: 0;
+}
+
+.system-load-row__gauges {
+    flex: 0 0 auto;
+    width: fit-content;
+}
+
+.system-load-gauges {
+    align-items: center;
+    display: inline-flex;
+    gap: 6px;
+    justify-content: flex-end;
+    width: fit-content;
+}
+
+.system-load-gauge {
+    min-width: 0;
+}
+</style>

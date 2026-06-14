@@ -14,10 +14,10 @@
                 <v-row>
                     <!-- DIRECTION BUTTONS -->
                     <v-col>
-                        <v-row dense class="mb-1">
+                        <v-row density="compact" class="mb-1">
                             <v-col cols="3"></v-col>
                             <v-col cols="3">
-                                <v-btn
+ <v-btn
                                     class="btnMinWidthAuto fill-width"
                                     :disabled="
                                         !yAxisHomed ||
@@ -31,7 +31,7 @@
                             </v-col>
                             <v-col cols="3"></v-col>
                             <v-col cols="3">
-                                <v-btn
+ <v-btn
                                     class="btnMinWidthAuto fill-width"
                                     :disabled="
                                         !zAxisHomed ||
@@ -44,9 +44,9 @@
                                 </v-btn>
                             </v-col>
                         </v-row>
-                        <v-row dense>
+                        <v-row density="compact">
                             <v-col cols="3" class="position-relative">
-                                <v-btn
+ <v-btn
                                     class="btnMinWidthAuto fill-width position-absolute"
                                     style="top: -50%; width: calc(100% - 8px)"
                                     :disabled="
@@ -60,7 +60,7 @@
                                 </v-btn>
                             </v-col>
                             <v-col cols="3">
-                                <v-btn
+ <v-btn
                                     class="btnMinWidthAuto fill-width"
                                     :disabled="
                                         !yAxisHomed ||
@@ -73,7 +73,7 @@
                                 </v-btn>
                             </v-col>
                             <v-col cols="3" class="position-relative">
-                                <v-btn
+ <v-btn
                                     class="btnMinWidthAuto fill-width position-absolute"
                                     style="top: -50%; width: calc(100% - 8px)"
                                     :disabled="
@@ -87,7 +87,7 @@
                                 </v-btn>
                             </v-col>
                             <v-col cols="3">
-                                <v-btn
+ <v-btn
                                     class="btnMinWidthAuto fill-width"
                                     :disabled="
                                         !zAxisHomed ||
@@ -104,14 +104,14 @@
                     <!-- HOME / 5th ACTION BUTTONS -->
                     <v-col v-if="!el.is.small" class="d-flex align-center">
                         <div class="flex-grow-1" style="border-radius: 4px; overflow: hidden">
-                            <v-row dense style="margin-bottom: -2px !important">
+                            <v-row density="compact" style="margin-bottom: -2px !important">
                                 <v-col cols="6">
-                                    <v-btn
+ <v-btn
                                         :disabled="['printing'].includes(printer_state)"
                                         :loading="loadings.includes('homeAll')"
                                         :color="homedAxes.includes('xyz') ? 'primary' : 'warning'"
                                         height="30"
-                                        tile
+                                        rounded="0"
                                         class="w-100"
                                         @click="doHome">
                                         <div class="d-flex align-center">
@@ -121,37 +121,37 @@
                                     </v-btn>
                                 </v-col>
                                 <v-col cols="6" class="d-flex">
-                                    <v-btn
+ <v-btn
                                         v-if="actionButton === 'qgl'"
                                         :disabled="['printing'].includes(printer_state)"
                                         :loading="loadings.includes('qgl')"
                                         :color="colorQuadGantryLevel"
                                         height="30"
-                                        dense
-                                        tile
+                                        density="compact"
+                                        rounded="0"
                                         class="btnMinWidthAuto flex-grow-1 px-0"
                                         @click="doQGL">
                                         {{ $t('Panels.ToolheadControlPanel.QGL') }}
                                     </v-btn>
-                                    <v-btn
+ <v-btn
                                         v-else-if="actionButton === 'ztilt'"
                                         :disabled="['printing'].includes(printer_state)"
                                         :loading="loadings.includes('zTilt')"
                                         :color="colorZTilt"
                                         height="30"
-                                        dense
-                                        tile
+                                        density="compact"
+                                        rounded="0"
                                         class="btnMinWidthAuto flex-grow-1 px-0"
                                         @click="doZtilt">
                                         {{ $t('Panels.ToolheadControlPanel.ZTilt') }}
                                     </v-btn>
-                                    <v-btn
+ <v-btn
                                         v-else
                                         :disabled="['printing'].includes(printer_state)"
                                         :color="homedAxes !== '' ? 'primary' : 'warning'"
                                         height="30"
-                                        dense
-                                        tile
+                                        density="compact"
+                                        rounded="0"
                                         class="flex-grow-1 px-0"
                                         @click="doSend('M84')">
                                         <v-icon>{{ mdiEngineOff }}</v-icon>
@@ -159,13 +159,13 @@
                                 </v-col>
                             </v-row>
                             <!-- X/Y/Z HOME BUTTONS -->
-                            <v-row dense>
+                            <v-row density="compact">
                                 <v-col v-if="!enableXYHoming" cols="4" class="flex-grow-1">
-                                    <v-btn
+ <v-btn
                                         :disabled="['printing'].includes(printer_state)"
                                         :loading="loadings.includes('homeX')"
                                         :color="homedAxes.includes('x') ? 'primary' : 'warning'"
-                                        tile
+                                        rounded="0"
                                         height="30"
                                         class="btnMinWidthAuto w-100"
                                         @click="doHomeX">
@@ -173,11 +173,11 @@
                                     </v-btn>
                                 </v-col>
                                 <v-col v-if="!enableXYHoming" cols="4" class="flex-grow-1">
-                                    <v-btn
+ <v-btn
                                         :disabled="['printing'].includes(printer_state)"
                                         :loading="loadings.includes('homeY')"
                                         :color="homedAxes.includes('y') ? 'primary' : 'warning'"
-                                        tile
+                                        rounded="0"
                                         height="30"
                                         class="btnMinWidthAuto w-100"
                                         @click="doHomeY">
@@ -185,23 +185,23 @@
                                     </v-btn>
                                 </v-col>
                                 <v-col v-else cols="6" class="flex-grow-1">
-                                    <v-btn
+ <v-btn
                                         :disabled="['printing'].includes(printer_state)"
                                         :loading="loadings.includes('homeY')"
                                         :color="homedAxes.includes('xy') ? 'primary' : 'warning'"
-                                        tile
+                                        rounded="0"
                                         height="30"
                                         class="btnMinWidthAuto w-100"
                                         @click="doHomeXY">
                                         XY
                                     </v-btn>
                                 </v-col>
-                                <v-col :class="enableXYHoming ? 'col-6' : 'col-4'" class="flex-grow-1">
-                                    <v-btn
+                                <v-col :class="enableXYHoming ? 'v-col-6' : 'v-col-4'" class="flex-grow-1">
+ <v-btn
                                         :disabled="['printing'].includes(printer_state)"
                                         :loading="loadings.includes('homeZ')"
                                         :color="homedAxes.includes('z') ? 'primary' : 'warning'"
-                                        tile
+                                        rounded="0"
                                         height="30"
                                         class="btnMinWidthAuto w-100"
                                         @click="doHomeZ">
@@ -216,14 +216,14 @@
                     <!-- HOME / 5th ACTION BUTTONS -->
                     <v-col class="d-flex align-center">
                         <div class="flex-grow-1" style="border-radius: 4px; overflow: hidden">
-                            <v-row dense style="margin-bottom: -2px !important">
+                            <v-row density="compact" style="margin-bottom: -2px !important">
                                 <v-col cols="6">
-                                    <v-btn
+ <v-btn
                                         :disabled="['printing'].includes(printer_state)"
                                         :loading="loadings.includes('homeAll')"
                                         :color="homedAxes.includes('xyz') ? 'primary' : 'warning'"
                                         height="30"
-                                        tile
+                                        rounded="0"
                                         class="w-100"
                                         @click="doHome">
                                         <div class="d-flex align-center">
@@ -233,37 +233,37 @@
                                     </v-btn>
                                 </v-col>
                                 <v-col cols="6" class="d-flex">
-                                    <v-btn
+ <v-btn
                                         v-if="actionButton === 'qgl'"
                                         :disabled="['printing'].includes(printer_state)"
                                         :loading="loadings.includes('qgl')"
                                         :color="colorQuadGantryLevel"
                                         height="30"
-                                        dense
-                                        tile
+                                        density="compact"
+                                        rounded="0"
                                         class="btnMinWidthAuto flex-grow-1 px-0"
                                         @click="doQGL">
                                         {{ $t('Panels.ToolheadControlPanel.QGL') }}
                                     </v-btn>
-                                    <v-btn
+ <v-btn
                                         v-else-if="actionButton === 'ztilt'"
                                         :disabled="['printing'].includes(printer_state)"
                                         :loading="loadings.includes('zTilt')"
                                         :color="colorZTilt"
                                         height="30"
-                                        dense
-                                        tile
+                                        density="compact"
+                                        rounded="0"
                                         class="btnMinWidthAuto flex-grow-1 px-0"
                                         @click="doZtilt">
                                         {{ $t('Panels.ToolheadControlPanel.ZTilt') }}
                                     </v-btn>
-                                    <v-btn
+ <v-btn
                                         v-else
                                         :disabled="['printing'].includes(printer_state)"
                                         :color="homedAxes !== '' ? 'primary' : 'warning'"
                                         height="30"
-                                        dense
-                                        tile
+                                        density="compact"
+                                        rounded="0"
                                         class="flex-grow-1 px-0"
                                         @click="doSend('M84')">
                                         <v-icon>{{ mdiEngineOff }}</v-icon>
@@ -271,13 +271,13 @@
                                 </v-col>
                             </v-row>
                             <!-- X/Y/Z HOME BUTTONS -->
-                            <v-row dense>
+                            <v-row density="compact">
                                 <v-col v-if="!enableXYHoming" cols="4" class="flex-grow-1">
-                                    <v-btn
+ <v-btn
                                         :disabled="['printing'].includes(printer_state)"
                                         :loading="loadings.includes('homeX')"
                                         :color="homedAxes.includes('x') ? 'primary' : 'warning'"
-                                        tile
+                                        rounded="0"
                                         height="30"
                                         class="btnMinWidthAuto w-100"
                                         @click="doHomeX">
@@ -285,11 +285,11 @@
                                     </v-btn>
                                 </v-col>
                                 <v-col v-if="!enableXYHoming" cols="4" class="flex-grow-1">
-                                    <v-btn
+ <v-btn
                                         :disabled="['printing'].includes(printer_state)"
                                         :loading="loadings.includes('homeY')"
                                         :color="homedAxes.includes('y') ? 'primary' : 'warning'"
-                                        tile
+                                        rounded="0"
                                         height="30"
                                         class="btnMinWidthAuto w-100"
                                         @click="doHomeY">
@@ -297,23 +297,23 @@
                                     </v-btn>
                                 </v-col>
                                 <v-col v-else cols="6" class="flex-grow-1">
-                                    <v-btn
+ <v-btn
                                         :disabled="['printing'].includes(printer_state)"
                                         :loading="loadings.includes('homeY')"
                                         :color="homedAxes.includes('xy') ? 'primary' : 'warning'"
-                                        tile
+                                        rounded="0"
                                         height="30"
                                         class="btnMinWidthAuto w-100"
                                         @click="doHomeXY">
                                         XY
                                     </v-btn>
                                 </v-col>
-                                <v-col :class="enableXYHoming ? 'col-6' : 'col-4'" class="flex-grow-1">
-                                    <v-btn
+                                <v-col :class="enableXYHoming ? 'v-col-6' : 'v-col-4'" class="flex-grow-1">
+ <v-btn
                                         :disabled="['printing'].includes(printer_state)"
                                         :loading="loadings.includes('homeZ')"
                                         :color="homedAxes.includes('z') ? 'primary' : 'warning'"
-                                        tile
+                                        rounded="0"
                                         height="30"
                                         class="btnMinWidthAuto w-100"
                                         @click="doHomeZ">
@@ -327,18 +327,19 @@
                 <!-- STEP SIZE BUTTON GROUP -->
                 <v-row no-gutters class="mt-3">
                     <v-col>
-                        <v-btn-toggle
+ <v-btn-toggle
                             v-if="stepsReversed.length > 0"
                             :key="`all-steps-${stepsReversed.join('_')}`"
-                            v-model="selectedCrossStep"
-                            dense
+                            :model-value="selectedCrossStep"
+                            @update:model-value="updateSelectedCrossStep"
+                            density="compact"
                             mandatory
                             style="flex-wrap: nowrap; width: 100%">
-                            <v-btn
+ <v-btn
                                 v-for="step of stepsReversed"
                                 :key="`step-${step}`"
                                 :disabled="['printing'].includes(printer_state)"
-                                dense
+                                density="compact"
                                 class="btnMinWidthAuto flex-grow-1 px-0"
                                 style="height: 28px">
                                 <span class="body-2">{{ step }}</span>
@@ -358,60 +359,40 @@
     </responsive>
 </template>
 
-<script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
-import ControlMixin from '@/components/mixins/control'
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import { useBase } from '@/composables/useBase'
+import { useControl } from '@/composables/useControl'
 import Responsive from '@/components/ui/Responsive.vue'
 import { mdiChevronUp, mdiChevronLeft, mdiChevronRight, mdiChevronDown, mdiEngineOff, mdiHome } from '@mdi/js'
 
-@Component({
-    components: { Responsive },
-})
-export default class CrossControl extends Mixins(BaseMixin, ControlMixin) {
-    mdiChevronUp = mdiChevronUp
-    mdiChevronLeft = mdiChevronLeft
-    mdiChevronRight = mdiChevronRight
-    mdiChevronDown = mdiChevronDown
-    mdiEngineOff = mdiEngineOff
-    mdiHome = mdiHome
+const { printer_state, loadings } = useBase()
+const {
+    homedAxes, xAxisHomed, yAxisHomed, zAxisHomed,
+    feedrateXY, feedrateZ,
+    enableXYHoming, existsQGL, existsZtilt,
+    colorQuadGantryLevel, colorZTilt, actionButton,
+    doHome, doHomeX, doHomeY, doHomeZ, doHomeXY,
+    doQGL, doZtilt, doSend, doSendMove,
+} = useControl()
+const store = useStore()
 
-    /**
-     * Step size selection
-     */
-    get selectedCrossStep() {
-        return this.$store.state.gui.control.selectedCrossStep
-    }
+const selectedCrossStep = computed(() => store.state.gui.control.selectedCrossStep)
 
-    set selectedCrossStep(newVal) {
-        this.$store.dispatch('gui/saveSetting', { name: 'control.selectedCrossStep', value: newVal })
-    }
-
-    get stepSize(): number {
-        return this.stepsReversed[this.selectedCrossStep]
-    }
-
-    /**
-     * Axes reverse states
-     */
-    get reverseX() {
-        return this.$store.state.gui.control.reverseX
-    }
-
-    get reverseY() {
-        return this.$store.state.gui.control.reverseY
-    }
-
-    get reverseZ() {
-        return this.$store.state.gui.control.reverseZ
-    }
-
-    get stepsAll() {
-        return this.$store.state.gui.control?.stepsAll ?? []
-    }
-
-    get stepsReversed() {
-        return Array.from(new Set([...(this.stepsAll ?? [])])).sort((a, b) => a - b)
-    }
+function updateSelectedCrossStep(newVal: any) {
+    store.dispatch('gui/saveSetting', { name: 'control.selectedCrossStep', value: newVal })
 }
+
+const stepSize = computed(() => stepsReversed.value[selectedCrossStep.value])
+
+const reverseX = computed(() => store.state.gui.control.reverseX)
+const reverseY = computed(() => store.state.gui.control.reverseY)
+const reverseZ = computed(() => store.state.gui.control.reverseZ)
+
+const stepsAll = computed(() => store.state.gui.control?.stepsAll ?? [])
+
+const stepsReversed = computed(() =>
+    Array.from(new Set([...(stepsAll.value ?? [])])).sort((a, b) => a - b)
+)
 </script>

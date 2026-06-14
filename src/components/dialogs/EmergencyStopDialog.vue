@@ -7,45 +7,45 @@
             :icon="mdiAlertOctagonOutline"
             :margin-bottom="false">
             <template #buttons>
-                <v-btn icon tile @click="closePrompt">
-                    <v-icon>{{ mdiCloseThick }}</v-icon>
-                </v-btn>
+ <v-btn :icon="mdiCloseThick" rounded="0" @click="closePrompt"/>
             </template>
             <v-card-text>{{ $t('EmergencyStopDialog.AreYouSure') }}</v-card-text>
             <v-card-actions>
                 <v-spacer />
-                <v-btn text @click="closePrompt">{{ $t('Buttons.No') }}</v-btn>
-                <v-btn color="error" text @click="emergencyStop">{{ $t('Buttons.Yes') }}</v-btn>
+ <v-btn variant="text" @click="closePrompt">{{ $t('Buttons.No') }}</v-btn>
+ <v-btn color="error" variant="text" @click="emergencyStop">{{ $t('Buttons.Yes') }}</v-btn>
             </v-card-actions>
         </panel>
     </v-dialog>
 </template>
 
-<script lang="ts">
-import { Component, Mixins, VModel } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useSocket } from '@/composables/useSocket'
 import Panel from '@/components/ui/Panel.vue'
 
 import { mdiAlertOctagonOutline, mdiCloseThick } from '@mdi/js'
 
-@Component({
-    components: { Panel },
+const socket = useSocket()
+
+const props = defineProps({
+    modelValue: { type: Boolean },
 })
-export default class EmergencyStopDialog extends Mixins(BaseMixin) {
-    mdiAlertOctagonOutline = mdiAlertOctagonOutline
-    mdiCloseThick = mdiCloseThick
+const emit = defineEmits(['update:modelValue'])
 
-    @VModel({ type: Boolean }) showDialog!: boolean
+const showDialog = computed({
+    get: () => props.modelValue,
+    set: (val) => emit('update:modelValue', val),
+})
 
-    emergencyStop() {
-        this.$socket.emit('printer.emergency_stop', {}, { loading: 'topbarEmergencyStop' })
+function emergencyStop() {
+    socket.emit('printer.emergency_stop', {}, { loading: 'topbarEmergencyStop' })
 
-        this.closePrompt()
-    }
+    closePrompt()
+}
 
-    closePrompt() {
-        this.showDialog = false
-    }
+function closePrompt() {
+    showDialog.value = false
 }
 </script>
 

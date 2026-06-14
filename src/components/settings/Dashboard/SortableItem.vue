@@ -1,66 +1,72 @@
 <template>
-    <v-list-item>
-        <v-row>
-            <v-col class="col-auto px-0">
-                <v-icon class="handle pr-2">{{ mdiDragVertical }}</v-icon>
-                <v-icon>{{ icon }}</v-icon>
-            </v-col>
-            <v-col class="pr-0 text-truncate">
+    <v-list-item class="px-0">
+        <div class="dashboard-sortable-item">
+            <div class="dashboard-sortable-item__leading">
+                <v-icon class="handle" :icon="mdiDragVertical" />
+                <v-icon :icon="icon" />
+            </div>
+            <div class="dashboard-sortable-item__title text-truncate">
                 {{ panelname }}
-            </v-col>
-            <v-col class="col-auto pl-2">
+            </div>
+            <div class="dashboard-sortable-item__action">
                 <v-icon
                     :color="checkboxColor"
                     @click.stop="$emit('change-visible', name, !visible)"
-                    v-html="checkboxIcon" />
-            </v-col>
-        </v-row>
+                    :icon="checkboxIcon" />
+            </div>
+        </div>
     </v-list-item>
 </template>
 
-<script lang="ts">
-import Component from 'vue-class-component'
-import { Mixins, Prop } from 'vue-property-decorator'
-import draggable from 'vuedraggable'
-import { mdiCheckboxBlankOutline, mdiCheckboxMarked, mdiDragVertical, mdiInformation } from '@mdi/js'
-import DashboardMixin from '@/components/mixins/dashboard'
+<script setup lang="ts">
+import { computed } from 'vue'
+import { mdiCheckboxBlankOutline, mdiCheckboxMarked, mdiDragVertical } from '@mdi/js'
+import { useDashboard } from '@/composables/useDashboard'
 
-@Component({
-    components: { draggable },
+const props = defineProps({
+    name: { type: String, required: true },
+    visible: { type: Boolean, required: true },
 })
-export default class SettingsDashboardSortableItem extends Mixins(DashboardMixin) {
-    /**
-     * Icons
-     */
-    mdiInformation = mdiInformation
-    mdiDragVertical = mdiDragVertical
 
-    @Prop({ type: String, required: true }) declare readonly name: string
-    @Prop({ type: Boolean, required: true }) declare readonly visible: boolean
+defineEmits<{
+    (e: 'change-visible', name: string, visible: boolean): void
+}>()
 
-    get panelname() {
-        return this.getPanelName(this.name)
-    }
+const { getPanelName, convertPanelnameToIcon } = useDashboard()
 
-    get icon() {
-        return this.convertPanelnameToIcon(this.name)
-    }
+const panelname = computed(() => getPanelName(props.name))
+const icon = computed(() => convertPanelnameToIcon(props.name))
 
-    get checkboxColor() {
-        if (this.visible) return 'primary'
-
-        return 'grey lighten-1'
-    }
-
-    get checkboxIcon() {
-        if (this.visible) return mdiCheckboxMarked
-
-        return mdiCheckboxBlankOutline
-    }
-}
+const checkboxColor = computed(() => props.visible ? 'primary' : '#bdbdbd')
+const checkboxIcon = computed(() => props.visible ? mdiCheckboxMarked : mdiCheckboxBlankOutline)
 </script>
 
 <style scoped>
+.dashboard-sortable-item {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    min-height: 44px;
+    width: 100%;
+}
+
+.dashboard-sortable-item__leading,
+.dashboard-sortable-item__action {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+}
+
+.dashboard-sortable-item__leading {
+    gap: 10px;
+    min-width: 52px;
+}
+
+.dashboard-sortable-item__title {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
 .handle {
     cursor: move;
 }

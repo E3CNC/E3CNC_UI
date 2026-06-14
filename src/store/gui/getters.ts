@@ -1,5 +1,5 @@
 import { GetterTree } from 'vuex'
-import { GuiState, GuiStateDashboard, GuiStateLayoutoption } from '@/store/gui/types'
+import type { GuiState, GuiStateDashboard, GuiStateLayoutoption } from '@/store/gui/types'
 import { GuiMacrosStateMacrogroup } from '@/store/gui/macros/types'
 import { allDashboardPanels, defaultTheme, themes } from '@/store/variables'
 import { RootState, Theme } from '@/store/types'
@@ -48,7 +48,7 @@ export const getters: GetterTree<GuiState, RootState> = {
         let allPanels = [...allDashboardPanels]
 
         if (!rootState.gui?.gcodeViewer?.cncMode) {
-            allPanels = allPanels.filter((name) => !['dro', 'cnc-status', 'jog', 'offsets', 'mdi', 'spindle-coolant'].includes(name))
+            allPanels = allPanels.filter((name) => !['dro', 'cnc-status', 'jog', 'offsets', 'offset-preview', 'mdi', 'spindle-coolant'].includes(name))
         }
 
         // remove macros panel and add macrogroups panels if macroMode === expert

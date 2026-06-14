@@ -2,9 +2,7 @@
     <v-dialog v-model="showDialog" width="400">
         <panel :title="$t('Files.RenameFile')" card-class="gcodefiles-rename-file-dialog" :margin-bottom="false">
             <template #buttons>
-                <v-btn icon tile @click="showDialog = false">
-                    <v-icon>{{ mdiCloseThick }}</v-icon>
-                </v-btn>
+ <v-btn :icon="mdiCloseThick" rounded="0" @click="showDialog = false"/>
             </template>
             <v-card-text>
                 <v-text-field
@@ -18,8 +16,8 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer />
-                <v-btn text @click="showDialog = false">{{ $t('Buttons.Cancel') }}</v-btn>
-                <v-btn :disabled="isInvalidName || name.length === 0" color="primary" text @click="renameFileAction">
+ <v-btn variant="text" @click="showDialog = false">{{ $t('Buttons.Cancel') }}</v-btn>
+ <v-btn :disabled="isInvalidName || name.length === 0" color="primary" variant="text" @click="renameFileAction">
                     {{ $t('Files.Rename') }}
                 </v-btn>
             </v-card-actions>
@@ -27,60 +25,66 @@
     </v-dialog>
 </template>
 
-<script lang="ts">
-import { Component, Mixins, Prop, Ref, VModel, Watch } from 'vue-property-decorator'
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useSocket } from '@/composables/useSocket'
+import { useGcodeFiles } from '@/composables/useGcodeFiles'
 import type { FocusableRef } from '@/types/vuetify'
-import BaseMixin from '@/components/mixins/base'
 import Panel from '@/components/ui/Panel.vue'
 import { mdiCloseThick } from '@mdi/js'
-import GcodefilesMixin from '@/components/mixins/gcodefiles'
-import { FileStateGcodefile } from '@/store/files/types'
+import type { FileStateGcodefile } from '@/store/files/types'
 
-@Component({
-    components: { Panel },
+const { t } = useI18n()
+const socket = useSocket()
+const { currentPath, existsFilename } = useGcodeFiles()
+
+const name = ref('')
+const isInvalidName = ref(true)
+
+const props = defineProps({
+    modelValue: { type: Boolean },
+    item: { type: Object as () => FileStateGcodefile, required: true },
 })
-export default class GcodefilesRenameFileDialog extends Mixins(BaseMixin, GcodefilesMixin) {
-    mdiCloseThick = mdiCloseThick
+const emit = defineEmits(['update:modelValue'])
 
-    name = ''
-    isInvalidName = true
+const showDialog = computed({
+    get: () => props.modelValue,
+    set: (val) => emit('update:modelValue', val),
+})
 
-    @VModel({ type: Boolean }) showDialog!: boolean
-    @Prop({ type: Object, required: true }) item!: FileStateGcodefile
-    @Ref('inputFieldRenameFile') readonly inputFieldRenameFile!: FocusableRef
+const inputFieldRenameFile = ref<FocusableRef | null>(null)
 
-    nameInputRules = [
-        (value: string) => !!value || this.$t('Files.InvalidNameEmpty'),
-        (value: string) => !this.existsFilename(value) || this.$t('Files.InvalidNameAlreadyExists'),
-    ]
+const nameInputRules = [
+    (value: string) => !!value || t('Files.InvalidNameEmpty'),
+    (value: string) => !existsFilename(value) || t('Files.InvalidNameAlreadyExists'),
+]
 
-    updateIsInvalidName(value: boolean) {
-        this.isInvalidName = value
-    }
-
-    renameFileAction() {
-        this.$socket.emit(
-            'server.files.move',
-            {
-                source: 'gcodes' + this.currentPath + '/' + this.item.filename,
-                dest: 'gcodes' + this.currentPath + '/' + this.name,
-            },
-            { action: 'files/getMove' }
-        )
-
-        this.showDialog = false
-    }
-
-    @Watch('showDialog')
-    onShowDialogChanged(newVal: boolean) {
-        if (!newVal) return
-
-        this.name = this.item.filename
-        this.isInvalidName = true
-
-        setTimeout(() => {
-            this.inputFieldRenameFile.focus()
-        }, 200)
-    }
+function updateIsInvalidName(value: boolean) {
+    isInvalidName.value = value
 }
+
+function renameFileAction() {
+    socket.emit(
+        'server.files.move',
+        {
+            source: 'gcodes' + currentPath.value + '/' + props.item.filename,
+            dest: 'gcodes' + currentPath.value + '/' + name.value,
+        },
+        { action: 'files/getMove' }
+    )
+
+    showDialog.value = false
+}
+
+watch(showDialog, (newVal: boolean) => {
+    if (!newVal) return
+
+    name.value = props.item.filename
+    isInvalidName.value = true
+
+    setTimeout(() => {
+        inputFieldRenameFile.value?.focus()
+    }, 200)
+})
 </script>

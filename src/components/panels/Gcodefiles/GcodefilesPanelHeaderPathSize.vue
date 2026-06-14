@@ -1,6 +1,6 @@
 <template>
     <v-row>
-        <v-col class="col-12 py-2 d-flex align-center">
+        <v-col class="v-col-12 py-2 d-flex align-center">
             <span>
                 <b class="mr-1">{{ $t('Files.CurrentPath') }}:</b>
                 <path-navigation
@@ -9,9 +9,9 @@
                     :on-segment-click="clickPathNavGoToDirectory" />
             </span>
             <v-spacer />
-            <v-tooltip v-if="disk_usage !== null" top>
-                <template #activator="{ on, attrs }">
-                    <span v-bind="attrs" v-on="on">
+            <v-tooltip v-if="disk_usage !== null" location="top">
+                <template #activator="{ props: activatorProps }">
+                    <span v-bind="activatorProps">
                         <b>{{ $t('Files.FreeDisk') }}:</b>
                         {{ formatFilesize(disk_usage.free) }}
                     </span>
@@ -27,27 +27,27 @@
         </v-col>
     </v-row>
 </template>
-<script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
-import GcodefilesMixin from '@/components/mixins/gcodefiles'
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import { useBase } from '@/composables/useBase'
+import { useGcodeFiles } from '@/composables/useGcodeFiles'
 import { formatFilesize } from '@/plugins/helpers'
 
-@Component
-export default class GcodefilesPanelHeaderPathSize extends Mixins(BaseMixin, GcodefilesMixin) {
-    formatFilesize = formatFilesize
+const { currentPath, setCurrentPath } = useGcodeFiles()
 
-    get directory() {
-        return this.$store.getters['files/getDirectory']('gcodes' + this.currentPath)
-    }
+const store = useStore()
 
-    get disk_usage() {
-        return this.directory?.disk_usage ?? { used: 0, free: 0, total: 0 }
-    }
+const directory = computed(() =>
+    store.getters['files/getDirectory']('gcodes' + currentPath.value)
+)
 
-    clickPathNavGoToDirectory(segment: { location: string }) {
-        this.currentPath = segment.location
-    }
+const disk_usage = computed(() =>
+    directory.value?.disk_usage ?? { used: 0, free: 0, total: 0 }
+)
+
+function clickPathNavGoToDirectory(segment: { location: string }) {
+    setCurrentPath(segment.location)
 }
 </script>
 

@@ -6,79 +6,79 @@
                 <template v-for="component in mobileLayout">
                     <component
                         v-if="isPanelKnown(component.name)"
-                        :is="extractPanelName(component.name)"
+                        :is="getPanelComponent(component.name)"
                         :key="'dashboard-mobileLayout-' + component.name"
                         :panel-id="extractPanelId(component.name)"></component>
                 </template>
             </v-col>
         </v-row>
         <v-row v-else-if="isTablet">
-            <v-col class="col-6">
+            <v-col class="v-col-6">
                 <status-panel />
                 <template v-for="component in tabletLayout1">
                     <component
                         v-if="isPanelKnown(component.name)"
-                        :is="extractPanelName(component.name)"
+                        :is="getPanelComponent(component.name)"
                         :key="'dashboard-tabletLayout1-' + component.name"
                         :panel-id="extractPanelId(component.name)"></component>
                 </template>
             </v-col>
-            <v-col class="col-6">
+            <v-col class="v-col-6">
                 <template v-for="component in tabletLayout2">
                     <component
                         v-if="isPanelKnown(component.name)"
-                        :is="extractPanelName(component.name)"
+                        :is="getPanelComponent(component.name)"
                         :key="'dashboard-tabletLayout2-' + component.name"
                         :panel-id="extractPanelId(component.name)"></component>
                 </template>
             </v-col>
         </v-row>
         <v-row v-else-if="isDesktop">
-            <v-col class="col-5">
+            <v-col class="v-col-5">
                 <status-panel />
                 <template v-for="component in desktopLayout1">
                     <component
                         v-if="isPanelKnown(component.name)"
-                        :is="extractPanelName(component.name)"
+                        :is="getPanelComponent(component.name)"
                         :key="'dashboard-desktopLayout1-' + component.name"
                         :panel-id="extractPanelId(component.name)"></component>
                 </template>
             </v-col>
-            <v-col class="col-7">
+            <v-col class="v-col-7">
                 <template v-for="component in desktopLayout2">
                     <component
                         v-if="isPanelKnown(component.name)"
-                        :is="extractPanelName(component.name)"
+                        :is="getPanelComponent(component.name)"
                         :key="'dashboard-desktopLayout2-' + component.name"
                         :panel-id="extractPanelId(component.name)"></component>
                 </template>
             </v-col>
         </v-row>
         <v-row v-else-if="isWidescreen">
-            <v-col class="col-3">
+            <v-col class="v-col-3">
                 <status-panel />
                 <template v-for="component in widescreenLayout1">
                     <component
                         v-if="isPanelKnown(component.name)"
-                        :is="extractPanelName(component.name)"
+                        :is="getPanelComponent(component.name)"
                         :key="'dashboard-desktopLayout1-' + component.name"
                         :panel-id="extractPanelId(component.name)"></component>
                 </template>
             </v-col>
-            <v-col class="col-5">
+            <v-col class="v-col-5">
                 <template v-for="component in widescreenLayout2">
                     <component
                         v-if="isPanelKnown(component.name)"
-                        :is="extractPanelName(component.name)"
+                        :is="getPanelComponent(component.name)"
                         :key="'dashboard-desktopLayout2-' + component.name"
                         :panel-id="extractPanelId(component.name)"></component>
                 </template>
             </v-col>
-            <v-col class="col-4">
+            <v-col class="v-col-4">
                 <template v-for="component in widescreenLayout3">
                     <component
                         v-if="isPanelKnown(component.name)"
-                        :is="extractPanelName(component.name)"
+                        :is="getPanelComponent(component.name)"
                         :key="'dashboard-desktopLayout3-' + component.name"
                         :panel-id="extractPanelId(component.name)"></component>
                 </template>
@@ -87,13 +87,12 @@
     </div>
 </template>
 
-<script lang="ts">
-import Component from 'vue-class-component'
-import { Mixins } from 'vue-property-decorator'
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+import { useDashboard } from '@/composables/useDashboard'
 import CncStatusPanel from '@/components/panels/Cnc/CncStatusPanel.vue'
 import DroPanel from '@/components/panels/Cnc/DroPanel.vue'
-
-import DashboardMixin from '@/components/mixins/dashboard'
 import JogPanel from '@/components/panels/Cnc/JogPanel.vue'
 import KlippyStatePanel from '@/components/panels/KlippyStatePanel.vue'
 import LedEffectsPanel from '@/components/panels/LedEffectsPanel.vue'
@@ -103,87 +102,59 @@ import MacrosPanel from '@/components/panels/MacrosPanel.vue'
 import MiniconsolePanel from '@/components/panels/MiniconsolePanel.vue'
 import MinSettingsPanel from '@/components/panels/MinSettingsPanel.vue'
 import MiscellaneousPanel from '@/components/panels/MiscellaneousPanel.vue'
+import OffsetPreview from '@/components/panels/Cnc/OffsetPreview.vue'
 import OffsetsPanel from '@/components/panels/Cnc/OffsetsPanel.vue'
 import SpindleCoolantPanel from '@/components/panels/Cnc/SpindleCoolantPanel.vue'
 import StatusPanel from '@/components/panels/StatusPanel.vue'
 import ToolheadControlPanel from '@/components/panels/ToolheadControlPanel.vue'
 import TemperaturePanel from '@/components/panels/TemperaturePanel.vue'
+import MdiPanel from '@/components/panels/Cnc/MdiPanel.vue'
 import WebcamPanel from '@/components/panels/WebcamPanel.vue'
 
-@Component({
-    components: {
-        CncStatusPanel,
-        DroPanel,
-        JogPanel,
-        KlippyStatePanel,
-        LedEffectsPanel,
-        MachineSettingsPanel,
-        MacrogroupPanel,
-        MacrosPanel,
-        MiniconsolePanel,
-        MinSettingsPanel,
-        MiscellaneousPanel,
-        OffsetsPanel,
-        SpindleCoolantPanel,
-        StatusPanel,
-        ToolheadControlPanel,
-        TemperaturePanel,
-        WebcamPanel,
-    },
-})
-export default class PageDashboard extends Mixins(DashboardMixin) {
-    get mobileLayout() {
-        return this.$store.getters['gui/getPanels']('mobile', 0, true)
-    }
+const store = useStore()
+const { isMobile, isTablet, isDesktop, isWidescreen } = useDashboard()
 
-    get tabletLayout1() {
-        return this.$store.getters['gui/getPanels']('tablet', 1, true)
-    }
+const mobileLayout = computed(() => store.getters['gui/getPanels']('mobile', 0, true))
+const tabletLayout1 = computed(() => store.getters['gui/getPanels']('tablet', 1, true))
+const tabletLayout2 = computed(() => store.getters['gui/getPanels']('tablet', 2, true))
+const desktopLayout1 = computed(() => store.getters['gui/getPanels']('desktop', 1, true))
+const desktopLayout2 = computed(() => store.getters['gui/getPanels']('desktop', 2, true))
+const widescreenLayout1 = computed(() => store.getters['gui/getPanels']('widescreen', 1, true))
+const widescreenLayout2 = computed(() => store.getters['gui/getPanels']('widescreen', 2, true))
+const widescreenLayout3 = computed(() => store.getters['gui/getPanels']('widescreen', 3, true))
 
-    get tabletLayout2() {
-        return this.$store.getters['gui/getPanels']('tablet', 2, true)
-    }
+function extractPanelId(name: string) {
+    return name.split('_')[1] ?? null
+}
 
-    get desktopLayout1() {
-        return this.$store.getters['gui/getPanels']('desktop', 1, true)
-    }
+const registeredPanels: Record<string, unknown> = {
+    'cnc-status': CncStatusPanel,
+    dro: DroPanel,
+    jog: JogPanel,
+    offsets: OffsetsPanel,
+    'offset-preview': OffsetPreview,
+    'spindle-coolant': SpindleCoolantPanel,
+    mdi: MdiPanel,
+    klippystate: KlippyStatePanel,
+    minsettings: MinSettingsPanel,
+    status: StatusPanel,
+    ledeffects: LedEffectsPanel,
+    machinesettings: MachineSettingsPanel,
+    macrogroup: MacrogroupPanel,
+    macros: MacrosPanel,
+    miniconsole: MiniconsolePanel,
+    miscellaneous: MiscellaneousPanel,
+    'toolhead-control': ToolheadControlPanel,
+    temperature: TemperaturePanel,
+    webcam: WebcamPanel,
+}
 
-    get desktopLayout2() {
-        return this.$store.getters['gui/getPanels']('desktop', 2, true)
-    }
+function getPanelComponent(name: string) {
+    const prefix = name.split('_')[0]
+    return registeredPanels[prefix] ?? null
+}
 
-    get widescreenLayout1() {
-        return this.$store.getters['gui/getPanels']('widescreen', 1, true)
-    }
-
-    get widescreenLayout2() {
-        return this.$store.getters['gui/getPanels']('widescreen', 2, true)
-    }
-
-    get widescreenLayout3() {
-        return this.$store.getters['gui/getPanels']('widescreen', 3, true)
-    }
-
-    extractPanelName(name: string) {
-        return name.split('_')[0] + '-panel'
-    }
-
-    extractPanelId(name: string) {
-        return name.split('_')[1] ?? null
-    }
-
-    get registeredPanelNames(): Set<string> {
-        return new Set([
-            'cnc-status', 'dro', 'jog', 'offsets', 'spindle-coolant', 'mdi',
-            'klippystate', 'minsettings', 'status',
-            'ledeffects', 'machinesettings', 'macrogroup', 'macros',
-            'miniconsole', 'miscellaneous', 'toolhead-control', 'temperature', 'webcam',
-        ])
-    }
-
-    isPanelKnown(name: string): boolean {
-        const prefix = name.split('_')[0]
-        return this.registeredPanelNames.has(prefix)
-    }
+function isPanelKnown(name: string): boolean {
+    return getPanelComponent(name) !== null
 }
 </script>

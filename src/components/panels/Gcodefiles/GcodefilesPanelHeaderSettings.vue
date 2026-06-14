@@ -1,7 +1,7 @@
 <template>
-    <v-menu offset-y left :close-on-content-click="false" :title="$t('Files.SetupCurrentList')">
-        <template #activator="{ on, attrs }">
-            <v-btn class="px-2 minwidth-0 ml-3" v-bind="attrs" v-on="on">
+    <v-menu location="bottom end" :close-on-content-click="false" :title="$t('Files.SetupCurrentList')">
+        <template #activator="{ props: activatorProps }">
+ <v-btn class="px-2 minwidth-0 ml-3" v-bind="activatorProps">
                 <v-icon>{{ mdiCog }}</v-icon>
             </v-btn>
         </template>
@@ -9,10 +9,10 @@
             <v-list-item class="minHeight36">
                 <v-row>
                     <v-col class="pr-0">{{ $t('Files.HiddenFiles') }}</v-col>
-                    <v-col class="col-auto pl-0">
+                    <v-col class="v-col-auto pl-0">
                         <v-icon
-                            :color="showHiddenFiles ? 'primary' : 'grey lighten-1'"
-                            @click.stop="showHiddenFiles = !showHiddenFiles">
+                            :color="showHiddenFiles ? 'primary' : '#bdbdbd'"
+                            @click.stop="toggleHiddenFiles">
                             {{ showHiddenFiles ? mdiCheckboxMarked : mdiCheckboxBlankOutline }}
                         </v-icon>
                     </v-col>
@@ -21,10 +21,10 @@
             <v-list-item class="minHeight36">
                 <v-row>
                     <v-col class="pr-0">{{ $t('Files.RunFiles') }}</v-col>
-                    <v-col class="col-auto pl-0">
+                    <v-col class="v-col-auto pl-0">
                         <v-icon
-                            :color="showCompletedFiles ? 'primary' : 'grey lighten-1'"
-                            @click.stop="showCompletedFiles = !showCompletedFiles">
+                            :color="showCompletedFiles ? 'primary' : '#bdbdbd'"
+                            @click.stop="toggleCompletedFiles">
                             {{ showCompletedFiles ? mdiCheckboxMarked : mdiCheckboxBlankOutline }}
                         </v-icon>
                     </v-col>
@@ -34,16 +34,17 @@
     </v-menu>
 </template>
 
-<script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator'
-import BaseMixin from '@/components/mixins/base'
-import GcodefilesMixin from '@/components/mixins/gcodefiles'
+<script setup lang="ts">
+import { useGcodeFiles } from '@/composables/useGcodeFiles'
 import { mdiCheckboxBlankOutline, mdiCheckboxMarked, mdiCog } from '@mdi/js'
 
-@Component
-export default class GcodefilesPanelHeaderSettings extends Mixins(BaseMixin, GcodefilesMixin) {
-    mdiCheckboxBlankOutline = mdiCheckboxBlankOutline
-    mdiCheckboxMarked = mdiCheckboxMarked
-    mdiCog = mdiCog
+const { showHiddenFiles, setShowHiddenFiles, showCompletedFiles, setShowCompletedFiles } = useGcodeFiles()
+
+function toggleHiddenFiles() {
+    setShowHiddenFiles(!showHiddenFiles.value)
+}
+
+function toggleCompletedFiles() {
+    setShowCompletedFiles(!showCompletedFiles.value)
 }
 </script>

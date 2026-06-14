@@ -1,7 +1,7 @@
 <template>
     <div>
-        <v-row class="py-0 pr-4">
-            <v-col class="pl-6">
+        <v-row class="system-load-row py-0 pr-4 flex-nowrap" align="center">
+            <v-col class="v-col system-load-row__info pl-6 pr-4">
                 <strong style="cursor: pointer" @click="mcuDetailsDialog = true">{{ mcu.name }}</strong>
                 <small v-if="mcu.chip" class="ml-2">({{ mcu.chip }})</small>
                 <br />
@@ -26,8 +26,8 @@
                                     mcu.tempSensor.measured_max_temp !== null
                                 ">
                                 <v-tooltip top>
-                                    <template #activator="{ on, attrs }">
-                                        <span v-bind="attrs" v-on="on">
+                                    <template #activator="{ props: activatorProps }">
+                                        <span v-bind="activatorProps">
                                             {{
                                                 $t('Machine.SystemPanel.Values.Temp', {
                                                     temp: mcu.tempSensor.temperature,
@@ -61,13 +61,14 @@
                     </div>
                 </div>
             </v-col>
-            <v-col class="px-2 col-auto d-flex justify-center align-center">
+            <v-col class="system-load-row__gauge px-2 v-col-auto d-flex justify-center align-center">
                 <v-progress-circular
                     :rotate="-90"
                     :size="55"
                     :width="7"
                     :value="mcu.loadPercent"
-                    :color="mcu.loadProgressColor">
+                    :color="mcu.loadProgressColor"
+                    :aria-label="`${mcu.name} ${mcu.loadPercent}%`">
                     {{ mcu.loadPercent }}
                 </v-progress-circular>
             </v-col>
@@ -79,12 +80,10 @@
                 card-class="machine-systemload-mcu-details-dialog"
                 :margin-bottom="false">
                 <template #buttons>
-                    <v-btn icon tile @click="mcuDetailsDialog = false">
-                        <v-icon>{{ mdiCloseThick }}</v-icon>
-                    </v-btn>
+ <v-btn :icon="mdiCloseThick" rounded="0" @click="mcuDetailsDialog = false"/>
                 </template>
                 <v-card-text class="pt-5 px-0">
-                    <overlay-scrollbars style="height: 350px" class="px-6">
+                    <OverlayScrollbarsComponent style="height: 350px" class="px-6">
                         <template v-if="mcu.mcu_constants">
                             <v-row>
                                 <v-col>
@@ -113,28 +112,39 @@
                                 </v-row>
                             </div>
                         </template>
-                    </overlay-scrollbars>
+                    </OverlayScrollbarsComponent>
                 </v-card-text>
             </panel>
         </v-dialog>
     </div>
 </template>
 
-<script lang="ts">
-import { Component, Mixins, Prop } from 'vue-property-decorator'
-import BaseMixin from '../../mixins/base'
-import { formatFilesize } from '@/plugins/helpers'
-import { PrinterStateMcu } from '@/store/printer/types'
+<script setup lang="ts">
+import { ref } from 'vue'
 import Panel from '@/components/ui/Panel.vue'
+import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 import { mdiCloseThick } from '@mdi/js'
-@Component({
-    components: { Panel },
-})
-export default class SystemPanelMcu extends Mixins(BaseMixin) {
-    formatFilesize = formatFilesize
-    mdiCloseThick = mdiCloseThick
+import type { PrinterStateMcu } from '@/store/printer/types'
 
-    @Prop({ required: true }) readonly mcu!: PrinterStateMcu
-    private mcuDetailsDialog = false
-}
+defineProps<{
+    mcu: PrinterStateMcu
+}>()
+
+const mcuDetailsDialog = ref(false)
 </script>
+
+<style scoped>
+.system-load-row {
+    width: 100%;
+}
+
+.system-load-row__info {
+    min-width: 0;
+}
+
+.system-load-row__gauge {
+    flex: 0 0 auto;
+    margin-left: auto;
+    width: fit-content;
+}
+</style>
