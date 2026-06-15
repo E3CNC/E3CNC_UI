@@ -4,6 +4,8 @@
         :icon="mdiGrid"
         title="WCS"
         :collapsible="true"
+        :toolbar-color="activeWcsToolbarColor"
+        toolbar-class="wcs-panel__toolbar"
         card-class="wcs-panel">
         <template #buttons>
             <v-btn
@@ -32,344 +34,355 @@
             </v-menu>
         </template>
         <div class="offset-preview-container">
-            <svg
-                ref="svgEl"
-                :viewBox="`0 0 ${svgWidth} ${svgHeight}`"
-                class="offset-preview-svg"
-                preserveAspectRatio="xMidYMid meet"
-                xmlns="http://www.w3.org/2000/svg"
-                @mousemove="onSvgMouseMove"
-                @mouseleave="onSvgMouseLeave"
-                @click="onSvgClick">
-                <!-- Machine bounds background -->
-                <rect
-                    :x="padding"
-                    :y="padding"
-                    :width="plotWidth"
-                    :height="plotHeight"
-                    fill="rgb(30, 30, 30)"
-                    stroke="rgba(255,255,255,0.2)"
-                    stroke-width="1" />
+            <div class="offset-preview-layout">
+                <div class="offset-preview-layout__preview">
+                    <svg
+                        ref="svgEl"
+                        :viewBox="`0 0 ${svgWidth} ${svgHeight}`"
+                        class="offset-preview-svg"
+                        preserveAspectRatio="xMidYMid meet"
+                        xmlns="http://www.w3.org/2000/svg"
+                        @mousemove="onSvgMouseMove"
+                        @mouseleave="onSvgMouseLeave"
+                        @click="onSvgClick">
+                        <!-- Machine bounds background -->
+                        <rect
+                            :x="padding"
+                            :y="padding"
+                            :width="plotWidth"
+                            :height="plotHeight"
+                            fill="rgb(30, 30, 30)"
+                            :stroke="previewStrokeColor"
+                            stroke-width="1" />
 
-                <!-- Grid lines -->
-                <line
-                    v-for="gx in gridLinesX"
-                    :key="'gx-' + gx"
-                    :x1="toSvgX(gx)"
-                    :y1="padding"
-                    :x2="toSvgX(gx)"
-                    :y2="padding + plotHeight"
-                    stroke="rgba(255,255,255,0.06)"
-                    stroke-width="0.5" />
-                <line
-                    v-for="gy in gridLinesY"
-                    :key="'gy-' + gy"
-                    :x1="padding"
-                    :y1="toSvgY(gy)"
-                    :x2="padding + plotWidth"
-                    :y2="toSvgY(gy)"
-                    stroke="rgba(255,255,255,0.06)"
-                    stroke-width="0.5" />
+                        <!-- Grid lines -->
+                        <line
+                            v-for="gx in gridLinesX"
+                            :key="'gx-' + gx"
+                            :x1="toSvgX(gx)"
+                            :y1="padding"
+                            :x2="toSvgX(gx)"
+                            :y2="padding + plotHeight"
+                            stroke="rgba(255,255,255,0.06)"
+                            stroke-width="0.5" />
+                        <line
+                            v-for="gy in gridLinesY"
+                            :key="'gy-' + gy"
+                            :x1="padding"
+                            :y1="toSvgY(gy)"
+                            :x2="padding + plotWidth"
+                            :y2="toSvgY(gy)"
+                            stroke="rgba(255,255,255,0.06)"
+                            stroke-width="0.5" />
 
-                <!-- Offset origin markers (back to front, inactive first) -->
-                <g
-                    v-for="(entry, idx) in sortedOffsets"
-                    :key="'wcs-' + entry.name"
-                    v-show="isOffsetVisible(entry.name)"
-                    class="offset-rect-group"
-                    :class="{ 'offset-rect--active': entry.name === activeWcs }"
-                    @click="onSelectWcs(entry.name)"
-                    style="cursor: pointer">
-                    <line
-                        :x1="toSvgX(entry.offsetX) - 8"
-                        :y1="toSvgY(entry.offsetY)"
-                        :x2="toSvgX(entry.offsetX) + 8"
-                        :y2="toSvgY(entry.offsetY)"
-                        :stroke="entry.color"
-                        :stroke-width="entry.name === activeWcs ? 2 : 1.5"
-                        :stroke-opacity="entry.name === activeWcs ? 1 : 0.75"
-                        stroke-linecap="round" />
-                    <line
-                        :x1="toSvgX(entry.offsetX)"
-                        :y1="toSvgY(entry.offsetY) - 8"
-                        :x2="toSvgX(entry.offsetX)"
-                        :y2="toSvgY(entry.offsetY) + 8"
-                        :stroke="entry.color"
-                        :stroke-width="entry.name === activeWcs ? 2 : 1.5"
-                        :stroke-opacity="entry.name === activeWcs ? 1 : 0.75"
-                        stroke-linecap="round" />
-                </g>
+                        <!-- Offset origin markers (back to front, inactive first) -->
+                        <g
+                            v-for="(entry, idx) in sortedOffsets"
+                            :key="'wcs-' + entry.name"
+                            v-show="isOffsetVisible(entry.name)"
+                            class="offset-rect-group"
+                            :class="{ 'offset-rect--active': entry.name === activeWcs }"
+                            @click="onSelectWcs(entry.name)"
+                            style="cursor: pointer">
+                            <line
+                                :x1="toSvgX(entry.offsetX) - 8"
+                                :y1="toSvgY(entry.offsetY)"
+                                :x2="toSvgX(entry.offsetX) + 8"
+                                :y2="toSvgY(entry.offsetY)"
+                                :stroke="entry.color"
+                                :stroke-width="entry.name === activeWcs ? 2 : 1.5"
+                                :stroke-opacity="entry.name === activeWcs ? 1 : 0.75"
+                                stroke-linecap="round" />
+                            <line
+                                :x1="toSvgX(entry.offsetX)"
+                                :y1="toSvgY(entry.offsetY) - 8"
+                                :x2="toSvgX(entry.offsetX)"
+                                :y2="toSvgY(entry.offsetY) + 8"
+                                :stroke="entry.color"
+                                :stroke-width="entry.name === activeWcs ? 2 : 1.5"
+                                :stroke-opacity="entry.name === activeWcs ? 1 : 0.75"
+                                stroke-linecap="round" />
+                        </g>
 
-                <!-- Stock size rectangles (origin at bottom-left of stock) -->
-                <g
-                    v-for="entry in allOffsetEntries"
-                    :key="'stock-' + entry.name"
-                    v-show="isOffsetVisible(entry.name)"
-                    style="pointer-events: none">
-                    <rect
-                        v-if="stockSizes[entry.name]"
-                        :x="toSvgX(entry.offsetX)"
-                        :y="toSvgY(entry.offsetY + stockSizes[entry.name].height)"
-                        :width="
-                            Math.max(0, toSvgX(entry.offsetX + stockSizes[entry.name].width) - toSvgX(entry.offsetX))
-                        "
-                        :height="
-                            Math.max(0, toSvgY(entry.offsetY) - toSvgY(entry.offsetY + stockSizes[entry.name].height))
-                        "
-                        fill="none"
-                        :stroke="entry.color"
-                        stroke-width="1.5"
-                        stroke-opacity="0.6" />
-                    <text
-                        v-if="stockSizes[entry.name]"
-                        :x="toSvgX(entry.offsetX + stockSizes[entry.name].width / 2)"
-                        :y="toSvgY(entry.offsetY + stockSizes[entry.name].height / 2) + 3"
-                        text-anchor="middle"
-                        :fill="entry.color"
-                        font-size="7"
-                        font-family="monospace"
-                        opacity="0.7">
-                        {{ stockSizes[entry.name].name || entry.name }}
-                    </text>
-                </g>
+                        <!-- Stock size rectangles (origin at bottom-left of stock) -->
+                        <g
+                            v-for="entry in allOffsetEntries"
+                            :key="'stock-' + entry.name"
+                            v-show="isOffsetVisible(entry.name)"
+                            style="pointer-events: none">
+                            <rect
+                                v-if="stockSizes[entry.name]"
+                                :x="toSvgX(entry.offsetX)"
+                                :y="toSvgY(entry.offsetY + stockSizes[entry.name].height)"
+                                :width="
+                                    Math.max(0, toSvgX(entry.offsetX + stockSizes[entry.name].width) - toSvgX(entry.offsetX))
+                                "
+                                :height="
+                                    Math.max(0, toSvgY(entry.offsetY) - toSvgY(entry.offsetY + stockSizes[entry.name].height))
+                                "
+                                fill="none"
+                                :stroke="entry.color"
+                                stroke-width="1.5"
+                                stroke-opacity="0.6" />
+                            <text
+                                v-if="stockSizes[entry.name]"
+                                :x="toSvgX(entry.offsetX + stockSizes[entry.name].width / 2)"
+                                :y="toSvgY(entry.offsetY + stockSizes[entry.name].height / 2) + 3"
+                                text-anchor="middle"
+                                :fill="entry.color"
+                                font-size="7"
+                                font-family="monospace"
+                                opacity="0.7">
+                                {{ stockSizes[entry.name].name || entry.name }}
+                            </text>
+                        </g>
 
-                <!-- Snap crosshair indicator -->
-                <template v-if="snapToGrid && snapInfo">
-                    <line
-                        :x1="toSvgX(snapInfo.x) - 8"
-                        :y1="toSvgY(snapInfo.y)"
-                        :x2="toSvgX(snapInfo.x) + 8"
-                        :y2="toSvgY(snapInfo.y)"
-                        stroke="rgba(255,255,255,0.7)"
-                        stroke-width="1"
-                        stroke-dasharray="3 2" />
-                    <line
-                        :x1="toSvgX(snapInfo.x)"
-                        :y1="toSvgY(snapInfo.y) - 8"
-                        :x2="toSvgX(snapInfo.x)"
-                        :y2="toSvgY(snapInfo.y) + 8"
-                        stroke="rgba(255,255,255,0.7)"
-                        stroke-width="1"
-                        stroke-dasharray="3 2" />
-                    <circle
-                        :cx="toSvgX(snapInfo.x)"
-                        :cy="toSvgY(snapInfo.y)"
-                        r="3"
-                        fill="none"
-                        stroke="rgba(255,255,255,0.5)"
-                        stroke-width="1" />
-                </template>
+                        <!-- Snap crosshair indicator -->
+                        <template v-if="snapToGrid && snapInfo">
+                            <line
+                                :x1="toSvgX(snapInfo.x) - 8"
+                                :y1="toSvgY(snapInfo.y)"
+                                :x2="toSvgX(snapInfo.x) + 8"
+                                :y2="toSvgY(snapInfo.y)"
+                                stroke="rgba(255,255,255,0.7)"
+                                stroke-width="1"
+                                stroke-dasharray="3 2" />
+                            <line
+                                :x1="toSvgX(snapInfo.x)"
+                                :y1="toSvgY(snapInfo.y) - 8"
+                                :x2="toSvgX(snapInfo.x)"
+                                :y2="toSvgY(snapInfo.y) + 8"
+                                stroke="rgba(255,255,255,0.7)"
+                                stroke-width="1"
+                                stroke-dasharray="3 2" />
+                            <circle
+                                :cx="toSvgX(snapInfo.x)"
+                                :cy="toSvgY(snapInfo.y)"
+                                r="3"
+                                fill="none"
+                                stroke="rgba(255,255,255,0.5)"
+                                stroke-width="1" />
+                        </template>
 
-                <!-- Tool position dot -->
-                <circle
-                    v-if="toolVisible"
-                    :cx="toSvgX(toolX)"
-                    :cy="toSvgY(toolY)"
-                    r="4"
-                    fill="#ff5000"
-                    stroke="white"
-                    stroke-width="1.5" />
+                        <!-- Tool position dot -->
+                        <circle
+                            v-if="toolVisible"
+                            :cx="toSvgX(toolX)"
+                            :cy="toSvgY(toolY)"
+                            r="4"
+                            fill="#ff5000"
+                            stroke="white"
+                            stroke-width="1.5" />
 
-                <!-- Axis labels -->
-                <text
-                    :x="padding + plotWidth / 2"
-                    :y="svgHeight - 2"
-                    text-anchor="middle"
-                    fill="rgba(255,255,255,0.5)"
-                    font-size="9"
-                    font-family="monospace">
-                    X ({{ machineMaxX.toFixed(0) }}mm)
-                </text>
-                <text
-                    :x="padding - 8"
-                    :y="padding + plotHeight / 2"
-                    text-anchor="middle"
-                    fill="rgba(255,255,255,0.5)"
-                    font-size="9"
-                    font-family="monospace"
-                    :transform="`rotate(-90, ${padding - 8}, ${padding + plotHeight / 2})`">
-                    Y ({{ machineMaxY.toFixed(0) }}mm)
-                </text>
-            </svg>
-
-            <!-- Legend -->
-            <div class="offset-preview-legend">
-                <div
-                    v-for="entry in allOffsetEntries"
-                    :key="'legend-' + entry.name"
-                    class="offset-preview-legend__card"
-                    :class="{ 'offset-preview-legend__card--active': entry.name === activeWcs }"
-                    :style="{ borderColor: entry.color }"
-                    @click="onSelectWcs(entry.name)"
-                    style="cursor: pointer">
-                    <div class="offset-preview-legend__card-header">
-                        <span class="offset-preview-legend__swatch" :style="{ backgroundColor: entry.color }" />
-                        <span class="offset-preview-legend__card-title">{{ entry.name }}</span>
-                        <span class="offset-preview-legend__card-origin">
-                            ({{ entry.offsetX.toFixed(1) }}, {{ entry.offsetY.toFixed(1) }})
-                        </span>
-                        <v-icon
-                            size="x-small"
-                            class="offset-preview-legend__card-eye"
-                            :style="{
-                                color: isOffsetVisible(entry.name) ? 'rgb(var(--v-theme-primary))' : undefined,
-                                opacity: isOffsetVisible(entry.name) ? 1 : 0.5,
-                            }"
-                            @click.stop="toggleOffsetVisibility(entry.name)">
-                            {{ isOffsetVisible(entry.name) ? mdiEye : mdiEyeOff }}
-                        </v-icon>
-                    </div>
-                    <div
-                        v-if="stockSizes[entry.name]"
-                        class="offset-preview-legend__card-stock"
-                        @click.stop="openStockDialog(entry.name)"
-                        style="cursor: pointer">
-                        <div class="offset-preview-legend__card-stock-name">
-                            {{ stockSizes[entry.name].name || entry.name }}
-                        </div>
-                        <div class="offset-preview-legend__card-stock-dims">
-                            <span>{{ stockSizes[entry.name].width }}W</span>
-                            <span class="offset-preview-legend__card-sep">&times;</span>
-                            <span>{{ stockSizes[entry.name].height }}H</span>
-                            <template v-if="stockSizes[entry.name].depth">
-                                <span class="offset-preview-legend__card-sep">&times;</span>
-                                <span>{{ stockSizes[entry.name].depth }}D</span>
-                            </template>
-                        </div>
-                    </div>
+                        <!-- Axis labels -->
+                        <text
+                            :x="padding + plotWidth / 2"
+                            :y="svgHeight - 2"
+                            text-anchor="middle"
+                            fill="rgba(255,255,255,0.5)"
+                            font-size="9"
+                            font-family="monospace">
+                            X ({{ machineMaxX.toFixed(0) }}mm)
+                        </text>
+                        <text
+                            :x="padding - 8"
+                            :y="padding + plotHeight / 2"
+                            text-anchor="middle"
+                            fill="rgba(255,255,255,0.5)"
+                            font-size="9"
+                            font-family="monospace"
+                            :transform="`rotate(-90, ${padding - 8}, ${padding + plotHeight / 2})`">
+                            Y ({{ machineMaxY.toFixed(0) }}mm)
+                        </text>
+                    </svg>
                 </div>
-                <div class="offset-preview-legend__item offset-preview-legend__item--tool">
-                    <span class="offset-preview-legend__swatch offset-preview-legend__swatch--tool" />
-                    <span class="offset-preview-legend__label">Tool</span>
-                    <span class="offset-preview-legend__coords">({{ toolX.toFixed(1) }}, {{ toolY.toFixed(1) }})</span>
-                </div>
-            </div>
 
-            <div class="offset-preview-controls">
-                <v-card variant="outlined" class="offset-preview-summary-card">
-                    <v-card-text class="offset-preview-summary-card__text">
-                        <div class="offset-preview-summary-grid">
-                            <div class="offset-preview-summary-grid__section">
-                                <span class="text-caption font-weight-bold section-label">Work Position:</span>
-                                <div class="compact-axis-list">
-                                    <span class="compact-axis compact-axis--stacked">
-                                        X
-                                        <strong>{{ currentWorkX.toFixed(3) }}</strong>
-                                    </span>
-                                    <span class="compact-axis compact-axis--stacked">
-                                        Y
-                                        <strong>{{ currentWorkY.toFixed(3) }}</strong>
-                                    </span>
-                                    <span class="compact-axis compact-axis--stacked">
-                                        Z
-                                        <strong>{{ currentWorkZ.toFixed(3) }}</strong>
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="offset-preview-summary-grid__section">
-                                <span class="text-caption font-weight-bold section-label">
-                                    Origin Offset (machine):
+                <div class="offset-preview-layout__details">
+                    <!-- Legend -->
+                    <div class="offset-preview-legend">
+                        <div
+                            v-for="entry in allOffsetEntries"
+                            :key="'legend-' + entry.name"
+                            class="offset-preview-legend__card"
+                            :class="{ 'offset-preview-legend__card--active': entry.name === activeWcs }"
+                            :style="{ borderColor: entry.color }"
+                            @click="onSelectWcs(entry.name)"
+                            style="cursor: pointer">
+                            <div class="offset-preview-legend__card-header">
+                                <span class="offset-preview-legend__swatch" :style="{ backgroundColor: entry.color }" />
+                                <span class="offset-preview-legend__card-title">{{ entry.name }}</span>
+                                <span class="offset-preview-legend__card-origin">
+                                    ({{ entry.offsetX.toFixed(1) }}, {{ entry.offsetY.toFixed(1) }})
                                 </span>
-                                <div class="compact-axis-list compact-axis-list--muted">
-                                    <span class="compact-axis compact-axis--stacked">
-                                        X
-                                        <strong>{{ wcsOriginOffsetX.toFixed(3) }}</strong>
-                                    </span>
-                                    <span class="compact-axis compact-axis--stacked">
-                                        Y
-                                        <strong>{{ wcsOriginOffsetY.toFixed(3) }}</strong>
-                                    </span>
-                                    <span class="compact-axis compact-axis--stacked">
-                                        Z
-                                        <strong>{{ wcsOriginOffsetZ.toFixed(3) }}</strong>
-                                    </span>
+                                <v-icon
+                                    size="x-small"
+                                    class="offset-preview-legend__card-eye"
+                                    :style="{
+                                        color: isOffsetVisible(entry.name) ? 'rgb(var(--v-theme-primary))' : undefined,
+                                        opacity: isOffsetVisible(entry.name) ? 1 : 0.5,
+                                    }"
+                                    @click.stop="toggleOffsetVisibility(entry.name)">
+                                    {{ isOffsetVisible(entry.name) ? mdiEye : mdiEyeOff }}
+                                </v-icon>
+                            </div>
+                            <div
+                                v-if="stockSizes[entry.name]"
+                                class="offset-preview-legend__card-stock"
+                                @click.stop="openStockDialog(entry.name)"
+                                style="cursor: pointer">
+                                <div class="offset-preview-legend__card-stock-name">
+                                    {{ stockSizes[entry.name].name || entry.name }}
+                                </div>
+                                <div class="offset-preview-legend__card-stock-dims">
+                                    <span>{{ stockSizes[entry.name].width }}W</span>
+                                    <span class="offset-preview-legend__card-sep">&times;</span>
+                                    <span>{{ stockSizes[entry.name].height }}H</span>
+                                    <template v-if="stockSizes[entry.name].depth">
+                                        <span class="offset-preview-legend__card-sep">&times;</span>
+                                        <span>{{ stockSizes[entry.name].depth }}D</span>
+                                    </template>
                                 </div>
                             </div>
                         </div>
-                    </v-card-text>
-                </v-card>
+                        <div class="offset-preview-legend__item offset-preview-legend__item--tool">
+                            <span class="offset-preview-legend__swatch offset-preview-legend__swatch--tool" />
+                            <span class="offset-preview-legend__label">Tool</span>
+                            <span class="offset-preview-legend__coords">({{ toolX.toFixed(1) }}, {{ toolY.toFixed(1) }})</span>
+                        </div>
+                    </div>
 
-                <v-row density="compact" class="offset-preview-controls__row offset-preview-controls__row--tight">
-                    <v-col cols="12">
-                        <span class="text-caption font-weight-bold">Set Work Zero:</span>
-                    </v-col>
-                    <v-col cols="6">
-                        <v-btn
-                            size="small"
-                            block
-                            variant="outlined"
-                            @click="onSetWorkZeroXYClick"
-                            :disabled="offsetActionsLocked">
-                            <v-icon size="small" start>{{ mdiTarget }}</v-icon>
-                            Set XY Zero
-                        </v-btn>
-                    </v-col>
-                    <v-col cols="6">
-                        <v-btn
-                            size="small"
-                            block
-                            variant="outlined"
-                            @click="onSetWorkZeroZClick"
-                            :disabled="offsetActionsLocked">
-                            <v-icon size="small" start>{{ mdiAxisZArrow }}</v-icon>
-                            Set Z Zero
-                        </v-btn>
-                    </v-col>
-                </v-row>
+                    <div class="offset-preview-controls">
+                        <v-card variant="outlined" class="offset-preview-summary-card">
+                            <v-card-text class="offset-preview-summary-card__text">
+                                <div class="offset-preview-summary-grid">
+                                    <div class="offset-preview-summary-grid__section">
+                                        <span class="text-caption font-weight-bold section-label">Work Position:</span>
+                                        <div class="compact-axis-list">
+                                            <span class="compact-axis compact-axis--stacked">
+                                                X
+                                                <strong>{{ currentWorkX.toFixed(3) }}</strong>
+                                            </span>
+                                            <span class="compact-axis compact-axis--stacked">
+                                                Y
+                                                <strong>{{ currentWorkY.toFixed(3) }}</strong>
+                                            </span>
+                                            <span class="compact-axis compact-axis--stacked">
+                                                Z
+                                                <strong>{{ currentWorkZ.toFixed(3) }}</strong>
+                                            </span>
+                                        </div>
+                                    </div>
 
-                <v-row density="compact" class="offset-preview-controls__row offset-preview-controls__row--tight">
-                    <v-col cols="12">
-                        <span class="text-caption font-weight-bold">Manual Offset:</span>
-                    </v-col>
-                    <v-col cols="4">
-                        <v-text-field
-                            v-model.number="offsetInputX"
-                            label="X"
-                            type="number"
-                            density="compact"
-                            variant="outlined"
-                            step="0.001" />
-                    </v-col>
-                    <v-col cols="4">
-                        <v-text-field
-                            v-model.number="offsetInputY"
-                            label="Y"
-                            type="number"
-                            density="compact"
-                            variant="outlined"
-                            step="0.001" />
-                    </v-col>
-                    <v-col cols="4">
-                        <v-text-field
-                            v-model.number="offsetInputZ"
-                            label="Z"
-                            type="number"
-                            density="compact"
-                            variant="outlined"
-                            step="0.001" />
-                    </v-col>
-                </v-row>
+                                    <div class="offset-preview-summary-grid__section">
+                                        <span class="text-caption font-weight-bold section-label">
+                                            Origin Offset (machine):
+                                        </span>
+                                        <div class="compact-axis-list compact-axis-list--muted">
+                                            <span class="compact-axis compact-axis--stacked">
+                                                X
+                                                <strong>{{ wcsOriginOffsetX.toFixed(3) }}</strong>
+                                            </span>
+                                            <span class="compact-axis compact-axis--stacked">
+                                                Y
+                                                <strong>{{ wcsOriginOffsetY.toFixed(3) }}</strong>
+                                            </span>
+                                            <span class="compact-axis compact-axis--stacked">
+                                                Z
+                                                <strong>{{ wcsOriginOffsetZ.toFixed(3) }}</strong>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </v-card-text>
+                        </v-card>
 
-                <v-row density="compact" class="offset-preview-controls__row offset-preview-controls__row--actions">
-                    <v-col cols="6">
-                        <v-btn size="small" block color="primary" @click="applyOffsets" :disabled="offsetActionsLocked">
-                            <v-icon size="small" start>{{ mdiCheck }}</v-icon>
-                            Apply
-                        </v-btn>
-                    </v-col>
-                    <v-col cols="6">
-                        <v-btn
-                            size="small"
-                            block
-                            variant="outlined"
-                            @click="resetOffsets"
-                            :disabled="offsetActionsLocked">
-                            <v-icon size="small" start>{{ mdiRestart }}</v-icon>
-                            Reset
-                        </v-btn>
-                    </v-col>
-                </v-row>
+                        <v-row density="compact" class="offset-preview-controls__row offset-preview-controls__row--tight">
+                            <v-col cols="12">
+                                <span class="text-caption font-weight-bold">Set Work Zero:</span>
+                            </v-col>
+                            <v-col cols="4">
+                                <v-btn
+                                    size="small"
+                                    block
+                                    variant="outlined"
+                                    @click="onSetWorkZeroClick('X')"
+                                    :disabled="offsetActionsLocked">
+                                    <v-icon size="small" start>{{ mdiTarget }}</v-icon>
+                                    Set X
+                                </v-btn>
+                            </v-col>
+                            <v-col cols="4">
+                                <v-btn
+                                    size="small"
+                                    block
+                                    variant="outlined"
+                                    @click="onSetWorkZeroClick('Y')"
+                                    :disabled="offsetActionsLocked">
+                                    <v-icon size="small" start>{{ mdiTarget }}</v-icon>
+                                    Set Y
+                                </v-btn>
+                            </v-col>
+                            <v-col cols="4">
+                                <v-btn
+                                    size="small"
+                                    block
+                                    variant="outlined"
+                                    @click="onSetWorkZeroClick('Z')"
+                                    :disabled="offsetActionsLocked">
+                                    <v-icon size="small" start>{{ mdiAxisZArrow }}</v-icon>
+                                    Set Z
+                                </v-btn>
+                            </v-col>
+                        </v-row>
+
+                        <v-row density="compact" class="offset-preview-controls__row offset-preview-controls__row--tight">
+                            <v-col cols="12">
+                                <span class="text-caption font-weight-bold">Manual Offset:</span>
+                            </v-col>
+                            <v-col cols="4">
+                                <v-text-field
+                                    v-model.number="offsetInputX"
+                                    label="X"
+                                    type="number"
+                                    density="compact"
+                                    variant="outlined"
+                                    step="0.001" />
+                            </v-col>
+                            <v-col cols="4">
+                                <v-text-field
+                                    v-model.number="offsetInputY"
+                                    label="Y"
+                                    type="number"
+                                    density="compact"
+                                    variant="outlined"
+                                    step="0.001" />
+                            </v-col>
+                            <v-col cols="4">
+                                <v-text-field
+                                    v-model.number="offsetInputZ"
+                                    label="Z"
+                                    type="number"
+                                    density="compact"
+                                    variant="outlined"
+                                    step="0.001" />
+                            </v-col>
+                        </v-row>
+
+                        <v-row density="compact" class="offset-preview-controls__row offset-preview-controls__row--actions">
+                            <v-col cols="12">
+                                <v-btn
+                                    size="small"
+                                    block
+                                    variant="outlined"
+                                    @click="resetOffsets"
+                                    :disabled="offsetActionsLocked">
+                                    <v-icon size="small" start>{{ mdiRestart }}</v-icon>
+                                    Reset
+                                </v-btn>
+                            </v-col>
+                        </v-row>
+                    </div>
+                </div>
             </div>
 
             <confirmation-dialog
@@ -473,7 +486,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useStore } from 'vuex'
 import { useBase } from '@/composables/useBase'
 import { useControl } from '@/composables/useControl'
@@ -488,7 +501,6 @@ import {
     mdiEyeOff,
     mdiTarget,
     mdiAxisZArrow,
-    mdiCheck,
     mdiRestart,
 } from '@mdi/js'
 import ConfirmationDialog from '@/components/dialogs/ConfirmationDialog.vue'
@@ -505,13 +517,27 @@ const store = useStore()
 const padding = 24
 const svgWidth = 260
 const { activeWcs, wcsOffsets, refreshWcs, setActiveWcs } = useCncOffsets()
+const viewportHeight = ref(window.innerHeight)
+
+function syncViewportHeight() {
+    viewportHeight.value = window.innerHeight
+}
+
+onMounted(() => {
+    window.addEventListener('resize', syncViewportHeight)
+})
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', syncViewportHeight)
+})
+
 const machineAspectY = computed(() => {
     const rangeX = machineMaxX.value - machineMinX.value
     const rangeY = machineMaxY.value - machineMinY.value
     return rangeX > 0 ? rangeY / rangeX : 1
 })
 const plotWidth = svgWidth - padding - 10
-const svgHeight = computed(() => Math.round(padding + 16 + plotWidth * machineAspectY.value))
+const svgHeight = computed(() => Math.min(Math.round(padding + 16 + plotWidth * machineAspectY.value), Math.max(320, viewportHeight.value - 560)))
 const plotHeight = computed(() => svgHeight.value - padding - 16)
 const gridStepOptions = [5, 10, 15, 20, 25, 30, 50, 100]
 const gridStep = ref(Number(localStorage.getItem('cncPreviewGridStep')) || 10)
@@ -523,7 +549,7 @@ const offsetInputZ = ref(0)
 const zeroConfirmDialogOpen = ref(false)
 const zeroConfirmText = ref('')
 const zeroConfirmTitle = ref('Confirm')
-const zeroConfirmAction = ref<'xy' | 'z' | null>(null)
+const zeroConfirmAction = ref<'X' | 'Y' | 'Z' | null>(null)
 watch(gridStep, (v) => localStorage.setItem('cncPreviewGridStep', String(v)))
 watch(snapToGrid, (v) => localStorage.setItem('cncPreviewSnapToGrid', String(v)))
 watch(
@@ -640,12 +666,25 @@ const activeWcsIndex = computed(() => {
     const index = offsetNames.indexOf(activeWcs.value)
     return index >= 0 ? index : 0
 })
+const activeWcsColor = computed(() => offsetColors[activeWcsIndex.value] ?? offsetColors[0])
+const activeWcsToolbarColor = computed(() => hexToRgba(activeWcsColor.value, 0.42))
+const previewStrokeColor = computed(() => hexToRgba(activeWcsColor.value, 0.9))
 const wcsOriginOffsets = computed(() => wcsOffsets.value[offsetNames[activeWcsIndex.value]] ?? { X: 0, Y: 0, Z: 0 })
 const wcsOriginOffsetX = computed(() => wcsOriginOffsets.value.X ?? 0)
 const wcsOriginOffsetY = computed(() => wcsOriginOffsets.value.Y ?? 0)
 const wcsOriginOffsetZ = computed(() => wcsOriginOffsets.value.Z ?? 0)
 
 const offsetColors = ['#42A5F5', '#66BB6A', '#FFA726', '#AB47BC', '#EF5350', '#26C6DA']
+
+function hexToRgba(hex: string, alpha: number): string {
+    const normalized = hex.replace('#', '')
+    const value = normalized.length === 3 ? normalized.split('').map((c) => c + c).join('') : normalized
+    const int = Number.parseInt(value, 16)
+    const r = (int >> 16) & 255
+    const g = (int >> 8) & 255
+    const b = int & 255
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
 
 const machineMinX = computed(() => {
     const min = store.state.printer?.toolhead?.axis_minimum
@@ -757,44 +796,23 @@ async function onSelectWcs(name: string) {
     }
 }
 
-function onSetWorkZeroXYClick() {
+function onSetWorkZeroClick(axis: 'X' | 'Y' | 'Z') {
     if (requireConfirmForZeroReset.value) {
         zeroConfirmTitle.value = 'Set Work Zero'
-        zeroConfirmText.value = 'Set XY zero for the current work coordinate system?'
-        zeroConfirmAction.value = 'xy'
+        zeroConfirmText.value = `Set ${axis} zero for the current work coordinate system?`
+        zeroConfirmAction.value = axis
         zeroConfirmDialogOpen.value = true
         return
     }
-    void setWorkZeroXY()
+    void setWorkZero(axis)
 }
 
-function onSetWorkZeroZClick() {
-    if (requireConfirmForZeroReset.value) {
-        zeroConfirmTitle.value = 'Set Work Zero'
-        zeroConfirmText.value = 'Set Z zero for the current work coordinate system?'
-        zeroConfirmAction.value = 'z'
-        zeroConfirmDialogOpen.value = true
-        return
-    }
-    void setWorkZeroZ()
-}
-
-async function setWorkZeroXY() {
+async function setWorkZero(axis: 'X' | 'Y' | 'Z') {
     try {
-        await setCncZero(store.getters['socket/getUrl'], { axes: ['X', 'Y'] })
+        await setCncZero(store.getters['socket/getUrl'], { axes: [axis] })
         await refreshWcs()
     } catch (error) {
-        const message = error instanceof Error ? error.message : 'Failed to set XY zero'
-        toast.error(message)
-    }
-}
-
-async function setWorkZeroZ() {
-    try {
-        await setCncZero(store.getters['socket/getUrl'], { axes: ['Z'] })
-        await refreshWcs()
-    } catch (error) {
-        const message = error instanceof Error ? error.message : 'Failed to set Z zero'
+        const message = error instanceof Error ? error.message : `Failed to set ${axis} zero`
         toast.error(message)
     }
 }
@@ -803,21 +821,9 @@ async function runZeroConfirmAction() {
     const action = zeroConfirmAction.value
     zeroConfirmAction.value = null
     zeroConfirmDialogOpen.value = false
-    if (action === 'xy') {
-        await setWorkZeroXY()
-    } else if (action === 'z') {
-        await setWorkZeroZ()
+    if (action) {
+        await setWorkZero(action)
     }
-}
-
-function applyOffsets() {
-    const x = offsetInputX.value ?? 0
-    const y = offsetInputY.value ?? 0
-    const z = offsetInputZ.value ?? 0
-    doSend(`G10 L20 P${activeWcsIndex.value + 1} X${x} Y${y} Z${z}`)
-    offsetInputX.value = 0
-    offsetInputY.value = 0
-    offsetInputZ.value = 0
 }
 
 function resetOffsets() {
@@ -906,6 +912,48 @@ onMounted(() => {
 <style scoped>
 .offset-preview-container {
     padding: 4px 18px 8px;
+    margin: 0 auto;
+}
+
+.offset-preview-layout {
+    display: grid;
+    gap: 16px;
+}
+
+.offset-preview-layout__preview {
+    width: 100%;
+    max-width: 320px;
+}
+
+.offset-preview-layout__details {
+    min-width: 0;
+}
+
+.offset-preview-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.offset-preview-controls :deep(.v-row) {
+    flex-shrink: 0;
+}
+
+@media (min-width: 1400px) {
+    .offset-preview-layout {
+        grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+        align-items: start;
+    }
+
+    .offset-preview-layout__preview {
+        position: sticky;
+        top: 12px;
+    }
+}
+
+.wcs-panel {
+    display: flex;
+    flex-direction: column;
 }
 
 .offset-preview-svg {

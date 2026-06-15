@@ -26,7 +26,7 @@ Primary directories discovered in Mainsail for CNC integration:
 - `src/components/panels/Cnc/CncStatusPanel.vue`
 - `src/components/panels/Cnc/DroPanel.vue`
 - `src/components/panels/Cnc/JogPanel.vue`
-- `src/components/panels/Cnc/OffsetsPanel.vue`
+- `src/components/panels/Cnc/Wcs.vue`
 - `src/components/panels/Cnc/SpindleCoolantPanel.vue`
 - `src/components/panels/Cnc/MdiPanel.vue`
 

@@ -54,7 +54,7 @@ Klipper  ──websocket objects──>  Mainsail Vuex store
 The agent only sees what is not already exposed cleanly by Klipper. The
 overlap (e.g. work position) is intentionally not duplicated: the
 frontend reads `printer.gcode_move.gcode_position` for display, and the
-`OffsetsPanel` "Set Work Zero" button sends `G10 L20 P{n} X0 Y0` through
+`Wcs` "Set Work Zero" button sends `G10 L20 P{n} X0 Y0` through
 the agent's `/server/cnc/wcs/set-zero` endpoint, which uses the WCS
 plugin's G10 handler.
 
@@ -64,7 +64,7 @@ plugin's G10 handler.
 | --- | --- | --- |
 | `CncStatusPanel` | `printer.print_stats`, `printer.gcode_move`, `printer.toolhead`, `printer.system_stats` | wired, renders |
 | `JogPanel` | `gui.control`, `printer.print_stats`, `printer.toolhead.homed_axes` + `doSend` | wired, renders |
-| `OffsetsPanel` | `printer.gcode_move.gcode_position` + `G10 L20` work-zero actions (WCS plugin) | wired, renders |
+| `Wcs` | `printer.gcode_move.gcode_position` + `G10 L20` work-zero actions (WCS plugin) | wired, renders |
 | `OffsetPreview` | interactive WCS preview with crosshairs/labels, click-to-move, hover tooltips, and grid-size selector | wired, renders |
 | `SpindleCoolantPanel` | `doSend` (raw `M3`/`M4`/`M5`/`M7`/`M8`/`M9`) | wired, renders |
 | `MdiPanel` | `ConsoleTextarea` + quick commands for G20/G21/G90/G91 and WCS shortcuts | wired, renders |

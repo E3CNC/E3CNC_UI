@@ -26,7 +26,7 @@ A two-part integration:
 | **Klipper extra** | `WorkCoordinateSystems` | `klipper-extras/work_coordinate_systems.py` |
 | **Klipper macros** | WCS selector and zero macros | `klipper-macros/wcs_macros.cfg` |
 | **Moonraker agent** | WCS endpoint enrichment | `moonraker-cnc-agent/src/moonraker_cnc_agent/cnc_agent.py` |
-| **Frontend** | Offsets panel → WCS-aware | `src/components/panels/Cnc/OffsetsPanel.vue` |
+| **Frontend** | Offsets panel → WCS-aware | `src/components/panels/Cnc/Wcs.vue` |
 
 ### Klipper extra plugin (`klipper-extras/work_coordinate_systems.py`)
 
@@ -87,9 +87,9 @@ async def handle_wcs_get(self, request=None):
 This makes the frontend's `/server/cnc/wcs` GET endpoint return authoritative
 WCS data from the Klipper plugin, not stubs.
 
-### Frontend (`OffsetsPanel.vue`)
+### Frontend (`Wcs.vue`)
 
-The OffsetsPanel already has:
+The Wcs panel already has:
 - G54–G59 selector buttons (calls `selectCncWcs`)
 - Set XY Zero / Set Z Zero (calls `setCncZero`, agent runs G92)
 - Manual offset entry fields (calls `doSend('G92 X... Y... Z...')`)
@@ -140,7 +140,7 @@ The OffsetsPanel already has:
 
 ### Phase 3 — Update frontend
 
-1. Replace `G92` calls in `OffsetsPanel.vue` with `G10 L20` calls.
+1. Replace `G92` calls in `Wcs.vue` with `G10 L20` calls.
 2. Show per-WCS origin offsets (not just gcode_position) from the agent.
 3. `setCncZero` in `cncApi.ts` — change G92 to G10 L20 payload.
 4. Remove `G10 unsupported` caveat from README.
@@ -170,5 +170,5 @@ The OffsetsPanel already has:
 - `klipper-extras/work_coordinate_systems.py` — the Klipper plugin
 - `klipper-macros/wcs_macros.cfg` — WCS macros
 - `moonraker-cnc-agent/src/moonraker_cnc_agent/cnc_agent.py` — Moonraker agent
-- `src/components/panels/Cnc/OffsetsPanel.vue` — frontend Offsets panel
+- `src/components/panels/Cnc/Wcs.vue` — frontend Offsets panel
 - `README.md` — see Klipper G-code caveats and WCS section

@@ -95,7 +95,7 @@ Total Vue files: 247
 - [x] src/components/panels/Cnc/DroPanel.vue
 - [x] src/components/panels/Cnc/JogPanel.vue
 - [x] src/components/panels/Cnc/MdiPanel.vue
-- [x] src/components/panels/Cnc/OffsetsPanel.vue
+- [x] src/components/panels/Cnc/Wcs.vue
 - [x] src/components/panels/Cnc/SpindleCoolantPanel.vue
 - [x] src/components/panels/FarmPrinterPanel.vue
 - [x] src/components/panels/Gcodefiles/GcodefilesPanelHeader.vue
