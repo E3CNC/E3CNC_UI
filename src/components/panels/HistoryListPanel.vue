@@ -258,17 +258,8 @@ const headers = computed<HistoryListPanelCol[]>(() => {
         { title: t('History.LastModified').toString(), key: 'modified', text: t('History.LastModified').toString(), value: 'modified', align: 'left', configable: true, visible: true, outputType: 'date' },
         { title: t('History.StartTime').toString(), key: 'start_time', text: t('History.StartTime').toString(), value: 'start_time', align: 'left', configable: true, visible: true, outputType: 'date' },
         { title: t('History.EndTime').toString(), key: 'end_time', text: t('History.EndTime').toString(), value: 'end_time', align: 'left', configable: true, visible: true, outputType: 'date' },
-        { title: t('History.EstimatedTime').toString(), key: 'estimated_time', text: t('History.EstimatedTime').toString(), value: 'estimated_time', align: 'left', configable: true, visible: true, outputType: 'time' },
         { title: t('History.PrintTime').toString(), key: 'print_duration', text: t('History.PrintTime').toString(), value: 'print_duration', align: 'left', configable: true, visible: true, outputType: 'time' },
-        { title: t('History.TotalTime').toString(), key: 'total_duration', text: t('History.TotalTime').toString(), value: 'total_duration', align: 'left', configable: true, visible: true, outputType: 'time' },
-        { title: t('History.FilamentCalc').toString(), key: 'filament_total', text: t('History.FilamentCalc').toString(), value: 'filament_total', align: 'left', configable: true, visible: true, outputType: 'length' },
-        { title: t('History.FilamentUsed').toString(), key: 'filament_used', text: t('History.FilamentUsed').toString(), value: 'filament_used', align: 'left', configable: true, visible: true, outputType: 'length' },
-        { title: t('History.FirstLayerExtTemp').toString(), key: 'first_layer_extr_temp', text: t('History.FirstLayerExtTemp').toString(), value: 'first_layer_extr_temp', align: 'left', configable: true, visible: true, outputType: 'temp' },
-        { title: t('History.FirstLayerBedTemp').toString(), key: 'first_layer_bed_temp', text: t('History.FirstLayerBedTemp').toString(), value: 'first_layer_bed_temp', align: 'left', configable: true, visible: true, outputType: 'temp' },
-        { title: t('History.FirstLayerHeight').toString(), key: 'first_layer_height', text: t('History.FirstLayerHeight').toString(), value: 'first_layer_height', align: 'left', configable: true, visible: true, outputType: 'length' },
-        { title: t('History.LayerHeight').toString(), key: 'layer_height', text: t('History.LayerHeight').toString(), value: 'layer_height', align: 'left', configable: true, visible: true, outputType: 'length' },
-        { title: t('History.ObjectHeight').toString(), key: 'object_height', text: t('History.ObjectHeight').toString(), value: 'object_height', align: 'left', configable: true, visible: true, outputType: 'length' },
-        { title: t('History.Slicer').toString(), key: 'slicer', text: t('History.Slicer').toString(), value: 'slicer', align: 'left', configable: true, visible: true },
+        { title: 'CAM', key: 'slicer', text: 'CAM', value: 'slicer', align: 'left', configable: true, visible: true },
     ]
 
     moonrakerHistoryFields.value.forEach((sensor) => {
