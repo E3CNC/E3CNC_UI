@@ -145,7 +145,7 @@
                         @dragleave="dragLeaveFilelist"
                         @drop.prevent.stop="dragDropFilelist($event, item)">
                         <td class="px-0 text-center" style="width: 32px">
-                            <v-icon v-if="item.isDirectory">{{ mdiFolder }}</v-icon>
+                            <v-icon v-if="item.isDirectory" color="primary">{{ mdiFolder }}</v-icon>
                             <v-icon v-else :color="getFileColor(item.filename)">{{ getFileIcon(item.filename) }}</v-icon>
                         </td>
                         <td class=" ">{{ item.filename }}</td>
@@ -767,7 +767,9 @@ const files = computed(() => {
                 !file.filename.match(klipperBackupFileMatcher) &&
                 !file.filename.match(crowsnestBackupFileMatcher) &&
                 !file.filename.endsWith('.bkp') &&
-                !backupDateMatcher.test(file.filename.replace(/\.[^/.]+$/, ''))
+                !file.filename.endsWith('.bak') &&
+                !file.filename.endsWith('.backup') &&
+                !backupDateMatcher.test(file.filename)
         )
     }
 
