@@ -2,10 +2,10 @@
     <v-card flat>
         <v-card-text>
             <v-row>
-                <v-col class="v-col-12 v-col-md-6">
+                <v-col class="v-col-12 v-col-md-6 d-flex">
                     <settings-dashboard-sortable viewport-name="desktop" :column="1" />
                 </v-col>
-                <v-col class="v-col-12 v-col-md-6">
+                <v-col class="v-col-12 v-col-md-6 d-flex">
                     <settings-dashboard-sortable viewport-name="desktop" :column="2" />
                 </v-col>
             </v-row>

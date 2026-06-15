@@ -1,5 +1,5 @@
 <template>
-    <v-card class="mx-auto fill-height w-100" rounded="0">
+    <v-card class="mx-auto fill-height w-100 d-flex flex-column" rounded="0">
         <v-list class="fill-height" density="compact">
             <v-list-item v-if="column < 2">
                 <v-row>

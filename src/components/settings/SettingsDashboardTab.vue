@@ -1,6 +1,6 @@
 <style scoped>
 .dashboard-rows-container :deep(.v-list-item) {
-    min-height: 80px;
+    min-height: 48px;
 }
 </style>
 
