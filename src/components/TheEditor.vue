@@ -152,9 +152,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 import { useBase } from '@/composables/useBase'
 import { capitalize, formatFilesize, windowBeforeUnloadFunction } from '@/plugins/helpers'
 import { klipperRepos } from '@/store/variables'
@@ -176,7 +177,55 @@ import { ConfigFileSection } from '@/store/files/types'
 
 const store = useStore()
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 const { printer_state, klipperAppName } = useBase()
+
+const editorFilePath = computed(() => {
+    if (!store.state.editor.bool) return null
+    const parts = [store.state.editor.fileroot]
+    if (store.state.editor.filepath) parts.push(store.state.editor.filepath)
+    parts.push(store.state.editor.filename)
+    return parts.join('/')
+})
+
+const isRestoring = ref(false)
+
+watch(editorFilePath, (newPath) => {
+    if (isRestoring.value) return
+    const query = { ...route.query }
+    if (newPath) {
+        query.editorFile = newPath
+    } else {
+        delete query.editorFile
+    }
+    router.replace({ query })
+})
+
+onMounted(async () => {
+    const filePath = route.query.editorFile as string | undefined
+    if (!filePath || store.state.editor.bool) return
+
+    const parts = filePath.split('/')
+    if (parts.length < 2) return
+
+    isRestoring.value = true
+    try {
+        await store.dispatch('editor/openFile', {
+            root: parts[0],
+            path: parts.length > 2 ? parts.slice(1, -1).join('/') : '',
+            filename: parts[parts.length - 1],
+            size: 0,
+            permissions: 'rw',
+        })
+    } catch {
+        const query = { ...route.query }
+        delete query.editorFile
+        router.replace({ query })
+    } finally {
+        isRestoring.value = false
+    }
+})
 
 const dialogConfirmChange = ref(false)
 const dialogDevices = ref(false)
