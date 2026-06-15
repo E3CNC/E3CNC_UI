@@ -620,9 +620,15 @@ const extensionIconMap: Record<string, string> = {
 }
 
 const imageExtensions = new Set(['png', 'jpg', 'jpeg', 'gif', 'svg', 'bmp', 'webp', 'tif', 'tiff'])
+const backupDatePattern = /\d{8}[-_]\d{6}/
+
+function hasBackupDate(filename: string): boolean {
+    return backupDatePattern.test(filename)
+}
 
 export function getFileIcon(filename: string): string {
     const ext = filename.split('.').pop()?.toLowerCase() ?? ''
+    if (hasBackupDate(filename)) return mdiBackupRestore
     if (imageExtensions.has(ext)) return mdiFileImage
     return extensionIconMap[ext] ?? mdiFileOutline
 }
@@ -643,6 +649,7 @@ const extensionColorMap: Record<string, string> = {
 }
 
 export function getFileColor(filename: string): string | undefined {
+    if (hasBackupDate(filename)) return 'brown'
     const ext = filename.split('.').pop()?.toLowerCase() ?? ''
     if (imageExtensions.has(ext)) return 'purple'
     return extensionColorMap[ext]
@@ -664,12 +671,14 @@ const typePriority: Record<string, string> = {
 }
 
 export function getFileType(filename: string): string {
-    if (imageExtensions.has(filename.split('.').pop()?.toLowerCase() ?? '')) return '09-image'
-    return typePriority[filename.split('.').pop()?.toLowerCase() ?? ''] ?? '99-other'
+    if (hasBackupDate(filename)) return '08-backup'
+    const ext = filename.split('.').pop()?.toLowerCase() ?? ''
+    if (imageExtensions.has(ext)) return '09-image'
+    return typePriority[ext] ?? '99-other'
 }
 
 export function typeSortValue(filename: string): string {
     const ext = filename.split('.').pop()?.toLowerCase() ?? ''
-    const priority = typePriority[ext] ?? '99-other'
+    const priority = hasBackupDate(filename) ? '08-backup' : (typePriority[ext] ?? '99-other')
     return priority + '-' + filename.toLowerCase()
 }

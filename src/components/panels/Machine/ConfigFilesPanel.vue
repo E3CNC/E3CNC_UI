@@ -112,12 +112,6 @@
                 }"
                 mobile-breakpoint="0"
                     item-key="filename">
-                <template #column.icon>
-                    <span class="cursor-pointer" @click="toggleTypeSort">
-                        <v-icon size="small">{{ sortBy === 'filetype' ? (sortDesc ? mdiSortDescending : mdiSortAscending) : mdiSortVariant }}</v-icon>
-                    </span>
-                </template>
-
                 <template #no-data>
                     <div class="text-center">{{ $t('Machine.ConfigFilesPanel.Empty') }}</div>
                 </template>
@@ -727,6 +721,15 @@ const toolbarButtons = computed(() => [
         condition: true,
         click: refreshFileList,
     },
+    {
+        text: t('Machine.ConfigFilesPanel.SortByType'),
+        color: machineButtonCol.value,
+        icon: sortBy.value === 'filetype' ? (sortDesc.value ? mdiSortDescending : mdiSortAscending) : mdiSortVariant,
+        loadingName: null,
+        onlyWriteable: false,
+        condition: true,
+        click: toggleTypeSort,
+    },
 ].filter((rule) => rule.condition))
 
 const filteredToolbarButtons = computed(() =>
@@ -757,12 +760,14 @@ const files = computed(() => {
     if (hideBackupFiles.value) {
         const klipperBackupFileMatcher = /^printer-\d{8}_\d{6}\.cfg$/
         const crowsnestBackupFileMatcher = /^crowsnest\.conf\.\d{4}-\d{2}-\d{2}-\d{4}$/
+        const backupDateMatcher = /\d{8}[-_]\d{6}/
 
         result = result.filter(
             (file) =>
                 !file.filename.match(klipperBackupFileMatcher) &&
                 !file.filename.match(crowsnestBackupFileMatcher) &&
-                !file.filename.endsWith('.bkp')
+                !file.filename.endsWith('.bkp') &&
+                !backupDateMatcher.test(file.filename.replace(/\.[^/.]+$/, ''))
         )
     }
 
@@ -781,7 +786,7 @@ function toggleTypeSort() {
 }
 
 const headers = computed(() => [
-    { title: '', key: '', sortable: false },
+    { title: '', key: 'icon', sortable: false },
     { title: t('Machine.ConfigFilesPanel.Name'), key: 'filename', sortable: false },
     { title: t('Machine.ConfigFilesPanel.Filesize'), key: 'size', align: 'end', sortable: false },
     { title: t('Machine.ConfigFilesPanel.LastModified'), key: 'modified', align: 'end', sortable: false },
