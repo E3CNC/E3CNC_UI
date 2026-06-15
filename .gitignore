@@ -22,6 +22,12 @@ cypress/videos/
 components.d.ts
 i18n-extract
 
+# Agent artifacts
+*.dmg
+page-snapshot*.txt
+verbose-snapshot*.txt
+config-editor*.png
+
 # Python
 __pycache__/
 *.py[cod]
