@@ -146,7 +146,7 @@
                         @drop.prevent.stop="dragDropFilelist($event, item)">
                         <td class="px-0 text-center" style="width: 32px">
                             <v-icon v-if="item.isDirectory">{{ mdiFolder }}</v-icon>
-                            <v-icon v-if="!item.isDirectory">{{ mdiFile }}</v-icon>
+                            <v-icon v-else :color="getFileColor(item.filename)">{{ getFileIcon(item.filename) }}</v-icon>
                         </td>
                         <td class=" ">{{ item.filename }}</td>
                         <td class="text-no-wrap text-right">
@@ -456,7 +456,7 @@ import { useBase } from '@/composables/useBase'
 import { useTheme } from '@/composables/useTheme'
 import { useSocket } from '@/composables/useSocket'
 import { useToast } from 'vue-toast-notification'
-import { escapePath, formatFilesize, generateTimestamp, sortFiles } from '@/plugins/helpers'
+import { escapePath, formatFilesize, generateTimestamp, getFileColor, getFileIcon, sortFiles } from '@/plugins/helpers'
 import type { FileStateFile, FileStateGcodefile } from '@/store/files/types'
 import axios from 'axios'
 import type { CancelTokenSource } from 'axios'
@@ -473,7 +473,6 @@ import {
     mdiCog,
     mdiFolder,
     mdiFolderUpload,
-    mdiFile,
     mdiFileDocumentEditOutline,
     mdiCloudDownload,
     mdiRenameBox,

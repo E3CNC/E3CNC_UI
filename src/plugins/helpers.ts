@@ -4,13 +4,22 @@ import {
     mdiAlertOutline,
     mdiCheckboxMarkedCircleOutline,
     mdiCloseCircleOutline,
+    mdiCodeJson,
+    mdiConsoleLine,
+    mdiFileCodeOutline,
+    mdiFileDocumentOutline,
+    mdiFileImage,
+    mdiFileOutline,
     mdiFlash,
     mdiGauge,
+    mdiLanguageMarkdown,
+    mdiLanguagePython,
     mdiLightningBoltOutline,
     mdiMeterElectricOutline,
     mdiProgressClock,
     mdiScale,
     mdiThermometer,
+    mdiTune,
 } from '@mdi/js'
 import { VColorPickerColor } from '@/types/vuetify'
 
@@ -592,4 +601,42 @@ export function generateTimestamp(date: Date = new Date()): string {
     const timeString = `${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
 
     return `${dateString}-${timeString}`
+}
+
+const extensionIconMap: Record<string, string> = {
+    cfg: mdiTune,
+    conf: mdiTune,
+    py: mdiLanguagePython,
+    json: mdiCodeJson,
+    yaml: mdiFileCodeOutline,
+    yml: mdiFileCodeOutline,
+    sh: mdiConsoleLine,
+    md: mdiLanguageMarkdown,
+    txt: mdiFileDocumentOutline,
+}
+
+const imageExtensions = new Set(['png', 'jpg', 'jpeg', 'gif', 'svg', 'bmp', 'webp', 'tif', 'tiff'])
+
+export function getFileIcon(filename: string): string {
+    const ext = filename.split('.').pop()?.toLowerCase() ?? ''
+    if (imageExtensions.has(ext)) return mdiFileImage
+    return extensionIconMap[ext] ?? mdiFileOutline
+}
+
+const extensionColorMap: Record<string, string> = {
+    cfg: 'orange',
+    conf: 'orange',
+    py: 'blue',
+    json: 'amber',
+    yaml: 'teal',
+    yml: 'teal',
+    sh: 'green',
+    md: 'blue-grey',
+    txt: 'grey',
+}
+
+export function getFileColor(filename: string): string | undefined {
+    const ext = filename.split('.').pop()?.toLowerCase() ?? ''
+    if (imageExtensions.has(ext)) return 'purple'
+    return extensionColorMap[ext]
 }
