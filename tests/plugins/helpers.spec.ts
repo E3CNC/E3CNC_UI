@@ -29,7 +29,27 @@ import {
     convertPrintStatusIcon,
     convertPrintStatusIconColor,
     sortResolutions,
+    getFileIcon,
+    getFileColor,
+    getFileType,
+    getFileTypeLabel,
+    typeSortValue,
+    sortFiles,
 } from '@/plugins/helpers'
+import {
+    mdiBackupRestore,
+    mdiCamera,
+    mdiClipboardTextOutline,
+    mdiCodeJson,
+    mdiConsoleLine,
+    mdiFileCodeOutline,
+    mdiFileDocumentOutline,
+    mdiFileImage,
+    mdiFileOutline,
+    mdiLanguageMarkdown,
+    mdiLanguagePython,
+    mdiTune,
+} from '@mdi/js'
 
 describe('parseNumber', () => {
     it('parses numeric strings', () => {
@@ -476,5 +496,237 @@ describe('sortResolutions', () => {
         const resolutions = ['1920x1080', '640x480', '1280x720']
         const sorted = resolutions.sort(sortResolutions)
         expect(sorted).toEqual(['640x480', '1280x720', '1920x1080'])
+    })
+})
+
+describe('getFileIcon', () => {
+    it('returns mdiTune for .cfg files', () => {
+        expect(getFileIcon('printer.cfg')).toBe(mdiTune)
+    })
+
+    it('returns mdiTune for .conf files', () => {
+        expect(getFileIcon('moonraker.conf')).toBe(mdiTune)
+    })
+
+    it('returns mdiLanguagePython for .py files', () => {
+        expect(getFileIcon('test.py')).toBe(mdiLanguagePython)
+    })
+
+    it('returns mdiCodeJson for .json files', () => {
+        expect(getFileIcon('config.json')).toBe(mdiCodeJson)
+    })
+
+    it('returns mdiFileCodeOutline for .yaml and .yml', () => {
+        expect(getFileIcon('config.yaml')).toBe(mdiFileCodeOutline)
+        expect(getFileIcon('config.yml')).toBe(mdiFileCodeOutline)
+    })
+
+    it('returns mdiConsoleLine for .sh files', () => {
+        expect(getFileIcon('script.sh')).toBe(mdiConsoleLine)
+    })
+
+    it('returns mdiLanguageMarkdown for .md files', () => {
+        expect(getFileIcon('readme.md')).toBe(mdiLanguageMarkdown)
+    })
+
+    it('returns mdiFileDocumentOutline for .txt files', () => {
+        expect(getFileIcon('notes.txt')).toBe(mdiFileDocumentOutline)
+    })
+
+    it('returns mdiClipboardTextOutline for .log files', () => {
+        expect(getFileIcon('klippy.log')).toBe(mdiClipboardTextOutline)
+    })
+
+    it('returns mdiBackupRestore for .bak, .bkp, .backup files', () => {
+        expect(getFileIcon('config.bak')).toBe(mdiBackupRestore)
+        expect(getFileIcon('config.bkp')).toBe(mdiBackupRestore)
+        expect(getFileIcon('config.backup')).toBe(mdiBackupRestore)
+    })
+
+    it('returns mdiFileImage for image files', () => {
+        expect(getFileIcon('photo.png')).toBe(mdiFileImage)
+        expect(getFileIcon('photo.jpg')).toBe(mdiFileImage)
+        expect(getFileIcon('photo.jpeg')).toBe(mdiFileImage)
+        expect(getFileIcon('photo.gif')).toBe(mdiFileImage)
+        expect(getFileIcon('photo.svg')).toBe(mdiFileImage)
+        expect(getFileIcon('photo.bmp')).toBe(mdiFileImage)
+        expect(getFileIcon('photo.webp')).toBe(mdiFileImage)
+    })
+
+    it('returns mdiBackupRestore for filenames with date pattern', () => {
+        expect(getFileIcon('backup-20260606_193930.cfg')).toBe(mdiBackupRestore)
+        expect(getFileIcon('moonraker.conf.pre-fluidd-uninstall-20260606_193717')).toBe(mdiBackupRestore)
+    })
+
+    it('returns mdiCamera for webcam files', () => {
+        expect(getFileIcon('webcam.txt')).toBe(mdiCamera)
+        expect(getFileIcon('my_webcam.conf')).toBe(mdiCamera)
+        expect(getFileIcon('crowsnest.conf')).toBe(mdiCamera)
+    })
+
+    it('returns mdiTune for filenames containing printer', () => {
+        expect(getFileIcon('printer.cfg.pre-z-fix-20260611')).toBe(mdiTune)
+        expect(getFileIcon('my_printer_settings.txt')).toBe(mdiTune)
+    })
+
+    it('returns mdiFileOutline for unknown extensions', () => {
+        expect(getFileIcon('readme.xyz')).toBe(mdiFileOutline)
+        expect(getFileIcon('file.unknown')).toBe(mdiFileOutline)
+    })
+
+    it('handles uppercase extensions', () => {
+        expect(getFileIcon('config.CFG')).toBe(mdiTune)
+        expect(getFileIcon('photo.PNG')).toBe(mdiFileImage)
+    })
+})
+
+describe('getFileColor', () => {
+    it('returns orange for config files', () => {
+        expect(getFileColor('printer.cfg')).toBe('orange')
+        expect(getFileColor('moonraker.conf')).toBe('orange')
+    })
+
+    it('returns blue for python files', () => {
+        expect(getFileColor('script.py')).toBe('blue')
+    })
+
+    it('returns amber for json files', () => {
+        expect(getFileColor('data.json')).toBe('amber')
+    })
+
+    it('returns teal for yaml files', () => {
+        expect(getFileColor('config.yaml')).toBe('teal')
+    })
+
+    it('returns green for shell scripts', () => {
+        expect(getFileColor('install.sh')).toBe('green')
+    })
+
+    it('returns blue-grey for markdown and log files', () => {
+        expect(getFileColor('readme.md')).toBe('blue-grey')
+        expect(getFileColor('klippy.log')).toBe('blue-grey')
+    })
+
+    it('returns grey for text files', () => {
+        expect(getFileColor('notes.txt')).toBe('grey')
+    })
+
+    it('returns brown for backup files', () => {
+        expect(getFileColor('config.bak')).toBe('brown')
+        expect(getFileColor('config.bkp')).toBe('brown')
+        expect(getFileColor('config.backup')).toBe('brown')
+    })
+
+    it('returns brown for filenames with date pattern', () => {
+        expect(getFileColor('config-20260606_193930.cfg')).toBe('brown')
+    })
+
+    it('returns cyan for webcam files', () => {
+        expect(getFileColor('webcam.txt')).toBe('cyan')
+        expect(getFileColor('crowsnest.conf')).toBe('cyan')
+    })
+
+    it('returns orange for filenames containing printer', () => {
+        expect(getFileColor('printer.cfg.pre-z-fix-20260611')).toBe('orange')
+    })
+
+    it('returns purple for image files', () => {
+        expect(getFileColor('photo.png')).toBe('purple')
+    })
+
+    it('returns undefined for unknown extensions', () => {
+        expect(getFileColor('file.xyz')).toBeUndefined()
+    })
+})
+
+describe('getFileType', () => {
+    it('returns 01-config for config files', () => {
+        expect(getFileType('printer.cfg')).toBe('01-config')
+        expect(getFileType('moonraker.conf')).toBe('01-config')
+    })
+
+    it('returns 02-webcam for webcam files', () => {
+        expect(getFileType('webcam.txt')).toBe('02-webcam')
+        expect(getFileType('crowsnest.conf')).toBe('02-webcam')
+    })
+
+    it('returns 02-python for python files', () => {
+        expect(getFileType('script.py')).toBe('02-python')
+    })
+
+    it('returns 06-log for log files', () => {
+        expect(getFileType('klippy.log')).toBe('06-log')
+    })
+
+    it('returns 08-backup for files with date pattern', () => {
+        expect(getFileType('printer-20260606_193930.cfg')).toBe('08-backup')
+    })
+
+    it('returns 09-image for image files', () => {
+        expect(getFileType('photo.png')).toBe('09-image')
+    })
+
+    it('returns 01-config for filenames containing printer', () => {
+        expect(getFileType('printer.cfg.pre-z-fix-20260611')).toBe('01-config')
+    })
+
+    it('returns 99-other for unknown extensions', () => {
+        expect(getFileType('file.xyz')).toBe('99-other')
+    })
+})
+
+describe('getFileTypeLabel', () => {
+    it('returns human-readable labels', () => {
+        expect(getFileTypeLabel('printer.cfg')).toBe('config')
+        expect(getFileTypeLabel('webcam.txt')).toBe('webcam')
+        expect(getFileTypeLabel('script.py')).toBe('python')
+        expect(getFileTypeLabel('data.json')).toBe('json')
+        expect(getFileTypeLabel('config.yaml')).toBe('yaml')
+        expect(getFileTypeLabel('install.sh')).toBe('script')
+        expect(getFileTypeLabel('readme.md')).toBe('markdown')
+        expect(getFileTypeLabel('klippy.log')).toBe('log')
+        expect(getFileTypeLabel('notes.txt')).toBe('text')
+        expect(getFileTypeLabel('config.bak')).toBe('backup')
+        expect(getFileTypeLabel('photo.png')).toBe('image')
+        expect(getFileTypeLabel('file.xyz')).toBe('other')
+    })
+})
+
+describe('typeSortValue', () => {
+    it('produces correct sort values', () => {
+        const config = typeSortValue('printer.cfg')
+        const backup = typeSortValue('printer-20260606_193930.cfg')
+        expect(config).toBe('01-config-printer.cfg')
+        expect(backup).toBe('08-backup-printer-20260606_193930.cfg')
+    })
+
+    it('webcam overrides config priority', () => {
+        const val = typeSortValue('crowsnest.conf')
+        expect(val).toBe('02-webcam-crowsnest.conf')
+    })
+})
+
+describe('sortFiles with filetype key', () => {
+    const files = [
+        { isDirectory: false, filename: 'notes.txt' },
+        { isDirectory: false, filename: 'script.py' },
+        { isDirectory: false, filename: 'printer.cfg' },
+        { isDirectory: true, filename: 'subdir' },
+        { isDirectory: false, filename: 'photo.png' },
+    ]
+
+    it('sorts by filetype in ascending order, directories first', () => {
+        const sorted = sortFiles([...files], ['filetype'], [false])
+        expect(sorted[0].filename).toBe('subdir') // directory first
+        expect(sorted[1].filename).toBe('printer.cfg')  // 01-config
+        expect(sorted[2].filename).toBe('script.py')    // 02-python
+        expect(sorted[3].filename).toBe('notes.txt')    // 07-text
+        expect(sorted[4].filename).toBe('photo.png')    // 09-image
+    })
+
+    it('sorts by filetype in descending order', () => {
+        const sorted = sortFiles([...files], ['filetype'], [true])
+        expect(sorted[0].filename).toBe('subdir') // directory first always
+        expect(sorted[4].filename).toBe('printer.cfg')  // 01-config last in desc
     })
 })
