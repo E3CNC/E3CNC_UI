@@ -290,7 +290,10 @@ function outputValue(vCol: HistoryListPanelCol, item: ServerHistoryStateJob) {
 
     if (value === null) return '--'
 
-    if (key === 'slicer') return `${value}<br />${item.metadata.slicer_version}`
+    if (key === 'slicer') {
+        const version = item.metadata?.slicer_version
+        return version ? `${value}<br />${version}` : `${value}`
+    }
 
     if (typeof value !== 'number') return value
 
