@@ -96,6 +96,10 @@ Panels render through the standard responsive dashboard layout engine (mobile, t
 | Screen | unchanged |
 | Interface Settings | **Console** tab renamed to **MDI** |
 
+### Floating dashboard panels
+
+Any panel can be torn off the grid layout into a freely draggable, resizable floating window. Drag the toolbar to reposition, use the bottom-right resize handle to resize, and click the dock icon to animate it back into the grid with a smooth three-phase transition (slide → spacer collapse → state removal). Floating positions are persisted across reloads via Moonraker DB. The bring-to-front action keeps overlapping panels manageable.
+
 All navigation routes are gated behind `klipperIsConnected`.
 
 ### Gating & visibility
