@@ -84,7 +84,7 @@ const showPerformDialog = ref(false)
 
 const date = computed(() => formatDateTime(props.item.start_time * 1000, false))
 
-const note = computed(() => props.item.note.replaceAll('\n', '<br>'))
+const note = computed(() => props.item.note?.replaceAll('\n', '<br>'))
 
 const showPerformButton = computed(() => {
     if (props.item.end_time) return false
@@ -109,7 +109,7 @@ const history = computed(() => {
 })
 
 const outputFirstPointOfHistory = computed(() => {
-    if (props.item.reminder.type === null) return t('History.EntrySince')
+    if (props.item.reminder?.type === null) return t('History.EntrySince')
     if (props.item.end_time === null) return t('History.EntryNextPerform')
 
     return t('History.EntryPerformedAt', { date: formatDateTime(props.item.end_time * 1000) })

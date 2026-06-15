@@ -50,7 +50,7 @@ const dateText = computed(() => {
 })
 
 const showGoals = computed(() => {
-    if (props.item.reminder.type === null) return false
+    if (props.item.reminder?.type === null) return false
 
     return props.current && props.item.end_time === null
 })
@@ -72,19 +72,19 @@ const restFilament = computed(() => {
 })
 
 const restFilamentText = computed(() => {
-    const value = props.item.reminder.filament?.value ?? 0
+    const value = props.item.reminder?.filament?.value ?? 0
     if (!showGoals.value) return `${restFilament.value.toFixed(0)} m`
 
-    if (!props.item.reminder.filament.bool) return false
+    if (!props.item.reminder?.filament?.bool) return false
 
     return `${restFilament.value.toFixed(0)} / ${value} m`
 })
 
 const restFilamentClass = computed(() => {
     const output = ['mr-3']
-    if (!showGoals.value || !props.item.reminder.filament.bool) return output
+    if (!showGoals.value || !props.item.reminder?.filament?.bool) return output
 
-    const value = props.item.reminder.filament?.value ?? 0
+    const value = props.item.reminder?.filament?.value ?? 0
     if (restFilament.value > value) return [...output, 'text-error', 'font-weight-bold']
 
     return output
@@ -107,19 +107,19 @@ const restPrinttime = computed(() => {
 })
 
 const restPrinttimeText = computed(() => {
-    const value = props.item.reminder.printtime?.value ?? 0
+    const value = props.item.reminder?.printtime?.value ?? 0
     if (!showGoals.value) return `${restPrinttime.value.toFixed(1)} h`
 
-    if (!props.item.reminder.printtime.bool) return false
+    if (!props.item.reminder?.printtime?.bool) return false
 
     return `${restPrinttime.value.toFixed(1)} / ${value} h`
 })
 
 const restPrinttimeClass = computed(() => {
     const output = ['mr-3']
-    if (!showGoals.value || !props.item.reminder.printtime.bool) return output
+    if (!showGoals.value || !props.item.reminder?.printtime?.bool) return output
 
-    const value = props.item.reminder.printtime?.value ?? 0
+    const value = props.item.reminder?.printtime?.value ?? 0
     if (restPrinttime.value > value) return [...output, 'text-error', 'font-weight-bold']
 
     return output
@@ -139,20 +139,20 @@ const restDays = computed(() => {
 })
 
 const restDaysText = computed(() => {
-    const value = props.item.reminder.date?.value ?? 0
+    const value = props.item.reminder?.date?.value ?? 0
 
     if (!showGoals.value) return `${restDays.value.toFixed(0)} days`
 
-    if (!props.item.reminder.date.bool) return false
+    if (!props.item.reminder?.date?.bool) return false
 
     return `${restDays.value.toFixed(0)} / ${value} days`
 })
 
 const restDaysClass = computed(() => {
     const output = ['mr-3']
-    if (!showGoals.value || !props.item.reminder.date.bool) return output
+    if (!showGoals.value || !props.item.reminder?.date?.bool) return output
 
-    const value = props.item.reminder.date?.value ?? 0
+    const value = props.item.reminder?.date?.value ?? 0
     if (restDays.value > value) return [...output, 'text-error', 'font-weight-bold']
 
     return output
@@ -166,6 +166,6 @@ const classDateItem = computed(() => {
 })
 
 const note = computed(() => {
-    return props.item.perform_note?.replaceAll('\n', '<br>')
+    return props.item.perform_note?.replaceAll('\n', '<br>') ?? ''
 })
 </script>
