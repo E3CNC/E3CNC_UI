@@ -15,7 +15,6 @@
             <the-fullscreen-upload />
             <the-upload-snackbar />
             <the-manual-probe-dialog />
-            <the-screws-tilt-adjust-dialog />
             <the-macro-prompt />
         </template>
         <the-select-printer-dialog v-else-if="instancesDB !== 'moonraker'" />
@@ -44,7 +43,6 @@ import TheTimelapseRenderingSnackbar from '@/components/TheTimelapseRenderingSna
 import TheFullscreenUpload from '@/components/TheFullscreenUpload.vue'
 import TheUploadSnackbar from '@/components/TheUploadSnackbar.vue'
 import TheManualProbeDialog from '@/components/dialogs/TheManualProbeDialog.vue'
-import TheScrewsTiltAdjustDialog from '@/components/dialogs/TheScrewsTiltAdjustDialog.vue'
 import { setAndLoadLocale } from './plugins/i18n'
 import TheMacroPrompt from '@/components/dialogs/TheMacroPrompt.vue'
 import type { AppRoute } from '@/routes'

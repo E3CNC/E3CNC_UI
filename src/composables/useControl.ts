@@ -18,11 +18,7 @@ export function useControl() {
 
     const existsQGL = computed(() => store.getters['printer/existsQGL'])
 
-    const existsZtilt = computed(() => store.getters['printer/existsZtilt'])
-
     const existsDeltaCalibrate = computed(() => store.getters['printer/existsDeltaCalibrate'])
-
-    const existsScrewsTilt = computed(() => store.getters['printer/existsScrewsTilt'])
 
     const existsFirmwareRetraction = computed(
         () => store.getters['printer/existsFirmwareRetraction']
@@ -121,11 +117,6 @@ export function useControl() {
         socket.emit('printer.gcode.script', { script: 'QUAD_GANTRY_LEVEL' }, { loading: 'qgl' })
     }
 
-    function doZtilt() {
-        store.dispatch('server/addEvent', { message: 'Z_TILT_ADJUST', type: 'command' })
-        socket.emit('printer.gcode.script', { script: 'Z_TILT_ADJUST' }, { loading: 'zTilt' })
-    }
-
     function doSendMove(gcode: string, feedrate: number) {
         let command =
             `SAVE_GCODE_STATE NAME=_ui_movement\n` +
@@ -162,7 +153,6 @@ export function useControl() {
         existsQGL,
         existsZtilt,
         existsDeltaCalibrate,
-        existsScrewsTilt,
         existsFirmwareRetraction,
         colorQuadGantryLevel,
         colorZTilt,
@@ -181,7 +171,6 @@ export function useControl() {
         doHomeXY,
         doHomeZ,
         doQGL,
-        doZtilt,
         doSendMove,
         doSend,
     }

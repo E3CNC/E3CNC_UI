@@ -189,7 +189,6 @@ export const getDefaultState = (): GuiState => {
             progressAsFavicon: true,
             disableFanAnimation: false,
             boolManualProbeDialog: true,
-            boolScrewsTiltAdjustDialog: true,
             tempchartHeight: 250,
             hideUpdateWarnings: false,
             printstatusThumbnailZoom: true,
@@ -298,7 +297,6 @@ export const getDefaultState = (): GuiState => {
                 showPosition: true,
                 showCoordinates: true,
                 showControl: true,
-                showZOffset: true,
                 showSpeedFactor: true,
             },
             webcam: {

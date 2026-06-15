@@ -733,32 +733,10 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return 'quad_gantry_level' in state.configfile.settings
     },
 
-    existsZtilt: (state) => {
-        // check for new Klipper gcode.commands for Z_TILT_ADJUST command
-        const commands = state.gcode?.commands ?? null
-        if (commands) {
-            return 'Z_TILT_ADJUST' in commands
-        }
-
-        // fallback for older Klipper versions
-        const settings = state.configfile?.settings ?? null
-        if (settings) {
-            return 'z_tilt' in settings
-        }
-
-        return false
-    },
-
     existsDeltaCalibrate: (state) => {
         if (!state.configfile?.settings) return false
 
         return 'delta_calibrate' in state.configfile.settings
-    },
-
-    existsScrewsTilt: (state) => {
-        if (!state.configfile?.settings) return false
-
-        return 'screws_tilt_adjust' in state.configfile.settings
     },
 
     existsFirmwareRetraction: (state) => {

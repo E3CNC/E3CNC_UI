@@ -249,13 +249,6 @@
                 </settings-row>
                 <v-divider class="my-2" />
                 <settings-row
-                    :title="$t('Settings.UiSettingsTab.ScrewsTiltAdjustDialog')"
-                    :sub-title="$t('Settings.UiSettingsTab.ScrewsTiltAdjustDialogDescription')"
-                    :dynamic-slot-width="true">
-                    <v-switch v-model="boolScrewsTiltAdjustDialog" hide-details class="mt-0" />
-                </settings-row>
-                <v-divider class="my-2" />
-                <settings-row
                     :title="$t('Settings.UiSettingsTab.TempchartHeight')"
                     :sub-title="$t('Settings.UiSettingsTab.TempchartHeightDescription')">
                     <v-slider
@@ -567,13 +560,6 @@ const boolManualProbeDialog = computed({
     get: () => store.state.gui.uiSettings.boolManualProbeDialog ?? true,
     set: (newVal) => {
         store.dispatch('gui/saveSetting', { name: 'uiSettings.boolManualProbeDialog', value: newVal })
-    },
-})
-
-const boolScrewsTiltAdjustDialog = computed({
-    get: () => store.state.gui.uiSettings.boolScrewsTiltAdjustDialog ?? true,
-    set: (newVal) => {
-        store.dispatch('gui/saveSetting', { name: 'uiSettings.boolScrewsTiltAdjustDialog', value: newVal })
     },
 })
 

@@ -21,7 +21,7 @@ export interface GuiState {
     control: {
         style: 'bars' | 'circle' | 'cross'
         hideDuringPrint: boolean
-        actionButton: null | 'm84' | 'qgl' | 'ztilt'
+        actionButton: null | 'm84' | 'qgl'
         enableXYHoming: boolean
         feedrateXY: number
         stepsXY: number[]
@@ -104,7 +104,6 @@ export interface GuiState {
         progressAsFavicon: boolean
         disableFanAnimation: boolean
         boolManualProbeDialog: boolean
-        boolScrewsTiltAdjustDialog: boolean
         tempchartHeight: number
         hideUpdateWarnings: boolean
         printstatusThumbnailZoom: boolean
@@ -179,7 +178,6 @@ export interface GuiState {
             showPosition: boolean
             showCoordinates: boolean
             showControl: boolean
-            showZOffset: boolean
             showSpeedFactor: boolean
         }
         webcam: {

@@ -223,15 +223,13 @@ import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { useBase } from '@/composables/useBase'
 import { useControl } from '@/composables/useControl'
-import { useZOffset } from '@/composables/useZOffset'
 import SettingsRow from '@/components/settings/SettingsRow.vue'
 import { mdiGamepad } from '@mdi/js'
 
 const store = useStore()
 const { t } = useI18n()
 const { klipperReadyForGui } = useBase()
-const { existsQGL, existsZtilt, defaultActionButton } = useControl()
-const { endstop_pin, existZOffsetApplyEndstop, existZOffsetApplyProbe, autoSaveZOffsetOption } = useZOffset()
+const { existsQGL, defaultActionButton } = useControl()
 
 const controlStyles = computed(() => [
     {
@@ -277,14 +275,6 @@ const actionOptions = computed(() => {
                 isDefault: defaultActionButton.value === 'qgl' ? t('Settings.ControlTab.IsDefault') : '',
             }),
             value: 'qgl',
-        })
-    }
-    if (existsZtilt.value) {
-        actions.push({
-            text: t('Settings.ControlTab.ZTiltAdjust', {
-                isDefault: defaultActionButton.value === 'ztilt' ? t('Settings.ControlTab.IsDefault') : '',
-            }),
-            value: 'ztilt',
         })
     }
     return actions

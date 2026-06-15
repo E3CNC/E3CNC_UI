@@ -60,13 +60,6 @@ export const actions: ActionTree<PrinterState, RootState> = {
         if (Object.keys(subscripts).length > 0) {
             const result = await getSocket().emitAndWait('printer.objects.subscribe', { objects: subscripts }, {})
 
-            // reset screws_tilt_adjust if it exists
-            if ('screws_tilt_adjust' in result.status) {
-                const screwsTiltAdjust = result.status.screws_tilt_adjust as { error: boolean; results: object }
-                screwsTiltAdjust.error = false
-                screwsTiltAdjust.results = {}
-            }
-
             dispatch('getData', result)
 
             setTimeout(() => {
@@ -162,7 +155,4 @@ export const actions: ActionTree<PrinterState, RootState> = {
         getSocket().emit('printer.gcode.script', { script: payload }, { loading: 'sendGcode' })
     },
 
-    clearScrewsTiltAdjust({ commit }) {
-        commit('clearScrewsTiltAdjust')
-    },
 }

@@ -44,8 +44,4 @@ export const mutations: MutationTree<PrinterState> = {
         state.endstops = payload
     },
 
-    clearScrewsTiltAdjust(state) {
-        state.screws_tilt_adjust.error = false
-        state.screws_tilt_adjust.results = {}
-    },
 }

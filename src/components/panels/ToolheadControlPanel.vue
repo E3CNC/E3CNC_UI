@@ -76,10 +76,6 @@
         <v-container v-if="axisControlVisible">
             <component :is="`${controlStyle}-control`" />
         </v-container>
-        <v-divider v-if="showZOffset" />
-        <v-container v-if="showZOffset">
-            <zoffset-control />
-        </v-container>
         <v-divider v-if="showSpeedFactor" />
         <v-container v-if="showSpeedFactor">
             <tool-slider
@@ -109,7 +105,6 @@ import CrossControl from '@/components/panels/ToolheadControls/CrossControl.vue'
 import MoveToControl from '@/components/panels/ToolheadControls/MoveToControl.vue'
 import Panel from '@/components/ui/Panel.vue'
 import ToolSlider from '@/components/inputs/ToolSlider.vue'
-import ZoffsetControl from '@/components/panels/ToolheadControls/ZoffsetControl.vue'
 import { mdiDotsVertical, mdiEngineOff, mdiGamepad, mdiSpeedometer, mdiMenuDown, mdiRestore } from '@mdi/js'
 
 const { klipperReadyForGui, printer_state } = useBase()
@@ -145,10 +140,6 @@ const showButtons = computed(() => {
 
 const showControl = computed(() =>
     store.state.gui.view.toolhead.showControl ?? true
-)
-
-const showZOffset = computed(() =>
-    store.state.gui.view.toolhead.showZOffset ?? true
 )
 
 const showSpeedFactor = computed(() =>
