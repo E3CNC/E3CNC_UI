@@ -58,7 +58,7 @@ const bigThumbnailTooltipColor = computed(() => {
 })
 
 const fileTimestamp = computed(() =>
-    typeof props.item.modified.getTime === 'function' ? props.item.modified.getTime() : 0
+    props.item.modified && typeof props.item.modified.getTime === 'function' ? props.item.modified.getTime() : 0
 )
 
 const thumbnails = computed(() => props.item.thumbnails ?? [])
