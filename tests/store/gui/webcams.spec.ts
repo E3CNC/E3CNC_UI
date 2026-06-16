@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mutations } from '@/store/gui/webcams/mutations'
 import { actions } from '@/store/gui/webcams/actions'
+import { getters } from '@/store/gui/webcams/getters'
 import { getDefaultState } from '@/store/gui/webcams/index'
 import type { GuiWebcamState } from '@/store/gui/webcams/types'
 
@@ -79,6 +80,72 @@ describe('gui webcams store', () => {
         it('delete emits delete_item', () => {
             actions.delete({} as any, 'cam1')
             expect(mockSocket.emit).toHaveBeenCalledWith('server.webcams.delete_item', { name: 'cam1' })
+        })
+
+        it('update dispatches timelapse updateCamSettings when timelapse component active', () => {
+            const dispatch = vi.fn()
+            const rootState = { server: { components: ['timelapse'] } }
+            const webcam = { name: 'newcam', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 }
+            actions.update({ dispatch, rootState: rootState as any } as any, { webcam, oldWebcamName: 'oldcam' })
+            expect(dispatch).toHaveBeenCalledWith(
+                'server/timelapse/updateCamSettings',
+                { newName: 'newcam', oldName: 'oldcam' },
+                { root: true }
+            )
+        })
+
+        it('update does not dispatch timelapse updateCamSettings when timelapse not active', () => {
+            const dispatch = vi.fn()
+            const rootState = { server: { components: [] } }
+            const webcam = { name: 'newcam', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 }
+            actions.update({ dispatch, rootState: rootState as any } as any, { webcam, oldWebcamName: 'oldcam' })
+            expect(dispatch).not.toHaveBeenCalledWith(
+                'server/timelapse/updateCamSettings',
+                expect.anything(),
+                expect.anything()
+            )
+        })
+
+        it('update does not dispatch delete when name unchanged', () => {
+            const dispatch = vi.fn()
+            const rootState = { server: { components: [] } }
+            const webcam = { name: 'cam1', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 }
+            actions.update({ dispatch, rootState: rootState as any } as any, { webcam, oldWebcamName: 'cam1' })
+            expect(dispatch).not.toHaveBeenCalledWith('delete', expect.anything())
+        })
+    })
+
+    describe('getters', () => {
+        it('getWebcams returns only enabled webcams', () => {
+            state.webcams = [
+                { name: 'cam1', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 },
+                { name: 'cam2', service: 'mjpegstreamer', enabled: false, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 },
+            ]
+            const result = (getters as any).getWebcams(state)
+            expect(result).toHaveLength(1)
+            expect(result[0].name).toBe('cam1')
+        })
+
+        it('getWebcams returns empty array when no webcams enabled', () => {
+            state.webcams = [
+                { name: 'cam1', service: 'mjpegstreamer', enabled: false, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 },
+            ]
+            const result = (getters as any).getWebcams(state)
+            expect(result).toEqual([])
+        })
+
+        it('getWebcam finds a webcam by name', () => {
+            state.webcams = [
+                { name: 'cam1', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 },
+            ]
+            const webcams = (getters as any).getWebcams(state)
+            const result = (getters as any).getWebcam(state, { getWebcams: webcams })('cam1')
+            expect(result.name).toBe('cam1')
+        })
+
+        it('getWebcam returns undefined for unknown name', () => {
+            const result = (getters as any).getWebcam(state, { getWebcams: [] })('unknown')
+            expect(result).toBeUndefined()
         })
     })
 })

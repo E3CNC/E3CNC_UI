@@ -124,4 +124,70 @@ describe('vLongpress', () => {
         wrapper.unmount()
         expect(spy).toHaveBeenCalledWith('touchstart', expect.any(Function))
     })
+
+    it('calls handler with args when binding is { handler, args } object', () => {
+        const handler = vi.fn()
+        const wrapper = mount({
+            template: `<div v-longpress="{ handler, args: ['arg1', 42] }"></div>`,
+            directives: { longpress: vLongpress },
+            data: () => ({ handler }),
+        })
+        triggerTouchstart(wrapper.element)
+        vi.advanceTimersByTime(1000)
+        expect(handler).toHaveBeenCalledWith(
+            expect.objectContaining({ preventDefault: expect.any(Function) }),
+            'arg1',
+            42
+        )
+    })
+
+    it('handler receives longpress event with touch coordinates and preventDefault', () => {
+        const handler = vi.fn()
+        const wrapper = mount(createTestComponent(handler))
+        triggerTouchstart(wrapper.element, 150, 200)
+        vi.advanceTimersByTime(1000)
+        expect(handler).toHaveBeenCalledWith(
+            expect.objectContaining({
+                clientX: 150,
+                clientY: 200,
+                preventDefault: expect.any(Function),
+            })
+        )
+    })
+
+    it('does not call handler when touchstart has no touches', () => {
+        const handler = vi.fn()
+        const wrapper = mount(createTestComponent(handler))
+        wrapper.element.dispatchEvent(new TouchEvent('touchstart', { bubbles: true }))
+        vi.advanceTimersByTime(1000)
+        expect(handler).not.toHaveBeenCalled()
+    })
+
+    it('cancels on document scroll during press', () => {
+        const handler = vi.fn()
+        const wrapper = mount(createTestComponent(handler))
+        triggerTouchstart(wrapper.element)
+        document.dispatchEvent(new Event('scroll'))
+        vi.advanceTimersByTime(1000)
+        expect(handler).not.toHaveBeenCalled()
+    })
+
+    it('prevents dragstart default during active longpress', () => {
+        const handler = vi.fn()
+        const wrapper = mount(createTestComponent(handler))
+        triggerTouchstart(wrapper.element)
+        const dragEvent = new Event('dragstart', { cancelable: true })
+        const preventDefaultSpy = vi.spyOn(dragEvent, 'preventDefault')
+        wrapper.element.dispatchEvent(dragEvent)
+        expect(preventDefaultSpy).toHaveBeenCalled()
+    })
+
+    it('removes user-select:none from body after debounceTime + 200ms', () => {
+        const handler = vi.fn()
+        const wrapper = mount(createTestComponent(handler))
+        triggerTouchstart(wrapper.element)
+        expect(document.body.style.userSelect).toBe('none')
+        vi.advanceTimersByTime(1200) // debounceTime (1000) + 200
+        expect(document.body.style.userSelect).toBe('')
+    })
 })

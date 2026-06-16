@@ -113,13 +113,98 @@ describe('gui macros store', () => {
             expect(commit).toHaveBeenCalledWith('groupStore', { id: 'mocked-uuid', values: { name: 'New Group' } })
             expect(dispatch).toHaveBeenCalledWith('groupUpload', 'mocked-uuid')
         })
+
+        it('groupUpdate commits and uploads', () => {
+            const commit = vi.fn()
+            const dispatch = vi.fn()
+            actions.groupUpdate({ commit, dispatch } as any, { id: 'g1', values: { name: 'Updated' } })
+            expect(commit).toHaveBeenCalledWith('groupUpdate', { id: 'g1', values: { name: 'Updated' } })
+            expect(dispatch).toHaveBeenCalledWith('groupUpload', 'g1')
+        })
+
+        it('addMacroToMacrogroup commits and uploads', () => {
+            const commit = vi.fn()
+            const dispatch = vi.fn()
+            actions.addMacroToMacrogroup({ commit, dispatch } as any, { id: 'g1', macro: 'G28' })
+            expect(commit).toHaveBeenCalledWith('addMacroToMacrogroup', { id: 'g1', macro: 'G28' })
+            expect(dispatch).toHaveBeenCalledWith('groupUpload', 'g1')
+        })
+
+        it('updateMacroFromMacrogroup commits and uploads', () => {
+            const commit = vi.fn()
+            const dispatch = vi.fn()
+            actions.updateMacroFromMacrogroup({ commit, dispatch } as any, { id: 'g1', macro: 'G28' })
+            expect(commit).toHaveBeenCalledWith('updateMacroFromMacrogroup', { id: 'g1', macro: 'G28' })
+            expect(dispatch).toHaveBeenCalledWith('groupUpload', 'g1')
+        })
+
+        it('removeMacroFromMacrogroup commits and uploads', () => {
+            const commit = vi.fn()
+            const dispatch = vi.fn()
+            actions.removeMacroFromMacrogroup({ commit, dispatch } as any, { id: 'g1', macro: 'G28' })
+            expect(commit).toHaveBeenCalledWith('removeMacroFromMacrogroup', { id: 'g1', macro: 'G28' })
+            expect(dispatch).toHaveBeenCalledWith('groupUpload', 'g1')
+        })
+
+        it('groupDelete commits and deletes from database', () => {
+            const commit = vi.fn()
+            const dispatch = vi.fn()
+            const rootState = {
+                gui: {
+                    dashboard: {
+                        mobileLayout: [{ name: 'macrogroup_g1', visible: true }],
+                        tabletLayout1: [],
+                        tabletLayout2: [],
+                        desktopLayout1: [{ name: 'webcam', visible: true }],
+                        desktopLayout2: [],
+                        widescreenLayout1: [],
+                        widescreenLayout2: [],
+                        widescreenLayout3: [],
+                    },
+                },
+            }
+            actions.groupDelete({ commit, dispatch, rootState: rootState as any } as any, 'g1')
+            expect(commit).toHaveBeenCalledWith('groupDelete', 'g1')
+            expect(commit).toHaveBeenCalledWith('gui/deleteFromDashboardLayout', { layoutname: 'mobileLayout', index: 0 }, { root: true })
+            expect(mockSocket.emit).toHaveBeenCalledWith('server.database.delete_item', {
+                namespace: 'mainsail',
+                key: 'macros.macrogroups.g1',
+            })
+            expect(dispatch).toHaveBeenCalledWith('gui/updateSettings', { keyName: 'dashboard.mobileLayout', newVal: [{ name: 'macrogroup_g1', visible: true }] }, { root: true })
+        })
+
+        it('groupDelete does not dispatch when macrogroup not in layout', () => {
+            const commit = vi.fn()
+            const dispatch = vi.fn()
+            const rootState = {
+                gui: {
+                    dashboard: {
+                        mobileLayout: [],
+                        tabletLayout1: [],
+                        tabletLayout2: [],
+                        desktopLayout1: [{ name: 'webcam', visible: true }],
+                        desktopLayout2: [],
+                        widescreenLayout1: [],
+                        widescreenLayout2: [],
+                        widescreenLayout3: [],
+                    },
+                },
+            }
+            actions.groupDelete({ commit, dispatch, rootState: rootState as any } as any, 'g1')
+            expect(commit).toHaveBeenCalledWith('groupDelete', 'g1')
+            expect(mockSocket.emit).toHaveBeenCalledWith('server.database.delete_item', {
+                namespace: 'mainsail',
+                key: 'macros.macrogroups.g1',
+            })
+            expect(dispatch).not.toHaveBeenCalledWith('gui/deleteFromDashboardLayout', expect.anything(), expect.anything())
+        })
     })
 
     describe('getters', () => {
         it('getAllMacrogroups returns sorted macrogroups', () => {
             state.macrogroups = {
-                g2: { name: 'Z group', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true },
-                g1: { name: 'A group', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true },
+                g2: { id: null, name: 'Z group', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true },
+                g1: { id: null, name: 'A group', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true },
             }
             const result = (getters as any).getAllMacrogroups(state)
             expect(result).toHaveLength(2)
@@ -128,8 +213,12 @@ describe('gui macros store', () => {
         })
 
         it('getMacrogroup returns a specific group', () => {
-            state.macrogroups['g1'] = { name: 'Group1', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true }
+            state.macrogroups['g1'] = { id: null, name: 'Group1', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true }
             expect((getters as any).getMacrogroup(state)('g1').name).toBe('Group1')
+        })
+
+        it('getMacrogroup returns undefined for non-existent group', () => {
+            expect((getters as any).getMacrogroup(state)('nonexistent')).toBeUndefined()
         })
     })
 })

@@ -253,4 +253,116 @@ describe('server store', () => {
         ])
         expect(dispatch).toHaveBeenCalledWith('socket/removeInitModule', 'server/gcode_store', { root: true })
     })
+
+    it('addEvent catches invalid regex filters and logs error', () => {
+        const consoleSpy = vi.spyOn(window.console, 'error').mockImplementation(() => {})
+        const commit = vi.fn()
+        actions.addEvent({ commit, rootGetters: { 'gui/console/getConsolefilterRules': ['[invalid'] } } as any, {
+            message: 'test message',
+            type: 'response',
+        })
+        expect(consoleSpy).toHaveBeenCalledWith("Custom console filter '[invalid' doesn't work!")
+        expect(commit).toHaveBeenCalled()
+        consoleSpy.mockRestore()
+    })
+
+    it('getGcodeStore passes when cleared_since is falsy', () => {
+        const commit = vi.fn()
+        const dispatch = vi.fn()
+        actions.getGcodeStore(
+            { commit, dispatch, rootGetters: { 'gui/console/getConsolefilterRules': [], 'gui/console/getConsoleClearedSince': 0 } } as any,
+            {
+                gcode_store: [
+                    { time: 1, type: 'response', message: 'hello' },
+                    { time: 2, type: 'response', message: 'world' },
+                ],
+            }
+        )
+        expect(commit).toHaveBeenCalledWith('setGcodeStore', [
+            { time: 1, type: 'response', message: 'hello' },
+            { time: 2, type: 'response', message: 'world' },
+        ])
+    })
+
+    it('getGcodeStore catches invalid regex filters', () => {
+        const consoleSpy = vi.spyOn(window.console, 'error').mockImplementation(() => {})
+        const commit = vi.fn()
+        const dispatch = vi.fn()
+        actions.getGcodeStore(
+            { commit, dispatch, rootGetters: { 'gui/console/getConsolefilterRules': ['[bad'], 'gui/console/getConsoleClearedSince': 0 } } as any,
+            {
+                gcode_store: [
+                    { time: 1, type: 'response', message: 'test' },
+                ],
+            }
+        )
+        expect(consoleSpy).toHaveBeenCalledWith("Custom console filter '[bad' doesn't work")
+        consoleSpy.mockRestore()
+    })
+
+    it('initServerInfo deletes plugins and failed_plugins keys from payload', () => {
+        const commit = vi.fn()
+        const dispatch = vi.fn()
+        const payload: any = {
+            components: ['power'],
+            registered_directories: ['gcodes'],
+            plugins: { somePlugin: {} },
+            failed_plugins: ['broken'],
+        }
+        actions.initServerInfo({ dispatch, commit } as any, payload)
+        expect(payload).not.toHaveProperty('plugins')
+        expect(payload).not.toHaveProperty('failed_plugins')
+        expect(commit).toHaveBeenCalledWith('setData', expect.not.objectContaining({ plugins: expect.anything() }))
+    })
+
+    it('initServerInfo handles empty components and registered_directories', () => {
+        const commit = vi.fn()
+        const dispatch = vi.fn()
+        actions.initServerInfo({ dispatch, commit } as any, {
+            components: [],
+            registered_directories: [],
+            klippy_state: 'ready',
+        })
+        expect(dispatch).not.toHaveBeenCalledWith('socket/addInitModule', expect.stringContaining('server/'), expect.anything())
+        expect(dispatch).not.toHaveBeenCalledWith('files/initRootDirs', expect.anything(), expect.anything())
+        expect(commit).toHaveBeenCalledWith('setData', {
+            components: [],
+            registered_directories: [],
+            klippy_state: 'ready',
+        })
+        expect(dispatch).toHaveBeenCalledWith('socket/removeInitModule', 'server/info', { root: true })
+    })
+
+    it('getGcodeStore filters events by date when cleared_since is set', () => {
+        const commit = vi.fn()
+        const dispatch = vi.fn()
+        const now = Date.now()
+        actions.getGcodeStore(
+            { commit, dispatch, rootGetters: { 'gui/console/getConsolefilterRules': [], 'gui/console/getConsoleClearedSince': now } } as any,
+            {
+                gcode_store: [
+                    { time: Math.floor(now / 1000) + 100, type: 'response', message: 'future event' },
+                    { type: 'response', message: 'old date event', date: new Date(now - 100000).toISOString() },
+                ],
+            }
+        )
+        expect(commit).toHaveBeenCalledWith('setGcodeStore', expect.arrayContaining([
+            expect.objectContaining({ message: 'future event' }),
+        ]))
+    })
+
+    it('init handles non-Error exception', async () => {
+        mockSocket.emitAndWait.mockRejectedValue('string error')
+        const commit = vi.fn()
+        const dispatch = vi.fn()
+        const rootState = { packageVersion: 'v2.14.0' }
+        const store = { dispatch }
+        const consoleSpy = vi.spyOn(window.console, 'error').mockImplementation(() => {})
+
+        await actions.init.bind(store)({ commit, dispatch, rootState } as any)
+
+        expect(consoleSpy).toHaveBeenCalledWith('Error while identifying client: string error')
+        expect(dispatch).not.toHaveBeenCalledWith('socket/setConnectionFailed', expect.anything())
+        consoleSpy.mockRestore()
+    })
 })

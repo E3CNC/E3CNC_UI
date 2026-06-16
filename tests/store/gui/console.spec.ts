@@ -130,6 +130,21 @@ describe('gui console store', () => {
             })
         })
 
+        it('filterUpdate commits and uploads updated filter', () => {
+            const commit = vi.fn()
+            const dispatch = vi.fn()
+            const stateMock = { consolefilters: { uuid1: { name: 'Test', regex: 'test', bool: true } } }
+            actions.filterUpdate({ commit, dispatch, state: stateMock as any } as any, {
+                id: 'uuid1',
+                values: { name: 'Updated' },
+            })
+            expect(commit).toHaveBeenCalledWith('filterUpdate', { id: 'uuid1', values: { name: 'Updated' } })
+            expect(dispatch).toHaveBeenCalledWith('filterUpload', {
+                id: 'uuid1',
+                value: stateMock.consolefilters['uuid1'],
+            })
+        })
+
         it('filterDelete commits and emits delete', () => {
             const commit = vi.fn()
             actions.filterDelete({ commit } as any, 'uuid1')

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mutations } from '@/store/gui/remoteprinters/mutations'
 import { actions } from '@/store/gui/remoteprinters/actions'
+import { getters } from '@/store/gui/remoteprinters/getters'
 import { getDefaultState } from '@/store/gui/remoteprinters/index'
 import type { GuiRemoteprintersState } from '@/store/gui/remoteprinters/types'
 
@@ -118,6 +119,102 @@ describe('gui remoteprinters store', () => {
             const rootState = { instancesDB: 'browser' }
             actions.delete({ commit, dispatch, rootState: rootState as any } as any, 'p1')
             expect(dispatch).toHaveBeenCalledWith('upload')
+        })
+
+        it('initFromLocalstorage loads printers from configInstances', () => {
+            const dispatch = vi.fn()
+            const rootState = { configInstances: [{ hostname: 'p1', port: 7125 }], instancesDB: 'moonraker' }
+            actions.initFromLocalstorage({ dispatch, rootState: rootState as any } as any)
+            expect(dispatch).toHaveBeenCalledWith('initStore', { 'mocked-uuid': { hostname: 'p1', port: 7125 } })
+        })
+
+        it('initFromLocalstorage loads printers from localStorage for browser DB', () => {
+            const dispatch = vi.fn()
+            const rootState = { configInstances: [], instancesDB: 'browser' }
+            localStorage.setItem('printers', JSON.stringify([{ hostname: 'p1', port: 7125 }]))
+            actions.initFromLocalstorage({ dispatch, rootState: rootState as any } as any)
+            expect(dispatch).toHaveBeenCalledWith('initStore', { 'mocked-uuid': { hostname: 'p1', port: 7125 } })
+            localStorage.removeItem('printers')
+        })
+
+        it('initFromLocalstorage does nothing for non-array values', () => {
+            const dispatch = vi.fn()
+            const rootState = { configInstances: 'invalid', instancesDB: 'moonraker' }
+            actions.initFromLocalstorage({ dispatch, rootState: rootState as any } as any)
+            expect(dispatch).not.toHaveBeenCalled()
+        })
+
+        it('initStore resets and stores printers with farm registration', () => {
+            const commit = vi.fn()
+            const dispatch = vi.fn()
+            actions.initStore({ commit, dispatch } as any, { p1: { hostname: 'p1', port: 7125 } })
+            expect(dispatch).toHaveBeenCalledWith('reset')
+            expect(commit).toHaveBeenCalledWith('store', { id: 'p1', values: { hostname: 'p1', port: 7125 } })
+            expect(dispatch).toHaveBeenCalledWith('farm/registerPrinter', {
+                id: 'p1',
+                hostname: 'p1',
+                port: 7125,
+                path: '',
+                settings: {},
+            }, { root: true })
+        })
+
+        it('updateSettings commits update and uploads', () => {
+            const commit = vi.fn()
+            const dispatch = vi.fn()
+            actions.updateSettings({ commit, dispatch } as any, { id: 'p1', values: { theme: 'dark' } })
+            expect(commit).toHaveBeenCalledWith('update', { id: 'p1', values: { settings: { theme: 'dark' } } })
+            expect(dispatch).toHaveBeenCalledWith('upload', 'p1')
+        })
+
+        it('upload stores printers to localStorage for browser DB', () => {
+            const rootState = { instancesDB: 'browser' }
+            const stateMock = { printers: { p1: { hostname: 'p1', port: 7125, path: null, name: 'P1', settings: {} } } }
+            actions.upload({ state: stateMock as any, rootState: rootState as any } as any, 'p1')
+            const stored = JSON.parse(localStorage.getItem('printers') ?? '[]')
+            expect(stored).toHaveLength(1)
+            expect(stored[0].hostname).toBe('p1')
+            localStorage.removeItem('printers')
+        })
+
+        it('upload emits database post_item for moonraker DB', () => {
+            const rootState = { instancesDB: 'moonraker' }
+            const stateMock = { printers: { p1: { hostname: 'p1', port: 7125, path: null, name: 'P1', settings: {} } } }
+            actions.upload({ state: stateMock as any, rootState: rootState as any } as any, 'p1')
+            expect(mockSocket.emit).toHaveBeenCalledWith('server.database.post_item', {
+                namespace: 'mainsail',
+                key: 'remoteprinters.printers.p1',
+                value: { hostname: 'p1', port: 7125, path: null, settings: {} },
+            })
+        })
+
+        it('upload does nothing for moonraker DB with unknown id', () => {
+            const rootState = { instancesDB: 'moonraker' }
+            const stateMock = { printers: {} }
+            actions.upload({ state: stateMock as any, rootState: rootState as any } as any, 'unknown')
+            expect(mockSocket.emit).not.toHaveBeenCalled()
+        })
+    })
+
+    describe('getters', () => {
+        it('getRemoteprinters returns sorted printers with socket state', () => {
+            state.printers = {
+                p1: { hostname: 'Z-printer', port: 7125 },
+                p2: { hostname: 'A-printer', port: 7126 },
+            }
+            const rootGetters = {
+                'farm/getPrinterSocketState': (id: string) => ({ status: id === 'p1' ? 'connected' : 'disconnected' }),
+            }
+            const result = (getters as any).getRemoteprinters(state, {}, {}, rootGetters)
+            expect(result).toHaveLength(2)
+            expect(result[0].hostname).toBe('A-printer')
+            expect(result[1].hostname).toBe('Z-printer')
+            expect(result[0].socket).toEqual({ status: 'disconnected' })
+        })
+
+        it('getRemoteprinters returns empty array when no printers', () => {
+            const result = (getters as any).getRemoteprinters(state, {}, {}, { 'farm/getPrinterSocketState': () => ({}) })
+            expect(result).toEqual([])
         })
     })
 })

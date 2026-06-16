@@ -139,6 +139,38 @@ describe('printer actions', () => {
         expect(commit).toHaveBeenCalledWith('setData', { extruder: { temperature: 200 } })
     })
 
+    it('getData handles direct payload without status wrapper', () => {
+        const commit = vi.fn()
+        const dispatch = vi.fn()
+        const payload = { extruder: { temperature: 200 } }
+        actions.getData({ commit, dispatch, state } as any, payload)
+        expect(commit).toHaveBeenCalledWith('setData', { extruder: { temperature: 200 } })
+    })
+
+    it('getData handles webhooks without toolhead/configfile data', () => {
+        const commit = vi.fn()
+        const dispatch = vi.fn()
+        const thisDispatch = vi.fn()
+        const payload = {
+            status: {
+                webhooks: { state: 'error', state_message: 'klippy shutdown' },
+                extruder: { temperature: 200 },
+            },
+        }
+        actions.getData.call(
+            { dispatch: thisDispatch },
+            { commit, dispatch, state } as any,
+            payload,
+        )
+        expect(thisDispatch).toHaveBeenCalledWith(
+            'server/getData',
+            { klippy_state: 'error', klippy_message: 'klippy shutdown' },
+            { root: true },
+        )
+        expect(dispatch).not.toHaveBeenCalledWith('gui/updateGcodeviewerCache', expect.anything())
+        expect(commit).toHaveBeenCalledWith('setData', { extruder: { temperature: 200 } })
+    })
+
     it('initGcodes fetches and commits gcode commands', async () => {
         mockSocket.emitAndWait.mockResolvedValue({ status: { gcode: { commands: { G28: {} } } } })
         const commit = vi.fn()
@@ -156,6 +188,14 @@ describe('printer actions', () => {
             objects: { extruder: ['can_extrude'], extruder1: ['can_extrude'] },
         }, {})
         expect(dispatch).toHaveBeenCalledWith('getData', { extruder: { can_extrude: true } })
+    })
+
+    it('initExtruderCanExtrude handles no extruders in state', async () => {
+        mockSocket.emitAndWait.mockResolvedValue({ status: {} })
+        const dispatch = vi.fn()
+        await actions.initExtruderCanExtrude({ dispatch, state: {} as any } as any)
+        expect(mockSocket.emitAndWait).toHaveBeenCalledWith('printer.objects.query', { objects: {} }, {})
+        expect(dispatch).toHaveBeenCalledWith('getData', {})
     })
 
     it('sendGcode dispatches addEvent and emits gcode script', () => {

@@ -52,4 +52,33 @@ describe('printer mutations', () => {
         mutations.setEndstopStatus(state, payload)
         expect(state.endstops).toEqual({ endstops: { x: 'TRIGGERED' } })
     })
+
+    it('removeBedMeshProfile deletes the named profile', () => {
+        state.bed_mesh = {
+            profile_name: 'default',
+            profiles: {
+                default: { points: [[0, 0, 0]] },
+                other: { points: [[1, 1, 0]] },
+            },
+        } as any
+        mutations.removeBedMeshProfile(state, 'default')
+        expect(state.bed_mesh.profiles.default).toBeUndefined()
+        expect(state.bed_mesh.profiles.other).toBeDefined()
+        expect(state.bed_mesh.profile_name).toBe('')
+    })
+
+    it('removeBedMeshProfile does nothing when profile does not exist', () => {
+        state.bed_mesh = {
+            profile_name: 'default',
+            profiles: { default: { points: [[0, 0, 0]] } },
+        } as any
+        mutations.removeBedMeshProfile(state, 'nonexistent')
+        expect(state.bed_mesh.profiles.default).toBeDefined()
+        expect(state.bed_mesh.profile_name).toBe('default')
+    })
+
+    it('removeBedMeshProfile handles missing bed_mesh state', () => {
+        mutations.removeBedMeshProfile(state, 'default')
+        expect(state.bed_mesh).toBeUndefined()
+    })
 })

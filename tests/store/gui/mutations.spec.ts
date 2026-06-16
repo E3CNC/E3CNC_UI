@@ -212,6 +212,36 @@ describe('gui mutations', () => {
         })
     })
 
+    describe('deleteFromDashboardLayout', () => {
+        it('removes an item from a dashboard layout by index', () => {
+            state.dashboard.mobileLayout = [
+                { name: 'webcam', visible: true },
+                { name: 'temperature', visible: false },
+                { name: 'macros', visible: true },
+            ]
+            mutations.deleteFromDashboardLayout(state, { layoutname: 'mobileLayout', index: 1 })
+            expect(state.dashboard.mobileLayout).toHaveLength(2)
+            expect(state.dashboard.mobileLayout[0].name).toBe('webcam')
+            expect(state.dashboard.mobileLayout[1].name).toBe('macros')
+        })
+
+        it('removes the last item from a dashboard layout', () => {
+            state.dashboard.desktopLayout1 = [
+                { name: 'webcam', visible: true },
+            ]
+            mutations.deleteFromDashboardLayout(state, { layoutname: 'desktopLayout1', index: 0 })
+            expect(state.dashboard.desktopLayout1).toHaveLength(0)
+        })
+
+        it('does nothing when index is out of bounds', () => {
+            state.dashboard.desktopLayout1 = [
+                { name: 'webcam', visible: true },
+            ]
+            mutations.deleteFromDashboardLayout(state, { layoutname: 'desktopLayout1', index: 5 })
+            expect(state.dashboard.desktopLayout1).toHaveLength(1)
+        })
+    })
+
     describe('setDatasetAdditionalSensorStatus', () => {
         it('creates new entry with additionalSensors', () => {
             mutations.setDatasetAdditionalSensorStatus(state, {

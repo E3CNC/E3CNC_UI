@@ -316,4 +316,299 @@ describe('printer getters', () => {
             expect((getters as any).existsQGL(state)).toBe(false)
         })
     })
+
+    describe('existsDeltaCalibrate', () => {
+        it('returns true when delta_calibrate exists in config', () => {
+            state.configfile = { settings: { delta_calibrate: {} } } as any
+            expect((getters as any).existsDeltaCalibrate(state)).toBe(true)
+        })
+
+        it('returns false when no configfile settings', () => {
+            expect((getters as any).existsDeltaCalibrate(state)).toBe(false)
+        })
+    })
+
+    describe('existsFirmwareRetraction', () => {
+        it('returns true when firmware_retraction exists in config', () => {
+            state.configfile = { settings: { firmware_retraction: {} } } as any
+            expect((getters as any).existsFirmwareRetraction(state)).toBe(true)
+        })
+
+        it('returns false when no configfile settings', () => {
+            expect((getters as any).existsFirmwareRetraction(state)).toBe(false)
+        })
+    })
+
+    describe('getPrintCurrentLayer', () => {
+        it('returns current_layer from print_stats.info', () => {
+            state.print_stats = { info: { current_layer: 5 }, print_duration: 100 } as any
+            expect((getters as any).getPrintCurrentLayer(state, { getPrintMaxLayers: 50 })).toBe(5)
+        })
+
+        it('calculates from gcode position when print_duration > 0', () => {
+            state.print_stats = { print_duration: 100 } as any
+            state.current_file = { first_layer_height: 0.2, layer_height: 0.1 } as any
+            state.gcode_move = { gcode_position: [0, 0, 0.5] } as any
+            expect((getters as any).getPrintCurrentLayer(state, { getPrintMaxLayers: 50 })).toBe(4)
+        })
+
+        it('caps at max layers', () => {
+            state.print_stats = { print_duration: 100 } as any
+            state.current_file = { first_layer_height: 0.2, layer_height: 0.1 } as any
+            state.gcode_move = { gcode_position: [0, 0, 100] } as any
+            expect((getters as any).getPrintCurrentLayer(state, { getPrintMaxLayers: 5 })).toBe(5)
+        })
+
+        it('returns 0 when no data available', () => {
+            expect((getters as any).getPrintCurrentLayer(state, { getPrintMaxLayers: 0 })).toBe(0)
+        })
+    })
+
+    describe('getAvailableHeaters', () => {
+        it('returns available heaters list', () => {
+            state.heaters = { available_heaters: ['extruder', 'heater_bed'] } as any
+            expect((getters as any).getAvailableHeaters(state)).toEqual(['extruder', 'heater_bed'])
+        })
+
+        it('returns empty array when no heaters', () => {
+            expect((getters as any).getAvailableHeaters(state)).toEqual([])
+        })
+    })
+
+    describe('getAvailableSensors', () => {
+        it('returns available sensors list', () => {
+            state.heaters = { available_sensors: ['extruder', 'temperature_sensor chamber'] } as any
+            expect((getters as any).getAvailableSensors(state)).toEqual(['extruder', 'temperature_sensor chamber'])
+        })
+    })
+
+    describe('getAvailableMonitors', () => {
+        it('returns available monitors list', () => {
+            state.heaters = { available_monitors: ['monitor1'] } as any
+            expect((getters as any).getAvailableMonitors(state)).toEqual(['monitor1'])
+        })
+    })
+
+    describe('getFilamentSensors', () => {
+        it('returns filament sensor objects from state', () => {
+            state['filament_switch_sensor my_sensor'] = { enabled: true, filament_detected: true, Diameter: 1.75 } as any
+            const result = (getters as any).getFilamentSensors(state)
+            expect(result).toHaveLength(1)
+            expect(result[0].name).toBe('my_sensor')
+            expect(result[0].filament_detected).toBe(true)
+        })
+
+        it('returns empty when no sensors', () => {
+            expect((getters as any).getFilamentSensors(state)).toEqual([])
+        })
+    })
+
+    describe('getPrinterObject', () => {
+        it('returns state object by name', () => {
+            state.extruder = { temperature: 200 } as any
+            expect((getters as any).getPrinterObject(state)('extruder')).toEqual({ temperature: 200 })
+        })
+
+        it('returns null when object not found', () => {
+            expect((getters as any).getPrinterObject(state)('nonexistent')).toBeNull()
+        })
+    })
+
+    describe('getPrinterConfigObjects', () => {
+        it('returns matching config settings', () => {
+            state.configfile = {
+                settings: {
+                    extruder: { heater_pin: 'PA0' },
+                    'gcode_macro START_PRINT': { gcode_filename: 'start.gcode' },
+                    heater_bed: { heater_pin: 'PB0' },
+                },
+            } as any
+            const result = (getters as any).getPrinterConfigObjects(state)(['extruder', 'heater_bed'])
+            expect(result).toEqual({
+                extruder: { heater_pin: 'PA0' },
+                heater_bed: { heater_pin: 'PB0' },
+            })
+        })
+
+        it('returns empty object when no settings', () => {
+            state.configfile = { settings: null } as any
+            expect((getters as any).getPrinterConfigObjects(state)(['extruder'])).toEqual({})
+        })
+    })
+
+    describe('getExtruderSteppers', () => {
+        it('returns extruder stepper objects from settings', () => {
+            state.configfile = {
+                settings: {
+                    'extruder_stepper my_stepper': { extruder: 'extruder' },
+                },
+            } as any
+            const result = (getters as any).getExtruderSteppers(state)
+            expect(result).toHaveLength(1)
+            expect(result[0].key).toBe('extruder_stepper my_stepper')
+            expect(result[0].name).toBe('my_stepper')
+        })
+
+        it('returns empty when no settings', () => {
+            expect((getters as any).getExtruderSteppers(state)).toEqual([])
+        })
+    })
+
+    describe('getExtrudePossible', () => {
+        it('returns can_extrude from current extruder', () => {
+            state.toolhead = { extruder: 'extruder' } as any
+            state.extruder = { can_extrude: true } as any
+            expect((getters as any).getExtrudePossible(state)).toBe(true)
+        })
+
+        it('defaults to false', () => {
+            expect((getters as any).getExtrudePossible(state)).toBe(false)
+        })
+    })
+
+    describe('getMaxTemp', () => {
+        it('finds and returns the highest max_temp + 10', () => {
+            state.heaters = { available_sensors: ['extruder', 'heater_bed'] } as any
+            state.configfile = {
+                settings: {
+                    extruder: { max_temp: 300 },
+                    heater_bed: { max_temp: 120 },
+                },
+            } as any
+            expect((getters as any).getMaxTemp(state)).toBe(310)
+        })
+
+        it('ignores max_temp >= 10000', () => {
+            state.heaters = { available_sensors: ['extruder'] } as any
+            state.configfile = { settings: { extruder: { max_temp: 99999 } } } as any
+            expect((getters as any).getMaxTemp(state)).toBe(300)
+        })
+
+        it('returns default 300 when no heaters', () => {
+            expect((getters as any).getMaxTemp(state)).toBe(300)
+        })
+    })
+
+    describe('checkNecessaryConfig', () => {
+        it('returns missing modules', () => {
+            state.configfile = { config: {} } as any
+            const result = (getters as any).checkNecessaryConfig(state, { checkConfig: () => false })
+            expect(result.length).toBeGreaterThan(0)
+        })
+
+        it('returns empty when all present', () => {
+            state.configfile = { config: {} } as any
+            const result = (getters as any).checkNecessaryConfig(state, { checkConfig: () => true })
+            expect(result).toEqual([])
+        })
+    })
+
+    describe('getEstimatedTimeFile', () => {
+        it('calculates estimated time from print percent', () => {
+            state.print_stats = { print_duration: 100 } as any
+            const result = (getters as any).getEstimatedTimeFile(state, { getPrintPercent: 0.5 })
+            expect(parseInt(result)).toBe(100)
+        })
+
+        it('returns 0 when print_duration is 0', () => {
+            state.print_stats = { print_duration: 0 } as any
+            expect((getters as any).getEstimatedTimeFile(state, { getPrintPercent: 0 })).toBe(0)
+        })
+    })
+
+    describe('getEstimatedTimeFilament', () => {
+        it('calculates from filament usage ratio', () => {
+            state.print_stats = { print_duration: 100, filament_used: 500 } as any
+            state.current_file = { filament_total: 2000 } as any
+            const result = (getters as any).getEstimatedTimeFilament(state)
+            expect(parseInt(result)).toBe(300)
+        })
+
+        it('returns 0 when conditions not met', () => {
+            expect((getters as any).getEstimatedTimeFilament(state)).toBe(0)
+        })
+    })
+
+    describe('getEstimatedTimeSlicer', () => {
+        it('calculates from slicer estimated_time', () => {
+            state.print_stats = { print_duration: 100 } as any
+            state.current_file = { estimated_time: 500 } as any
+            const result = (getters as any).getEstimatedTimeSlicer(state)
+            expect(parseInt(result)).toBe(400)
+        })
+
+        it('returns 0 when conditions not met', () => {
+            expect((getters as any).getEstimatedTimeSlicer(state)).toBe(0)
+        })
+    })
+
+    describe('getEstimatedTimeAvg', () => {
+        it('returns average of file and filament estimates', () => {
+            const moduleGetters = {
+                getEstimatedTimeFile: '200',
+                getEstimatedTimeFilament: '400',
+            }
+            const rootState = { gui: { general: { calcEstimateTime: ['file', 'filament'] } } }
+            expect((getters as any).getEstimatedTimeAvg(state, moduleGetters, rootState)).toBe(300)
+        })
+
+        it('returns 0 when no calc methods active', () => {
+            const rootState = { gui: { general: { calcEstimateTime: [] } } }
+            expect((getters as any).getEstimatedTimeAvg(state, { getEstimatedTimeFile: 0, getEstimatedTimeFilament: 0 }, rootState)).toBe(0)
+        })
+    })
+
+    describe('getEstimatedTimeETA', () => {
+        it('calculates future ETA timestamp', () => {
+            const now = Date.now()
+            const moduleGetters = {
+                getEstimatedTimeFile: '3600',
+                getEstimatedTimeFilament: '0',
+                getEstimatedTimeSlicer: '0',
+            }
+            const rootState = { gui: { general: { calcEtaTime: ['file'] } } }
+            const result = (getters as any).getEstimatedTimeETA(state, moduleGetters, rootState)
+            expect(result).toBeGreaterThan(now)
+        })
+
+        it('returns 0 when no calc methods active', () => {
+            const rootState = { gui: { general: { calcEtaTime: [] } } }
+            expect((getters as any).getEstimatedTimeETA(state, { getEstimatedTimeFile: 0, getEstimatedTimeFilament: 0, getEstimatedTimeSlicer: 0 }, rootState)).toBe(0)
+        })
+    })
+
+    describe('getEstimatedTimeETAFormat', () => {
+        it('formats time in 12-hour mode with AM/PM', () => {
+            vi.setSystemTime(new Date(2024, 0, 1, 10, 0, 0))
+            const eta = new Date(2024, 0, 1, 14, 30, 0).getTime()
+            expect((getters as any).getEstimatedTimeETAFormat(
+                {} as PrinterState,
+                { getEstimatedTimeETA: eta },
+                {} as any,
+                { 'gui/getHours12Format': true },
+            )).toBe('02:30 PM')
+        })
+
+        it('shows +1 when ETA is next day', () => {
+            vi.setSystemTime(new Date(2024, 0, 1, 23, 0, 0))
+            const eta = new Date(2024, 0, 2, 1, 0, 0).getTime()
+            expect((getters as any).getEstimatedTimeETAFormat(
+                {} as PrinterState,
+                { getEstimatedTimeETA: eta },
+                {} as any,
+                { 'gui/getHours12Format': false },
+            )).toBe('01:00 +1')
+        })
+
+        it('returns -- when ETA is not in the future', () => {
+            vi.setSystemTime(new Date(2024, 0, 1, 10, 0, 0))
+            const eta = new Date(2024, 0, 1, 9, 0, 0).getTime()
+            expect((getters as any).getEstimatedTimeETAFormat(
+                {} as PrinterState,
+                { getEstimatedTimeETA: eta },
+                {} as any,
+                { 'gui/getHours12Format': false },
+            )).toBe('--')
+        })
+    })
 })

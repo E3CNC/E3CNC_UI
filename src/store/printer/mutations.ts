@@ -44,4 +44,12 @@ export const mutations: MutationTree<PrinterState> = {
         state.endstops = payload
     },
 
+    removeBedMeshProfile(state, payload) {
+        if (state.bed_mesh?.profiles && payload in state.bed_mesh.profiles) {
+            delete state.bed_mesh.profiles[payload]
+            if (state.bed_mesh.profile_name === payload) {
+                state.bed_mesh.profile_name = ''
+            }
+        }
+    },
 }
