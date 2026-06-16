@@ -105,6 +105,48 @@ sudo systemctl restart klipper moonraker
     It is good practice to keep a few dated backups (e.g. `~/backup-20250101`, `~/backup-20250115`)
     so you can compare configuration changes over time using `diff`.
 
+## Reverting the Installation
+
+If you need to undo the Mainsail-CNC installation and return to stock Mainsail, the
+`scripts/uninstall.sh` script reverses every change made by `install_to_moonraker.sh`:
+
+```bash
+cd ~/mainsail-cnc
+./scripts/uninstall.sh
+```
+
+This script:
+
+1. Removes the vendored `cnc_agent` and `cnc_metadata` components from Moonraker
+2. Deletes the `cnc_metadata_extractor.py` script
+3. Strips the `[cnc_agent]`, `[cnc_metadata]`, and `[update_manager mainsail-cnc]` sections from `moonraker.conf`
+4. Removes the WCS Klipper plugin (`work_coordinate_systems.py`) and macros (`wcs_macros.cfg`)
+5. Restarts Moonraker
+
+It does **not** delete your `printer.cfg`, g-code files, the `~/mainsail-cnc` repo checkout,
+or the built frontend files in `~/mainsail/`.
+
+### Restoring the stock frontend
+
+After running `uninstall.sh`, restore the original Mainsail web interface:
+
+```bash
+# Option A: Reinstall via KIAUH
+./kiauh/kiauh.sh  # Select Install → Install Mainsail
+
+# Option B: Manual clone
+cd ~
+git clone https://github.com/mainsail-crew/mainsail.git ~/mainsail-tmp
+cp -a ~/mainsail-tmp/* ~/mainsail/
+cp ~/mainsail-tmp/.* ~/mainsail/ 2>/dev/null || true
+rm -rf ~/mainsail-tmp
+sudo systemctl restart nginx
+```
+
+!!! tip "Restore your backup"
+    After reverting, copy your backed-up `config.json` to `~/mainsail/config.json` to
+    recover your previous panel layout and theme settings.
+
 ## Prerequisites
 
 - **A Debian-based system:** Raspberry Pi (3A+ or newer recommended), BTT-CB1, Odroid, or any x86 Linux machine.
