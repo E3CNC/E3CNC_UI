@@ -303,6 +303,21 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
+    # Prevent browser caching of index.html (so new builds are picked up immediately)
+    location = /index.html {
+        add_header Cache-Control "no-cache, must-revalidate";
+    }
+
+    # Service worker must be revalidated on every load
+    location = /sw.js {
+        add_header Cache-Control "no-cache, must-revalidate";
+    }
+
+    # Hashed assets can be cached indefinitely — Vite embeds a content hash in the filename
+    location /assets/ {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
     # Proxy Moonraker WebSocket
     location /websocket {
         proxy_pass http://127.0.0.1:7125/websocket;

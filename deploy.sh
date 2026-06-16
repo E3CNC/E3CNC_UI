@@ -57,6 +57,9 @@ cp -a "$MAINSAIL_CNC_DIR/dist/"* "$DEPLOY_DIR/"
 # Copy hidden files too (e.g. .htaccess)
 cp "$MAINSAIL_CNC_DIR"/dist/.* "$DEPLOY_DIR/" 2>/dev/null || true
 
+# Write a build version stamp so the service worker detects the update
+echo "{\"buildTime\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"commit\":\"$(git -C "$MAINSAIL_CNC_DIR" rev-parse --short HEAD 2>/dev/null || echo unknown)\"}" > "$DEPLOY_DIR/version.json"
+
 # Reload nginx (use sudo if available)
 if command -v sudo &>/dev/null; then
   sudo systemctl reload nginx 2>/dev/null || echo "Warning: could not reload nginx — do it manually."
