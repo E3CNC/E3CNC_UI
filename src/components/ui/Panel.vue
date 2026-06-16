@@ -181,6 +181,9 @@ const wrapperStyle = computed(() => {
 })
 
 // --- Drag ---
+const dragThreshold = 5
+let dragStarted = false
+
 interface DragState {
     startX: number
     startY: number
@@ -197,59 +200,65 @@ function onPointerDown(e: PointerEvent) {
     if (target.closest('.v-btn, button, a, input, select, textarea, .resize-handle')) return
 
     e.preventDefault()
-    isDragging.value = true
+    dragStarted = false
 
     dragState.startX = e.clientX
     dragState.startY = e.clientY
-
-    if (floating.value) {
-        dragState.floatX = floatState.x
-        dragState.floatY = floatState.y
-        bringToFront()
-    } else {
-        const rect = panelEl?.getBoundingClientRect()
-        if (!rect) {
-            isDragging.value = false
-            return
-        }
-        const z = nextZIndex()
-        floatState.x = rect.left
-        floatState.y = rect.top
-        floatState.width = rect.width
-        floatState.height = rect.height
-        floatState.zIndex = z
-        dragState.floatX = rect.left
-        dragState.floatY = rect.top
-        saveToStore({ x: rect.left, y: rect.top, width: rect.width, height: rect.height, zIndex: z })
-
-        // Collapse the spacer with animation
-        enableTransition.value = false
-        spacerHeight.value = rect.height
-        requestAnimationFrame(() => {
-            enableTransition.value = true
-            spacerHeight.value = 0
-        })
-    }
 
     window.addEventListener('pointermove', onPointerMove)
     window.addEventListener('pointerup', onPointerUp)
 }
 
-onUnmounted(() => {
-    window.removeEventListener('pointermove', onPointerMove)
-    window.removeEventListener('pointerup', onPointerUp)
-    window.removeEventListener('pointermove', onResizeMove)
-    window.removeEventListener('pointerup', onResizeEnd)
-})
-
 function onPointerMove(e: PointerEvent) {
-    floatState.x = dragState.floatX + (e.clientX - dragState.startX)
-    floatState.y = dragState.floatY + (e.clientY - dragState.startY)
+    if (!dragStarted) {
+        const dx = e.clientX - dragState.startX
+        const dy = e.clientY - dragState.startY
+        if (Math.abs(dx) < dragThreshold && Math.abs(dy) < dragThreshold) return
+
+        dragStarted = true
+        isDragging.value = true
+
+        if (floating.value) {
+            dragState.floatX = floatState.x
+            dragState.floatY = floatState.y
+            bringToFront()
+        } else {
+            const rect = panelEl?.getBoundingClientRect()
+            if (!rect) {
+                isDragging.value = false
+                return
+            }
+            const z = nextZIndex()
+            floatState.x = rect.left
+            floatState.y = rect.top
+            floatState.width = rect.width
+            floatState.height = rect.height
+            floatState.zIndex = z
+            dragState.floatX = rect.left
+            dragState.floatY = rect.top
+            saveToStore({ x: rect.left, y: rect.top, width: rect.width, height: rect.height, zIndex: z })
+
+            enableTransition.value = false
+            spacerHeight.value = rect.height
+            requestAnimationFrame(() => {
+                enableTransition.value = true
+                spacerHeight.value = 0
+            })
+        }
+    }
+
+    if (floating.value || dragStarted) {
+        floatState.x = dragState.floatX + (e.clientX - dragState.startX)
+        floatState.y = dragState.floatY + (e.clientY - dragState.startY)
+    }
 }
 
 function onPointerUp() {
     window.removeEventListener('pointermove', onPointerMove)
     window.removeEventListener('pointerup', onPointerUp)
+
+    if (!dragStarted) return
+
     isDragging.value = false
     saveToStore({
         x: floatState.x,
@@ -440,8 +449,16 @@ function dockPanel() {
 .v-card.panel .v-toolbar__content {
     padding-right: 0;
 }
+.v-card.panel .v-toolbar__content > .v-toolbar-title {
+    flex: 1 1 auto;
+    min-width: 0;
+}
 .v-card.panel .v-toolbar__content .subheading {
     user-select: none;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .panel-toolbar .v-btn.v-btn--icon {
     width: var(--panel-toolbar-icon-btn-width);
@@ -449,8 +466,8 @@ function dockPanel() {
 .v-card.panel.floating {
     outline: 2px solid rgb(var(--v-theme-primary));
     box-shadow:
-        17px 20px 24px 20px rgba(var(--v-theme-on-surface), 0.43),
-        0 2px 8px rgba(var(--v-theme-on-surface), 0.25);
+        17px 20px 24px 20px rgba(0, 0, 0, 0.43),
+        0 2px 8px rgba(0, 0, 0, 0.25);
 }
 .v-card.panel.floating .panel-content {
     overflow: auto;
