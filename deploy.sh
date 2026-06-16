@@ -10,7 +10,7 @@ export PATH="${HOME}/.bun/bin:${PATH}"
 MAINSAIL_CNC_DIR="${MAINSAIL_CNC_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 DEPLOY_DIR="${MAINSAIL_DEPLOY_DIR:-$HOME/mainsail}"
 
-REPO_DIR="$1"
+REPO_DIR="${1:-}"
 MODE="dry-run"
 if [ "$REPO_DIR" = "--live" ]; then
   MODE="live"
