@@ -183,6 +183,7 @@
     </p>
     <div class="links">
       <a href="https://github.com/isaaceliape/mainsail-cnc">GitHub</a>
+      <a href="https://github.com/isaaceliape/mainsail-cnc/actions/workflows/build-frontend.yml"><img src="https://github.com/isaaceliape/mainsail-cnc/actions/workflows/build-frontend.yml/badge.svg?branch=develop" alt="Build" style="vertical-align:middle;height:20px"></a>
       <a href="https://docs.mainsail.xyz">Mainsail Docs</a>
       <a href="https://isaaceliape.github.io/mainsail-cnc/architecture">Architecture</a>
       <a href="https://isaaceliape.github.io/mainsail-cnc/api">API Reference</a>
@@ -351,12 +352,12 @@
       </div>
       <div class="feature-card">
         <h3>Moonraker Update Manager</h3>
-        <p>Automatic updates via Moonraker&rsquo;s update manager. The <code>post_update_script</code> hook rebuilds the frontend, re-vendors the agent, and restarts services on every <code>git pull</code>.</p>
+        <p>Automatic updates via Moonraker&rsquo;s update manager. The <code>post_update_script</code> hook rebuilds the frontend, re-vendors the agent, and restarts services on every <code>git pull</code>. Each nightly release includes a changelog of commits since the previous build.</p>
         <span class="badge">Stable</span>
       </div>
       <div class="feature-card">
         <h3>Pre-built Nightly Releases</h3>
-        <p>Every push to <code>develop</code> publishes a nightly release with the built frontend. Devices with limited RAM download the pre-built zip instead of running <code>vite build</code> locally.</p>
+        <p>Every push to <code>develop</code> publishes a nightly release with the built frontend and a changelog. Devices with limited RAM download the pre-built zip instead of running <code>vite build</code> locally.</p>
         <span class="badge">CI</span>
       </div>
       <div class="feature-card">

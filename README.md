@@ -2,6 +2,9 @@
 
 CNC-focused control stack built around Klipper, Moonraker, and a maintained Mainsail fork.
 
+[![Build Frontend](https://github.com/isaaceliape/mainsail-cnc/actions/workflows/build-frontend.yml/badge.svg?branch=develop)](https://github.com/isaaceliape/mainsail-cnc/actions/workflows/build-frontend.yml)
+[![Tests](https://github.com/isaaceliape/mainsail-cnc/actions/workflows/build-frontend.yml/badge.svg?branch=develop)](https://github.com/isaaceliape/mainsail-cnc/actions/workflows/build-frontend.yml)
+
 ## Overview
 
 A real [Mainsail](https://github.com/mainsail-prusa/mainsail) fork built on Vue 3.5 + Vuetify 3, extended with CNC-native dashboard panels, CNC-specific navigation terminology, file-card metadata enrichment, interactive offset preview tools, and a Moonraker-side CNC agent for normalized CNC state and guarded command endpoints.
@@ -197,7 +200,7 @@ Read-only Klipper state flows directly from Mainsail's Vuex store subscription â
 
 ## Status
 
-This repository has progressed well beyond its initial scaffold. The fork is deployed and live on a Linux SBC at `~/mainsail/`, tracked by Moonraker's update_manager on the `develop` branch. Pre-built frontend releases are available via CI (every push to `develop` publishes a `nightly` release), so low-RAM devices like the CB1 avoid running `vite build` locally. Ansible playbooks are available for idempotent install/deploy/uninstall at `ansible/`.
+This repository has progressed well beyond its initial scaffold. The fork is deployed and live on a Linux SBC at `~/mainsail/`, tracked by Moonraker's update_manager on the `develop` branch. Pre-built frontend releases are available via CI (every push to `develop` publishes a `nightly` release with a changelog), so low-RAM devices like the CB1 avoid running `vite build` locally. Ansible playbooks are available for idempotent install/deploy/uninstall at `ansible/`.
 
 ### CNC-specific cleanup
 
