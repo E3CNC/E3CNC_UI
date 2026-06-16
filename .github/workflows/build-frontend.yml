@@ -57,11 +57,7 @@ jobs:
           echo "### Changelog" >> nightly-notes.md
           echo "" >> nightly-notes.md
           PREV=$(git rev-parse --verify refs/tags/nightly 2>/dev/null || echo "")
-          if [ -n "$PREV" ]; then
-            git log --oneline --no-decorate "$PREV..HEAD" >> nightly-notes.md 2>/dev/null || true
-          else
-            git log --oneline --no-decorate -20 HEAD >> nightly-notes.md 2>/dev/null || true
-          fi
+          python3 scripts/_gen_changelog.py "$PREV" >> nightly-notes.md
 
       - name: Delete old nightly release
         env:
