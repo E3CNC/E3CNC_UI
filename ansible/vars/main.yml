@@ -1,0 +1,22 @@
+---
+repo:
+  url: https://github.com/isaaceliape/mainsail-cnc.git
+  dest: "{{ ansible_env.HOME }}/mainsail-cnc"
+  branch: develop
+
+frontend:
+  web_root: "{{ ansible_env.HOME }}/mainsail"
+
+agent:
+  vender_dir: "{{ ansible_env.HOME }}/moonraker/moonraker/components"
+  source_dir: "{{ repo.dest }}/moonraker-cnc-agent/src/moonraker_cnc_agent"
+
+klipper:
+  extras_dir: "{{ ansible_env.HOME }}/klipper/klippy/extras"
+
+printer_data:
+  config_dir: "{{ ansible_env.HOME }}/printer_data/config"
+  scripts_dir: "{{ ansible_env.HOME }}/printer_data/scripts"
+  macros_dir: "{{ ansible_env.HOME }}/printer_data/config/macros"
+
+moonraker_conf: "{{ printer_data.config_dir }}/moonraker.conf"

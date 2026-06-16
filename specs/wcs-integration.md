@@ -106,8 +106,8 @@ The Wcs panel already has:
 
 ### Phase 1 — Deploy Klipper plugin and macros
 
-1. Add a new step to `scripts/install_to_moonraker.sh` (or a new
-   `scripts/install_klipper_extras.sh`) that:
+1. Add a new role/task to the Ansible install playbook at `ansible/playbooks/install.yml`
+   (or the legacy `scripts/install_to_moonraker.sh`) that:
 
    ```bash
    # Copy the Klipper extra plugin
@@ -135,7 +135,7 @@ The Wcs panel already has:
 ### Phase 2 — Wire agent to live WCS state
 
 1. Update `CncAgent.handle_wcs_get` to query Klipper's printer object.
-2. Deploy via `install_to_moonraker.sh`.
+2. Deploy via the Ansible install playbook or `install_to_moonraker.sh`.
 3. Verify: `GET /server/cnc/wcs` returns the live WCS data.
 
 ### Phase 3 — Update frontend

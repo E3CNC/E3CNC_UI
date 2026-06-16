@@ -1,0 +1,13 @@
+---
+- name: Ensure printer_data macros directory exists
+  ansible.builtin.file:
+    path: "{{ printer_data.macros_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Deploy wcs_macros.cfg
+  ansible.builtin.copy:
+    src: "{{ repo.dest }}/klipper-macros/wcs_macros.cfg"
+    dest: "{{ printer_data.macros_dir }}/wcs_macros.cfg"
+    mode: "0644"
+    remote_src: true

@@ -159,7 +159,7 @@ The section uses `channel: dev` and `refresh_interval: 24`. It has
 `git pull`. The `info_tags.post_update` hint lists the three manual
 post-pull steps (re-vendor agent, `bun run build`, RESTART Klipper).
 
-The `scripts/install_to_moonraker.sh` script:
+The `ansible/playbooks/install.yml` playbook and the legacy `scripts/install_to_moonraker.sh` script:
 
 - Resolves target paths from `CNC_REPO_DIR` (default `~/mainsail-cnc`).
 - Resolves the git `origin` from the local clone's `remote.origin.url`,
@@ -624,7 +624,7 @@ land in Moonraker/Klipper before they can move hardware for real.
 - **Update manager integration**: single `[update_manager mainsail-cnc]`
   entry covering agent + fork + macros together (git repo, dev channel,
   `managed_services: moonraker`, `enable_node_updates: false`).
-- **Deploy script**: `scripts/install_to_moonraker.sh` — clones monorepo,
+- **Deploy**: `ansible/playbooks/install.yml` (Ansible, recommended) or `scripts/install_to_moonraker.sh` (bash, legacy) — clones monorepo,
   vendors agent into Moonraker components dir, appends config + update
   manager entry idempotently. Honours `CNC_SKIP_UPDATE_MANAGER` /
   `CNC_SKIP_CLONE`.

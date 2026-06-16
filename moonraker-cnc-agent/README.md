@@ -84,37 +84,61 @@ moonraker-cnc-mcp
 
 ## Installation
 
-Use the deploy script from the repo root:
+**Recommended — Ansible playbook (idempotent, supports `--check`):**
+
+```sh
+cd ~/mainsail-cnc
+ansible-playbook ansible/playbooks/install.yml
+```
+
+**Alternative — bash script (legacy):**
 
 ```sh
 ./scripts/install_to_moonraker.sh
 ```
 
-It vendors the package into moonraker's `components/` directory, installs
-runtime dependencies into `moonraker-env`, ensures the `[cnc_agent]` section
-is present in the active `moonraker.conf`, and restarts Moonraker.
+Both methods vendor the package into moonraker's `components/` directory,
+ensure the `[cnc_agent]` section is present in the active `moonraker.conf`,
+and restart Moonraker.
+
+## Updates via the Ansible playbook
+
+After pulling the latest code:
+
+```sh
+cd ~/mainsail-cnc
+git pull
+ansible-playbook ansible/playbooks/install.yml
+```
+
+The playbook is idempotent — it only re-vendors files that have changed.
 
 ## Updates via the Mainsail update manager
 
-The install script also wires the project into Moonraker's update manager
-by default, so mainsail-cnc shows up in Mainsail's **Machine → Update
-Manager** panel alongside Klipper, Moonraker, and stock Mainsail.
+The Ansible install playbook and the bash install script both wire the
+project into Moonraker's update manager by default, so mainsail-cnc shows
+up in Mainsail's **Machine → Update Manager** panel alongside Klipper,
+Moonraker, and stock Mainsail.
 
 The entry is `type: git_repo` pointing at the monorepo clone on the
-printer (`~/mainsail-cnc` by default). The install script creates that
-clone on first run (and `git pull --ff-only`s on subsequent runs) so
+printer (`~/mainsail-cnc` by default). The install creates that
+clone on first run (and pulls on subsequent runs) so
 it's a real git checkout of the project — no synthetic subpath, no
 "ahead 1, behind N" weirdness.
 
 Clicking **Update** in the Mainsail UI runs `git pull` and restarts
 Moonraker. The agent is vendored into
-`moonraker/moonraker/components/cnc_agent/` by the install script, so a
-pull alone won't activate the new code — re-run
-`./scripts/install_to_moonraker.sh` to re-vendor and restart Moonraker.
+`moonraker/moonraker/components/cnc_agent/` by the install, so a
+pull alone won't activate the new code — re-run the Ansible install
+playbook or the bash script to re-vendor and restart Moonraker.
 
-To skip the update-manager work on install:
+To skip the update-manager work:
 
 ```sh
+# Ansible: use --skip-tags
+ansible-playbook ansible/playbooks/install.yml --skip-tags moonraker-config
+
+# Bash (legacy):
 CNC_SKIP_UPDATE_MANAGER=1 ./scripts/install_to_moonraker.sh
 # or skip just the clone/pull step (use an existing checkout):
 CNC_SKIP_CLONE=1 ./scripts/install_to_moonraker.sh

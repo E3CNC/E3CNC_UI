@@ -9,11 +9,12 @@ Mainsail-CNC is a maintained fork of [Mainsail](https://github.com/mainsail-crew
 dashboard panels, CNC-specific navigation terminology, file-card CAM metadata enrichment, an interactive offset preview
 for WCS tuning, and a Moonraker-side CNC agent for spindle, coolant, WCS, jog, and assistant-integration workflows.
 
-This guide covers two installation paths:
+This guide covers three installation paths:
 
 | Path | Difficulty | Best for |
 |------|------------|----------|
 | [Quick install via KIAUH](#quick-install-via-kiauh) | Easy | Beginners, standard Raspberry Pi / Debian setups |
+| [Ansible playbooks](#ansible-install) | Medium | Existing Klipper/Moonraker installs, idempotent setup |
 | [Manual install](#manual-install) | Advanced | Full control, custom hardware, existing Klipper installs |
 
 !!! warning "Fork vs plugin"
@@ -107,15 +108,24 @@ sudo systemctl restart klipper moonraker
 
 ## Reverting the Installation
 
-If you need to undo the Mainsail-CNC installation and return to stock Mainsail, the
-`scripts/uninstall.sh` script reverses every change made by `install_to_moonraker.sh`:
+If you need to undo the Mainsail-CNC installation and return to stock Mainsail, use
+the Ansible uninstall playbook or the bash uninstall script.
+
+**Ansible (recommended):**
+
+```bash
+cd ~/mainsail-cnc
+ansible-playbook ansible/playbooks/uninstall.yml
+```
+
+**Bash script (legacy):**
 
 ```bash
 cd ~/mainsail-cnc
 ./scripts/uninstall.sh
 ```
 
-This script:
+Both methods:
 
 1. Removes the vendored `cnc_agent` and `cnc_metadata` components from Moonraker
 2. Deletes the `cnc_metadata_extractor.py` script
@@ -128,7 +138,7 @@ or the built frontend files in `~/mainsail/`.
 
 ### Restoring the stock frontend
 
-After running `uninstall.sh`, restore the original Mainsail web interface:
+After uninstalling, restore the original Mainsail web interface:
 
 ```bash
 # Option A: Reinstall via KIAUH
@@ -208,12 +218,21 @@ cp dist/.* ~/mainsail/ 2>/dev/null || true
 
 ### 5. Add the CNC agent to Moonraker
 
+**Option A — Ansible (recommended):**
+
+```bash
+cd ~/mainsail-cnc
+ansible-playbook ansible/playbooks/install.yml
+```
+
+**Option B — Bash script (legacy):**
+
 ```bash
 cd ~/mainsail-cnc
 ./scripts/install_to_moonraker.sh
 ```
 
-This script:
+Both methods:
 - Vendors the `cnc_agent` and `cnc_metadata` components into Moonraker's Python package.
 - Appends `[cnc_agent]` and `[cnc_metadata]` sections to your `moonraker.conf`.
 - Registers the fork in Moonraker's update manager.
@@ -239,6 +258,105 @@ sudo systemctl restart moonraker
 
 Open your browser and navigate to `http://<your-device-ip>`. You should see the CNC dashboard with panels for DRO,
 Jog, Offsets, Spindle & Coolant, and CNC Status.
+
+---
+
+## Ansible Install
+
+[Ansible](https://www.ansible.com/) playbooks provide an idempotent, declarative
+alternative to the bash install scripts. They handle all installation steps —
+agent vendoring, config management, frontend build, plugin deployment, and
+service restarts — in a single command.
+
+### Prerequisites
+
+- **Ansible** installed on the target machine (or your control machine if deploying remotely):
+  ```bash
+  pip install ansible
+  ```
+- **community.general** collection (for `ini_file` module):
+  ```bash
+  ansible-galaxy collection install community.general
+  ```
+- **Bun** installed on the target (for frontend builds):
+  ```bash
+  curl -fsSL https://bun.sh/install | bash
+  ```
+
+### 1. Clone the repository
+
+```bash
+cd ~
+git clone https://github.com/isaaceliape/mainsail-cnc.git
+cd mainsail-cnc
+```
+
+### 2. Install everything (agent, frontend, plugins, config)
+
+```bash
+ansible-playbook ansible/playbooks/install.yml
+```
+
+This playbook:
+
+1. Clones (or pulls) the monorepo from GitHub
+2. Vendors `cnc_agent` and `cnc_metadata` into Moonraker's components directory
+3. Deploys the `cnc_metadata_extractor.py` script
+4. Adds `[cnc_agent]`, `[cnc_metadata]`, and `[update_manager mainsail-cnc]` sections to `moonraker.conf`
+5. Deploys the WCS Klipper plugin (`work_coordinate_systems.py`)
+6. Deploys WCS macros (`wcs_macros.cfg`)
+7. Installs frontend dependencies, builds, and deploys to `~/mainsail/`
+8. Restarts Moonraker and verifies the agent loaded cleanly
+
+### 3. Verify
+
+```bash
+curl -s http://127.0.0.1:7125/printer/info | python3 -m json.tool
+curl -s http://127.0.0.1:7125/server/cnc/spindle | python3 -m json.tool
+```
+
+### Deploy frontend only
+
+To rebuild and redeploy just the frontend (e.g. after code changes):
+
+```bash
+ansible-playbook ansible/playbooks/deploy.yml
+```
+
+### Uninstall
+
+```bash
+ansible-playbook ansible/playbooks/uninstall.yml
+```
+
+### Check mode
+
+All playbooks support `--check` for dry-run validation:
+
+```bash
+ansible-playbook ansible/playbooks/install.yml --check
+ansible-playbook ansible/playbooks/uninstall.yml --check
+```
+
+### Remote deployment
+
+To install on a remote printer, create an inventory file:
+
+```yaml
+# inventory/my-printer.yml
+all:
+  hosts:
+    cnc:
+      ansible_host: 192.168.1.100
+      ansible_user: pi
+      ansible_port: 22
+```
+
+Then run:
+
+```bash
+ansible-playbook -i ansible/inventory/my-printer.yml ansible/playbooks/install.yml
+```
 
 ---
 
@@ -503,12 +621,21 @@ This produces a `dist/` directory with the compiled frontend.
 
 #### 4.3 Deploy to the web directory
 
+**Option A — Ansible deploy playbook:**
+
+```bash
+cd ~/mainsail-cnc
+ansible-playbook ansible/playbooks/deploy.yml
+```
+
+**Option B — Deploy script (legacy):**
+
 ```bash
 cd ~/mainsail-cnc
 ./deploy.sh --live
 ```
 
-The `deploy.sh` script copies the built `dist/` contents to `~/mainsail/` (or another target if configured).
+Both methods copy the built `dist/` contents to `~/mainsail/` and reload nginx.
 
 If you prefer to do it manually:
 
@@ -529,14 +656,28 @@ cp ~/mainsail-cnc/dist/.* ~/mainsail/ 2>/dev/null || true
 
 The CNC agent provides endpoints for spindle, coolant, WCS management, and jog commands.
 
+**Option A — Ansible (recommended):**
+
+```bash
+cd ~/mainsail-cnc
+ansible-playbook ansible/playbooks/install.yml
+```
+
+This installs everything — agent, config, frontend, Klipper extras, and macros —
+in a single idempotent run.
+
+**Option B — Bash script (legacy):**
+
 ```bash
 cd ~/mainsail-cnc
 ./scripts/install_to_moonraker.sh
 ```
 
-This script vendors the agent, adds config sections, and restarts Moonraker.
+The bash script vendors the agent, adds config sections, and restarts Moonraker.
 It works locally by default (`CNC_HOST=localhost`). For remote deployment
 over SSH, set `CNC_HOST` to the target hostname.
+
+Either method performs the following:
 
 1. Clones (or pulls) the monorepo to `~/mainsail-cnc`
 2. Vendors `cnc_agent` into `moonraker/moonraker/components/cnc_agent/`
@@ -590,23 +731,46 @@ Open `http://<your-device-ip>` in a browser. You should see:
 
 ## Updating Mainsail-CNC
 
+### Via Ansible playbook
+
+```bash
+cd ~/mainsail-cnc
+git pull
+ansible-playbook ansible/playbooks/install.yml
+```
+
+The install playbook is idempotent — it only makes changes when files differ.
+Use the `deploy.yml` playbook to rebuild and redeploy just the frontend:
+
+```bash
+cd ~/mainsail-cnc
+git pull
+ansible-playbook ansible/playbooks/deploy.yml
+```
+
 ### Via Mainsail UI (Update Manager)
 
 1. Go to **Machine** → **Update Manager**
 2. Find **Mainsail-CNC** and click **Update**
 3. Moonraker will `git pull` the latest code and restart
 
-### Post-update steps
+### Post-update steps (bash scripts, legacy)
 
 After a `git pull`, the following steps are needed to fully update:
 
-1. **Re-vendor the agent** (if the agent code changed):
+1. **Re-run the Ansible install playbook** (recommended):
+   ```bash
+   cd ~/mainsail-cnc
+   ansible-playbook ansible/playbooks/install.yml
+   ```
+
+2. **Re-vendor the agent** (if the agent code changed, bash alternative):
    ```bash
    cd ~/mainsail-cnc
    ./scripts/install_to_moonraker.sh
    ```
 
-2. **Rebuild the frontend** (if frontend code changed):
+3. **Rebuild the frontend** (if frontend code changed):
    ```bash
    cd ~/mainsail-cnc
    bun install --frozen-lockfile  # only if bun.lock changed
@@ -614,7 +778,7 @@ After a `git pull`, the following steps are needed to fully update:
    ./deploy.sh --live
    ```
 
-3. **Restart Klipper** (if macros changed):
+4. **Restart Klipper** (if macros changed):
    From the Mainsail UI, click the **Restart** button in the Klippy State panel, or:
    ```bash
    sudo systemctl restart klipper
@@ -702,7 +866,7 @@ The `cnc_metadata` component automatically processes uploaded G-code files throu
 which detects common CAM signatures (EstlCam, FreeCAD, Fusion 360, V-Carve) and writes a `.cnc-meta.json` sidecar
 alongside each file. These sidecars are displayed on the Job Files cards.
 
-The extractor is deployed automatically by `install_to_moonraker.sh`. Manual deployment:
+The extractor is deployed automatically by the Ansible install playbook or the bash `install_to_moonraker.sh` script. Manual deployment:
 
 ```bash
 mkdir -p ~/printer_data/scripts
@@ -738,8 +902,8 @@ This means:
 
 ### Enabling the WCS plugin
 
-The plugin is deployed automatically by `scripts/install_to_moonraker.sh`
-(step 7/11). After running the install script, add to `printer.cfg`:
+The plugin is deployed automatically by the Ansible install playbook or the bash
+`install_to_moonraker.sh` script. After running the install, add to `printer.cfg`:
 
 ```ini
 [work_coordinate_systems]
@@ -782,10 +946,13 @@ Look for errors referencing `cnc_agent` or `cnc_metadata`. Common causes:
 - Python import error (vendored files not in the right location)
 - Missing `[cnc_agent]` section in `moonraker.conf`
 
-Fix: Re-run the install script:
+Fix: Re-run the install:
 
 ```bash
 cd ~/mainsail-cnc
+# Ansible (recommended)
+ansible-playbook ansible/playbooks/install.yml
+# or bash (legacy)
 ./scripts/install_to_moonraker.sh
 ```
 
@@ -800,6 +967,9 @@ cd ~/mainsail-cnc
 2. Rebuild and redeploy:
    ```bash
    cd ~/mainsail-cnc
+   # Ansible (recommended)
+   ansible-playbook ansible/playbooks/deploy.yml
+   # or bash (legacy)
    bun run build
    ./deploy.sh --live
    ```
@@ -849,12 +1019,13 @@ On-device builds may require more RAM than available. Options:
 | `moonraker-cnc-agent/` | Moonraker CNC agent (Python component) |
 | `klipper-extras/` | Klipper extra plugins (e.g. `work_coordinate_systems.py` for G10 L2/L20) |
 | `klipper-macros/` | CNC macros (WCS selector/zero macros, scaffold macros) |
+| `ansible/` | Ansible playbooks and roles for idempotent install/deploy/uninstall |
 | `scripts/` | Metadata extractor, install scripts |
 | `config/examples/` | Example machine profile and update-manager config |
 | `specs/` | Design specs and integration plans (e.g. `wcs-integration.md`) |
 | `docs/` | Architecture, API, and milestone documentation |
 | `deploy.sh` | Build-and-deploy script (dry-run by default) |
-| `scripts/install_to_moonraker.sh` | Full install script for agent + update manager |
+| `scripts/install_to_moonraker.sh` | Full install script for agent + update manager (legacy) |
 
 ## Further Reading
 

@@ -1,0 +1,59 @@
+---
+- name: Install mainsail-cnc — agent, frontend, plugins
+  hosts: cnc
+  gather_facts: true
+  vars_files:
+    - ../vars/main.yml
+  pre_tasks:
+    - name: Clone or update monorepo on the target
+      ansible.builtin.git:
+        repo: "{{ repo.url }}"
+        dest: "{{ repo.dest }}"
+        version: "{{ repo.branch }}"
+        force: true
+      register: repo_clone
+  roles:
+    - role: agent
+      tags: [agent]
+    - role: extractor
+      tags: [extractor]
+    - role: moonraker-config
+      tags: [moonraker-config]
+    - role: klipper-extras
+      tags: [klipper-extras]
+    - role: macros
+      tags: [macros]
+    - role: frontend
+      tags: [frontend]
+  post_tasks:
+    - name: Restart moonraker
+      ansible.builtin.systemd:
+        name: moonraker
+        state: restarted
+      become: true
+      tags:
+        - restart-services
+
+    - name: Wait for moonraker API to respond
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:7125/printer/info"
+        method: GET
+      register: moonraker_api
+      retries: 30
+      delay: 1
+      until: moonraker_api.status == 200
+      tags:
+        - restart-services
+
+    - name: Verify CncAgent loaded in moonraker logs
+      ansible.builtin.shell:
+        cmd: |
+          journalctl -u moonraker --since "2 minutes ago" --no-pager 2>/dev/null \
+            || tail -200 {{ printer_data.config_dir }}/../logs/moonraker.log 2>/dev/null \
+            || true
+        warn: false
+      register: agent_logs
+      changed_when: false
+      failed_when: false
+      tags:
+        - restart-services

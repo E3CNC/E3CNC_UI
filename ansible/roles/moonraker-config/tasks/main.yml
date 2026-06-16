@@ -1,0 +1,44 @@
+---
+- name: Ensure [cnc_agent] section header in moonraker.conf
+  ansible.builtin.lineinfile:
+    path: "{{ moonraker_conf }}"
+    line: '[cnc_agent]'
+    insertbefore: EOF
+    create: true
+
+- name: Ensure extractor_path in [cnc_metadata] section
+  community.general.ini_file:
+    path: "{{ moonraker_conf }}"
+    section: cnc_metadata
+    option: extractor_path
+    value: "{{ printer_data.scripts_dir }}/cnc_metadata_extractor.py"
+    value_delimiter: ": "
+
+- name: Ensure timeout in [cnc_metadata] section
+  community.general.ini_file:
+    path: "{{ moonraker_conf }}"
+    section: cnc_metadata
+    option: timeout
+    value: "30.0"
+    value_delimiter: ": "
+
+- name: Ensure [update_manager mainsail-cnc] section in moonraker.conf
+  ansible.builtin.blockinfile:
+    path: "{{ moonraker_conf }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - update_manager mainsail-cnc"
+    insertafter: EOF
+    create: true
+    block: |-
+      [update_manager mainsail-cnc]
+      type: git_repo
+      channel: dev
+      path: {{ repo.dest }}
+      origin: {{ repo.url }}
+      primary_branch: {{ repo.branch }}
+      enable_node_updates: False
+      is_system_service: False
+      info_tags:
+          desc=Mainsail CNC
+          post_update=./deploy.sh --live && cp -f klipper-extras/work_coordinate_systems.py {{ klipper.extras_dir }}/work_coordinate_systems.py && cp -f klipper-macros/wcs_macros.cfg {{ printer_data.macros_dir }}/wcs_macros.cfg && cp -f moonraker-cnc-agent/src/moonraker_cnc_agent/cnc_agent.py {{ agent.vender_dir }}/cnc_agent/cnc_agent.py && cp -f moonraker-cnc-agent/src/moonraker_cnc_agent/cnc_metadata.py {{ agent.vender_dir }}/cnc_metadata/cnc_metadata.py
+      managed_services: klipper moonraker
+      refresh_interval: 24

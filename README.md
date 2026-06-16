@@ -17,6 +17,23 @@ Two paths are documented:
 
 ### Quick start (existing Klipper + Moonraker)
 
+**Recommended — Ansible playbook (idempotent, supports `--check`):**
+
+```bash
+# 1. Clone the fork
+git clone https://github.com/isaaceliape/mainsail-cnc.git ~/mainsail-cnc
+cd ~/mainsail-cnc
+
+# 2. Install Ansible and required collection
+pip install ansible
+ansible-galaxy collection install community.general
+
+# 3. Run the install playbook
+ansible-playbook ansible/playbooks/install.yml
+```
+
+**Alternative — manual steps (bash scripts):**
+
 ```bash
 # 1. Clone the fork
 git clone https://github.com/isaaceliape/mainsail-cnc.git ~/mainsail-cnc
@@ -29,16 +46,10 @@ export PATH="$HOME/.bun/bin:$PATH"
 # 3. Build and deploy
 bun install --frozen-lockfile
 bun run build
-# Deploys built files to ~/mainsail/ (the web root)
 ./deploy.sh --live
 
 # 4. Install the Moonraker CNC agent
-# Vendors the agent into Moonraker, adds [cnc_agent] to moonraker.conf,
-# registers update_manager entry, and restarts Moonraker
 ./scripts/install_to_moonraker.sh
-
-# 5. Restart Moonraker
-sudo systemctl restart moonraker
 ```
 
 Then open `http://<your-device-ip>` in a browser.
@@ -186,7 +197,7 @@ Read-only Klipper state flows directly from Mainsail's Vuex store subscription �
 
 ## Status
 
-This repository has progressed well beyond its initial scaffold. The fork is deployed and live on a Linux SBC at `~/mainsail/`, tracked by Moonraker's update_manager on the `develop` branch. On-device builds are supported (Node.js v20 + Bun).
+This repository has progressed well beyond its initial scaffold. The fork is deployed and live on a Linux SBC at `~/mainsail/`, tracked by Moonraker's update_manager on the `develop` branch. On-device builds are supported (Node.js v20 + Bun). Ansible playbooks are available for idempotent install/deploy/uninstall at `ansible/`.
 
 ### CNC-specific cleanup
 
@@ -217,6 +228,7 @@ All 3D-printer-only features have been removed:
 - ✅ G-Code Files card grid with CAM metadata sidecar rendering
 - ✅ Moonraker CNC agent component with `/server/cnc/...` REST endpoints
 - ✅ Metadata extractor CLI (`scripts/cnc_metadata_extractor.py`)
+- ✅ Ansible playbooks for idempotent install/deploy/uninstall
 - ✅ Deploy script + Moonraker update-manager integration
 - ✅ Klipper G-code caveats documented
 - ✅ Compact DRO readout in app header toolbar (machine position, homed state, live velocity, G90/G91 mode)
@@ -309,6 +321,7 @@ to use `G10 L20 P{n}` — the `ZERO_X`/`Y`/`Z`/`ALL` macros in
 - `config/examples/`: example machine profile and update-manager config
 - `specs/`: design specs and integration plans (e.g. `wcs-integration.md`)
 - `docs/`: supporting architecture and API notes
+- `ansible/`: Ansible playbooks and roles for idempotent install/deploy/uninstall
 - `deploy.sh`: portable build-and-deploy script (dry-run by default, `--live` to deploy)
 - `moonraker-cnc-update.conf`: drop-in Moonraker update_manager config snippet
 

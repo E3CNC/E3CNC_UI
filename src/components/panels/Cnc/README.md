@@ -24,8 +24,8 @@ This directory contains CNC-focused dashboard panels for the Mainsail fork.
 - With the `[work_coordinate_systems]` Klipper extra plugin (see
   `klipper-extras/`), this build **does** support `G10 L2/L20`. Work-zero
   operations use `G10 L20` per-WCS commands. The plugin is deployed as part
-  of `install_to_moonraker.sh`. Without it, stock Klipper behaviour applies
-  and work-zero falls back to `G92`.
+  of the Ansible install playbook or `install_to_moonraker.sh`. Without it,
+  stock Klipper behaviour applies and work-zero falls back to `G92`.
 
 ## Re-registering this directory
 
