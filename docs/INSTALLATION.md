@@ -21,6 +21,90 @@ This guide covers two installation paths:
     Mainsail web files with the built output of this fork. Your existing Klipper and Moonraker configuration is not
     affected.
 
+## Backup Your Current Setup
+
+Before making any changes, back up your existing configuration. This ensures you can restore your system if
+something goes wrong during installation.
+
+### What to back up
+
+| File | Purpose | Location |
+|------|---------|----------|
+| **Klipper config** | Printer/CNC machine definition | `~/printer_data/config/printer.cfg` |
+| **Moonraker config** | API server settings | `~/printer_data/config/moonraker.conf` |
+| **Mainsail config** | Web UI settings (theme, layout, panels) | `~/mainsail/config.json` (if it exists) |
+| **Moonraker DB** | Persisted dashboard state, panel layouts | `~/printer_data/config/moonraker.db` |
+| **WCS offsets** | Work coordinate system offset tables | `~/wcs_offsets.json` (if using the WCS plugin) |
+| **Machine profile** | CNC capabilities and safety rules | `~/printer_data/config/machine_profile.yaml` (if it exists) |
+| **CNC dashboard settings** | Agent-side CNC preferences | `~/printer_data/config/cnc_dashboard_settings.json` (if it exists) |
+| **Custom themes** | Any user-uploaded themes or backgrounds | `~/printer_data/config/.theme/` (if it exists) |
+
+### One-line backup
+
+```bash
+mkdir -p ~/backup-$(date +%Y%m%d)
+cp -a ~/printer_data/config ~/backup-$(date +%Y%m%d)/
+cp -a ~/mainsail/config.json ~/backup-$(date +%Y%m%d)/ 2>/dev/null || true
+cp -a ~/printer_data/config/moonraker.db ~/backup-$(date +%Y%m%d)/ 2>/dev/null || true
+cp -a ~/wcs_offsets.json ~/backup-$(date +%Y%m%d)/ 2>/dev/null || true
+echo "Backed up to ~/backup-$(date +%Y%m%d)"
+```
+
+### Manual backup (step by step)
+
+```bash
+# Create a dated backup directory
+BACKUP_DIR=~/backup-$(date +%Y%m%d)
+mkdir -p "$BACKUP_DIR"
+
+# Klipper and Moonraker configuration
+cp -a ~/printer_data/config "$BACKUP_DIR/config"
+
+# Mainsail web UI settings
+cp ~/mainsail/config.json "$BACKUP_DIR/" 2>/dev/null || echo "No config.json found — skipping"
+
+# Moonraker database (panel layouts, floating panel positions, etc.)
+cp ~/printer_data/config/moonraker.db "$BACKUP_DIR/" 2>/dev/null || echo "No moonraker.db found — skipping"
+
+# WCS offset tables (Klipper extra plugin)
+cp ~/wcs_offsets.json "$BACKUP_DIR/" 2>/dev/null || echo "No wcs_offsets.json found — skipping"
+
+# Machine profile
+cp ~/printer_data/config/machine_profile.yaml "$BACKUP_DIR/" 2>/dev/null || echo "No machine_profile.yaml found — skipping"
+
+# CNC dashboard settings (agent-side)
+cp ~/printer_data/config/cnc_dashboard_settings.json "$BACKUP_DIR/" 2>/dev/null || echo "No cnc_dashboard_settings.json found — skipping"
+
+# Custom themes
+cp -a ~/printer_data/config/.theme "$BACKUP_DIR/" 2>/dev/null || echo "No .theme directory found — skipping"
+
+echo "Backup complete: $BACKUP_DIR"
+```
+
+### What is NOT backed up
+
+- **G-code files** in `~/printer_data/gcodes/` — these are your job files and should be backed up separately
+  if needed, but they are not affected by installing or updating Mainsail-CNC.
+- **Klipper firmware binaries** — the compiled microcontroller firmware is not affected by frontend changes.
+- **Systemd service files** — the service definitions for Klipper and Moonraker are unchanged.
+
+### Restoring from a backup
+
+```bash
+# Replace the configuration directories and files
+cp -a ~/backup-20250101/config ~/printer_data/
+cp ~/backup-20250101/config.json ~/mainsail/ 2>/dev/null || true
+cp ~/backup-20250101/moonraker.db ~/printer_data/config/ 2>/dev/null || true
+cp ~/backup-20250101/wcs_offsets.json ~/ 2>/dev/null || true
+
+# Restart services to pick up the restored config
+sudo systemctl restart klipper moonraker
+```
+
+!!! tip "Keep multiple backups"
+    It is good practice to keep a few dated backups (e.g. `~/backup-20250101`, `~/backup-20250115`)
+    so you can compare configuration changes over time using `diff`.
+
 ## Prerequisites
 
 - **A Debian-based system:** Raspberry Pi (3A+ or newer recommended), BTT-CB1, Odroid, or any x86 Linux machine.
