@@ -99,8 +99,8 @@ app.use(VueToast, { duration: 3000, position: 'top-right' })
 app.directive('longpress', vLongpress)
 app.directive('responsive-class', vResponsiveClass)
 app.directive('observe-visibility', ObserveVisibility)
-app.component('vue-load-image', VueLoadImage)
-app.component('e-chart', EChart)
+app.component('VueLoadImage', VueLoadImage)
+app.component('EChart', EChart)
 
 initLoad().then(() => {
     app.use(store)

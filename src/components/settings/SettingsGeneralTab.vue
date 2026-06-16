@@ -59,7 +59,7 @@ import SettingsGeneralTabResetDatabase from '@/components/settings/General/Gener
 const store = useStore()
 const { t } = useI18n()
 const { browserLocale, formatDate } = useBase()
-const {  } = useSettingsDatabase()
+useSettingsDatabase()
 
 const availableLanguages = ref<{ text: string; value: string }[]>([])
 

@@ -20,11 +20,11 @@
                             v-for="log in rolloverLogfiles"
                             :key="log"
                             :model-value="selectedRolloverLogs"
-                            @update:model-value="setSelectedRolloverLogs"
                             :label="capitalize(log)"
                             :value="log"
                             hide-details
-                            class="mt-0" />
+                            class="mt-0"
+                            @update:model-value="setSelectedRolloverLogs" />
                     </v-col>
                 </v-row>
             </v-card-text>

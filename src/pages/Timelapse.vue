@@ -20,5 +20,5 @@ import TimelapseStatusPanel from '@/components/panels/Timelapse/TimelapseStatusP
 const display = useDisplay()
 const mdAndUp = computed(() => display.mdAndUp.value)
 
-const { } = useBase()
+useBase()
 </script>

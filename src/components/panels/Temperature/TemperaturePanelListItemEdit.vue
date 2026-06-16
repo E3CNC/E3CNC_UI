@@ -1,5 +1,5 @@
 <template>
-    <v-dialog :model-value="showDialog" @update:model-value="$emit('update:model-value', $event)" persistent :width="400">
+    <v-dialog :model-value="showDialog" persistent :width="400" @update:model-value="$emit('update:model-value', $event)">
         <panel :title="formatName" :icon="icon" card-class="temperature-edit-heater-dialog" :margin-bottom="false">
             <template #buttons>
  <v-btn :icon="mdiCloseThick" rounded="0" @click="closeDialog"/>

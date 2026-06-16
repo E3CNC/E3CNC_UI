@@ -77,13 +77,13 @@
 
                         <!-- Offset origin markers (back to front, inactive first) -->
                         <g
-                            v-for="(entry, idx) in sortedOffsets"
-                            :key="'wcs-' + entry.name"
+                            v-for="(entry) in sortedOffsets"
                             v-show="isOffsetVisible(entry.name)"
+                            :key="'wcs-' + entry.name"
                             class="offset-rect-group"
                             :class="{ 'offset-rect--active': entry.name === activeWcs }"
-                            @click="onSelectWcs(entry.name)"
-                            style="cursor: pointer">
+                            style="cursor: pointer"
+                            @click="onSelectWcs(entry.name)">
                             <line
                                 :x1="toSvgX(entry.offsetX) - 8"
                                 :y1="toSvgY(entry.offsetY)"
@@ -107,8 +107,8 @@
                         <!-- Stock size rectangles (origin at bottom-left of stock) -->
                         <g
                             v-for="entry in allOffsetEntries"
-                            :key="'stock-' + entry.name"
                             v-show="isOffsetVisible(entry.name)"
+                            :key="'stock-' + entry.name"
                             style="pointer-events: none">
                             <rect
                                 v-if="stockSizes[entry.name]"
@@ -243,8 +243,8 @@
                             class="offset-preview-legend__card"
                             :class="{ 'offset-preview-legend__card--active': entry.name === activeWcs }"
                             :style="{ borderColor: entry.color }"
-                            @click="onSelectWcs(entry.name)"
-                            style="cursor: pointer">
+                            style="cursor: pointer"
+                            @click="onSelectWcs(entry.name)">
                             <div class="offset-preview-legend__card-header">
                                 <span class="offset-preview-legend__swatch" :style="{ backgroundColor: entry.color }" />
                                 <span class="offset-preview-legend__card-title">{{ entry.name }}</span>
@@ -362,8 +362,8 @@
                                     size="small"
                                     block
                                     variant="outlined"
-                                    @click="onSetWorkZeroClick('X')"
-                                    :disabled="offsetActionsLocked">
+                                    :disabled="offsetActionsLocked"
+                                    @click="onSetWorkZeroClick('X')">
                                     <v-icon size="small" start>{{ mdiTarget }}</v-icon>
                                     Set X
                                 </v-btn>
@@ -373,8 +373,8 @@
                                     size="small"
                                     block
                                     variant="outlined"
-                                    @click="onSetWorkZeroClick('Y')"
-                                    :disabled="offsetActionsLocked">
+                                    :disabled="offsetActionsLocked"
+                                    @click="onSetWorkZeroClick('Y')">
                                     <v-icon size="small" start>{{ mdiTarget }}</v-icon>
                                     Set Y
                                 </v-btn>
@@ -384,8 +384,8 @@
                                     size="small"
                                     block
                                     variant="outlined"
-                                    @click="onSetWorkZeroClick('Z')"
-                                    :disabled="offsetActionsLocked">
+                                    :disabled="offsetActionsLocked"
+                                    @click="onSetWorkZeroClick('Z')">
                                     <v-icon size="small" start>{{ mdiAxisZArrow }}</v-icon>
                                     Set Z
                                 </v-btn>
@@ -431,8 +431,8 @@
                                     size="small"
                                     block
                                     variant="outlined"
-                                    @click="resetOffsets"
-                                    :disabled="offsetActionsLocked">
+                                    :disabled="offsetActionsLocked"
+                                    @click="resetOffsets">
                                     <v-icon size="small" start>{{ mdiRestart }}</v-icon>
                                     Reset
                                 </v-btn>

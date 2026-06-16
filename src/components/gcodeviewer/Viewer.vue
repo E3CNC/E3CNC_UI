@@ -24,8 +24,8 @@
                         <div class="viewer">
                             <CodeStream
                                 ref="gcodestream"
+                                v-model:currentline="scrubPosition"
                                 :shown="showGCode"
-                                :currentline.sync="scrubPosition"
                                 :document="fileData"
                                 :is-simulating="!printerIsPrinting" />
                         </div>

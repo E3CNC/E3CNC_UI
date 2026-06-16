@@ -18,7 +18,7 @@ const store = useStore()
 const route = useRoute()
 const { t } = useI18n()
 const { proxy } = getCurrentInstance()!
-const { } = useBase()
+useBase()
 
 const visible = ref(false)
 

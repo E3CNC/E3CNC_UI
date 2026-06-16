@@ -30,7 +30,7 @@
                         <template #prepend>
                             <v-icon size="small" class="mt-1 mr-2">{{ convertWebcamIcon(webcam.icon) }}</v-icon>
                         </template>
-                        <template #title v-text="webcam.name" />
+                        <template #title>{{ webcam.name }}</template>
                     </v-list-item>
                 </v-list>
             </v-menu>

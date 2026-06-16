@@ -17,5 +17,5 @@ import { useBase } from '@/composables/useBase'
 import HistoryListPanel from '@/components/panels/HistoryListPanel.vue'
 import HistoryStatisticsPanel from '@/components/panels/HistoryStatisticsPanel.vue'
 
-const { } = useBase()
+useBase()
 </script>

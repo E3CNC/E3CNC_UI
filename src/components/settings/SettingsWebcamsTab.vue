@@ -38,7 +38,7 @@ import type { GuiWebcamStateWebcam } from '@/store/gui/webcams/types'
 const DEFAULT_ASPECT_RATIO = '16:9'
 
 const store = useStore()
-const {  } = useWebcam()
+useWebcam()
 
 const boolForm = ref(false)
 const typeForm = ref<'create' | 'edit'>('create')

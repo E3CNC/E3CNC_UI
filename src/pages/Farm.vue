@@ -14,7 +14,7 @@ import { useBase } from '@/composables/useBase'
 import FarmPrinterPanel from '@/components/panels/FarmPrinterPanel.vue'
 
 const store = useStore()
-const { } = useBase()
+useBase()
 
 const printers = computed(() => store.getters['farm/getPrinters'])
 </script>

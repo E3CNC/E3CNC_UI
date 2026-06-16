@@ -22,7 +22,7 @@ import SettingsMiscellaneousTabLightGroups from '@/components/settings/Miscellan
 import SettingsMiscellaneousTabLightPresets from '@/components/settings/Miscellaneous/SettingsMiscellaneousTabLightPresets.vue'
 import { useMiscellaneous } from '@/composables/useMiscellaneous'
 
-const {  } = useMiscellaneous()
+useMiscellaneous()
 const route = useRoute()
 const router = useRouter()
 

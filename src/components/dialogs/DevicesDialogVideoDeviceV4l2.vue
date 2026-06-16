@@ -5,7 +5,7 @@
             <template #title>
                 <span class="text-h5 mb-0">{{ device.camera_name }}</span>
             </template>
-            <template #subtitle v-if="show_alt_name">
+            <template v-if="show_alt_name" #subtitle>
                 <span>{{ device.alt_name }}</span>
             </template>
         </v-list-item>

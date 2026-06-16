@@ -118,9 +118,11 @@ a9144473 spec: add Ansible migration plan
 
 ## Operational Guidelines
 
+- **Ask before pushing**: Never push to remote without asking the user first.
 - **Build verification**: Always run `bun run build` after changes. The build must pass before committing.
 - **Store layer**: Store migration is complete — all Vue 2 patterns (`Vue.set`, `Vue.$socket`, `Vue.$toast`, `import Vue`) removed.
 - **`@vue/compat`**: Fully removed — app runs on pure Vue 3.5 + Vuetify 3.
 - **Runtime fixes applied**: `i18n.global.t`, `useDisplay()`, `boolMenu`, removed `const mdiXxx = mdiXxx` TDZ bugs across 100+ files.
 - **CB1 builds**: Do NOT run `bun run build` on the CB1 — it OOMs. Use `scripts/download_frontend.sh` or CI nightly releases instead.
 - **Moonraker update manager**: Has `post_update_script: ~/mainsail-cnc/scripts/post_update.sh` which auto-updates frontend + agent on git pull.
+- **Ask before pushing**: Never push to remote without asking the user first.

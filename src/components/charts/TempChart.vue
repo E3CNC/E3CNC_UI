@@ -7,8 +7,8 @@
         :autoresize="true"
         :style="tempchartStyle"
         class="w-100"
-        @mouseenter.native="hoverChart = true"
-        @mouseleave.native="hoverChart = false" />
+        @mouseenter="hoverChart = true"
+        @mouseleave="hoverChart = false" />
 </template>
 
 <script setup lang="ts">

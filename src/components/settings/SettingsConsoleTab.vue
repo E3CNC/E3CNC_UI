@@ -153,7 +153,7 @@ type ConsoleFilter = Omit<GuiConsoleStateFilter, 'id'> & { id: string }
 const store = useStore()
 const { t } = useI18n()
 const { klipperReadyForGui, moonrakerComponents } = useBase()
-const {  } = useConsole()
+useConsole()
 
 const form = ref<consoleForm>({
     bool: false,

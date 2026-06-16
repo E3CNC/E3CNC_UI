@@ -53,11 +53,10 @@ const webcamStyle = computed(() => ({
 }))
 
 const url = computed(() => {
-    let urlSearch = ''
     let u = new URL(location.href)
 
     try {
-        urlSearch = new URL(props.camSettings.stream_url).search.toString()
+        const urlSearch = new URL(props.camSettings.stream_url).search.toString()
         u = new URL('api/ws' + urlSearch, props.camSettings.stream_url)
     } catch {
         log('invalid url', props.camSettings.stream_url)

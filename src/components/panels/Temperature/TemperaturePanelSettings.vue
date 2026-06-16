@@ -7,34 +7,34 @@
             <v-list-item class="minHeight36">
                 <v-checkbox
                     :model-value="boolTempchart"
-                    @update:model-value="toggleBoolTempchart"
                     class="mt-0"
                     hide-details
-                    :label="$t('Panels.TemperaturePanel.ShowChart')" />
+                    :label="$t('Panels.TemperaturePanel.ShowChart')"
+                    @update:model-value="toggleBoolTempchart" />
             </v-list-item>
             <v-list-item class="minHeight36">
                 <v-checkbox
                     :model-value="hideMcuHostSensors"
-                    @update:model-value="toggleHideMcuHostSensors"
                     class="mt-0"
                     hide-details
-                    :label="$t('Panels.TemperaturePanel.HideMcuHostSensors')" />
+                    :label="$t('Panels.TemperaturePanel.HideMcuHostSensors')"
+                    @update:model-value="toggleHideMcuHostSensors" />
             </v-list-item>
             <v-list-item class="minHeight36">
                 <v-checkbox
                     :model-value="hideMonitors"
-                    @update:model-value="toggleHideMonitors"
                     class="mt-0"
                     hide-details
-                    :label="$t('Panels.TemperaturePanel.HideMonitors')" />
+                    :label="$t('Panels.TemperaturePanel.HideMonitors')"
+                    @update:model-value="toggleHideMonitors" />
             </v-list-item>
             <v-list-item class="minHeight36">
                 <v-checkbox
                     :model-value="autoscaleTempchart"
-                    @update:model-value="toggleAutoscaleTempchart"
                     class="mt-0"
                     hide-details
-                    :label="$t('Panels.TemperaturePanel.AutoscaleChart')" />
+                    :label="$t('Panels.TemperaturePanel.AutoscaleChart')"
+                    @update:model-value="toggleAutoscaleTempchart" />
             </v-list-item>
         </v-list>
     </v-menu>

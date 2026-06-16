@@ -11,8 +11,8 @@
             <div class="dashboard-sortable-item__action">
                 <v-icon
                     :color="checkboxColor"
-                    @click.stop="$emit('change-visible', name, !visible)"
-                    :icon="checkboxIcon" />
+                    :icon="checkboxIcon"
+                    @click.stop="$emit('change-visible', name, !visible)" />
             </div>
         </div>
     </v-list-item>

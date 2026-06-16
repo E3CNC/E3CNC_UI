@@ -5,8 +5,8 @@
                 <status-panel />
                 <template v-for="component in mobileLayout">
                     <component
-                        v-if="isPanelKnown(component.name)"
                         :is="getPanelComponent(component.name)"
+                        v-if="isPanelKnown(component.name)"
                         :key="'dashboard-mobileLayout-' + component.name"
                         floatable
                         :panel-id="extractPanelId(component.name)"></component>
@@ -18,8 +18,8 @@
                 <status-panel />
                 <template v-for="component in tabletLayout1">
                     <component
-                        v-if="isPanelKnown(component.name)"
                         :is="getPanelComponent(component.name)"
+                        v-if="isPanelKnown(component.name)"
                         :key="'dashboard-tabletLayout1-' + component.name"
                         floatable
                         :panel-id="extractPanelId(component.name)"></component>
@@ -28,8 +28,8 @@
             <v-col class="v-col-6">
                 <template v-for="component in tabletLayout2">
                     <component
-                        v-if="isPanelKnown(component.name)"
                         :is="getPanelComponent(component.name)"
+                        v-if="isPanelKnown(component.name)"
                         :key="'dashboard-tabletLayout2-' + component.name"
                         floatable
                         :panel-id="extractPanelId(component.name)"></component>
@@ -41,8 +41,8 @@
                 <status-panel />
                 <template v-for="component in desktopLayout1">
                     <component
-                        v-if="isPanelKnown(component.name)"
                         :is="getPanelComponent(component.name)"
+                        v-if="isPanelKnown(component.name)"
                         :key="'dashboard-desktopLayout1-' + component.name"
                         floatable
                         :panel-id="extractPanelId(component.name)"></component>
@@ -51,8 +51,8 @@
             <v-col class="v-col-7">
                 <template v-for="component in desktopLayout2">
                     <component
-                        v-if="isPanelKnown(component.name)"
                         :is="getPanelComponent(component.name)"
+                        v-if="isPanelKnown(component.name)"
                         :key="'dashboard-desktopLayout2-' + component.name"
                         floatable
                         :panel-id="extractPanelId(component.name)"></component>
@@ -64,8 +64,8 @@
                 <status-panel />
                 <template v-for="component in widescreenLayout1">
                     <component
-                        v-if="isPanelKnown(component.name)"
                         :is="getPanelComponent(component.name)"
+                        v-if="isPanelKnown(component.name)"
                         :key="'dashboard-desktopLayout1-' + component.name"
                         floatable
                         :panel-id="extractPanelId(component.name)"></component>
@@ -74,8 +74,8 @@
             <v-col class="v-col-5">
                 <template v-for="component in widescreenLayout2">
                     <component
-                        v-if="isPanelKnown(component.name)"
                         :is="getPanelComponent(component.name)"
+                        v-if="isPanelKnown(component.name)"
                         :key="'dashboard-desktopLayout2-' + component.name"
                         floatable
                         :panel-id="extractPanelId(component.name)"></component>
@@ -84,8 +84,8 @@
             <v-col class="v-col-4">
                 <template v-for="component in widescreenLayout3">
                     <component
-                        v-if="isPanelKnown(component.name)"
                         :is="getPanelComponent(component.name)"
+                        v-if="isPanelKnown(component.name)"
                         :key="'dashboard-desktopLayout3-' + component.name"
                         floatable
                         :panel-id="extractPanelId(component.name)"></component>

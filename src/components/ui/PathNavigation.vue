@@ -34,9 +34,9 @@ interface pathSegment {
 }
 
 const props = defineProps({
-    path: { type: String, default: false },
-    baseDirectoryLabel: { type: String, default: false },
-    onSegmentClick: { type: Function, default: false },
+    path: { type: String, default: '' },
+    baseDirectoryLabel: { type: String, default: '' },
+    onSegmentClick: { type: Function, default: () => {} },
 })
 
 const segmentSeparator = '/'

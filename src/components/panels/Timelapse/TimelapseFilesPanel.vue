@@ -90,11 +90,8 @@
                 :headers="headers"
                 :custom-sort="sortFiles"
                 :sort-by="sortBy"
-                @update:sort-by="setSortBy"
                 :sort-desc="sortDesc"
-                @update:sort-desc="setSortDesc"
                 :items-per-page="countPerPage"
-                @update:items-per-page="setCountPerPage"
                 :footer-props="{
                     itemsPerPageText: $t('Timelapse.Files'),
                     itemsPerPageAllText: $t('Timelapse.AllFiles'),
@@ -104,7 +101,10 @@
                 :search="search"
                 :custom-filter="advancedSearch"
                 mobile-breakpoint="0"
-                show-select>
+                show-select
+                @update:sort-by="setSortBy"
+                @update:sort-desc="setSortDesc"
+                @update:items-per-page="setCountPerPage">
                 <template #items>
                     <td v-for="header in headers" :key="header.value">{{ header.text }}</td>
                 </template>

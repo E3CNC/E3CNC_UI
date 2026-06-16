@@ -9,7 +9,7 @@
             <template #title>
                 <span class="text-h5 mb-1">{{ device.product ?? 'Unknown' }}</span>
             </template>
-            <template #subtitle v-if="device.description">
+            <template v-if="device.description" #subtitle>
                 <span>{{ device.description }}</span>
             </template>
         </v-list-item>

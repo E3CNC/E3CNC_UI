@@ -3,10 +3,10 @@
         <v-col class="py-1">
             <v-checkbox
                 :model-value="value"
-                @update:model-value="setValue"
                 :label="label"
                 hide-details
-                class="mt-0" />
+                class="mt-0"
+                @update:model-value="setValue" />
         </v-col>
     </v-row>
 </template>

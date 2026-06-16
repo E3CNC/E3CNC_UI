@@ -13,5 +13,5 @@
 import { useBase } from '@/composables/useBase'
 import WebcamPanel from '@/components/panels/WebcamPanel.vue'
 
-const { } = useBase()
+useBase()
 </script>

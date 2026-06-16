@@ -22,7 +22,7 @@
                         <checkbox-list
                             :options="backupableNamespaces"
                             select-all
-                            @update:selectedCheckboxes="onSelectBackupCheckboxes" />
+                            @update:selected-checkboxes="onSelectBackupCheckboxes" />
                     </v-row>
                     <v-row>
                         <v-col class="text-center">

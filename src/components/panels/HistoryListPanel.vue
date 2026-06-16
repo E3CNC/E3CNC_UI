@@ -70,17 +70,17 @@
                         <v-list>
                             <v-list-item class="minHeight36">
                                 <v-checkbox
+                                    v-model="showMaintenanceEntries"
                                     class="mt-0"
                                     hide-details
-                                    v-model="showMaintenanceEntries"
                                     :label="$t('History.MaintenanceEntries')"
                                      />
                             </v-list-item>
                             <v-list-item class="minHeight36">
                                 <v-checkbox
+                                    v-model="showPrintJobs"
                                     class="mt-0"
                                     hide-details
-                                    v-model="showPrintJobs"
                                     :label="$t('History.PrintJobs')"
                                      />
                             </v-list-item>
@@ -88,9 +88,9 @@
                             <template v-if="printStatusArray.length">
                                 <v-list-item v-for="status of printStatusArray" :key="status.name" class="minHeight36">
                                     <v-checkbox
+                                        v-model="status.showInTable"
                                         class="mt-0"
                                         hide-details
-                                        v-model="status.showInTable"
                                         :label="`${status.displayName} (${status.value})`"
                                         @change="changeStatusVisible(status)" />
                                 </v-list-item>
@@ -115,11 +115,11 @@
         <v-divider class="mb-3" />
         <v-data-table
             v-model="selectedJobsTable"
+            v-model:items-per-page="countPerPage"
             :items="entries"
             class="history-jobs-table"
             :headers="filteredHeaders"
             disable-sort
-            v-model:items-per-page="countPerPage"
             :footer-props="{
                 itemsPerPageText: $t('History.Jobs'),
                 itemsPerPageAllText: $t('History.AllJobs'),

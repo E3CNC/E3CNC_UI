@@ -22,7 +22,7 @@
                         <checkbox-list
                             :options="resetableNamespaces"
                             select-all
-                            @update:selectedCheckboxes="onSelectResetCheckboxes" />
+                            @update:selected-checkboxes="onSelectResetCheckboxes" />
                     </v-row>
                     <v-row>
                         <v-col class="text-center">

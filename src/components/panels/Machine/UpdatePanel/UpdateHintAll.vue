@@ -1,5 +1,5 @@
 <template>
-    <v-dialog :model-value="showDialog" @update:model-value="emitValue" persistent max-width="600">
+    <v-dialog :model-value="showDialog" persistent max-width="600" @update:model-value="emitValue">
         <panel
             :title="$t('Machine.UpdatePanel.AreYouSure')"
             :icon="mdiProgressQuestion"
@@ -35,7 +35,7 @@
                 </v-btn>
             </v-card-actions>
         </panel>
-        <git-commits-list :model-value="boolShowCommitHistory" @update:model-value="boolShowCommitHistory = $event" :repo="showCommitsRepo" />
+        <git-commits-list :model-value="boolShowCommitHistory" :repo="showCommitsRepo" @update:model-value="boolShowCommitHistory = $event" />
     </v-dialog>
 </template>
 

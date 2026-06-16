@@ -3,7 +3,7 @@
         <template #title>
             <span class="text-primary font-weight-bold cursor-pointer" @click="onCommand">{{ command }}</span>
         </template>
-        <template #subtitle v-if="description">
+        <template v-if="description" #subtitle>
             <span class="text-wrap">{{ description }}</span>
         </template>
     </v-list-item>

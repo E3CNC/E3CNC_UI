@@ -11,7 +11,7 @@ export default defineConfigWithVueTs(
     },
 
     eslint.configs.recommended,
-    ...pluginVue.configs['flat/vue2-recommended'],
+    ...pluginVue.configs['flat/recommended'],
 
     // TypeScript setup
     // base = parser setup for .ts and .vue files
@@ -30,12 +30,31 @@ export default defineConfigWithVueTs(
     },
 
     {
+        rules: {
+            '@typescript-eslint/no-explicit-any': 'warn',
+            '@typescript-eslint/no-unused-vars': 'warn',
+        },
+    },
+
+    {
         files: ['**/*.vue'],
         rules: {
             'vue/no-v-html': 'off',
             'vue/block-order': 'off',
             'vue/no-v-text-v-html-on-component': 'off',
             'vue/valid-v-slot': ['error', { allowModifiers: true }],
+            'vue/multi-word-component-names': ['error', {
+                ignores: [
+                    'Panel', 'Dashboard', 'Console', 'History', 'Viewer',
+                    'Desktop', 'Mobile', 'Tablet', 'Widescreen', 'Sortable',
+                    'Responsive', 'Entry', 'Files', 'Farm', 'Machine',
+                    'Timelapse', 'Webcam', 'Gcodefiles', 'Jobqueue',
+                    'Printstatus', 'Codemirror', 'Wcs', 'Hlsstreamer',
+                    'Mjpegstreamer', 'SubPanel',
+                ],
+            }],
+            'vue/no-v-model-argument': 'off',
+            'vue/require-prop-comment': 'off',
         },
     },
 

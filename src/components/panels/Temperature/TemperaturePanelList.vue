@@ -72,7 +72,7 @@ const temperature_fans = computed(() =>
         .sort(sortObjectName)
 )
 
-const monitors = computed(() => available_monitors.value.sort(sortObjectName))
+const monitors = computed(() => [...available_monitors.value].sort(sortObjectName))
 
 const filteredHeaters = computed(() => filterNamesAndSort(available_heaters.value))
 

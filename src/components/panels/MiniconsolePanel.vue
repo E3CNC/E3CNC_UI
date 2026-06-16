@@ -8,7 +8,7 @@
         :hide-buttons-on-collapse="true">
         <template #buttons>
  <v-btn :icon="mdiTrashCan" rounded="0" @click="clearConsole"/>
-            <command-help-modal :in-toolbar="true" @onCommand="commandClick($event)" />
+            <command-help-modal :in-toolbar="true" @on-command="commandClick($event)" />
             <v-menu
                 :offset-y="true"
                 :close-on-content-click="false"

@@ -51,7 +51,7 @@
                             class="settings-tabs"
                             :options="{ overflowBehavior: { x: 'hidden' } }"
                             @focusin.capture="scrollFocusedSettingsElementIntoView">
-                            <component :is="tabComponents[activeTab]" @scrollToTop="scrollToTop" @resetLayout="resetDashboardLayout" />
+                            <component :is="tabComponents[activeTab]" @scroll-to-top="scrollToTop" @reset-layout="resetDashboardLayout" />
                         </OverlayScrollbarsComponent>
                     </v-col>
                     </v-row>

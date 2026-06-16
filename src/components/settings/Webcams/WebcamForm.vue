@@ -32,7 +32,7 @@
                                                     {{ convertWebcamIcon(icon.value) }}
                                                 </v-icon>
                                             </template>
-                                            <template #title v-text="icon.text" />
+                                            <template #title>{{ icon.text }}</template>
                                         </v-list-item>
                                     </v-list>
                                 </v-menu>

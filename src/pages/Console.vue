@@ -9,7 +9,7 @@
  <v-btn class="mr-3 px-2 minwidth-0" color="lightgray" @click="clearConsole">
                     <v-icon>{{ mdiTrashCan }}</v-icon>
                 </v-btn>
-                <command-help-modal @onCommand="commandClick($event)" />
+                <command-help-modal @on-command="commandClick($event)" />
                 <v-menu
                     offset-y
                     :top="consoleDirection === 'shell'"

@@ -56,7 +56,7 @@
                         :file-extension="fileExtension"
                         class="codemirror"
                         :class="{ withSidebar: existsFileStructure && fileStructureSidebar }"
-                        @lineChange="lineChanges" />
+                        @line-change="lineChanges" />
                     <div v-if="existsFileStructure && fileStructureSidebar" class="d-none d-md-flex structure-sidebar">
                         <v-treeview
                             activatable

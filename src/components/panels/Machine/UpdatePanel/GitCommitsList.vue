@@ -1,5 +1,5 @@
 <template>
-    <v-dialog :model-value="showDialog" @update:model-value="emitValue" persistent :max-width="800" :fullscreen="isMobile">
+    <v-dialog :model-value="showDialog" persistent :max-width="800" :fullscreen="isMobile" @update:model-value="emitValue">
         <panel
             :title="$t('Machine.UpdatePanel.Commits')"
             :icon="mdiUpdate"

@@ -9,8 +9,8 @@
         </v-card-text>
         <template v-if="mode === 'expert'">
             <settings-macros-tab-expert
-                @update:showGeneral="updateShowGeneral"
-                @scrollToTop="scrollToTop"></settings-macros-tab-expert>
+                @update:show-general="updateShowGeneral"
+                @scroll-to-top="scrollToTop"></settings-macros-tab-expert>
         </template>
         <template v-else>
             <settings-macros-tab-simple></settings-macros-tab-simple>

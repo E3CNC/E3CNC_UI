@@ -13,9 +13,9 @@
                 lines="two"
                 :disabled="!printer.socket.isConnected"
                 link
-                @click="changePrinter(printer)"
                 :title="getPrinterName(printer._namespace)"
-                :subtitle="getPrinterDescription(printer)">
+                :subtitle="getPrinterDescription(printer)"
+                @click="changePrinter(printer)">
             </v-list-item>
         </v-list>
     </v-menu>

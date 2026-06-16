@@ -99,12 +99,12 @@
                 <v-data-table
                     v-if="!showMissingConfigRootWarning"
                     v-model="selectedFiles"
+                    v-model:page="currentPage"
+                    v-model:items-per-page="countPerPage"
                     :items="sortedFiles"
                     class="files-table"
                     :headers="headers"
-                    v-model:page="currentPage"
                     disable-sort
-                    v-model:items-per-page="countPerPage"
                 :footer-props="{
                     itemsPerPageText: $t('Machine.ConfigFilesPanel.Files'),
                     itemsPerPageAllText: $t('Machine.ConfigFilesPanel.AllFiles'),
@@ -141,7 +141,7 @@
                     <div class="text-center">{{ $t('Machine.ConfigFilesPanel.Empty') }}</div>
                 </template>
 
-                <template v-if="currentPath !== ''" v-slot:body.prepend>
+                <template v-if="currentPath !== ''" #body.prepend>
                     <tr
                         class="file-list-cursor"
                         @click="clickRowGoBack"
