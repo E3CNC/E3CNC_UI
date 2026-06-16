@@ -1,7 +1,7 @@
 # WCS (Work Coordinate Systems) — Integration Plan
 
 > **Status:** Fully implemented. See [klipper-macros/README.md](../klipper-macros/README.md)
-> for the WCS plugin setup guide and [docs/INSTALLATION.md](../docs/INSTALLATION.md#wcs-work-coordinate-systems)
+> for the WCS plugin setup guide and the [Installation wiki page](https://github.com/isaaceliape/mainsail-cnc/wiki/Installation#wcs-work-coordinate-systems)
 > for the WCS section. Below is the original design spec, kept for historical reference.
 
 ## Problem

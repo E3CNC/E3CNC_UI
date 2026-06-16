@@ -23,6 +23,10 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Get package version
+        id: pkgver
+        run: echo "VERSION=v$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
@@ -36,7 +40,7 @@ jobs:
       - name: Create dist archive
         run: |
           cp ./remote/* ./dist/ 2>/dev/null || true
-          cd dist && zip -r ../mainsail-cnc.zip . && cd ..
+          cd dist && zip -r ../mainsail-cnc-${{ steps.pkgver.outputs.VERSION }}.zip . && cd ..
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v5
@@ -71,7 +75,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create nightly \
-            --title "Nightly build (${{ steps.commit.outputs.SHA_SHORT }})" \
+            --title "${{ steps.pkgver.outputs.VERSION }}-nightly (${{ steps.commit.outputs.SHA_SHORT }})" \
             --notes-file nightly-notes.md \
             --target "${{ github.sha }}" \
-            mainsail-cnc.zip
+            mainsail-cnc-${{ steps.pkgver.outputs.VERSION }}.zip

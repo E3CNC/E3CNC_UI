@@ -92,7 +92,7 @@ Responsibilities:
 
 Repository root:
 - `README.md`
-- `docs/`
+- `docs/` (migrated to [wiki](https://github.com/isaaceliape/mainsail-cnc/wiki))
 - `config/examples/`
 - `frontend/` placeholder exploration layer
 - `moonraker-cnc-agent/`
@@ -109,11 +109,11 @@ Important working frontend target:
 Created monorepo scaffold at:
 - `/Users/isaaceliape/repos/mainsail-cnc`
 
-Existing planning/support files:
-- `docs/architecture.md`
-- `docs/api.md`
-- `docs/milestones.md`
-- `docs/mainsail-fork-integration.md`
+Existing planning/support files (now on the [wiki](https://github.com/isaaceliape/mainsail-cnc/wiki)):
+- [Architecture](https://github.com/isaaceliape/mainsail-cnc/wiki/Architecture)
+- [API Reference](https://github.com/isaaceliape/mainsail-cnc/wiki/API)
+- [Milestones](https://github.com/isaaceliape/mainsail-cnc/wiki/Milestones)
+- [Mainsail Fork Integration](https://github.com/isaaceliape/mainsail-cnc/wiki/Mainsail-Fork-Integration)
 - `config/examples/machine-profile.example.yaml`
 
 ### Moonraker agent scaffold
@@ -503,7 +503,7 @@ Exit criteria:
 Completed across the project (commit `6de9345`):
 - Dashboard tab `G-Code` → `Job Files`
 - Card grid column labels adjusted accordingly
-- Documentation updated (`docs/api.md`, `README.md`)
+- Documentation updated (wiki, `README.md`)
 - Interface Settings `Console` tab renamed to `MDI`
 
 ## Phase 4: Safety and workflow hardening

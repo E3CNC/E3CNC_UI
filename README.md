@@ -11,7 +11,7 @@ A real [Mainsail](https://github.com/mainsail-prusa/mainsail) fork built on Vue 
 
 ## Installation
 
-See the full installation guide: [docs/INSTALLATION.md](docs/INSTALLATION.md)
+See the full installation guide: [Installation](https://github.com/isaaceliape/mainsail-cnc/wiki/Installation)
 
 Two paths are documented:
 
@@ -325,7 +325,7 @@ to use `G10 L20 P{n}` — the `ZERO_X`/`Y`/`Z`/`ALL` macros in
 - `scripts/`: metadata extractor and test fixtures (`scripts/cnc_metadata_extractor.py`)
 - `config/examples/`: example machine profile and update-manager config
 - `specs/`: design specs and integration plans (e.g. `wcs-integration.md`)
-- `docs/`: supporting architecture and API notes
+- `docs/` (migrated to [wiki](https://github.com/isaaceliape/mainsail-cnc/wiki)): supporting architecture and API notes
 - `ansible/`: Ansible playbooks and roles for idempotent install/deploy/uninstall
 - `deploy.sh`: portable build-and-deploy script (dry-run by default, `--live` to deploy)
 - `moonraker-cnc-update.conf`: drop-in Moonraker update_manager config snippet

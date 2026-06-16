@@ -159,7 +159,7 @@ all:
 | **9** | Write `deploy.yml` playbook (frontend only) | `playbooks/deploy.yml` |
 | **10** | Write `uninstall.yml` playbook with `state=absent` on all roles | `playbooks/uninstall.yml` |
 | **11** | Add `--check` support and test all playbooks | *(verify idempotency)* |
-| **12** | Update INSTALLATION.md to document `ansible-playbook` commands | `docs/INSTALLATION.md` |
+| **12** | Update Installation wiki page to document `ansible-playbook` commands | [Installation wiki](https://github.com/isaaceliape/mainsail-cnc/wiki/Installation) |
 | **13** | Add `test:shell` helper to generate an Ansible check run | *(optional)* |
 | **14** | Deprecate `scripts/install_to_moonraker.sh` and `scripts/uninstall.sh` | *(keep for legacy, point to playbooks)* |
 

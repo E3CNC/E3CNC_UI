@@ -18,8 +18,9 @@ echo "=== Downloading pre-built frontend ==="
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-ZIP_URL="https://github.com/${OWNER}/${REPO}/releases/download/nightly/mainsail-cnc.zip"
-ZIP_FILE="$TMP_DIR/mainsail-cnc.zip"
+PKG_VER="v$(node -p "require('$REPO_ROOT/package.json').version")"
+ZIP_URL="https://github.com/${OWNER}/${REPO}/releases/download/nightly/mainsail-cnc-${PKG_VER}.zip"
+ZIP_FILE="$TMP_DIR/mainsail-cnc-${PKG_VER}.zip"
 
 if curl -sfL "$ZIP_URL" -o "$ZIP_FILE" && [[ -s "$ZIP_FILE" ]]; then
     echo "    downloaded nightly build ($(du -h "$ZIP_FILE" | cut -f1))"
