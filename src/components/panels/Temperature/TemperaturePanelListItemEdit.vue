@@ -1,8 +1,12 @@
 <template>
-    <v-dialog :model-value="showDialog" persistent :width="400" @update:model-value="$emit('update:model-value', $event)">
+    <v-dialog
+        :model-value="showDialog"
+        persistent
+        :width="400"
+        @update:model-value="$emit('update:model-value', $event)">
         <panel :title="formatName" :icon="icon" card-class="temperature-edit-heater-dialog" :margin-bottom="false">
             <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="closeDialog"/>
+                <v-btn :icon="mdiCloseThick" rounded="0" @click="closeDialog" />
             </template>
             <v-card-text class="pt-6">
                 <temperature-panel-list-item-edit-chart-serie
@@ -52,9 +56,7 @@ const emit = defineEmits<{
 
 const store = useStore()
 
-const chartSeries = computed(() =>
-    store.getters['printer/tempHistory/getSerieNames'](props.objectName) ?? []
-)
+const chartSeries = computed(() => store.getters['printer/tempHistory/getSerieNames'](props.objectName) ?? [])
 
 const printerObjectAdditionalSensor = computed(() => {
     if (props.additionalSensorName === null || !(props.additionalSensorName in store.state.printer)) return {}

@@ -56,28 +56,50 @@ describe('gui miscellaneous store', () => {
         })
 
         it('updateLightgroup updates an existing lightgroup', () => {
-            state.entries['e1'] = { name: 'LED', type: 'light', lightgroups: { lg1: { name: 'Old', start: 0, end: 50 } }, presets: {} }
-            mutations.updateLightgroup(state, { entryId: 'e1', lightgroupId: 'lg1', values: { name: 'New', start: 0, end: 100 } })
+            state.entries['e1'] = {
+                name: 'LED',
+                type: 'light',
+                lightgroups: { lg1: { name: 'Old', start: 0, end: 50 } },
+                presets: {},
+            }
+            mutations.updateLightgroup(state, {
+                entryId: 'e1',
+                lightgroupId: 'lg1',
+                values: { name: 'New', start: 0, end: 100 },
+            })
             expect(state.entries['e1'].lightgroups['lg1'].name).toBe('New')
             expect(state.entries['e1'].lightgroups['lg1'].end).toBe(100)
         })
 
         it('destroyLightgroup removes a lightgroup', () => {
-            state.entries['e1'] = { name: 'LED', type: 'light', lightgroups: { lg1: { name: 'G1', start: 0, end: 100 } }, presets: {} }
+            state.entries['e1'] = {
+                name: 'LED',
+                type: 'light',
+                lightgroups: { lg1: { name: 'G1', start: 0, end: 100 } },
+                presets: {},
+            }
             mutations.destroyLightgroup(state, { entryId: 'e1', lightgroupId: 'lg1' })
             expect(state.entries['e1'].lightgroups).toEqual({})
         })
 
         it('storePreset adds a preset', () => {
             state.entries['e1'] = { name: 'LED', type: 'light', lightgroups: {}, presets: {} }
-            mutations.storePreset(state, { entryId: 'e1', values: { name: 'P1', red: 255, blue: 0, green: 0, white: null } })
+            mutations.storePreset(state, {
+                entryId: 'e1',
+                values: { name: 'P1', red: 255, blue: 0, green: 0, white: null },
+            })
             const keys = Object.keys(state.entries['e1'].presets)
             expect(keys).toHaveLength(1)
             expect(state.entries['e1'].presets[keys[0]].name).toBe('P1')
         })
 
         it('destroyPreset removes a preset', () => {
-            state.entries['e1'] = { name: 'LED', type: 'light', lightgroups: {}, presets: { p1: { name: 'P1', red: 255, blue: 0, green: 0, white: null } } }
+            state.entries['e1'] = {
+                name: 'LED',
+                type: 'light',
+                lightgroups: {},
+                presets: { p1: { name: 'P1', red: 255, blue: 0, green: 0, white: null } },
+            }
             mutations.destroyPreset(state, { entryId: 'e1', presetId: 'p1' })
             expect(state.entries['e1'].presets).toEqual({})
         })

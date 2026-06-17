@@ -6,7 +6,7 @@
             card-class="miscellaneous-light-neopixel-dialog"
             :margin-bottom="false">
             <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="closePrompt"/>
+                <v-btn :icon="mdiCloseThick" rounded="0" @click="closePrompt" />
             </template>
             <v-card-text>
                 <template v-if="presets.length">
@@ -126,7 +126,11 @@ const props = defineProps({
     modelValue: { type: Boolean },
     type: { type: String, required: true },
     name: { type: String, required: true },
-    group: { type: Object as () => GuiMiscellaneousStateEntry, required: false, default: () => ({}) as GuiMiscellaneousStateEntry },
+    group: {
+        type: Object as () => GuiMiscellaneousStateEntry,
+        required: false,
+        default: () => ({}) as GuiMiscellaneousStateEntry,
+    },
     index: { type: Number, default: 1 },
 })
 const emit = defineEmits(['update:modelValue', 'update-color'])

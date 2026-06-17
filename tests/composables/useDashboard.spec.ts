@@ -47,9 +47,18 @@ function mountComposable(overrides: Record<string, any> = {}) {
     const store = createStore({
         state: {
             socket: { isConnected: true, initializationList: [], loadings: [], port: 80, hostname: 'localhost' },
-            server: { klippy_connected: true, klippy_state: 'ready', components: [], registered_directories: [], config: { config: {} } },
+            server: {
+                klippy_connected: true,
+                klippy_state: 'ready',
+                components: [],
+                registered_directories: [],
+                config: { config: {} },
+            },
             printer: { app_name: 'Klipper', print_stats: { state: 'standby' }, idle_timeout: { state: 'Idle' } },
-            gui: { general: { timeFormat: '24hours', dateFormat: 'yyyy-mm-dd' }, uiSettings: { powerDeviceName: null } },
+            gui: {
+                general: { timeFormat: '24hours', dateFormat: 'yyyy-mm-dd' },
+                uiSettings: { powerDeviceName: null },
+            },
             instancesDB: 'moonraker',
             ...overrides,
         },
@@ -115,7 +124,14 @@ describe('useDashboard', () => {
         const c = mountComposable({
             getters: {
                 'gui/macros/getAllMacrogroups': () => [
-                    { id: '', name: 'Empty Group', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true },
+                    {
+                        id: '',
+                        name: 'Empty Group',
+                        color: 'primary',
+                        showInStandby: true,
+                        showInPrinting: true,
+                        showInPause: true,
+                    },
                 ],
             },
         })
@@ -127,7 +143,14 @@ describe('useDashboard', () => {
             const c = mountComposable({
                 getters: {
                     'gui/macros/getAllMacrogroups': () => [
-                        { id: 'g1', name: 'My Group', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true },
+                        {
+                            id: 'g1',
+                            name: 'My Group',
+                            color: 'primary',
+                            showInStandby: true,
+                            showInPrinting: true,
+                            showInPause: true,
+                        },
                     ],
                 },
             })

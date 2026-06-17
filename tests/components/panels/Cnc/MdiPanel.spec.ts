@@ -6,7 +6,11 @@ import MdiPanel from '@/components/panels/Cnc/MdiPanel.vue'
 // Mock Vuetify components
 vi.mock('vuetify/components', () => ({
     VContainer: { name: 'VContainer', template: '<div class="v-container"><slot /></div>' },
-    VRow: { name: 'VRow', props: { density: String }, template: '<div class="v-row" :class="`density-${density}`"><slot /></div>' },
+    VRow: {
+        name: 'VRow',
+        props: { density: String },
+        template: '<div class="v-row" :class="`density-${density}`"><slot /></div>',
+    },
     VCol: {
         name: 'VCol',
         props: { cols: [String, Number] },

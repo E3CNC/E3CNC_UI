@@ -9,9 +9,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: T
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: T) { this._value = val }
-        get value() { return this._value }
-        set value(v: T) { this._value = v }
+        constructor(val: T) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v: T) {
+            this._value = v
+        }
     }
     return {
         apiUrl: new MockRef('//localhost:8080'),
@@ -26,9 +32,15 @@ const mockGcodeFilesValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         search: new MockRef(''),
@@ -79,9 +91,27 @@ vi.mock('@/store/variables', () => ({
 const vuetifyComponentsMock = vi.hoisted(() => ({
     VRow: { name: 'VRow', template: '<div><slot /></div>' },
     VCol: { name: 'VCol', props: ['cols', 'class'], template: '<div :class="$attrs.class"><slot /></div>' },
-    VTextField: { name: 'VTextField', props: ['modelValue', 'appendIcon', 'label', 'singleLine', 'variant', 'clearable', 'hideDetails', 'density', 'class'], template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />' },
+    VTextField: {
+        name: 'VTextField',
+        props: [
+            'modelValue',
+            'appendIcon',
+            'label',
+            'singleLine',
+            'variant',
+            'clearable',
+            'hideDetails',
+            'density',
+            'class',
+        ],
+        template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+    },
     VSpacer: { name: 'VSpacer', template: '<div class="v-spacer" />' },
-    VBtn: { name: 'VBtn', props: ['title', 'color', 'class', 'loading'], template: '<button :class="$attrs.class" :disabled="loading" @click="$emit(\'click\')"><slot /></button>' },
+    VBtn: {
+        name: 'VBtn',
+        props: ['title', 'color', 'class', 'loading'],
+        template: '<button :class="$attrs.class" :disabled="loading" @click="$emit(\'click\')"><slot /></button>',
+    },
     VIcon: { name: 'VIcon', props: ['size', 'color'], template: '<i><slot /></i>' },
 }))
 
@@ -273,9 +303,7 @@ describe('GcodefilesPanelHeader.vue', () => {
     })
 
     it('shows download and delete buttons when files selected', () => {
-        mockGcodeFilesValues.selectedFiles.value = [
-            { filename: 'test.gcode' } as FileStateGcodefile,
-        ]
+        mockGcodeFilesValues.selectedFiles.value = [{ filename: 'test.gcode' } as FileStateGcodefile]
         const store = createStoreWithState()
         const wrapper = mount(GcodefilesPanelHeader, {
             global: {
@@ -290,9 +318,7 @@ describe('GcodefilesPanelHeader.vue', () => {
     })
 
     it('shows confirmation dialog when delete button clicked', async () => {
-        mockGcodeFilesValues.selectedFiles.value = [
-            { filename: 'test.gcode' } as FileStateGcodefile,
-        ]
+        mockGcodeFilesValues.selectedFiles.value = [{ filename: 'test.gcode' } as FileStateGcodefile]
         const store = createStoreWithState()
         const wrapper = mount(GcodefilesPanelHeader, {
             global: {
@@ -373,9 +399,7 @@ describe('GcodefilesPanelHeader.vue', () => {
 
     it('shows loading state on download button when gcodeDownloadZip is loading', () => {
         mockBaseValues.loadings.value = ['gcodeDownloadZip']
-        mockGcodeFilesValues.selectedFiles.value = [
-            { filename: 'test.gcode' } as FileStateGcodefile,
-        ]
+        mockGcodeFilesValues.selectedFiles.value = [{ filename: 'test.gcode' } as FileStateGcodefile]
         const store = createStoreWithState()
         const wrapper = mount(GcodefilesPanelHeader, {
             global: {
@@ -407,9 +431,7 @@ describe('GcodefilesPanelHeader.vue', () => {
     })
 
     it('computed deleteSelectedText for single file', () => {
-        mockGcodeFilesValues.selectedFiles.value = [
-            { filename: 'test.gcode' } as FileStateGcodefile,
-        ]
+        mockGcodeFilesValues.selectedFiles.value = [{ filename: 'test.gcode' } as FileStateGcodefile]
         const store = createStoreWithState()
         const wrapper = mount(GcodefilesPanelHeader, {
             global: {
@@ -519,9 +541,7 @@ describe('GcodefilesPanelHeader.vue', () => {
         const openSpy = vi.fn()
         vi.stubGlobal('open', openSpy)
 
-        mockGcodeFilesValues.selectedFiles.value = [
-            { filename: 'test.gcode' } as FileStateGcodefile,
-        ]
+        mockGcodeFilesValues.selectedFiles.value = [{ filename: 'test.gcode' } as FileStateGcodefile]
         const store = createStoreWithState()
         mount(GcodefilesPanelHeader, {
             global: {

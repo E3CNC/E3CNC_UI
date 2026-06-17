@@ -20,19 +20,19 @@
                         <span class="text-caption font-weight-bold">Spindle Control:</span>
                     </v-col>
                     <v-col cols="4">
- <v-btn size="small" class="d-block w-100" color="success" @click="setSpindleOn">
+                        <v-btn size="small" class="d-block w-100" color="success" @click="setSpindleOn">
                             <v-icon start>{{ mdiPlay }}</v-icon>
                             ON
                         </v-btn>
                     </v-col>
                     <v-col cols="4">
- <v-btn size="small" class="d-block w-100" color="error" @click="setSpindleOff">
+                        <v-btn size="small" class="d-block w-100" color="error" @click="setSpindleOff">
                             <v-icon start>{{ mdiStop }}</v-icon>
                             OFF
                         </v-btn>
                     </v-col>
                     <v-col cols="4">
- <v-btn size="small" class="d-block w-100" color="info" @click="setSpindleCcwl">
+                        <v-btn size="small" class="d-block w-100" color="info" @click="setSpindleCcwl">
                             <v-icon start>{{ mdiRotate3dVariant }}</v-icon>
                             CCW
                         </v-btn>
@@ -49,11 +49,15 @@
                             variant="outlined"
                             hide-details
                             :min="0"
-                            :max="24000"
-                        ></v-text-field>
+                            :max="24000"></v-text-field>
                     </v-col>
                     <v-col cols="4">
- <v-btn size="small" class="d-block w-100" color="primary" :disabled="spindleSpeedInput === null" @click="setSpindleSpeed">
+                        <v-btn
+                            size="small"
+                            class="d-block w-100"
+                            color="primary"
+                            :disabled="spindleSpeedInput === null"
+                            @click="setSpindleSpeed">
                             SET
                         </v-btn>
                     </v-col>
@@ -68,13 +72,13 @@
                         <span class="text-caption font-weight-bold">Coolant Control:</span>
                     </v-col>
                     <v-col cols="6">
- <v-btn size="small" class="d-block w-100" color="success" @click="setCoolantFloodOn">
+                        <v-btn size="small" class="d-block w-100" color="success" @click="setCoolantFloodOn">
                             <v-icon start>{{ mdiWater }}</v-icon>
                             Flood ON
                         </v-btn>
                     </v-col>
                     <v-col cols="6">
- <v-btn size="small" class="d-block w-100" color="error" @click="setCoolantFloodOff">
+                        <v-btn size="small" class="d-block w-100" color="error" @click="setCoolantFloodOff">
                             <v-icon start>{{ mdiStop }}</v-icon>
                             Flood OFF
                         </v-btn>
@@ -82,13 +86,13 @@
                 </v-row>
                 <v-row density="compact" class="mb-3">
                     <v-col cols="6">
- <v-btn size="small" class="d-block w-100" color="success" @click="setCoolantMistOn">
+                        <v-btn size="small" class="d-block w-100" color="success" @click="setCoolantMistOn">
                             <v-icon start>{{ mdiSpray }}</v-icon>
                             Mist ON
                         </v-btn>
                     </v-col>
                     <v-col cols="6">
- <v-btn size="small" class="d-block w-100" color="error" @click="setCoolantMistOff">
+                        <v-btn size="small" class="d-block w-100" color="error" @click="setCoolantMistOff">
                             <v-icon start>{{ mdiStop }}</v-icon>
                             Mist OFF
                         </v-btn>
@@ -219,5 +223,4 @@ async function sendCoolant(payload: { flood?: boolean; mist?: boolean }) {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -1,12 +1,7 @@
 <template>
     <v-row>
         <v-col class="py-1">
-            <v-checkbox
-                :model-value="value"
-                :label="label"
-                hide-details
-                class="mt-0"
-                @update:model-value="setValue" />
+            <v-checkbox :model-value="value" :label="label" hide-details class="mt-0" @update:model-value="setValue" />
         </v-col>
     </v-row>
 </template>
@@ -25,9 +20,7 @@ const props = defineProps<{
 const store = useStore()
 const { t } = useI18n()
 
-const value = computed(() =>
-    store.getters['gui/getDatasetValue']({ name: props.objectName, type: props.serieName })
-)
+const value = computed(() => store.getters['gui/getDatasetValue']({ name: props.objectName, type: props.serieName }))
 
 function setValue(newVal: any) {
     store.dispatch('gui/setChartDatasetStatus', {

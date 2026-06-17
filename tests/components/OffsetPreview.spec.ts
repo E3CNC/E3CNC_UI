@@ -42,23 +42,13 @@ const padding = 24
 const svgWidth = 260
 const gridStepOptions = [5, 10, 15, 20, 25, 30, 50, 100]
 
-function toSvgX(
-    machineX: number,
-    machineMinX: number,
-    machineMaxX: number,
-    plotWidth: number
-): number {
+function toSvgX(machineX: number, machineMinX: number, machineMaxX: number, plotWidth: number): number {
     const range = machineMaxX - machineMinX
     if (range === 0) return padding
     return padding + ((machineX - machineMinX) / range) * plotWidth
 }
 
-function toSvgY(
-    machineY: number,
-    machineMinY: number,
-    machineMaxY: number,
-    plotHeight: number
-): number {
+function toSvgY(machineY: number, machineMinY: number, machineMaxY: number, plotHeight: number): number {
     const range = machineMaxY - machineMinY
     if (range === 0) return padding + plotHeight
     return padding + plotHeight - ((machineY - machineMinY) / range) * plotHeight

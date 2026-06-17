@@ -8,9 +8,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         klipperReadyForGui: new MockRef(true),
@@ -35,21 +41,23 @@ vi.mock('@/composables/useSocket', () => ({
     }),
 }))
 
-const mockT = vi.hoisted(() => vi.fn((key: string) => {
-    const translations: Record<string, string> = {
-        'Panels.StatusPanel.Unknown': 'Unknown',
-        'Panels.StatusPanel.PausePrint': 'Pause',
-        'Panels.StatusPanel.ResumePrint': 'Resume',
-        'Panels.StatusPanel.CancelPrint': 'Cancel',
-        'Panels.StatusPanel.ClearPrintStats': 'Clear',
-        'Panels.StatusPanel.ReprintJob': 'Reprint',
-        'CancelJobDialog.CancelJob': 'Cancel Job',
-        'CancelJobDialog.AreYouSure': 'Are you sure you want to cancel this job?',
-        'Buttons.Yes': 'Yes',
-        'Buttons.No': 'No',
-    }
-    return translations[key] ?? key
-}))
+const mockT = vi.hoisted(() =>
+    vi.fn((key: string) => {
+        const translations: Record<string, string> = {
+            'Panels.StatusPanel.Unknown': 'Unknown',
+            'Panels.StatusPanel.PausePrint': 'Pause',
+            'Panels.StatusPanel.ResumePrint': 'Resume',
+            'Panels.StatusPanel.CancelPrint': 'Cancel',
+            'Panels.StatusPanel.ClearPrintStats': 'Clear',
+            'Panels.StatusPanel.ReprintJob': 'Reprint',
+            'CancelJobDialog.CancelJob': 'Cancel Job',
+            'CancelJobDialog.AreYouSure': 'Are you sure you want to cancel this job?',
+            'Buttons.Yes': 'Yes',
+            'Buttons.No': 'No',
+        }
+        return translations[key] ?? key
+    })
+)
 
 vi.mock('vue-i18n', () => ({
     useI18n: () => ({
@@ -158,7 +166,14 @@ vi.mock('@/components/ui/Panel.vue', () => ({
 vi.mock('@/components/dialogs/ConfirmationDialog.vue', () => ({
     default: {
         name: 'ConfirmationDialog',
-        props: { modelValue: Boolean, icon: String, title: String, text: String, actionButtonText: String, cancelButtonText: String },
+        props: {
+            modelValue: Boolean,
+            icon: String,
+            title: String,
+            text: String,
+            actionButtonText: String,
+            cancelButtonText: String,
+        },
         template: '<div v-if="modelValue" class="confirmation-dialog"><slot /></div>',
         emits: ['action', 'update:modelValue'],
     },
@@ -347,11 +362,7 @@ describe('StatusPanel.vue', () => {
             const panelButtons = wrapper.findAll('.status-panel button.v-btn')
             if (panelButtons.length > 0) {
                 await panelButtons[0].trigger('click')
-                expect(mockSocketEmit).toHaveBeenCalledWith(
-                    'printer.print.pause',
-                    {},
-                    { loading: 'statusPrintPause' }
-                )
+                expect(mockSocketEmit).toHaveBeenCalledWith('printer.print.pause', {}, { loading: 'statusPrintPause' })
             }
         })
 

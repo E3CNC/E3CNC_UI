@@ -16,7 +16,7 @@
                 :select="(v) => selectItem(item, v)" />
 
             <div v-if="!hasContent" class="gcode-list__empty">
-                <v-icon size="64" color="disabled"> {{ mdiFolderOpen }} </v-icon>
+                <v-icon size="64" color="disabled">{{ mdiFolderOpen }}</v-icon>
                 <div class="gcode-list__empty-title">{{ $t('Files.Empty') }}</div>
             </div>
         </div>
@@ -33,17 +33,11 @@ import { mdiFolderOpen } from '@mdi/js'
 
 const { currentPath, files, selectedFiles, setSelectedFiles } = useGcodeFiles()
 
-const directories = computed(() =>
-    files.value.filter((file) => file.isDirectory)
-)
+const directories = computed(() => files.value.filter((file) => file.isDirectory))
 
-const filesOnly = computed(() =>
-    files.value.filter((file) => !file.isDirectory)
-)
+const filesOnly = computed(() => files.value.filter((file) => !file.isDirectory))
 
-const hasContent = computed(() =>
-    directories.value.length > 0 || filesOnly.value.length > 0
-)
+const hasContent = computed(() => directories.value.length > 0 || filesOnly.value.length > 0)
 
 function isItemSelected(item: { filename: string }) {
     return selectedFiles.value.includes('gcodes' + currentPath.value + '/' + item.filename)

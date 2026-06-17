@@ -10,13 +10,12 @@
             <v-toolbar-title class="text-no-wrap ml-0 pl-2 mr-2">{{ printerName }}</v-toolbar-title>
             <printer-selector v-if="countPrinters" />
             <div v-if="klipperReadyForGui" class="topbar-dro mx-3">
-                <span
-                    v-for="axis in droAxes"
-                    :key="axis.id"
-                    class="topbar-dro__axis"
-                >
+                <span v-for="axis in droAxes" :key="axis.id" class="topbar-dro__axis">
                     <span
-                        :class="['topbar-dro__label', axis.homed ? 'topbar-dro__label--homed' : 'topbar-dro__label--unhomed']">
+                        :class="[
+                            'topbar-dro__label',
+                            axis.homed ? 'topbar-dro__label--homed' : 'topbar-dro__label--unhomed',
+                        ]">
                         {{ axis.id }}
                     </span>
                     <span class="topbar-dro__value">{{ axis.machine }}</span>
@@ -33,7 +32,7 @@
                 :accept="gcodeInputFileAccept.join(', ')"
                 style="display: none"
                 @change="uploadAndStart" />
- <v-btn
+            <v-btn
                 v-if="showSaveConfigButton"
                 rounded="0"
                 :icon="displaySmAndDown"
@@ -46,7 +45,7 @@
                 <v-icon class="d-md-none">{{ mdiContentSave }}</v-icon>
                 <span class="d-none d-md-inline">{{ $t('App.TopBar.SAVE_CONFIG') }}</span>
             </v-btn>
- <v-btn
+            <v-btn
                 v-if="boolShowUploadAndPrint"
                 rounded="0"
                 :icon="displaySmAndDown"
@@ -58,7 +57,7 @@
                 <v-icon class="mr-md-2">{{ mdiFileUpload }}</v-icon>
                 <span class="d-none d-md-inline">{{ $t('App.TopBar.UploadPrint') }}</span>
             </v-btn>
- <v-btn
+            <v-btn
                 v-if="klippyIsConnected"
                 rounded="0"
                 :icon="displaySmAndDown"
@@ -81,7 +80,13 @@
             <br />
             <v-progress-linear class="mt-2" :model-value="uploadSnackbar.percent"></v-progress-linear>
             <template #actions="{ props }">
- <v-btn :icon="mdiClose" color="error" variant="text" v-bind="props" style="min-width: auto" @click="cancelUpload"/>
+                <v-btn
+                    :icon="mdiClose"
+                    color="error"
+                    variant="text"
+                    v-bind="props"
+                    style="min-width: auto"
+                    @click="cancelUpload" />
             </template>
         </v-snackbar>
         <emergency-stop-dialog v-model="showEmergencyStopDialog" />
@@ -129,8 +134,16 @@ const display = useDisplay()
 const displaySmAndDown = computed(() => display.smAndDown.value)
 const displayMdAndUp = computed(() => display.mdAndUp.value)
 const { proxy } = getCurrentInstance()!
-const { klipperReadyForGui, klippyIsConnected, printer_state, printerIsPrinting, loadings, isIOS,
-    apiUrl, existGcodesRootDirectory } = useBase()
+const {
+    klipperReadyForGui,
+    klippyIsConnected,
+    printer_state,
+    printerIsPrinting,
+    loadings,
+    isIOS,
+    apiUrl,
+    existGcodesRootDirectory,
+} = useBase()
 const { sidebarLogo } = useTheme()
 const logoColor = computed(() => store.state.gui.uiSettings.logo)
 const socket = useSocket()
@@ -200,27 +213,24 @@ const droAxes = computed(() => [
     { id: 'Z', homed: zAxisHomed.value, machine: formatAxis(machinePosition.value.z, 3) },
 ])
 
-const boolHideUploadAndPrintButton = computed(() =>
-    store.state.gui.uiSettings.boolHideUploadAndPrintButton ?? false
-)
+const boolHideUploadAndPrintButton = computed(() => store.state.gui.uiSettings.boolHideUploadAndPrintButton ?? false)
 
-const isSvgLogo = computed(() =>
-    sidebarLogo.value.includes('.svg?timestamp=') || sidebarLogo.value.endsWith('.svg')
-)
+const isSvgLogo = computed(() => sidebarLogo.value.includes('.svg?timestamp=') || sidebarLogo.value.endsWith('.svg'))
 
 const logoClasses = computed(() => ['nav-logo', 'ml-2', 'mr-1', 'd-none', 'd-sm-flex'])
 
-const boolShowUploadAndPrint = computed(() =>
-    klippyIsConnected.value &&
-    existGcodesRootDirectory.value &&
-    ['standby', 'complete', 'cancelled'].includes(printer_state.value) &&
-    !boolHideUploadAndPrintButton.value
+const boolShowUploadAndPrint = computed(
+    () =>
+        klippyIsConnected.value &&
+        existGcodesRootDirectory.value &&
+        ['standby', 'complete', 'cancelled'].includes(printer_state.value) &&
+        !boolHideUploadAndPrintButton.value
 )
 
 const countPrinters = computed(() => store.getters['farm/countPrinters'])
 
-const defaultNavigationStateSetting = computed(() =>
-    store.state.gui?.uiSettings?.defaultNavigationStateSetting ?? 'alwaysOpen'
+const defaultNavigationStateSetting = computed(
+    () => store.state.gui?.uiSettings?.defaultNavigationStateSetting ?? 'alwaysOpen'
 )
 
 onMounted(() => {

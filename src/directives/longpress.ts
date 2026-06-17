@@ -14,7 +14,9 @@ const cleanupMap = new WeakMap<HTMLElement, () => void>()
 export const vLongpress: Directive<HTMLElement, LongpressBinding> = {
     mounted(el, binding) {
         if (typeof binding.value !== 'function' && typeof binding.value?.handler !== 'function') {
-            console.warn(`[longpress:] provided expression '${binding.value}' is not a function or { handler, args } object`)
+            console.warn(
+                `[longpress:] provided expression '${binding.value}' is not a function or { handler, args } object`
+            )
         }
 
         const debounceTime = Number(binding.arg ?? 1000)

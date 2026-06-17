@@ -6,8 +6,7 @@ export function useConsole() {
     const store = useStore()
 
     const helplist = computed(() => {
-        const commands: { [key: string]: { help?: string } } =
-            store.state.printer.gcode?.commands ?? {}
+        const commands: { [key: string]: { help?: string } } = store.state.printer.gcode?.commands ?? {}
         const helplist: { command: string; help: string }[] = []
 
         for (const [key, values] of Object.entries(commands)) {

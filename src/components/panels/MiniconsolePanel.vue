@@ -7,14 +7,14 @@
         card-class="miniconsole-panel"
         :hide-buttons-on-collapse="true">
         <template #buttons>
- <v-btn :icon="mdiTrashCan" rounded="0" @click="clearConsole"/>
+            <v-btn :icon="mdiTrashCan" rounded="0" @click="clearConsole" />
             <command-help-modal :in-toolbar="true" @on-command="commandClick($event)" />
             <v-menu
                 :offset-y="true"
                 :close-on-content-click="false"
                 :title="$t('Panels.MiniconsolePanel.SetupConsole')">
                 <template #activator="{ props }">
- <v-btn :icon="mdiCog" rounded="0" v-bind="props"/>
+                    <v-btn :icon="mdiCog" rounded="0" v-bind="props" />
                 </template>
                 <v-list>
                     <v-list-item v-if="consoleDirection === 'shell'" class="minHeight36">
@@ -99,20 +99,20 @@ const _console = useConsole()
 const consoleDirection = _console.consoleDirection
 const hideWaitTemperatures = computed({
     get: () => _console.hideWaitTemperatures.value,
-    set: (val) => _console.setHideWaitTemperatures(val)
+    set: (val) => _console.setHideWaitTemperatures(val),
 })
 const hideTlCommands = computed({
     get: () => _console.hideTlCommands.value,
-    set: (val) => _console.setHideTlCommands(val)
+    set: (val) => _console.setHideTlCommands(val),
 })
 const customFilters = _console.customFilters
 const autoscroll = computed({
     get: () => _console.autoscroll.value,
-    set: (val) => _console.setAutoscroll(val)
+    set: (val) => _console.setAutoscroll(val),
 })
 const rawOutput = computed({
     get: () => _console.rawOutput.value,
-    set: (val) => _console.setRawOutput(val)
+    set: (val) => _console.setRawOutput(val),
 })
 const { toggleFilter, clearConsole } = _console
 
@@ -121,13 +121,9 @@ const store = useStore()
 const miniConsoleScroll = ref<OverlayScrollbarsComponent | null>(null)
 const gcodeCommandField = ref<typeof ConsoleTextarea | null>(null)
 
-const consoleHeight = computed(() =>
-    store.state.gui.console.height ?? 300
-)
+const consoleHeight = computed(() => store.state.gui.console.height ?? 300)
 
-const events = computed(() =>
-    store.getters['server/getConsoleEvents'](consoleDirection.value === 'table', 250)
-)
+const events = computed(() => store.getters['server/getConsoleEvents'](consoleDirection.value === 'table', 250))
 
 watch(events, () => {
     if (consoleDirection.value === 'shell' && autoscroll.value) {

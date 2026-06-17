@@ -33,9 +33,7 @@ export function useDashboard() {
     function getPanelName(name: string) {
         if (name.startsWith('macrogroup_')) {
             const groupId = name.split('_')[1]
-            const group = macrogroups.value.find(
-                (group: GuiMacrosStateMacrogroup) => group.id === groupId
-            )
+            const group = macrogroups.value.find((group: GuiMacrosStateMacrogroup) => group.id === groupId)
 
             return group ? group.name : 'Macrogroup'
         }

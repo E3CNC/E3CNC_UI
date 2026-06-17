@@ -65,8 +65,6 @@ export const mutations: MutationTree<SocketState> = {
 
     removeInitComponent(state, payload) {
         // remove all components which start with payload
-        state.initializationList = state.initializationList.filter(
-            (item: string) => !item.startsWith(payload)
-        )
+        state.initializationList = state.initializationList.filter((item: string) => !item.startsWith(payload))
     },
 }

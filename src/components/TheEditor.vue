@@ -17,11 +17,11 @@
                 :icon="isWriteable ? mdiFileDocumentEditOutline : mdiFileDocumentOutline"
                 :title="title">
                 <template #buttons>
- <v-btn variant="text" rounded="0" class="d-none d-md-flex" @click="dialogDevices = true">
+                    <v-btn variant="text" rounded="0" class="d-none d-md-flex" @click="dialogDevices = true">
                         <v-icon size="small" class="mr-1">{{ mdiUsb }}</v-icon>
                         {{ $t('Editor.DeviceDialog') }}
                     </v-btn>
- <v-btn
+                    <v-btn
                         v-if="restartServiceName === 'klipper'"
                         variant="text"
                         rounded="0"
@@ -31,11 +31,16 @@
                         <v-icon size="small" class="mr-1">{{ mdiHelp }}</v-icon>
                         {{ $t('Editor.ConfigReference') }}
                     </v-btn>
- <v-btn v-if="existsFileStructure" variant="text" rounded="0" class="d-none d-md-flex" @click="toggleFileStructure">
+                    <v-btn
+                        v-if="existsFileStructure"
+                        variant="text"
+                        rounded="0"
+                        class="d-none d-md-flex"
+                        @click="toggleFileStructure">
                         <v-icon size="small" class="mr-1">{{ mdiFormatListCheckbox }}</v-icon>
                         {{ $t('Editor.FileStructure') }}
                     </v-btn>
- <v-btn
+                    <v-btn
                         v-if="restartServiceNameExists"
                         color="primary"
                         variant="text"
@@ -45,8 +50,8 @@
                         <v-icon size="small" class="mr-1">{{ mdiRestart }}</v-icon>
                         {{ $t('Editor.SaveRestart') }}
                     </v-btn>
- <v-btn v-if="isWriteable" :icon="mdiContentSave" rounded="0" @click="save(null)"/>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="close"/>
+                    <v-btn v-if="isWriteable" :icon="mdiContentSave" rounded="0" @click="save(null)" />
+                    <v-btn :icon="mdiCloseThick" rounded="0" @click="close" />
                 </template>
                 <v-card-text class="pa-0 d-flex">
                     <codemirror-async
@@ -75,7 +80,7 @@
                                 </div>
                             </template>
                             <template v-if="restartServiceName === 'klipper'" #append="{ item }">
- <v-btn
+                                <v-btn
                                     v-if="item.type == 'section'"
                                     :icon="mdiHelpCircle"
                                     size="small"
@@ -109,7 +114,13 @@
                 <v-progress-linear class="mt-2" indeterminate></v-progress-linear>
             </template>
             <template #actions="{ props }">
- <v-btn color="error" variant="text" v-bind="props" style="min-width: auto" rounded="0" @click="cancelDownload">
+                <v-btn
+                    color="error"
+                    variant="text"
+                    v-bind="props"
+                    style="min-width: auto"
+                    rounded="0"
+                    @click="cancelDownload">
                     <v-icon class="0">{{ mdiClose }}</v-icon>
                 </v-btn>
             </template>
@@ -121,7 +132,7 @@
                 :title="$t('Editor.UnsavedChanges')"
                 :margin-bottom="false">
                 <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="dialogConfirmChange = false"/>
+                    <v-btn :icon="mdiCloseThick" rounded="0" @click="dialogConfirmChange = false" />
                 </template>
                 <v-card-text class="pt-3">
                     <v-row>
@@ -133,14 +144,14 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer />
- <v-btn variant="text" @click="discardChanges">
+                    <v-btn variant="text" @click="discardChanges">
                         {{ $t('Editor.DontSave') }}
                     </v-btn>
- <v-btn variant="text" color="primary" @click="save">
+                    <v-btn variant="text" color="primary" @click="save">
                         {{ $t('Editor.SaveClose') }}
                     </v-btn>
                     <template v-if="restartServiceNameExists">
- <v-btn variant="text" color="primary" @click="save(restartServiceName)">
+                        <v-btn variant="text" color="primary" @click="save(restartServiceName)">
                             {{ $t('Editor.SaveRestart') }}
                         </v-btn>
                     </template>
@@ -233,7 +244,7 @@ const treeviewItemKeyProp = 'line' as const
 const structureActive = ref<number[]>([])
 const structureOpen = ref<number[]>([])
 const changed = computed(() => store.state.editor.changed ?? false)
-const changedOutput = computed(() => changed.value ? '*' : '')
+const changedOutput = computed(() => (changed.value ? '*' : ''))
 const show = computed(() => store.state.editor.bool ?? false)
 const filepath = computed((): string => store.state.editor.filepath ?? '')
 const filename = computed((): string => store.state.editor.filename ?? '')
@@ -475,5 +486,4 @@ watch(changed, (newVal: boolean) => {
     overflow: hidden;
     white-space: nowrap;
 }
-
 </style>

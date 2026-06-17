@@ -123,7 +123,9 @@
             </v-col>
             <v-col class="system-load-row__gauges v-col-auto px-2">
                 <div class="system-load-gauges">
-                    <div v-if="cpuUsage !== null" class="system-load-gauge d-flex flex-column align-center justify-center">
+                    <div
+                        v-if="cpuUsage !== null"
+                        class="system-load-gauge d-flex flex-column align-center justify-center">
                         <v-progress-circular
                             :rotate="-90"
                             :size="55"
@@ -171,7 +173,7 @@
                 card-class="machine-systemload-host-details-dialog"
                 :margin-bottom="false">
                 <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="hostDetailsDialog = false"/>
+                    <v-btn :icon="mdiCloseThick" rounded="0" @click="hostDetailsDialog = false" />
                 </template>
                 <v-card-text class="pt-5 px-0">
                     <OverlayScrollbarsComponent style="height: 350px" class="px-6">

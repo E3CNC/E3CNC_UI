@@ -90,9 +90,13 @@ onBeforeUnmount(() => {
     jmuxer?.destroy()
 })
 
-watch(() => props.camSettings, () => {
-    play()
-}, { deep: true })
+watch(
+    () => props.camSettings,
+    () => {
+        play()
+    },
+    { deep: true }
+)
 
 function onLoadedMetadata() {
     aspectRatio.value = updateAspectRatioFromVideo(video.value)

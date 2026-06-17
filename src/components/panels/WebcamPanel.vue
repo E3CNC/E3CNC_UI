@@ -11,7 +11,7 @@
         <template #buttons>
             <v-menu v-if="showSwitch" :offset-y="true">
                 <template #activator="{ props }">
- <v-btn variant="text" rounded="0" v-bind="props">
+                    <v-btn variant="text" rounded="0" v-bind="props">
                         <v-icon v-if="'icon' in currentCam" size="small" class="mr-2">
                             {{ convertWebcamIcon(currentCam.icon) }}
                         </v-icon>
@@ -67,13 +67,9 @@ const { t } = useI18n()
 
 const store = useStore()
 
-const webcams = computed<GuiWebcamStateWebcam[]>(() =>
-    store.getters['gui/webcams/getWebcams']
-)
+const webcams = computed<GuiWebcamStateWebcam[]>(() => store.getters['gui/webcams/getWebcams'])
 
-const showSwitch = computed(() =>
-    webcams.value.length > 1
-)
+const showSwitch = computed(() => webcams.value.length > 1)
 
 const currentCamId = computed({
     get: () => {
@@ -87,7 +83,7 @@ const currentCamId = computed({
     },
     set: (newVal: string) => {
         store.dispatch('gui/setCurrentWebcam', { page: props.currentPage, value: newVal })
-    }
+    },
 })
 
 const currentCam = computed<GuiWebcamStateWebcam>(() => {

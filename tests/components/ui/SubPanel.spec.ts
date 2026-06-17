@@ -47,12 +47,10 @@ function createStoreWithState(overrides: Record<string, any> = {}) {
             ...overrides,
         },
         getters: {
-            'gui/getPanelExpand':
-                () =>
-                (name: string, viewport: string) => {
-                    const nonExpand = overrides.gui?.dashboard?.nonExpandPanels ?? {}
-                    const list = nonExpand[viewport]
-                    return !(list && list.includes(name))
+            'gui/getPanelExpand': () => (name: string, viewport: string) => {
+                const nonExpand = overrides.gui?.dashboard?.nonExpandPanels ?? {}
+                const list = nonExpand[viewport]
+                return !(list && list.includes(name))
             },
             ...(overrides.getters || {}),
         },
@@ -71,10 +69,12 @@ describe('SubPanel.vue', () => {
         const { props = {}, slots = {}, overrides = {}, customDispatch } = options
         const storeInstance = createStoreWithState(overrides)
         const originalDispatch = storeInstance.dispatch
-        storeInstance.dispatch = customDispatch ?? vi.fn((...args: any[]) => {
-            dispatchSpy(...args)
-            return originalDispatch.call(storeInstance, ...args)
-        })
+        storeInstance.dispatch =
+            customDispatch ??
+            vi.fn((...args: any[]) => {
+                dispatchSpy(...args)
+                return originalDispatch.call(storeInstance, ...args)
+            })
 
         return mount(SubPanel, {
             props: {

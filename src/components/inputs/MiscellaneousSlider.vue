@@ -11,7 +11,12 @@
                         @click="ledOff">
                         {{ mdiLightbulbOnOutline }}
                     </v-icon>
-                    <v-icon v-else-if="type === 'led'" class="mr-2" size="small" :retain-focus-on-click="true" @click="ledOn">
+                    <v-icon
+                        v-else-if="type === 'led'"
+                        class="mr-2"
+                        size="small"
+                        :retain-focus-on-click="true"
+                        @click="ledOn">
                         {{ mdiLightbulbOutline }}
                     </v-icon>
                     <v-icon v-else-if="type.includes('fan')" size="small" :class="fanClasses">{{ mdiFan }}</v-icon>
@@ -47,7 +52,7 @@
                     </div>
                 </transition>
                 <v-card-text v-if="controllable && pwm" class="py-0 pb-2 d-flex align-center">
- <v-btn
+                    <v-btn
                         v-if="lockSliders && isTouchDevice && pwm"
                         variant="plain"
                         size="small"
@@ -134,9 +139,13 @@ const value = computed(() => Math.round((props.target / (props.max ?? 1)) * 100)
 
 const lockSliders = computed(() => store.state.gui.uiSettings.lockSlidersOnTouchDevices)
 
-watch([lockSliders, isTouchDevice], () => {
-    isLocked.value = lockSliders.value && isTouchDevice.value
-}, { immediate: true })
+watch(
+    [lockSliders, isTouchDevice],
+    () => {
+        isLocked.value = lockSliders.value && isTouchDevice.value
+    },
+    { immediate: true }
+)
 
 function startLockTimer(): void {
     const t = store.state.gui.uiSettings.lockSlidersDelay ?? 0
@@ -215,9 +224,13 @@ watch(value, (newVal: number) => {
     sliderValue.value = newVal
 })
 
-watch(sliderValue, (newVal: number) => {
-    inputValue.value = Math.round(newVal * 100)
-}, { immediate: true })
+watch(
+    sliderValue,
+    (newVal: number) => {
+        inputValue.value = Math.round(newVal * 100)
+    },
+    { immediate: true }
+)
 
 function checkInvalidChars(event: KeyboardEvent): void {
     if (min >= 0) invalidChars.push('-')
@@ -240,7 +253,8 @@ const disableFanAnimation = computed(() => store.state.gui.uiSettings.disableFan
 
 const fanClasses = computed(() => {
     const output = ['mr-2']
-    if (!disableFanAnimation.value && value.value >= (props.off_below ?? 0) && value.value > 0) output.push('icon-rotate')
+    if (!disableFanAnimation.value && value.value >= (props.off_below ?? 0) && value.value > 0)
+        output.push('icon-rotate')
 
     return output
 })

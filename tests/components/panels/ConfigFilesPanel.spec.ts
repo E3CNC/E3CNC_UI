@@ -8,9 +8,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         apiUrl: new MockRef('//localhost:8080'),
@@ -55,22 +61,60 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VCardText: { name: 'VCardText', template: '<div><slot /></div>' },
     VRow: { name: 'VRow', template: '<div><slot /></div>' },
     VCol: { name: 'VCol', template: '<div><slot /></div>' },
-    VSelect: { name: 'VSelect', props: ['modelValue', 'items', 'label', 'variant', 'hideDetails', 'density', 'attach'], template: '<select :value="modelValue"><option v-for="item in items" :key="item" :value="item">{{ item }}</option></select>' },
-    VBtn: { name: 'VBtn', props: ['icon', 'rounded', 'variant', 'color', 'density', 'loading', 'disabled'], template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>' },
+    VSelect: {
+        name: 'VSelect',
+        props: ['modelValue', 'items', 'label', 'variant', 'hideDetails', 'density', 'attach'],
+        template:
+            '<select :value="modelValue"><option v-for="item in items" :key="item" :value="item">{{ item }}</option></select>',
+    },
+    VBtn: {
+        name: 'VBtn',
+        props: ['icon', 'rounded', 'variant', 'color', 'density', 'loading', 'disabled'],
+        template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>',
+    },
     VIcon: { name: 'VIcon', props: ['size', 'start', 'color'], template: '<i><slot /></i>' },
     VTooltip: { name: 'VTooltip', props: ['top'], template: '<div><slot name="activator" /><slot /></div>' },
-    VMenu: { name: 'VMenu', props: ['offsetY', 'left', 'title', 'positionX', 'positionY', 'absolute', 'modelValue'], template: '<div class="v-menu"><slot /><slot name="activator" /></div>' },
+    VMenu: {
+        name: 'VMenu',
+        props: ['offsetY', 'left', 'title', 'positionX', 'positionY', 'absolute', 'modelValue'],
+        template: '<div class="v-menu"><slot /><slot name="activator" /></div>',
+    },
     VList: { name: 'VList', template: '<div><slot /></div>' },
     VListItem: { name: 'VListItem', props: ['class'], template: '<div :class="$attrs.class"><slot /></div>' },
-    VCheckbox: { name: 'VCheckbox', props: ['modelValue', 'hideDetails', 'label', 'class'], template: '<label><input type="checkbox" :checked="modelValue" /><span>{{ label }}</span></label>' },
-    VDataTable: { name: 'VDataTable', props: ['items', 'headers', 'modelValue'], template: '<div class="v-data-table"><slot name="no-data" /><slot name="item" /><slot name="header.filename" /><slot name="header.size" /><slot name="header.modified" /><slot name="header.filetype" /><slot name="body.prepend" /></div>' },
+    VCheckbox: {
+        name: 'VCheckbox',
+        props: ['modelValue', 'hideDetails', 'label', 'class'],
+        template: '<label><input type="checkbox" :checked="modelValue" /><span>{{ label }}</span></label>',
+    },
+    VDataTable: {
+        name: 'VDataTable',
+        props: ['items', 'headers', 'modelValue'],
+        template:
+            '<div class="v-data-table"><slot name="no-data" /><slot name="item" /><slot name="header.filename" /><slot name="header.size" /><slot name="header.modified" /><slot name="header.filetype" /><slot name="body.prepend" /></div>',
+    },
     VSpacer: { name: 'VSpacer', template: '<span style="flex:1" />' },
     VDivider: { name: 'VDivider', template: '<hr />' },
-    VDialog: { name: 'VDialog', props: ['modelValue', 'maxWidth', 'fullscreen', 'hideOverlay'], template: '<div v-if="modelValue" class="v-dialog"><slot /></div>' },
-    VTextField: { name: 'VTextField', props: ['modelValue', 'label', 'required', 'rules'], template: '<input :value="modelValue" />' },
+    VDialog: {
+        name: 'VDialog',
+        props: ['modelValue', 'maxWidth', 'fullscreen', 'hideOverlay'],
+        template: '<div v-if="modelValue" class="v-dialog"><slot /></div>',
+    },
+    VTextField: {
+        name: 'VTextField',
+        props: ['modelValue', 'label', 'required', 'rules'],
+        template: '<input :value="modelValue" />',
+    },
     VCardActions: { name: 'VCardActions', template: '<div><slot /></div>' },
-    VAlert: { name: 'VAlert', props: ['density', 'variant', 'type', 'icon', 'elevation', 'maxWidth'], template: '<div class="v-alert"><slot /></div>' },
-    VSnackbar: { name: 'VSnackbar', props: ['modelValue', 'timeout', 'location'], template: '<div v-if="modelValue" class="v-snackbar"><slot /><slot name="actions" /></div>' },
+    VAlert: {
+        name: 'VAlert',
+        props: ['density', 'variant', 'type', 'icon', 'elevation', 'maxWidth'],
+        template: '<div class="v-alert"><slot /></div>',
+    },
+    VSnackbar: {
+        name: 'VSnackbar',
+        props: ['modelValue', 'timeout', 'location'],
+        template: '<div v-if="modelValue" class="v-snackbar"><slot /><slot name="actions" /></div>',
+    },
     VProgressLinear: { name: 'VProgressLinear', props: ['modelValue'], template: '<div class="v-progress-linear" />' },
 }))
 

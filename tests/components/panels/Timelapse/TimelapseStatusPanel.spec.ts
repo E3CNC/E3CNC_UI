@@ -8,9 +8,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         socketIsConnected: new MockRef(true),
@@ -25,9 +31,15 @@ const mockTimelapseValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         framesCount: new MockRef(0),
@@ -69,11 +81,24 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VCardText: { name: 'VCardText', template: '<div><slot /></div>' },
     VRow: { name: 'VRow', template: '<div><slot /></div>' },
     VCol: { name: 'VCol', template: '<div><slot /></div>' },
-    VBtn: { name: 'VBtn', props: ['icon', 'size', 'color', 'variant', 'rounded'], template: '<button :class="$attrs.class"><slot /></button>' },
+    VBtn: {
+        name: 'VBtn',
+        props: ['icon', 'size', 'color', 'variant', 'rounded'],
+        template: '<button :class="$attrs.class"><slot /></button>',
+    },
     VIcon: { name: 'VIcon', props: ['start', 'icon', 'size'], template: '<i><slot /></i>' },
-    VSwitch: { name: 'VSwitch', props: ['modelValue', 'hideDetails'], template: '<label class="v-switch"><input type="checkbox" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" /></label>' },
+    VSwitch: {
+        name: 'VSwitch',
+        props: ['modelValue', 'hideDetails'],
+        template:
+            '<label class="v-switch"><input type="checkbox" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" /></label>',
+    },
     VDivider: { name: 'VDivider', template: '<hr />' },
-    VProgressCircular: { name: 'VProgressCircular', props: ['size', 'indeterminate'], template: '<span class="v-progress-circular" />' },
+    VProgressCircular: {
+        name: 'VProgressCircular',
+        props: ['size', 'indeterminate'],
+        template: '<span class="v-progress-circular" />',
+    },
 }))
 
 vi.mock('vuetify/components', () => vuetifyComponentsMock)

@@ -77,7 +77,7 @@
 
                         <!-- Offset origin markers (back to front, inactive first) -->
                         <g
-                            v-for="(entry) in sortedOffsets"
+                            v-for="entry in sortedOffsets"
                             v-show="isOffsetVisible(entry.name)"
                             :key="'wcs-' + entry.name"
                             class="offset-rect-group"
@@ -115,10 +115,16 @@
                                 :x="toSvgX(entry.offsetX)"
                                 :y="toSvgY(entry.offsetY + stockSizes[entry.name].height)"
                                 :width="
-                                    Math.max(0, toSvgX(entry.offsetX + stockSizes[entry.name].width) - toSvgX(entry.offsetX))
+                                    Math.max(
+                                        0,
+                                        toSvgX(entry.offsetX + stockSizes[entry.name].width) - toSvgX(entry.offsetX)
+                                    )
                                 "
                                 :height="
-                                    Math.max(0, toSvgY(entry.offsetY) - toSvgY(entry.offsetY + stockSizes[entry.name].height))
+                                    Math.max(
+                                        0,
+                                        toSvgY(entry.offsetY) - toSvgY(entry.offsetY + stockSizes[entry.name].height)
+                                    )
                                 "
                                 fill="none"
                                 :stroke="entry.color"
@@ -142,7 +148,7 @@
                             <line
                                 :x1="padding"
                                 :y1="toSvgY(cursorInfo.y)"
-                                :x2="Math.max(padding, toSvgX(cursorInfo.x - gridStep) )"
+                                :x2="Math.max(padding, toSvgX(cursorInfo.x - gridStep))"
                                 :y2="toSvgY(cursorInfo.y)"
                                 stroke="rgba(var(--v-theme-on-surface), 0.45)"
                                 stroke-width="1"
@@ -249,16 +255,26 @@
                                 <span class="offset-preview-legend__swatch" :style="{ backgroundColor: entry.color }" />
                                 <span class="offset-preview-legend__card-title">{{ entry.name }}</span>
                                 <span class="offset-preview-legend__card-origin">
-                                    <span class="offset-preview-legend__card-axis" :style="{ color: entry.color }">x</span
-                                    ><span class="offset-preview-legend__card-number">{{ formatOffsetValue(entry.offsetX) }}</span>, <span
-                                        class="offset-preview-legend__card-axis"
-                                        :style="{ color: entry.color }"
-                                        >y</span
-                                    ><span class="offset-preview-legend__card-number">{{ formatOffsetValue(entry.offsetY) }}</span>, <span
-                                        class="offset-preview-legend__card-axis"
-                                        :style="{ color: entry.color }"
-                                        >z</span
-                                    ><span class="offset-preview-legend__card-number">{{ formatOffsetValue(entry.offsetZ) }}</span>
+                                    <span class="offset-preview-legend__card-axis" :style="{ color: entry.color }">
+                                        x
+                                    </span>
+                                    <span class="offset-preview-legend__card-number">
+                                        {{ formatOffsetValue(entry.offsetX) }}
+                                    </span>
+                                    ,
+                                    <span class="offset-preview-legend__card-axis" :style="{ color: entry.color }">
+                                        y
+                                    </span>
+                                    <span class="offset-preview-legend__card-number">
+                                        {{ formatOffsetValue(entry.offsetY) }}
+                                    </span>
+                                    ,
+                                    <span class="offset-preview-legend__card-axis" :style="{ color: entry.color }">
+                                        z
+                                    </span>
+                                    <span class="offset-preview-legend__card-number">
+                                        {{ formatOffsetValue(entry.offsetZ) }}
+                                    </span>
                                 </span>
                                 <v-icon
                                     size="x-small"
@@ -282,9 +298,7 @@
                                     <v-icon size="x-small">{{ mdiPencilPlusOutline }}</v-icon>
                                 </v-btn>
                             </div>
-                            <div
-                                v-if="stockSizes[entry.name]"
-                                class="offset-preview-legend__card-stock">
+                            <div v-if="stockSizes[entry.name]" class="offset-preview-legend__card-stock">
                                 <div class="offset-preview-legend__card-stock-content">
                                     <div class="offset-preview-legend__card-stock-name">
                                         {{ stockSizes[entry.name].name || entry.name }}
@@ -304,7 +318,9 @@
                         <div class="offset-preview-legend__item offset-preview-legend__item--tool">
                             <span class="offset-preview-legend__swatch offset-preview-legend__swatch--tool" />
                             <span class="offset-preview-legend__label">Tool</span>
-                            <span class="offset-preview-legend__coords">({{ toolX.toFixed(1) }}, {{ toolY.toFixed(1) }})</span>
+                            <span class="offset-preview-legend__coords">
+                                ({{ toolX.toFixed(1) }}, {{ toolY.toFixed(1) }})
+                            </span>
                         </div>
                     </div>
 
@@ -353,7 +369,9 @@
                             </v-card-text>
                         </v-card>
 
-                        <v-row density="compact" class="offset-preview-controls__row offset-preview-controls__row--tight">
+                        <v-row
+                            density="compact"
+                            class="offset-preview-controls__row offset-preview-controls__row--tight">
                             <v-col cols="12">
                                 <span class="text-caption font-weight-bold">Set Work Zero:</span>
                             </v-col>
@@ -392,7 +410,9 @@
                             </v-col>
                         </v-row>
 
-                        <v-row density="compact" class="offset-preview-controls__row offset-preview-controls__row--tight">
+                        <v-row
+                            density="compact"
+                            class="offset-preview-controls__row offset-preview-controls__row--tight">
                             <v-col cols="12">
                                 <span class="text-caption font-weight-bold">Manual Offset:</span>
                             </v-col>
@@ -425,7 +445,9 @@
                             </v-col>
                         </v-row>
 
-                        <v-row density="compact" class="offset-preview-controls__row offset-preview-controls__row--actions">
+                        <v-row
+                            density="compact"
+                            class="offset-preview-controls__row offset-preview-controls__row--actions">
                             <v-col cols="12">
                                 <v-btn
                                     size="small"
@@ -596,7 +618,9 @@ const machineAspectY = computed(() => {
     return rangeX > 0 ? rangeY / rangeX : 1
 })
 const plotWidth = svgWidth - padding - 10
-const svgHeight = computed(() => Math.min(Math.round(padding + 16 + plotWidth * machineAspectY.value), Math.max(320, viewportHeight.value - 560)))
+const svgHeight = computed(() =>
+    Math.min(Math.round(padding + 16 + plotWidth * machineAspectY.value), Math.max(320, viewportHeight.value - 560))
+)
 const plotHeight = computed(() => svgHeight.value - padding - 16)
 const gridStepOptions = [5, 10, 15, 20, 25, 30, 50, 100]
 const gridStep = ref(Number(localStorage.getItem('cncPreviewGridStep')) || 10)
@@ -737,7 +761,13 @@ const offsetColors = ['#42A5F5', '#66BB6A', '#FFA726', '#AB47BC', '#EF5350', '#2
 
 function hexToRgba(hex: string, alpha: number): string {
     const normalized = hex.replace('#', '')
-    const value = normalized.length === 3 ? normalized.split('').map((c) => c + c).join('') : normalized
+    const value =
+        normalized.length === 3
+            ? normalized
+                  .split('')
+                  .map((c) => c + c)
+                  .join('')
+            : normalized
     const int = Number.parseInt(value, 16)
     const r = (int >> 16) & 255
     const g = (int >> 8) & 255

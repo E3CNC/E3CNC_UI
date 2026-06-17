@@ -43,8 +43,7 @@ export const mutations: MutationTree<ServerUpdateManagerState> = {
         if (state.updateResponse.application !== payload.application)
             state.updateResponse.application = payload.application
 
-        if (state.updateResponse.complete !== payload.complete)
-            state.updateResponse.complete = payload.complete
+        if (state.updateResponse.complete !== payload.complete) state.updateResponse.complete = payload.complete
 
         if ('complete' in payload && payload.complete)
             getSocket().emit(

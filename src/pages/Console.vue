@@ -6,7 +6,7 @@
             </v-col>
 
             <v-col class="v-col-auto d-flex align-center">
- <v-btn class="mr-3 px-2 minwidth-0" color="lightgray" @click="clearConsole">
+                <v-btn class="mr-3 px-2 minwidth-0" color="lightgray" @click="clearConsole">
                     <v-icon>{{ mdiTrashCan }}</v-icon>
                 </v-btn>
                 <command-help-modal @on-command="commandClick($event)" />
@@ -16,7 +16,7 @@
                     :close-on-content-click="false"
                     :title="$t('Console.SetupConsole')">
                     <template #activator="{ props: activatorProps }">
- <v-btn class="ml-3 px-2 minwidth-0" color="lightgray" v-bind="activatorProps">
+                        <v-btn class="ml-3 px-2 minwidth-0" color="lightgray" v-bind="activatorProps">
                             <v-icon>{{ mdiCog }}</v-icon>
                         </v-btn>
                     </template>
@@ -65,7 +65,9 @@
             <v-col :class="consoleDirection === 'table' ? 'v-col' : 'v-col pt-0'">
                 <v-card>
                     <v-card-text class="pa-0">
-                        <OverlayScrollbarsComponent ref="consoleScroll" class="consoleScrollContainer d-flex flex-column">
+                        <OverlayScrollbarsComponent
+                            ref="consoleScroll"
+                            class="consoleScrollContainer d-flex flex-column">
                             <console-table
                                 ref="console"
                                 :is-mini="false"
@@ -92,7 +94,16 @@ import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 
 const store = useStore()
 const { moonrakerComponents } = useBase()
-const { consoleDirection, autoscroll, hideWaitTemperatures, hideTlCommands, customFilters, rawOutput, toggleFilter, clearConsole } = useConsole()
+const {
+    consoleDirection,
+    autoscroll,
+    hideWaitTemperatures,
+    hideTlCommands,
+    customFilters,
+    rawOutput,
+    toggleFilter,
+    clearConsole,
+} = useConsole()
 
 const consoleScroll = ref<any>(null)
 const gcodeCommandField = ref<any>(null)

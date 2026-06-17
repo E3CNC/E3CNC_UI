@@ -9,9 +9,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: T
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: T) { this._value = val }
-        get value() { return this._value }
-        set value(v: T) { this._value = v }
+        constructor(val: T) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v: T) {
+            this._value = v
+        }
     }
     return {
         apiUrl: new MockRef('//localhost:8080'),
@@ -28,9 +34,15 @@ const mockGcodeFilesValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         currentPath: new MockRef(''),
@@ -74,16 +86,50 @@ vi.mock('vue-router', () => ({
 }))
 
 const vuetifyComponentsMock = vi.hoisted(() => ({
-    VCard: { name: 'VCard', inheritAttrs: false, template: '<div :class="$attrs.class"><slot /><slot name="activator" /><slot name="default" /></div>' },
-    VCheckbox: { name: 'VCheckbox', props: ['modelValue', 'density', 'hideDetails', 'ripple'], template: '<input type="checkbox" @click="$emit(\'click\', $event)" />' },
-    VIcon: { name: 'VIcon', props: ['size', 'color', 'start', 'icon'], template: '<i :class="$attrs.class"><slot /></i>' },
-    VTooltip: { name: 'VTooltip', props: ['location', 'disabled', 'top'], template: '<div><slot name="activator" :props="{}" /><slot /></div>' },
-    VMenu: { name: 'VMenu', props: ['modelValue', 'positionX', 'positionY', 'absolute', 'offsetY'], template: '<div class="v-menu" :class="{ visible: modelValue }"><slot name="activator" :props="{onClick: () => {}}" /><div v-if="modelValue"><slot /></div></div>' },
+    VCard: {
+        name: 'VCard',
+        inheritAttrs: false,
+        template: '<div :class="$attrs.class"><slot /><slot name="activator" /><slot name="default" /></div>',
+    },
+    VCheckbox: {
+        name: 'VCheckbox',
+        props: ['modelValue', 'density', 'hideDetails', 'ripple'],
+        template: '<input type="checkbox" @click="$emit(\'click\', $event)" />',
+    },
+    VIcon: {
+        name: 'VIcon',
+        props: ['size', 'color', 'start', 'icon'],
+        template: '<i :class="$attrs.class"><slot /></i>',
+    },
+    VTooltip: {
+        name: 'VTooltip',
+        props: ['location', 'disabled', 'top'],
+        template: '<div><slot name="activator" :props="{}" /><slot /></div>',
+    },
+    VMenu: {
+        name: 'VMenu',
+        props: ['modelValue', 'positionX', 'positionY', 'absolute', 'offsetY'],
+        template:
+            '<div class="v-menu" :class="{ visible: modelValue }"><slot name="activator" :props="{onClick: () => {}}" /><div v-if="modelValue"><slot /></div></div>',
+    },
     VList: { name: 'VList', template: '<div class="v-list"><slot /></div>' },
-    VListItem: { name: 'VListItem', props: ['disabled', 'class'], template: '<div class="v-list-item" :class="[disabled ? \'disabled\' : \'\', $attrs.class]" @click="$emit(\'click\')"><slot /></div>' },
-    VBtn: { name: 'VBtn', props: ['block', 'size', 'color', 'disabled'], template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>' },
+    VListItem: {
+        name: 'VListItem',
+        props: ['disabled', 'class'],
+        template:
+            '<div class="v-list-item" :class="[disabled ? \'disabled\' : \'\', $attrs.class]" @click="$emit(\'click\')"><slot /></div>',
+    },
+    VBtn: {
+        name: 'VBtn',
+        props: ['block', 'size', 'color', 'disabled'],
+        template: '<button :disabled="disabled" @click="$emit(\'click\')"><slot /></button>',
+    },
     VDivider: { name: 'VDivider', template: '<hr />' },
-    VChip: { name: 'VChip', props: ['x-small', 'variant', 'class'], template: '<span :class="$attrs.class"><slot /></span>' },
+    VChip: {
+        name: 'VChip',
+        props: ['x-small', 'variant', 'class'],
+        template: '<span :class="$attrs.class"><slot /></span>',
+    },
 }))
 
 vi.mock('vuetify/components', () => vuetifyComponentsMock)
@@ -150,8 +196,10 @@ vi.mock('@/store/files/cncMetadata', () => ({
 }))
 
 vi.mock('@/plugins/helpers', () => ({
-    convertPrintStatusIcon: vi.fn((status: string) => status === 'completed' ? 'mdi-check-circle' : 'mdi-alert-circle'),
-    convertPrintStatusIconColor: vi.fn((status: string) => status === 'completed' ? 'success' : 'error'),
+    convertPrintStatusIcon: vi.fn((status: string) =>
+        status === 'completed' ? 'mdi-check-circle' : 'mdi-alert-circle'
+    ),
+    convertPrintStatusIconColor: vi.fn((status: string) => (status === 'completed' ? 'success' : 'error')),
     escapePath: vi.fn((path: string) => path),
     formatFilesize: vi.fn((size: number) => {
         if (size >= 1073741824) return `${(size / 1073741824).toFixed(1)} GB`
@@ -470,7 +518,7 @@ describe('GcodefilesPanelListCardFile.vue', () => {
         await vi.dynamicImportSettled?.()
         // The component calls refreshCncMetadata on mount which loads metadata
         // In the test environment, the mock will resolve
-        await new Promise(resolve => setTimeout(resolve, 0))
+        await new Promise((resolve) => setTimeout(resolve, 0))
 
         // Refresh the wrapper
         expect(wrapper.text()).toContain('CAM Tool')

@@ -35,7 +35,5 @@ useControl()
 
 const store = useStore()
 
-const boolTempchart = computed(() =>
-    store.state.gui.view.tempchart.boolTempchart ?? false
-)
+const boolTempchart = computed(() => store.state.gui.view.tempchart.boolTempchart ?? false)
 </script>

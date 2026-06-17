@@ -24,7 +24,8 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VBtn: {
         name: 'VBtn',
         props: { icon: Boolean, variant: String, color: String },
-        template: '<button :data-color="color" :data-variant="variant" @click="$emit(\'click\', $event)"><slot /></button>',
+        template:
+            '<button :data-color="color" :data-variant="variant" @click="$emit(\'click\', $event)"><slot /></button>',
     },
     VSpacer: { name: 'VSpacer', template: '<span />' },
     VIcon: { name: 'VIcon', props: { start: Boolean, icon: String }, template: '<i><slot /></i>' },
@@ -199,9 +200,7 @@ describe('ConfirmationDialog.vue', () => {
         })
 
         // Find the action button by its text content
-        const actionBtn = wrapper.findAll('button').filter(
-            (b) => b.text() === 'Delete'
-        )
+        const actionBtn = wrapper.findAll('button').filter((b) => b.text() === 'Delete')
         expect(actionBtn).toHaveLength(1)
         await actionBtn[0].trigger('click')
 

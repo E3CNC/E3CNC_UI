@@ -8,7 +8,11 @@ import CncStatusPanel from '@/components/panels/Cnc/CncStatusPanel.vue'
 vi.mock('vuetify/components', () => ({
     VContainer: { name: 'VContainer', template: '<div class="v-container"><slot /></div>' },
     VRow: { name: 'VRow', template: '<div class="v-row"><slot /></div>' },
-    VCol: { name: 'VCol', props: { cols: String }, template: '<div class="v-col" :class="`cols-${cols}`"><slot /></div>' },
+    VCol: {
+        name: 'VCol',
+        props: { cols: String },
+        template: '<div class="v-col" :class="`cols-${cols}`"><slot /></div>',
+    },
     VChip: {
         name: 'VChip',
         props: { size: String, label: Boolean, color: String, variant: String, loading: Boolean },

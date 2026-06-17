@@ -132,7 +132,11 @@ describe('server timelapse store', () => {
             expect(dispatch).toHaveBeenCalledWith('saveSetting', { camera: 'cam2' })
 
             actions.saveSetting(null as any, { enabled: true })
-            expect(mockSocket.emit).toHaveBeenCalledWith('machine.timelapse.post_settings', { enabled: true }, { action: 'server/timelapse/initSettings' })
+            expect(mockSocket.emit).toHaveBeenCalledWith(
+                'machine.timelapse.post_settings',
+                { enabled: true },
+                { action: 'server/timelapse/initSettings' }
+            )
         })
 
         it('initLastFrameinfo commits last frame data', () => {
@@ -147,7 +151,11 @@ describe('server timelapse store', () => {
         it('getEvent handles render success (non-error)', () => {
             const commit = vi.fn()
             actions.getEvent({ commit } as any, { action: 'render', status: 'rendering', progress: 50 })
-            expect(commit).toHaveBeenCalledWith('setRenderStatus', { action: 'render', status: 'rendering', progress: 50 })
+            expect(commit).toHaveBeenCalledWith('setRenderStatus', {
+                action: 'render',
+                status: 'rendering',
+                progress: 50,
+            })
             expect(mockToast.error).not.toHaveBeenCalled()
         })
 

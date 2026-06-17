@@ -1,6 +1,6 @@
 /**
  * Vue component mount utilities for testing
- * 
+ *
  * Provides helpers to mount Vue components with all necessary dependencies
  * (Vuetify, Vuex store, Vue Router, i18n, etc.)
  */

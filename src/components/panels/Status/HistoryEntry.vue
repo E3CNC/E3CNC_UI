@@ -13,12 +13,7 @@
                 <template #activator="{ props }">
                     <vue-load-image class="text-center width-32">
                         <template #image>
-                            <img
-                                :src="smallThumbnail"
-                                :width="32"
-                                :height="32"
-                                :alt="job.filename"
-                                v-bind="props" />
+                            <img :src="smallThumbnail" :width="32" :height="32" :alt="job.filename" v-bind="props" />
                         </template>
                         <template #preloader>
                             <v-progress-circular indeterminate color="primary" />
@@ -167,8 +162,7 @@ const description = computed(() => {
     if (filamentArray.length) filament = filamentArray.join(' / ')
     outputArray.push(`Filament: ${filament}`)
 
-    if (estimatedTime.value !== '--')
-        outputArray.push(`Print Time: ${estimatedTime.value}`)
+    if (estimatedTime.value !== '--') outputArray.push(`Print Time: ${estimatedTime.value}`)
     else if (totalTime.value) outputArray.push(`Total Time: ${totalTime.value}`)
 
     return outputArray.join(', ')
@@ -205,8 +199,8 @@ const totalTime = computed(() => {
     return formatPrintTime(totalSeconds)
 })
 
-const bigThumbnailBackground = computed(() =>
-    store.state.gui.uiSettings.bigThumbnailBackground ?? defaultBigThumbnailBackground
+const bigThumbnailBackground = computed(
+    () => store.state.gui.uiSettings.bigThumbnailBackground ?? defaultBigThumbnailBackground
 )
 
 const bigThumbnailTooltipColor = computed(() => {
@@ -236,11 +230,7 @@ function addToQueue() {
 }
 
 function deleteJob() {
-    socket.emit(
-        'server.history.delete_job',
-        { uid: props.job.job_id },
-        { action: 'server/history/getDeletedJobs' }
-    )
+    socket.emit('server.history.delete_job', { uid: props.job.job_id }, { action: 'server/history/getDeletedJobs' })
 }
 
 function createThumbnailUrl(thumbnail: FileStateFileThumbnail) {

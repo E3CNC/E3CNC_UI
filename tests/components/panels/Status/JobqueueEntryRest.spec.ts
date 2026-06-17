@@ -22,7 +22,11 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
 
 vi.mock('vuetify/components', () => vuetifyComponentsMock)
 
-function makeJob(job_id: string, filename: string, overrides: Partial<ServerJobQueueStateJob> = {}): ServerJobQueueStateJob {
+function makeJob(
+    job_id: string,
+    filename: string,
+    overrides: Partial<ServerJobQueueStateJob> = {}
+): ServerJobQueueStateJob {
     return {
         job_id,
         filename,
@@ -54,10 +58,7 @@ describe('JobqueueEntryRest.vue', () => {
     })
 
     it('renders headline with count', () => {
-        const jobs = [
-            makeJob('1', 'test1.gcode'),
-            makeJob('2', 'test2.gcode'),
-        ]
+        const jobs = [makeJob('1', 'test1.gcode'), makeJob('2', 'test2.gcode')]
         const wrapper = mount(JobqueueEntryRest, {
             props: { jobs },
         })
@@ -66,10 +67,7 @@ describe('JobqueueEntryRest.vue', () => {
     })
 
     it('renders headline with combined count', () => {
-        const jobs = [
-            makeJob('1', 'test1.gcode', { combinedIds: ['a', 'b'] }),
-            makeJob('2', 'test2.gcode'),
-        ]
+        const jobs = [makeJob('1', 'test1.gcode', { combinedIds: ['a', 'b'] }), makeJob('2', 'test2.gcode')]
         const wrapper = mount(JobqueueEntryRest, {
             props: { jobs },
         })
@@ -78,9 +76,7 @@ describe('JobqueueEntryRest.vue', () => {
     })
 
     it('renders description with filament and print time', () => {
-        const jobs = [
-            makeJobWithMetadata('1', 'test1.gcode'),
-        ]
+        const jobs = [makeJobWithMetadata('1', 'test1.gcode')]
         const wrapper = mount(JobqueueEntryRest, {
             props: { jobs },
         })
@@ -103,10 +99,7 @@ describe('JobqueueEntryRest.vue', () => {
     })
 
     it('shows -- when no filament or time data', () => {
-        const jobs = [
-            makeJob('1', 'test1.gcode'),
-            makeJob('2', 'test2.gcode'),
-        ]
+        const jobs = [makeJob('1', 'test1.gcode'), makeJob('2', 'test2.gcode')]
         const wrapper = mount(JobqueueEntryRest, {
             props: { jobs },
         })

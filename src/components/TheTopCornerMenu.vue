@@ -2,7 +2,7 @@
     <div>
         <v-menu v-model="showMenu" location="bottom end" :close-on-content-click="false">
             <template #activator="{ props }">
- <v-btn :icon="mdiPowerStandby" rounded="0" v-bind="props"/>
+                <v-btn :icon="mdiPowerStandby" rounded="0" v-bind="props" />
             </template>
             <v-list density="compact">
                 <template v-if="klipperState !== 'disconnected'">
@@ -68,7 +68,9 @@
                     </v-list-item>
                 </template>
                 <v-divider class="mt-0"></v-divider>
-                <v-list-subheader class="pt-2" style="height: auto">{{ $t('App.TopCornerMenu.HostControl') }}</v-list-subheader>
+                <v-list-subheader class="pt-2" style="height: auto">
+                    {{ $t('App.TopCornerMenu.HostControl') }}
+                </v-list-subheader>
                 <v-list-item class="minHeight30 pr-2" link @click="checkDialog(hostReboot, 'host', 'reboot')">
                     <template #title>{{ $t('App.TopCornerMenu.Reboot') }}</template>
                     <template #append>
@@ -154,9 +156,7 @@ const dialogConfirmation = ref<dialogConfirmation>({
 
 const services = computed(() => {
     let services =
-        store.state.server.system_info?.available_services?.filter(
-            (name: string) => name !== 'klipper_mcu'
-        ) ?? []
+        store.state.server.system_info?.available_services?.filter((name: string) => name !== 'klipper_mcu') ?? []
 
     if (hideOtherInstances.value && klipperInstance.value !== '') {
         services = services.filter(
@@ -257,13 +257,8 @@ function changeSwitch(device: ServerPowerStateDevice, value: string) {
 }
 
 function powerDeviceToggle() {
-    const rpc =
-        dialogPowerDeviceChange.value.value === 'off' ? 'machine.device_power.on' : 'machine.device_power.off'
-    socket.emit(
-        rpc,
-        { [dialogPowerDeviceChange.value.device]: null },
-        { action: 'server/power/responseToggle' }
-    )
+    const rpc = dialogPowerDeviceChange.value.value === 'off' ? 'machine.device_power.on' : 'machine.device_power.off'
+    socket.emit(rpc, { [dialogPowerDeviceChange.value.device]: null }, { action: 'server/power/responseToggle' })
 }
 
 function hostReboot() {

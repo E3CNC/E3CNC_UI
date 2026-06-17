@@ -6,7 +6,7 @@
             :margin-bottom="false"
             card-class="machine-update-hint-dialog">
             <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="closeDialog"/>
+                <v-btn :icon="mdiCloseThick" rounded="0" @click="closeDialog" />
             </template>
             <v-card-text>
                 <v-row>
@@ -29,20 +29,26 @@
             <v-divider />
             <v-card-actions>
                 <v-spacer />
- <v-btn variant="text" @click="closeDialog">{{ $t('Machine.UpdatePanel.Abort') }}</v-btn>
- <v-btn variant="text" color="primary" :disabled="!checkboxUpdateQuestion" @click="updateAll">
+                <v-btn variant="text" @click="closeDialog">{{ $t('Machine.UpdatePanel.Abort') }}</v-btn>
+                <v-btn variant="text" color="primary" :disabled="!checkboxUpdateQuestion" @click="updateAll">
                     {{ $t('Machine.UpdatePanel.StartUpdate') }}
                 </v-btn>
             </v-card-actions>
         </panel>
-        <git-commits-list :model-value="boolShowCommitHistory" :repo="showCommitsRepo" @update:model-value="boolShowCommitHistory = $event" />
+        <git-commits-list
+            :model-value="boolShowCommitHistory"
+            :repo="showCommitsRepo"
+            @update:model-value="boolShowCommitHistory = $event" />
     </v-dialog>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
-import type { ServerUpdateManagerStateGitRepo, ServerUpdateManagerStateGuiList } from '@/store/server/updateManager/types'
+import type {
+    ServerUpdateManagerStateGitRepo,
+    ServerUpdateManagerStateGuiList,
+} from '@/store/server/updateManager/types'
 import { mdiProgressQuestion, mdiCloseThick } from '@mdi/js'
 import Panel from '@/components/ui/Panel.vue'
 import UpdateHintAlert from '@/components/panels/Machine/UpdatePanel/UpdateHintAlert.vue'
@@ -69,9 +75,7 @@ function emitValue(val: boolean) {
     emit('update:model-value', val)
 }
 
-const modules = computed(() =>
-    store.getters['server/updateManager/getUpdateManagerList'] ?? []
-)
+const modules = computed(() => store.getters['server/updateManager/getUpdateManagerList'] ?? [])
 
 const filteredModules = computed(() =>
     modules.value.filter((module: ServerUpdateManagerStateGuiList) => {

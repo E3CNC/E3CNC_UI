@@ -33,8 +33,12 @@ describe('gui reminders store', () => {
     describe('mutations', () => {
         it('reset restores defaults', () => {
             state.reminders['r1'] = {
-                name: 'Test', start_total_print_time: 1000, time_delta: 3600,
-                repeating: false, snooze_print_hours_timestamps: [], snooze_epoch_timestamps: [],
+                name: 'Test',
+                start_total_print_time: 1000,
+                time_delta: 3600,
+                repeating: false,
+                snooze_print_hours_timestamps: [],
+                snooze_epoch_timestamps: [],
             }
             mutations.reset(state)
             expect(state.reminders).toEqual({})
@@ -43,7 +47,14 @@ describe('gui reminders store', () => {
         it('initStore replaces reminders from payload value', () => {
             const payload = {
                 value: {
-                    r1: { name: 'Oil change', start_total_print_time: 1000, time_delta: 3600, repeating: false, snooze_print_hours_timestamps: [], snooze_epoch_timestamps: [] },
+                    r1: {
+                        name: 'Oil change',
+                        start_total_print_time: 1000,
+                        time_delta: 3600,
+                        repeating: false,
+                        snooze_print_hours_timestamps: [],
+                        snooze_epoch_timestamps: [],
+                    },
                 },
             }
             mutations.initStore(state, payload)
@@ -54,8 +65,12 @@ describe('gui reminders store', () => {
             mutations.store(state, {
                 id: 'r1',
                 values: {
-                    name: 'Lube', start_total_print_time: 0, time_delta: 7200,
-                    repeating: true, snooze_print_hours_timestamps: [], snooze_epoch_timestamps: [],
+                    name: 'Lube',
+                    start_total_print_time: 0,
+                    time_delta: 7200,
+                    repeating: true,
+                    snooze_print_hours_timestamps: [],
+                    snooze_epoch_timestamps: [],
                 },
             })
             expect(state.reminders['r1'].name).toBe('Lube')
@@ -64,8 +79,12 @@ describe('gui reminders store', () => {
 
         it('update modifies an existing reminder', () => {
             state.reminders['r1'] = {
-                name: 'Old', start_total_print_time: 1000, time_delta: 3600,
-                repeating: false, snooze_print_hours_timestamps: [], snooze_epoch_timestamps: [],
+                name: 'Old',
+                start_total_print_time: 1000,
+                time_delta: 3600,
+                repeating: false,
+                snooze_print_hours_timestamps: [],
+                snooze_epoch_timestamps: [],
             }
             mutations.update(state, { id: 'r1', name: 'Updated' })
             expect(state.reminders['r1'].name).toBe('Updated')
@@ -79,8 +98,12 @@ describe('gui reminders store', () => {
 
         it('delete removes a reminder', () => {
             state.reminders['r1'] = {
-                name: 'Test', start_total_print_time: 0, time_delta: 3600,
-                repeating: false, snooze_print_hours_timestamps: [], snooze_epoch_timestamps: [],
+                name: 'Test',
+                start_total_print_time: 0,
+                time_delta: 3600,
+                repeating: false,
+                snooze_print_hours_timestamps: [],
+                snooze_epoch_timestamps: [],
             }
             mutations.delete(state, 'r1')
             expect(state.reminders).toEqual({})
@@ -130,12 +153,29 @@ describe('gui reminders store', () => {
         it('store creates reminder with uuid and uploads', async () => {
             const commit = vi.fn()
             const dispatch = vi.fn()
-            const stateMock = { reminders: { 'mocked-uuid': { name: 'Test', start_total_print_time: 0, time_delta: 3600, repeating: false, snooze_print_hours_timestamps: [], snooze_epoch_timestamps: [] } } }
+            const stateMock = {
+                reminders: {
+                    'mocked-uuid': {
+                        name: 'Test',
+                        start_total_print_time: 0,
+                        time_delta: 3600,
+                        repeating: false,
+                        snooze_print_hours_timestamps: [],
+                        snooze_epoch_timestamps: [],
+                    },
+                },
+            }
             await actions.store({ commit, dispatch, state: stateMock as any } as any, {
                 values: { name: 'Test', start_total_print_time: 0, time_delta: 3600, repeating: false },
             })
-            expect(commit).toHaveBeenCalledWith('store', { id: 'mocked-uuid', values: { name: 'Test', start_total_print_time: 0, time_delta: 3600, repeating: false } })
-            expect(dispatch).toHaveBeenCalledWith('upload', { id: 'mocked-uuid', value: stateMock.reminders['mocked-uuid'] })
+            expect(commit).toHaveBeenCalledWith('store', {
+                id: 'mocked-uuid',
+                values: { name: 'Test', start_total_print_time: 0, time_delta: 3600, repeating: false },
+            })
+            expect(dispatch).toHaveBeenCalledWith('upload', {
+                id: 'mocked-uuid',
+                value: stateMock.reminders['mocked-uuid'],
+            })
         })
 
         it('update commits and uploads', () => {
@@ -170,7 +210,15 @@ describe('gui reminders store', () => {
             const rootStateMock = { server: { history: { job_totals: { total_print_time: 5000 } } } }
             const now = Date.now()
             vi.setSystemTime(now)
-            actions.repeat({ dispatch, getters: gettersMock as any, state: stateMock as any, rootState: rootStateMock as any } as any, { id: 'r1' })
+            actions.repeat(
+                {
+                    dispatch,
+                    getters: gettersMock as any,
+                    state: stateMock as any,
+                    rootState: rootStateMock as any,
+                } as any,
+                { id: 'r1' }
+            )
             expect(dispatch).toHaveBeenCalledWith('update', {
                 id: 'r1',
                 snooze_print_hours_timestamps: [5000],
@@ -189,8 +237,12 @@ describe('gui reminders store', () => {
     describe('getters', () => {
         it('getReminders returns all reminders with ids', () => {
             state.reminders['r1'] = {
-                name: 'Lube', start_total_print_time: 1000, time_delta: 3600,
-                repeating: false, snooze_print_hours_timestamps: [], snooze_epoch_timestamps: [],
+                name: 'Lube',
+                start_total_print_time: 1000,
+                time_delta: 3600,
+                repeating: false,
+                snooze_print_hours_timestamps: [],
+                snooze_epoch_timestamps: [],
             }
             const result = (getters as any).getReminders(state)
             expect(result).toHaveLength(1)
@@ -200,8 +252,12 @@ describe('gui reminders store', () => {
 
         it('getReminder finds reminder by id', () => {
             state.reminders['r1'] = {
-                name: 'Oil', start_total_print_time: 1000, time_delta: 3600,
-                repeating: false, snooze_print_hours_timestamps: [], snooze_epoch_timestamps: [],
+                name: 'Oil',
+                start_total_print_time: 1000,
+                time_delta: 3600,
+                repeating: false,
+                snooze_print_hours_timestamps: [],
+                snooze_epoch_timestamps: [],
             }
             const reminders = (getters as any).getReminders(state)
             const result = (getters as any).getReminder(state, { getReminders: reminders })('r1')
@@ -216,12 +272,20 @@ describe('gui reminders store', () => {
 
         it('getOverdueReminders filters overdue entries', () => {
             state.reminders['r1'] = {
-                name: 'Overdue', start_total_print_time: 1000, time_delta: 500,
-                repeating: false, snooze_print_hours_timestamps: [], snooze_epoch_timestamps: [],
+                name: 'Overdue',
+                start_total_print_time: 1000,
+                time_delta: 500,
+                repeating: false,
+                snooze_print_hours_timestamps: [],
+                snooze_epoch_timestamps: [],
             }
             state.reminders['r2'] = {
-                name: 'Not overdue', start_total_print_time: 1000, time_delta: 10000,
-                repeating: false, snooze_print_hours_timestamps: [], snooze_epoch_timestamps: [],
+                name: 'Not overdue',
+                start_total_print_time: 1000,
+                time_delta: 10000,
+                repeating: false,
+                snooze_print_hours_timestamps: [],
+                snooze_epoch_timestamps: [],
             }
             const rootState = { server: { history: { job_totals: { total_print_time: 2000 } } } }
             const reminders = (getters as any).getReminders(state)

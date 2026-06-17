@@ -174,11 +174,7 @@ describe('EmergencyStopDialog.vue', () => {
         await yesBtn[0].trigger('click')
 
         // Should emit socket emergency_stop
-        expect(mockSocketEmit).toHaveBeenCalledWith(
-            'printer.emergency_stop',
-            {},
-            { loading: 'topbarEmergencyStop' }
-        )
+        expect(mockSocketEmit).toHaveBeenCalledWith('printer.emergency_stop', {}, { loading: 'topbarEmergencyStop' })
 
         // Should close the dialog
         expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([false])

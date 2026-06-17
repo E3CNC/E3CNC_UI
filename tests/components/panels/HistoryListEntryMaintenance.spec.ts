@@ -46,10 +46,15 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VCheckbox: {
         name: 'VCheckbox',
         props: ['modelValue', 'density', 'hideDetails', 'ripple'],
-        template: '<input type="checkbox" :checked="modelValue" @click.stop="$emit(\'update:modelValue\', !modelValue)" />',
+        template:
+            '<input type="checkbox" :checked="modelValue" @click.stop="$emit(\'update:modelValue\', !modelValue)" />',
     },
     VIcon: { name: 'VIcon', props: ['start', 'icon', 'size', 'color', 'disabled'], template: '<i><slot /></i>' },
-    VTooltip: { name: 'VTooltip', props: ['location', 'top', 'text'], template: '<div><slot name=\"activator\" :props=\"{}\" /><slot /></div>' },
+    VTooltip: {
+        name: 'VTooltip',
+        props: ['location', 'top', 'text'],
+        template: '<div><slot name=\"activator\" :props=\"{}\" /><slot /></div>',
+    },
     VMenu: {
         name: 'VMenu',
         props: ['modelValue', 'positionX', 'positionY', 'absolute', 'offsetY'],
@@ -234,7 +239,12 @@ describe('HistoryListEntryMaintenance.vue', () => {
     it('shows reminder icon when reminder type is set', () => {
         const store = createStoreWithState()
         const item = createMockItem({
-            reminder: { type: 'one-time', filament: { bool: true, value: 1000 }, printtime: { bool: false, value: null }, date: { bool: false, value: null } },
+            reminder: {
+                type: 'one-time',
+                filament: { bool: true, value: 1000 },
+                printtime: { bool: false, value: null },
+                date: { bool: false, value: null },
+            },
         })
         const wrapper = mount(HistoryListEntryMaintenance, {
             props: {
@@ -257,7 +267,12 @@ describe('HistoryListEntryMaintenance.vue', () => {
     it('does not show reminder icon when no reminder type', () => {
         const store = createStoreWithState()
         const item = createMockItem({
-            reminder: { type: null, filament: { bool: false, value: null }, printtime: { bool: false, value: null }, date: { bool: false, value: null } },
+            reminder: {
+                type: null,
+                filament: { bool: false, value: null },
+                printtime: { bool: false, value: null },
+                date: { bool: false, value: null },
+            },
         })
         const wrapper = mount(HistoryListEntryMaintenance, {
             props: {
@@ -294,7 +309,12 @@ describe('HistoryListEntryMaintenance.vue', () => {
         const item = createMockItem({
             start_filament: 0,
             end_filament: null,
-            reminder: { type: 'one-time', filament: { bool: true, value: 1000 }, printtime: { bool: false, value: null }, date: { bool: false, value: null } },
+            reminder: {
+                type: 'one-time',
+                filament: { bool: true, value: 1000 },
+                printtime: { bool: false, value: null },
+                date: { bool: false, value: null },
+            },
         })
         const wrapper = mount(HistoryListEntryMaintenance, {
             props: {
@@ -332,7 +352,12 @@ describe('HistoryListEntryMaintenance.vue', () => {
         const item = createMockItem({
             start_printtime: 0,
             end_printtime: null,
-            reminder: { type: 'one-time', filament: { bool: false, value: null }, printtime: { bool: true, value: 100 }, date: { bool: false, value: null } },
+            reminder: {
+                type: 'one-time',
+                filament: { bool: false, value: null },
+                printtime: { bool: true, value: 100 },
+                date: { bool: false, value: null },
+            },
         })
         const wrapper = mount(HistoryListEntryMaintenance, {
             props: {

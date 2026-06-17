@@ -149,6 +149,6 @@ function muteColor(val: string): string {
 const surface = computed(() => getOnSurface() || '200,200,200')
 const colorMuted = computed(() => muteColor(getOnSurface()))
 const colorMainsail = computed(() => surface.value)
-const colorMoonraker = computed(() => props.moonraker ? surface.value : colorMuted.value)
-const colorKlipper = computed(() => props.klipper ? surface.value : colorMuted.value)
+const colorMoonraker = computed(() => (props.moonraker ? surface.value : colorMuted.value))
+const colorKlipper = computed(() => (props.klipper ? surface.value : colorMuted.value))
 </script>

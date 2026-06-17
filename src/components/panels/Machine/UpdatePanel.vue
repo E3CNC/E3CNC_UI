@@ -9,7 +9,7 @@
             <template #buttons>
                 <v-tooltip top>
                     <template #activator="{ props: activatorProps }">
- <v-btn
+                        <v-btn
                             icon
                             rounded="0"
                             color="primary"
@@ -70,21 +70,13 @@ const { loadings, printer_state } = useBase()
 const store = useStore()
 const socket = useSocket()
 
-const enableUpdateManager = computed(() =>
-    store.state.server.components.includes('update_manager')
-)
+const enableUpdateManager = computed(() => store.state.server.components.includes('update_manager'))
 
-const modules = computed(() =>
-    store.getters['server/updateManager/getUpdateManagerList'] ?? []
-)
+const modules = computed(() => store.getters['server/updateManager/getUpdateManagerList'] ?? [])
 
-const existsSystemModul = computed(() =>
-    'system' in store.state.server.updateManager
-)
+const existsSystemModul = computed(() => 'system' in store.state.server.updateManager)
 
-const systemPackagesCount = computed(() =>
-    store.state.server.updateManager?.system?.package_count ?? 0
-)
+const systemPackagesCount = computed(() => store.state.server.updateManager?.system?.package_count ?? 0)
 
 const checkInitState = computed(() => {
     const initModules = modules.value.filter(

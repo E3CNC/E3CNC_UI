@@ -55,7 +55,7 @@ export const getDefaultState = (): GuiState => {
             reverseX: false,
             reverseY: false,
             reverseZ: false,
-            },
+        },
         dashboard: {
             nonExpandPanels: {
                 mobile: [],
@@ -192,8 +192,8 @@ export const getDefaultState = (): GuiState => {
             dashboardHistoryLimit: 5,
             hideOtherInstances: false,
         },
-		view: {
-			blockFileUpload: false,
+        view: {
+            blockFileUpload: false,
             configfiles: {
                 countPerPage: 10,
                 sortBy: 'filename',

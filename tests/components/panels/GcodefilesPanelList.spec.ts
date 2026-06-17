@@ -8,9 +8,15 @@ const mockGcodeFilesValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         currentPath: new MockRef(''),
@@ -164,9 +170,7 @@ describe('GcodefilesPanelList.vue', () => {
 
     it('shows back card when currentPath is not empty', () => {
         mockGcodeFilesValues.currentPath.value = '/subfolder'
-        mockGcodeFilesValues.files.value = [
-            { isDirectory: false, filename: 'test.gcode' },
-        ]
+        mockGcodeFilesValues.files.value = [{ isDirectory: false, filename: 'test.gcode' }]
 
         const store = createStoreWithState({
             gui: {

@@ -28,13 +28,39 @@ describe('gui webcams store', () => {
 
     describe('mutations', () => {
         it('reset restores defaults', () => {
-            state.webcams = [{ name: 'cam1', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 }]
+            state.webcams = [
+                {
+                    name: 'cam1',
+                    service: 'mjpegstreamer',
+                    enabled: true,
+                    icon: '',
+                    target_fps: 15,
+                    stream_url: '',
+                    snapshot_url: '',
+                    flip_horizontal: false,
+                    flip_vertical: false,
+                    rotation: 0,
+                },
+            ]
             mutations.reset(state)
             expect(state.webcams).toEqual([])
         })
 
         it('initStore replaces webcams', () => {
-            const webcams = [{ name: 'cam1', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 }]
+            const webcams = [
+                {
+                    name: 'cam1',
+                    service: 'mjpegstreamer',
+                    enabled: true,
+                    icon: '',
+                    target_fps: 15,
+                    stream_url: '',
+                    snapshot_url: '',
+                    flip_horizontal: false,
+                    flip_vertical: false,
+                    rotation: 0,
+                },
+            ]
             mutations.initStore(state, webcams)
             expect(state.webcams).toEqual(webcams)
         })
@@ -55,7 +81,20 @@ describe('gui webcams store', () => {
         it('initStore resets and loads webcams', async () => {
             const commit = vi.fn()
             const dispatch = vi.fn()
-            const webcams = [{ name: 'cam1', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 }]
+            const webcams = [
+                {
+                    name: 'cam1',
+                    service: 'mjpegstreamer',
+                    enabled: true,
+                    icon: '',
+                    target_fps: 15,
+                    stream_url: '',
+                    snapshot_url: '',
+                    flip_horizontal: false,
+                    flip_vertical: false,
+                    rotation: 0,
+                },
+            ]
             await actions.initStore({ commit, dispatch } as any, { webcams })
             expect(commit).toHaveBeenCalledWith('reset')
             expect(commit).toHaveBeenCalledWith('initStore', webcams)
@@ -63,7 +102,18 @@ describe('gui webcams store', () => {
         })
 
         it('store emits webcam post_item', () => {
-            const webcam = { name: 'cam1', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 }
+            const webcam = {
+                name: 'cam1',
+                service: 'mjpegstreamer',
+                enabled: true,
+                icon: '',
+                target_fps: 15,
+                stream_url: '',
+                snapshot_url: '',
+                flip_horizontal: false,
+                flip_vertical: false,
+                rotation: 0,
+            }
             actions.store({} as any, webcam)
             expect(mockSocket.emit).toHaveBeenCalledWith('server.webcams.post_item', webcam)
         })
@@ -71,7 +121,18 @@ describe('gui webcams store', () => {
         it('update emits post_item and dispatches delete for renamed webcam', () => {
             const dispatch = vi.fn()
             const rootState = { server: { components: [] } }
-            const webcam = { name: 'newcam', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 }
+            const webcam = {
+                name: 'newcam',
+                service: 'mjpegstreamer',
+                enabled: true,
+                icon: '',
+                target_fps: 15,
+                stream_url: '',
+                snapshot_url: '',
+                flip_horizontal: false,
+                flip_vertical: false,
+                rotation: 0,
+            }
             actions.update({ dispatch, rootState: rootState as any } as any, { webcam, oldWebcamName: 'oldcam' })
             expect(mockSocket.emit).toHaveBeenCalledWith('server.webcams.post_item', webcam)
             expect(dispatch).toHaveBeenCalledWith('delete', 'oldcam')
@@ -85,7 +146,18 @@ describe('gui webcams store', () => {
         it('update dispatches timelapse updateCamSettings when timelapse component active', () => {
             const dispatch = vi.fn()
             const rootState = { server: { components: ['timelapse'] } }
-            const webcam = { name: 'newcam', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 }
+            const webcam = {
+                name: 'newcam',
+                service: 'mjpegstreamer',
+                enabled: true,
+                icon: '',
+                target_fps: 15,
+                stream_url: '',
+                snapshot_url: '',
+                flip_horizontal: false,
+                flip_vertical: false,
+                rotation: 0,
+            }
             actions.update({ dispatch, rootState: rootState as any } as any, { webcam, oldWebcamName: 'oldcam' })
             expect(dispatch).toHaveBeenCalledWith(
                 'server/timelapse/updateCamSettings',
@@ -97,7 +169,18 @@ describe('gui webcams store', () => {
         it('update does not dispatch timelapse updateCamSettings when timelapse not active', () => {
             const dispatch = vi.fn()
             const rootState = { server: { components: [] } }
-            const webcam = { name: 'newcam', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 }
+            const webcam = {
+                name: 'newcam',
+                service: 'mjpegstreamer',
+                enabled: true,
+                icon: '',
+                target_fps: 15,
+                stream_url: '',
+                snapshot_url: '',
+                flip_horizontal: false,
+                flip_vertical: false,
+                rotation: 0,
+            }
             actions.update({ dispatch, rootState: rootState as any } as any, { webcam, oldWebcamName: 'oldcam' })
             expect(dispatch).not.toHaveBeenCalledWith(
                 'server/timelapse/updateCamSettings',
@@ -109,7 +192,18 @@ describe('gui webcams store', () => {
         it('update does not dispatch delete when name unchanged', () => {
             const dispatch = vi.fn()
             const rootState = { server: { components: [] } }
-            const webcam = { name: 'cam1', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 }
+            const webcam = {
+                name: 'cam1',
+                service: 'mjpegstreamer',
+                enabled: true,
+                icon: '',
+                target_fps: 15,
+                stream_url: '',
+                snapshot_url: '',
+                flip_horizontal: false,
+                flip_vertical: false,
+                rotation: 0,
+            }
             actions.update({ dispatch, rootState: rootState as any } as any, { webcam, oldWebcamName: 'cam1' })
             expect(dispatch).not.toHaveBeenCalledWith('delete', expect.anything())
         })
@@ -118,8 +212,30 @@ describe('gui webcams store', () => {
     describe('getters', () => {
         it('getWebcams returns only enabled webcams', () => {
             state.webcams = [
-                { name: 'cam1', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 },
-                { name: 'cam2', service: 'mjpegstreamer', enabled: false, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 },
+                {
+                    name: 'cam1',
+                    service: 'mjpegstreamer',
+                    enabled: true,
+                    icon: '',
+                    target_fps: 15,
+                    stream_url: '',
+                    snapshot_url: '',
+                    flip_horizontal: false,
+                    flip_vertical: false,
+                    rotation: 0,
+                },
+                {
+                    name: 'cam2',
+                    service: 'mjpegstreamer',
+                    enabled: false,
+                    icon: '',
+                    target_fps: 15,
+                    stream_url: '',
+                    snapshot_url: '',
+                    flip_horizontal: false,
+                    flip_vertical: false,
+                    rotation: 0,
+                },
             ]
             const result = (getters as any).getWebcams(state)
             expect(result).toHaveLength(1)
@@ -128,7 +244,18 @@ describe('gui webcams store', () => {
 
         it('getWebcams returns empty array when no webcams enabled', () => {
             state.webcams = [
-                { name: 'cam1', service: 'mjpegstreamer', enabled: false, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 },
+                {
+                    name: 'cam1',
+                    service: 'mjpegstreamer',
+                    enabled: false,
+                    icon: '',
+                    target_fps: 15,
+                    stream_url: '',
+                    snapshot_url: '',
+                    flip_horizontal: false,
+                    flip_vertical: false,
+                    rotation: 0,
+                },
             ]
             const result = (getters as any).getWebcams(state)
             expect(result).toEqual([])
@@ -136,7 +263,18 @@ describe('gui webcams store', () => {
 
         it('getWebcam finds a webcam by name', () => {
             state.webcams = [
-                { name: 'cam1', service: 'mjpegstreamer', enabled: true, icon: '', target_fps: 15, stream_url: '', snapshot_url: '', flip_horizontal: false, flip_vertical: false, rotation: 0 },
+                {
+                    name: 'cam1',
+                    service: 'mjpegstreamer',
+                    enabled: true,
+                    icon: '',
+                    target_fps: 15,
+                    stream_url: '',
+                    snapshot_url: '',
+                    flip_horizontal: false,
+                    flip_vertical: false,
+                    rotation: 0,
+                },
             ]
             const webcams = (getters as any).getWebcams(state)
             const result = (getters as any).getWebcam(state, { getWebcams: webcams })('cam1')

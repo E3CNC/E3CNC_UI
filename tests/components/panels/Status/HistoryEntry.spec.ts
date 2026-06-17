@@ -9,9 +9,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: T
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: T) { this._value = val }
-        get value() { return this._value }
-        set value(v: T) { this._value = v }
+        constructor(val: T) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v: T) {
+            this._value = v
+        }
     }
     return {
         printerIsPrinting: new MockRef(false),
@@ -64,12 +70,29 @@ vi.mock('@/directives/longpress', () => ({
 const vuetifyComponentsMock = vi.hoisted(() => ({
     VRow: { name: 'VRow', template: '<div :class="$attrs.class"><slot /></div>' },
     VCol: { name: 'VCol', props: ['cols'], template: '<div :class="$attrs.class"><slot /></div>' },
-    VTooltip: { name: 'VTooltip', props: ['location', 'disabled'], template: '<div><slot name="activator" :props="{}" /><slot /></div>' },
-    VMenu: { name: 'VMenu', props: ['modelValue', 'positionX', 'positionY', 'absolute', 'offsetY'], template: '<div class="v-menu" :class="{ visible: modelValue }"><slot name="activator" :props="{onClick: () => {}}" /><div v-if="modelValue"><slot /></div></div>' },
+    VTooltip: {
+        name: 'VTooltip',
+        props: ['location', 'disabled'],
+        template: '<div><slot name="activator" :props="{}" /><slot /></div>',
+    },
+    VMenu: {
+        name: 'VMenu',
+        props: ['modelValue', 'positionX', 'positionY', 'absolute', 'offsetY'],
+        template:
+            '<div class="v-menu" :class="{ visible: modelValue }"><slot name="activator" :props="{onClick: () => {}}" /><div v-if="modelValue"><slot /></div></div>',
+    },
     VList: { name: 'VList', template: '<div class="v-list"><slot /></div>' },
-    VListItem: { name: 'VListItem', props: ['disabled'], template: '<div class="v-list-item" :class="{disabled: disabled}" @click="$emit(\'click\')"><slot /></div>' },
+    VListItem: {
+        name: 'VListItem',
+        props: ['disabled'],
+        template: '<div class="v-list-item" :class="{disabled: disabled}" @click="$emit(\'click\')"><slot /></div>',
+    },
     VIcon: { name: 'VIcon', props: ['size', 'color', 'icon'], template: '<i :class="$attrs.class"><slot /></i>' },
-    VProgressCircular: { name: 'VProgressCircular', props: ['indeterminate', 'color'], template: '<span class="v-progress-circular" />' },
+    VProgressCircular: {
+        name: 'VProgressCircular',
+        props: ['indeterminate', 'color'],
+        template: '<span class="v-progress-circular" />',
+    },
     VBtn: { name: 'VBtn', props: ['icon'], template: '<button @click="$emit(\'click\')"><slot /></button>' },
 }))
 
@@ -78,16 +101,25 @@ vi.mock('vuetify/components', () => vuetifyComponentsMock)
 vi.mock('vue-load-image', () => ({
     default: {
         name: 'VueLoadImage',
-        template: '<div class="vue-load-image"><slot name="image" /><slot name="preloader" /><slot name="error" /></div>',
+        template:
+            '<div class="vue-load-image"><slot name="image" /><slot name="preloader" /><slot name="error" /></div>',
     },
 }))
 
 vi.mock('@/components/dialogs/StartPrintDialog.vue', () => ({
-    default: { name: 'StartPrintDialog', props: ['modelValue', 'file', 'currentPath'], template: '<div class="start-print-dialog" />' },
+    default: {
+        name: 'StartPrintDialog',
+        props: ['modelValue', 'file', 'currentPath'],
+        template: '<div class="start-print-dialog" />',
+    },
 }))
 
 vi.mock('@/components/dialogs/AddBatchToQueueDialog.vue', () => ({
-    default: { name: 'AddBatchToQueueDialog', props: ['modelValue', 'filename', 'showToast'], template: '<div class="add-batch-to-queue-dialog" />' },
+    default: {
+        name: 'AddBatchToQueueDialog',
+        props: ['modelValue', 'filename', 'showToast'],
+        template: '<div class="add-batch-to-queue-dialog" />',
+    },
 }))
 
 vi.mock('@/plugins/helpers', () => ({
@@ -132,7 +164,10 @@ function createTestStore(overrides: Record<string, any> = {}) {
                 toolhead: { homed_axes: 'xyz' },
             },
             gui: {
-                dashboard: { nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] }, floatingPanels: {} },
+                dashboard: {
+                    nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] },
+                    floatingPanels: {},
+                },
                 general: { printername: 'Test' },
                 control: {},
                 uiSettings: {
@@ -157,7 +192,11 @@ function createTestStore(overrides: Record<string, any> = {}) {
     })
 }
 
-function makeJob(job_id: string, filename: string, overrides: Record<string, any> = {}): ServerHistoryStateJobWithCount {
+function makeJob(
+    job_id: string,
+    filename: string,
+    overrides: Record<string, any> = {}
+): ServerHistoryStateJobWithCount {
     return {
         job_id,
         filename,
@@ -299,9 +338,7 @@ describe('HistoryEntry.vue', () => {
         const store = createTestStore()
         const job = makeJob('1', 'test.gcode', {
             metadata: {
-                thumbnails: [
-                    { width: 32, height: 32, size: 1024, relative_path: '.thumbs/test_32.png' },
-                ],
+                thumbnails: [{ width: 32, height: 32, size: 1024, relative_path: '.thumbs/test_32.png' }],
                 modified: 1000000,
             },
         })

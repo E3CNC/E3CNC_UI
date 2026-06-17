@@ -155,7 +155,14 @@ describe('useTimelapse', () => {
 
     it('estimatedVideoLength uses variableTargetFps when variable_fps enabled', () => {
         const { composable: c } = mountComposable({
-            settings: { variable_fps: true, variable_fps_min: 5, variable_fps_max: 60, targetlength: 10, output_framerate: 30, duplicatelastframe: 0 },
+            settings: {
+                variable_fps: true,
+                variable_fps_min: 5,
+                variable_fps_max: 60,
+                targetlength: 10,
+                output_framerate: 30,
+                duplicatelastframe: 0,
+            },
             lastFrame: { count: 300 },
         })
         expect(c.estimatedVideoLength.value).toBe('10s')
@@ -172,7 +179,14 @@ describe('useTimelapse', () => {
 
     it('estimatedVideoLength uses targetlength floor when variable_fps result is shorter', () => {
         const { composable: c } = mountComposable({
-            settings: { variable_fps: true, variable_fps_min: 5, variable_fps_max: 60, targetlength: 20, output_framerate: 30, duplicatelastframe: 0 },
+            settings: {
+                variable_fps: true,
+                variable_fps_min: 5,
+                variable_fps_max: 60,
+                targetlength: 20,
+                output_framerate: 30,
+                duplicatelastframe: 0,
+            },
             lastFrame: { count: 10 },
         })
         expect(c.estimatedVideoLength.value).toBe('20s')

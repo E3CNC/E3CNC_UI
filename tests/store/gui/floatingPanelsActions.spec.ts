@@ -26,10 +26,7 @@ describe('gui floating panels actions', () => {
             const dispatch = vi.fn()
             const position: PanelFloatingState = { x: 100, y: 200, width: 400, height: 300, zIndex: 5 }
 
-            ;(actions as any).saveFloatingPanelPosition(
-                { commit, dispatch, state },
-                { id: 'temperature', position }
-            )
+            ;(actions as any).saveFloatingPanelPosition({ commit, dispatch, state }, { id: 'temperature', position })
 
             expect(commit).toHaveBeenCalledWith('setFloatingPanels', {
                 temperature: position,
@@ -48,10 +45,7 @@ describe('gui floating panels actions', () => {
             }
             const position: PanelFloatingState = { x: 100, y: 200, width: 400, height: 300, zIndex: 5 }
 
-            ;(actions as any).saveFloatingPanelPosition(
-                { commit, dispatch, state },
-                { id: 'temperature', position }
-            )
+            ;(actions as any).saveFloatingPanelPosition({ commit, dispatch, state }, { id: 'temperature', position })
 
             expect(commit).toHaveBeenCalledWith('setFloatingPanels', {
                 macros: { x: 500, y: 200, width: 350, height: 250, zIndex: 2 },
@@ -88,7 +82,6 @@ describe('gui floating panels actions', () => {
                 temperature: { x: 0, y: 0, width: 400, height: 300, zIndex: 1 },
                 macros: { x: 500, y: 200, width: 350, height: 250, zIndex: 2 },
             }
-
             ;(actions as any).saveFloatingPanelPosition(
                 { commit, dispatch, state },
                 { id: 'temperature', remove: true }
@@ -105,7 +98,6 @@ describe('gui floating panels actions', () => {
             state.dashboard.floatingPanels = {
                 temperature: { x: 0, y: 0, width: 400, height: 300, zIndex: 1 },
             }
-
             ;(actions as any).saveFloatingPanelPosition(
                 { commit, dispatch, state },
                 { id: 'temperature', remove: true }
@@ -120,7 +112,6 @@ describe('gui floating panels actions', () => {
             state.dashboard.floatingPanels = {
                 macros: { x: 0, y: 0, width: 400, height: 300, zIndex: 1 },
             }
-
             ;(actions as any).saveFloatingPanelPosition(
                 { commit, dispatch, state },
                 { id: 'temperature', remove: true }
@@ -139,11 +130,7 @@ describe('gui floating panels actions', () => {
                 temperature: { x: 0, y: 0, width: 400, height: 300, zIndex: 5 },
                 macros: { x: 500, y: 200, width: 350, height: 250, zIndex: 10 },
             }
-
-            ;(actions as any).bringFloatingPanelToFront(
-                { dispatch, state },
-                'temperature'
-            )
+            ;(actions as any).bringFloatingPanelToFront({ dispatch, state }, 'temperature')
 
             expect(dispatch).toHaveBeenCalledWith('saveFloatingPanelPosition', {
                 id: 'temperature',
@@ -156,11 +143,7 @@ describe('gui floating panels actions', () => {
             state.dashboard.floatingPanels = {
                 temperature: { x: 0, y: 0, width: 400, height: 300, zIndex: 5 },
             }
-
-            ;(actions as any).bringFloatingPanelToFront(
-                { dispatch, state },
-                'temperature'
-            )
+            ;(actions as any).bringFloatingPanelToFront({ dispatch, state }, 'temperature')
 
             expect(dispatch).toHaveBeenCalledWith('saveFloatingPanelPosition', {
                 id: 'temperature',

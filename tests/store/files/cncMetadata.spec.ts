@@ -1,9 +1,5 @@
 import { describe, expect, it, vi, afterEach } from 'vitest'
-import {
-    buildCncMetadataViewModel,
-    loadCncMetadata,
-    type CncMetadata,
-} from '@/store/files/cncMetadata'
+import { buildCncMetadataViewModel, loadCncMetadata, type CncMetadata } from '@/store/files/cncMetadata'
 
 afterEach(() => {
     vi.unstubAllGlobals()

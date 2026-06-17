@@ -6,7 +6,7 @@
                     {{ icon }}
                 </v-icon>
                 <span>{{ label }}</span>
- <v-btn
+                <v-btn
                     v-if="_value !== defaultValue && !hasInputField"
                     size="x-small"
                     icon
@@ -44,7 +44,7 @@
                 </div>
             </transition>
             <v-card-text class="pa-0 d-flex align-center">
- <v-btn
+                <v-btn
                     v-if="lockSliders && isTouchDevice"
                     variant="plain"
                     size="small"
@@ -124,9 +124,13 @@ const inputMin = computed(() => props.min ?? 0)
 
 const lockSliders = computed(() => store.state.gui.uiSettings.lockSlidersOnTouchDevices)
 
-watch([lockSliders, isTouchDevice], () => {
-    isLocked.value = lockSliders.value && isTouchDevice.value
-}, { immediate: true })
+watch(
+    [lockSliders, isTouchDevice],
+    () => {
+        isLocked.value = lockSliders.value && isTouchDevice.value
+    },
+    { immediate: true }
+)
 
 function startLockTimer(): void {
     const t = store.state.gui.uiSettings.lockSlidersDelay ?? 0
@@ -138,7 +142,7 @@ function resetLockTimer(): void {
     clearTimeout(timeout)
 }
 
-const colorBar = computed(() => (props.max ?? 100) < _value.value ? 'warning' : 'primary')
+const colorBar = computed(() => ((props.max ?? 100) < _value.value ? 'warning' : 'primary'))
 
 const changeSlider = debounce(() => {
     sendCmd()
@@ -149,22 +153,35 @@ const changeSlider = debounce(() => {
     }
 }, 250)
 
-watch(_value, (newVal: number) => {
-    numInput.value = newVal
-}, { immediate: true })
+watch(
+    _value,
+    (newVal: number) => {
+        numInput.value = newVal
+    },
+    { immediate: true }
+)
 
-watch(() => props.target, (newVal: number) => {
-    _value.value = Math.round(newVal * (props.multi ?? 1))
+watch(
+    () => props.target,
+    (newVal: number) => {
+        _value.value = Math.round(newVal * (props.multi ?? 1))
 
-    if (!props.dynamicRange) return
-    if (_value.value >= processedMax.value) {
-        processedMax.value = _value.value + dynamicStep.value
-    }
-}, { immediate: true })
+        if (!props.dynamicRange) return
+        if (_value.value >= processedMax.value) {
+            processedMax.value = _value.value + dynamicStep.value
+        }
+    },
+    { immediate: true }
+)
 
-watch(() => props.max, (newVal: number) => {
-    processedMax.value = newVal > _value.value ? newVal : Math.ceil(_value.value / dynamicStep.value) * dynamicStep.value
-}, { immediate: true })
+watch(
+    () => props.max,
+    (newVal: number) => {
+        processedMax.value =
+            newVal > _value.value ? newVal : Math.ceil(_value.value / dynamicStep.value) * dynamicStep.value
+    },
+    { immediate: true }
+)
 
 function checkInvalidChars(event: KeyboardEvent): void {
     if (inputMin.value >= 0) invalidChars.push('-')
@@ -220,7 +237,9 @@ function decrement(): void {
 
 function increment(): void {
     _value.value =
-        _value.value < processedMax.value || props.dynamicRange ? Math.round(_value.value + (props.step ?? 1)) : processedMax.value
+        _value.value < processedMax.value || props.dynamicRange
+            ? Math.round(_value.value + (props.step ?? 1))
+            : processedMax.value
     sendCmd()
 }
 </script>

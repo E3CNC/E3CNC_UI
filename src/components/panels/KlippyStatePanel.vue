@@ -1,6 +1,12 @@
 <template>
     <div v-if="klipperState !== 'ready' && socketIsConnected">
-        <v-alert v-if="klippyIsConnected" :color="messageType.color" density="compact" variant="text" border="start" class="mb-0 mb-6">
+        <v-alert
+            v-if="klippyIsConnected"
+            :color="messageType.color"
+            density="compact"
+            variant="text"
+            border="start"
+            class="mb-0 mb-6">
             <p class="font-weight-medium d-flex align-center">
                 <v-icon :color="messageType.color" class="pr-2">{{ messageType.icon }}</v-icon>
                 {{ serviceReportsKlipper }}
@@ -10,17 +16,17 @@
                 <v-divider class="mt-2 pb-3" />
                 <v-row>
                     <v-col>
- <v-btn size="small" variant="outlined" :class="buttonClasses" @click="restart">
+                        <v-btn size="small" variant="outlined" :class="buttonClasses" @click="restart">
                             <v-icon class="mr-sm-2">{{ mdiRestart }}</v-icon>
                             {{ $t('Panels.KlippyStatePanel.Restart') }}
                         </v-btn>
- <v-btn size="small" variant="outlined" :class="buttonClasses" @click="firmwareRestart">
+                        <v-btn size="small" variant="outlined" :class="buttonClasses" @click="firmwareRestart">
                             <v-icon class="mr-sm-2">{{ mdiRestart }}</v-icon>
                             {{ $t('Panels.KlippyStatePanel.FirmwareRestart') }}
                         </v-btn>
                     </v-col>
                     <v-col>
- <v-btn
+                        <v-btn
                             :href="apiUrl + '/server/files/klippy.log'"
                             size="small"
                             variant="outlined"
@@ -29,7 +35,7 @@
                             <v-icon class="mr-2">{{ mdiDownload }}</v-icon>
                             {{ $t('Panels.KlippyStatePanel.KlipperLog') }}
                         </v-btn>
- <v-btn
+                        <v-btn
                             :href="apiUrl + '/server/files/moonraker.log'"
                             size="small"
                             variant="outlined"
@@ -53,14 +59,19 @@
             <p>{{ $t('Panels.KlippyStatePanel.PrinterSwitchedOffDescription') }}</p>
             <v-row>
                 <v-col class="text-center">
- <v-btn size="small" variant="outlined" :class="`text-${messageType.color} my-1`" @click="powerOn">
+                    <v-btn size="small" variant="outlined" :class="`text-${messageType.color} my-1`" @click="powerOn">
                         <v-icon class="mr-sm-2">{{ mdiPower }}</v-icon>
                         {{ $t('Panels.KlippyStatePanel.PowerOn') }}
                     </v-btn>
                 </v-col>
             </v-row>
         </v-alert>
-        <v-alert v-else-if="klipperState === 'disconnected'" density="compact" variant="text" border="start" class="mb-6">
+        <v-alert
+            v-else-if="klipperState === 'disconnected'"
+            density="compact"
+            variant="text"
+            border="start"
+            class="mb-6">
             <p class="font-weight-medium d-flex align-center">
                 <v-icon class="pr-2">{{ messageType.icon }}</v-icon>
                 {{ serviceReportsMoonraker }}
@@ -96,9 +107,7 @@ const { klipperState, socketIsConnected, klippyIsConnected, isPrinterPowerOff, p
 const store = useStore()
 const socket = useSocket()
 
-const klippy_message = computed<string | null>(() =>
-    store.state.server.klippy_message ?? null
-)
+const klippy_message = computed<string | null>(() => store.state.server.klippy_message ?? null)
 
 const messageType = computed<{ color: string; icon: string }>(() => {
     switch (klipperState.value) {
@@ -115,20 +124,20 @@ const messageType = computed<{ color: string; icon: string }>(() => {
     }
 })
 
-const buttonClasses = computed(() =>
-    [messageType.value.color + '--text', 'my-1', 'w-100']
+const buttonClasses = computed(() => [messageType.value.color + '--text', 'my-1', 'w-100'])
+
+const serviceReportsKlipper = computed(
+    () =>
+        `${useI18n().t('Panels.KlippyStatePanel.ServiceReports', {
+            service: 'Klipper',
+        })}: ${klipperState.value.toUpperCase()}`
 )
 
-const serviceReportsKlipper = computed(() =>
-    `${useI18n().t('Panels.KlippyStatePanel.ServiceReports', {
-        service: 'Klipper',
-    })}: ${klipperState.value.toUpperCase()}`
-)
-
-const serviceReportsMoonraker = computed(() =>
-    `${useI18n().t('Panels.KlippyStatePanel.ServiceReports', {
-        service: 'Moonraker',
-    })}: ${klipperState.value.toUpperCase()}`
+const serviceReportsMoonraker = computed(
+    () =>
+        `${useI18n().t('Panels.KlippyStatePanel.ServiceReports', {
+            service: 'Moonraker',
+        })}: ${klipperState.value.toUpperCase()}`
 )
 
 function restart() {

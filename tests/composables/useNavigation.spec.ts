@@ -99,9 +99,16 @@ describe('useNavigation', () => {
 
         expect(nav.countPrinters.value).toBe(2)
         expect(nav.routesNaviPoints.value.map((entry: any) => entry.title)).toContain('App.Printers')
-        expect(nav.getUiSettings({ type: 'route', title: 'Dashboard', position: 5, visible: true })).toEqual([20, false])
-        expect(nav.showInNavi({ title: 'Dashboard', showInNavi: true, path: '/dashboard', icon: 'dash', position: 5 })).toBe(true)
-        expect(nav.showInNavi({ title: 'Webcam', showInNavi: true, path: '/webcam', icon: 'cam', position: 2 })).toBe(false)
+        expect(nav.getUiSettings({ type: 'route', title: 'Dashboard', position: 5, visible: true })).toEqual([
+            20,
+            false,
+        ])
+        expect(
+            nav.showInNavi({ title: 'Dashboard', showInNavi: true, path: '/dashboard', icon: 'dash', position: 5 })
+        ).toBe(true)
+        expect(nav.showInNavi({ title: 'Webcam', showInNavi: true, path: '/webcam', icon: 'cam', position: 2 })).toBe(
+            false
+        )
         expect(nav.visibleNaviPoints.value.some((entry: any) => entry.title === 'Router.Webcam')).toBe(false)
         expect(nav.naviPoints.value[0].position).toBe(0)
     })

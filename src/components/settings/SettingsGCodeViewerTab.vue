@@ -9,7 +9,7 @@
                 <settings-row :title="$t('Settings.GCodeViewerTab.BackgroundColor')">
                     <v-menu :close-on-content-click="false" location="bottom end">
                         <template #activator="{ props: activatorProps }">
- <v-btn
+                            <v-btn
                                 :color="backgroundColor"
                                 class="color-swatch"
                                 variant="flat"
@@ -26,7 +26,11 @@
                 <settings-row :title="$t('Settings.GCodeViewerTab.GridColor')">
                     <v-menu :close-on-content-click="false" location="bottom end">
                         <template #activator="{ props: activatorProps }">
- <v-btn :color="gridColor" class="color-swatch" variant="flat" v-bind="activatorProps"></v-btn>
+                            <v-btn
+                                :color="gridColor"
+                                class="color-swatch"
+                                variant="flat"
+                                v-bind="activatorProps"></v-btn>
                         </template>
                         <v-color-picker
                             :value="gridColor"
@@ -39,7 +43,7 @@
                 <settings-row :title="$t('Settings.GCodeViewerTab.ProgressColor')">
                     <v-menu :close-on-content-click="false" location="bottom end">
                         <template #activator="{ props: activatorProps }">
- <v-btn
+                            <v-btn
                                 :color="progressColor"
                                 class="color-swatch"
                                 variant="flat"
@@ -57,7 +61,7 @@
                 <settings-row :title="$t('Settings.GCodeViewerTab.MinFeed')">
                     <v-menu :close-on-content-click="false" location="bottom end">
                         <template #activator="{ props: activatorProps }">
- <v-btn
+                            <v-btn
                                 :color="minFeedColor"
                                 class="color-swatch mr-3"
                                 variant="flat"
@@ -84,7 +88,7 @@
                 <settings-row :title="$t('Settings.GCodeViewerTab.MaxFeed')">
                     <v-menu :close-on-content-click="false" location="bottom end">
                         <template #activator="{ props: activatorProps }">
- <v-btn
+                            <v-btn
                                 :color="maxFeedColor"
                                 class="color-swatch mr-3"
                                 variant="flat"

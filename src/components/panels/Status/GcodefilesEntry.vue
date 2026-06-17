@@ -153,9 +153,7 @@ const description = computed(() => {
 const statusIcon = computed(() => convertPrintStatusIcon(props.item.last_status ?? ''))
 const statusColor = computed(() => convertPrintStatusIconColor(props.item.last_status ?? ''))
 
-const filename = computed(() =>
-    props.item.filename.slice(props.item.filename.lastIndexOf('/') + 1)
-)
+const filename = computed(() => props.item.filename.slice(props.item.filename.lastIndexOf('/') + 1))
 
 function showContextMenu(e: MouseEvent | LongpressEvent) {
     e?.preventDefault()

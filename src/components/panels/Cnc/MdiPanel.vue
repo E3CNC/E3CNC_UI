@@ -14,7 +14,7 @@
                     <span class="text-caption font-weight-bold">Quick Commands:</span>
                 </v-col>
                 <v-col v-for="command in quickCommands" :key="command.label" cols="6" sm="3">
- <v-btn size="small" class="d-block w-100" variant="outlined" @click="runCommand(command.command)">
+                    <v-btn size="small" class="d-block w-100" variant="outlined" @click="runCommand(command.command)">
                         {{ command.label }}
                     </v-btn>
                 </v-col>
@@ -25,7 +25,7 @@
                     <span class="text-caption font-weight-bold">Work Coordinate Systems:</span>
                 </v-col>
                 <v-col v-for="wcs in workCoordinateSystems" :key="wcs" cols="4" sm="2">
- <v-btn size="small" class="d-block w-100" variant="outlined" @click="runCommand(wcs)">
+                    <v-btn size="small" class="d-block w-100" variant="outlined" @click="runCommand(wcs)">
                         {{ wcs }}
                     </v-btn>
                 </v-col>
@@ -60,5 +60,4 @@ function runCommand(command: string) {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

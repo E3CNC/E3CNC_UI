@@ -60,7 +60,7 @@
                 </v-row>
                 <v-row>
                     <v-col class="text-center pt-5">
- <v-btn variant="text" :disabled="!complete" color="primary" @click="close">
+                        <v-btn variant="text" :disabled="!complete" color="primary" @click="close">
                             {{ $t('Buttons.Close') }}
                         </v-btn>
                     </v-col>
@@ -101,7 +101,9 @@ const headers = [
 
 const application = computed(() => store.state.server.updateManager.updateResponse.application ?? '')
 
-const messages = computed<ServerUpdateManagerStateMessages[]>(() => store.state.server.updateManager.updateResponse.messages ?? [])
+const messages = computed<ServerUpdateManagerStateMessages[]>(
+    () => store.state.server.updateManager.updateResponse.messages ?? []
+)
 
 const complete = computed(() => store.state.server.updateManager.updateResponse.complete ?? true)
 
@@ -150,11 +152,7 @@ function close() {
     }
 
     store.commit('server/updateManager/resetUpdateResponse')
-    socket.emit(
-        'machine.update.status',
-        { refresh: false },
-        { action: 'server/updateManager/onUpdateStatus' }
-    )
+    socket.emit('machine.update.status', { refresh: false }, { action: 'server/updateManager/onUpdateStatus' })
 }
 
 watch(messages, () => {

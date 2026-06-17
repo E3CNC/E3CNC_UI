@@ -19,14 +19,24 @@ vi.mock('@/components/panels/Temperature/TemperaturePanelListItemNevermoreValue.
     default: {
         name: 'TemperaturePanelListItemNevermoreValue',
         props: ['printerObject', 'objectName', 'keyName', 'small'],
-        template: '<div class="mock-nevermore-value" :data-key-name="keyName">{{ keyName }}: {{ printerObject?.[keyName] }}</div>',
+        template:
+            '<div class="mock-nevermore-value" :data-key-name="keyName">{{ keyName }}: {{ printerObject?.[keyName] }}</div>',
     },
 }))
 
 vi.mock('@/components/panels/Temperature/TemperaturePanelListItemEdit.vue', () => ({
     default: {
         name: 'TemperaturePanelListItemEdit',
-        props: ['modelValue', 'showDialog', 'objectName', 'name', 'formatName', 'additionalSensorName', 'icon', 'color'],
+        props: [
+            'modelValue',
+            'showDialog',
+            'objectName',
+            'name',
+            'formatName',
+            'additionalSensorName',
+            'icon',
+            'color',
+        ],
         template: '<div class="mock-edit-dialog" />',
     },
 }))
@@ -98,7 +108,7 @@ describe('TemperaturePanelListItemNevermore.vue', () => {
         const mockValues = wrapper.findAll('.mock-nevermore-value')
         expect(mockValues.length).toBe(4)
 
-        const keyNames = mockValues.map(v => v.attributes('data-key-name'))
+        const keyNames = mockValues.map((v) => v.attributes('data-key-name'))
         expect(keyNames).toContain('gas')
         expect(keyNames).toContain('temperature')
         expect(keyNames).toContain('pressure')

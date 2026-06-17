@@ -8,9 +8,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         klipperReadyForGui: new MockRef(true),
@@ -32,15 +38,28 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VRow: { name: 'VRow', template: '<div><slot /></div>' },
     VCol: { name: 'VCol', template: '<div><slot /></div>' },
     VCardText: { name: 'VCardText', template: '<div><slot /></div>' },
-    VBtn: { name: 'VBtn', props: ['icon', 'ripple', 'color', 'loading', 'disabled'], template: '<button :class="$attrs.class" :disabled="$attrs.disabled" @click="$attrs.onClick || $attrs.click"><slot /></button>' },
+    VBtn: {
+        name: 'VBtn',
+        props: ['icon', 'ripple', 'color', 'loading', 'disabled'],
+        template:
+            '<button :class="$attrs.class" :disabled="$attrs.disabled" @click="$attrs.onClick || $attrs.click"><slot /></button>',
+    },
     VIcon: { name: 'VIcon', props: ['start', 'icon'], template: '<i><slot /></i>' },
     VTooltip: { name: 'VTooltip', props: ['top'], template: '<div><slot /></div>' },
-    VToolbar: { name: 'VToolbar', inheritAttrs: false, template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>' },
+    VToolbar: {
+        name: 'VToolbar',
+        inheritAttrs: false,
+        template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>',
+    },
     VToolbarTitle: { name: 'VToolbarTitle', template: '<span><slot /></span>' },
     VToolbarItems: { name: 'VToolbarItems', template: '<div><slot /></div>' },
     VSpacer: { name: 'VSpacer', template: '<span style="flex:1" />' },
     VExpandTransition: { name: 'VExpandTransition', template: '<div><slot /></div>' },
-    VCard: { name: 'VCard', inheritAttrs: false, template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>' },
+    VCard: {
+        name: 'VCard',
+        inheritAttrs: false,
+        template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>',
+    },
 }))
 
 vi.mock('vuetify/components', () => vuetifyComponentsMock)

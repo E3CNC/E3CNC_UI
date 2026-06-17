@@ -1,6 +1,6 @@
 /**
  * Global test setup for Mainsail CNC
- * 
+ *
  * This file is loaded before each test file and sets up:
  * - Global mocks for browser APIs (WebSocket, localStorage, etc.)
  * - Mock implementations for external dependencies
@@ -176,10 +176,7 @@ const originalConsoleError = console.error
 console.error = vi.fn((...args) => {
     // Only show errors that don't match common patterns
     const message = args.join(' ')
-    if (
-        message.includes('[Vue warn]') ||
-        message.includes('file not found in filetree')
-    ) {
+    if (message.includes('[Vue warn]') || message.includes('file not found in filetree')) {
         return
     }
     originalConsoleError(...args)

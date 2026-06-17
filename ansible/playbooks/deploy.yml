@@ -5,55 +5,42 @@
   vars_files:
     - ../vars/main.yml
   tasks:
-    - name: Check that bun is available
-      ansible.builtin.command:
-        cmd: which bun
-      register: bun_check
-      changed_when: false
-      failed_when: bun_check.rc != 0
-      when: not ansible_check_mode
-
-    - name: Install frontend dependencies
-      ansible.builtin.command:
-        cmd: bun install --frozen-lockfile
-        chdir: "{{ repo.dest }}"
-      when: not ansible_check_mode
-
-    - name: Build frontend
-      ansible.builtin.command:
-        cmd: bun run build
-        chdir: "{{ repo.dest }}"
-      when: not ansible_check_mode
+    - name: Include frontend build role
+      ansible.builtin.include_role:
+        name: frontend
+      vars:
+        repo_dest: '{{ repo.dest }}'
+        web_root: '{{ frontend.web_root }}'
 
     - name: Ensure web root directory exists
       ansible.builtin.file:
-        path: "{{ frontend.web_root }}"
+        path: '{{ frontend.web_root }}'
         state: directory
-        mode: "0755"
+        mode: '0755'
 
-- name: Deploy built frontend to web root
-  ansible.builtin.copy:
-    src: "{{ repo.dest }}/dist/"
-    dest: "{{ frontend.web_root }}/"
-    remote_src: true
+    - name: Deploy built frontend to web root
+      ansible.builtin.copy:
+        src: '{{ repo.dest }}/dist/'
+        dest: '{{ frontend.web_root }}/'
+        remote_src: true
 
     - name: Get git commit hash for version stamp
       ansible.builtin.command:
         cmd: git rev-parse --short HEAD
-        chdir: "{{ repo.dest }}"
+        chdir: '{{ repo.dest }}'
       register: git_commit
       changed_when: false
       when: not ansible_check_mode
 
     - name: Write version.json
       ansible.builtin.copy:
-        dest: "{{ frontend.web_root }}/version.json"
+        dest: '{{ frontend.web_root }}/version.json'
         content: |
           {
             "buildTime": "{{ ansible_date_time.iso8601 }}",
             "commit": "{{ git_commit.stdout | default('unknown') }}"
           }
-        mode: "0644"
+        mode: '0644'
 
     - name: Reload nginx
       ansible.builtin.systemd:

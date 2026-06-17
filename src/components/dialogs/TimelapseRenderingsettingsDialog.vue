@@ -6,7 +6,7 @@
             card-class="timelapse-rendersettings-dialog-panel"
             :margin-bottom="false">
             <template #buttons>
- <v-btn :icon="mdiCloseThick" @click="close"/>
+                <v-btn :icon="mdiCloseThick" @click="close" />
             </template>
             <v-card-text class="">
                 <v-row>
@@ -90,8 +90,8 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer />
- <v-btn variant="text" @click="close">{{ $t('Buttons.Cancel') }}</v-btn>
- <v-btn variant="text" color="primary" @click="startRender">{{ $t('Timelapse.StartRender') }}</v-btn>
+                <v-btn variant="text" @click="close">{{ $t('Buttons.Cancel') }}</v-btn>
+                <v-btn variant="text" color="primary" @click="startRender">{{ $t('Timelapse.StartRender') }}</v-btn>
             </v-card-actions>
         </panel>
     </v-dialog>

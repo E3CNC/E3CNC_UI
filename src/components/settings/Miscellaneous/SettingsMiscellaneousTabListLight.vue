@@ -1,10 +1,10 @@
 <template>
     <settings-row :title="outputName" :dynamic-slot-width="true">
- <v-btn v-if="chainCount> 1" size="small" variant="outlined" class="ml-3" @click="openGroups">
+        <v-btn v-if="chainCount > 1" size="small" variant="outlined" class="ml-3" @click="openGroups">
             <v-icon start size="small">{{ mdiPencil }}</v-icon>
             {{ $t('Settings.MiscellaneousTab.Groups') }}
         </v-btn>
- <v-btn size="small" variant="outlined" class="ml-3" @click="openPresets">
+        <v-btn size="small" variant="outlined" class="ml-3" @click="openPresets">
             <v-icon start size="small">{{ mdiPalette }}</v-icon>
             {{ $t('Settings.MiscellaneousTab.Presets') }}
         </v-btn>

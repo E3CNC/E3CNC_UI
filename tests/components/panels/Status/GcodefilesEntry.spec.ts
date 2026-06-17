@@ -9,9 +9,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: T
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: T) { this._value = val }
-        get value() { return this._value }
-        set value(v: T) { this._value = v }
+        constructor(val: T) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v: T) {
+            this._value = v
+        }
     }
     return {
         printerIsPrinting: new MockRef(false),
@@ -53,10 +59,23 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VCol: { name: 'VCol', props: ['cols'], template: '<div :class="$attrs.class"><slot /></div>' },
     VTable: { name: 'VTable', template: '<table><slot /></table>' },
     VCard: { name: 'VCard', inheritAttrs: false, template: '<div :class="$attrs.class"><slot /></div>' },
-    VTooltip: { name: 'VTooltip', props: ['location'], template: '<div><slot name="activator" :props="{}" /><slot /></div>' },
-    VMenu: { name: 'VMenu', props: ['modelValue', 'positionX', 'positionY', 'absolute', 'offsetY'], template: '<div class="v-menu" :class="{ visible: modelValue }"><slot name="activator" :props="{onClick: () => {}}" /><div v-if="modelValue"><slot /></div></div>' },
+    VTooltip: {
+        name: 'VTooltip',
+        props: ['location'],
+        template: '<div><slot name="activator" :props="{}" /><slot /></div>',
+    },
+    VMenu: {
+        name: 'VMenu',
+        props: ['modelValue', 'positionX', 'positionY', 'absolute', 'offsetY'],
+        template:
+            '<div class="v-menu" :class="{ visible: modelValue }"><slot name="activator" :props="{onClick: () => {}}" /><div v-if="modelValue"><slot /></div></div>',
+    },
     VList: { name: 'VList', template: '<div class="v-list"><slot /></div>' },
-    VListItem: { name: 'VListItem', props: ['disabled'], template: '<div class="v-list-item" :class="{disabled: disabled}" @click="$emit(\'click\')"><slot /></div>' },
+    VListItem: {
+        name: 'VListItem',
+        props: ['disabled'],
+        template: '<div class="v-list-item" :class="{disabled: disabled}" @click="$emit(\'click\')"><slot /></div>',
+    },
     VIcon: { name: 'VIcon', props: ['size', 'color', 'icon'], template: '<i :class="$attrs.class"><slot /></i>' },
     VBtn: { name: 'VBtn', props: ['icon'], template: '<button @click="$emit(\'click\')"><slot /></button>' },
     VCardText: { name: 'VCardText', template: '<div><slot /></div>' },
@@ -66,19 +85,35 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
 vi.mock('vuetify/components', () => vuetifyComponentsMock)
 
 vi.mock('@/components/dialogs/StartPrintDialog.vue', () => ({
-    default: { name: 'StartPrintDialog', props: ['modelValue', 'file', 'currentPath'], template: '<div class="start-print-dialog" />' },
+    default: {
+        name: 'StartPrintDialog',
+        props: ['modelValue', 'file', 'currentPath'],
+        template: '<div class="start-print-dialog" />',
+    },
 }))
 
 vi.mock('@/components/dialogs/AddBatchToQueueDialog.vue', () => ({
-    default: { name: 'AddBatchToQueueDialog', props: ['modelValue', 'filename', 'showToast'], template: '<div class="add-batch-to-queue-dialog" />' },
+    default: {
+        name: 'AddBatchToQueueDialog',
+        props: ['modelValue', 'filename', 'showToast'],
+        template: '<div class="add-batch-to-queue-dialog" />',
+    },
 }))
 
 vi.mock('@/components/dialogs/ConfirmationDialog.vue', () => ({
-    default: { name: 'ConfirmationDialog', props: ['modelValue', 'title', 'text', 'actionButtonText'], template: '<div class="confirmation-dialog" />' },
+    default: {
+        name: 'ConfirmationDialog',
+        props: ['modelValue', 'title', 'text', 'actionButtonText'],
+        template: '<div class="confirmation-dialog" />',
+    },
 }))
 
 vi.mock('@/components/dialogs/GcodefilesRenameFileDialog.vue', () => ({
-    default: { name: 'GcodefilesRenameFileDialog', props: ['modelValue', 'item'], template: '<div class="rename-file-dialog" />' },
+    default: {
+        name: 'GcodefilesRenameFileDialog',
+        props: ['modelValue', 'item'],
+        template: '<div class="rename-file-dialog" />',
+    },
 }))
 
 vi.mock('@/components/panels/Gcodefiles/GcodefilesThumbnail.vue', () => ({
@@ -86,8 +121,10 @@ vi.mock('@/components/panels/Gcodefiles/GcodefilesThumbnail.vue', () => ({
 }))
 
 vi.mock('@/plugins/helpers', () => ({
-    convertPrintStatusIcon: vi.fn((status: string) => status === 'completed' ? 'mdi-check-circle' : 'mdi-alert-circle'),
-    convertPrintStatusIconColor: vi.fn((status: string) => status === 'completed' ? 'success' : 'error'),
+    convertPrintStatusIcon: vi.fn((status: string) =>
+        status === 'completed' ? 'mdi-check-circle' : 'mdi-alert-circle'
+    ),
+    convertPrintStatusIconColor: vi.fn((status: string) => (status === 'completed' ? 'success' : 'error')),
     escapePath: vi.fn((path: string) => path),
     formatPrintTime: vi.fn((seconds: number) => `${seconds}s`),
 }))
@@ -109,7 +146,10 @@ function createTestStore(overrides: Record<string, any> = {}) {
                 toolhead: { homed_axes: 'xyz' },
             },
             gui: {
-                dashboard: { nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] }, floatingPanels: {} },
+                dashboard: {
+                    nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] },
+                    floatingPanels: {},
+                },
                 general: { printername: 'Test' },
                 control: {},
                 uiSettings: {},

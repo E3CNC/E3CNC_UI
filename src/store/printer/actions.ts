@@ -154,5 +154,4 @@ export const actions: ActionTree<PrinterState, RootState> = {
 
         getSocket().emit('printer.gcode.script', { script: payload }, { loading: 'sendGcode' })
     },
-
 }

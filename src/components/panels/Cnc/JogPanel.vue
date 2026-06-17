@@ -3,7 +3,7 @@
         <v-container class="pa-2">
             <v-row density="compact" class="mb-3">
                 <v-col cols="12">
- <v-btn
+                    <v-btn
                         size="small"
                         class="d-block w-100"
                         :disabled="['printing'].includes(printer_state)"
@@ -15,7 +15,7 @@
                     </v-btn>
                 </v-col>
                 <v-col cols="6">
- <v-btn
+                    <v-btn
                         size="small"
                         class="d-block w-100"
                         :disabled="['printing'].includes(printer_state)"
@@ -27,7 +27,7 @@
                     </v-btn>
                 </v-col>
                 <v-col cols="6">
- <v-btn
+                    <v-btn
                         size="small"
                         class="d-block w-100"
                         :disabled="['printing'].includes(printer_state)"
@@ -42,7 +42,7 @@
 
             <v-row density="compact" class="mb-3">
                 <v-col cols="12">
- <v-btn
+                    <v-btn
                         size="small"
                         class="d-block w-100"
                         :disabled="['printing'].includes(printer_state) || !allAxesHomed"
@@ -58,8 +58,8 @@
             <v-row density="compact" class="mb-3">
                 <v-col cols="12" class="d-flex align-center">
                     <span class="text-caption mr-2">Jog Step:</span>
- <v-btn-toggle v-model="selectedStepIndex" density="compact" size="small" class="flex-grow-1">
- <v-btn v-for="(step, idx) in jogSteps" :key="idx" :value="idx" size="x-small">
+                    <v-btn-toggle v-model="selectedStepIndex" density="compact" size="small" class="flex-grow-1">
+                        <v-btn v-for="(step, idx) in jogSteps" :key="idx" :value="idx" size="x-small">
                             {{ formatStep(step) }}
                         </v-btn>
                     </v-btn-toggle>
@@ -99,21 +99,21 @@
                         <span class="text-caption font-weight-bold">XY Jog ({{ currentStep }} mm)</span>
                     </div>
                     <div class="jog-panel__xy-pad">
- <v-btn
+                        <v-btn
                             class="jog-panel__xy-btn"
                             size="large"
                             :disabled="['printing'].includes(printer_state) || !xyHomed"
                             @click="jog('Y', currentStep)">
                             <v-icon>{{ mdiChevronUp }}</v-icon>
                         </v-btn>
- <v-btn
+                        <v-btn
                             class="jog-panel__xy-btn"
                             size="large"
                             :disabled="['printing'].includes(printer_state) || !xyHomed"
                             @click="jog('X', -currentStep)">
                             <v-icon>{{ mdiChevronLeft }}</v-icon>
                         </v-btn>
- <v-btn
+                        <v-btn
                             class="jog-panel__xy-btn jog-panel__xy-center"
                             size="large"
                             variant="outlined"
@@ -121,14 +121,14 @@
                             @click="jogStop">
                             <v-icon>{{ mdiStop }}</v-icon>
                         </v-btn>
- <v-btn
+                        <v-btn
                             class="jog-panel__xy-btn"
                             size="large"
                             :disabled="['printing'].includes(printer_state) || !xyHomed"
                             @click="jog('X', currentStep)">
                             <v-icon>{{ mdiChevronRight }}</v-icon>
                         </v-btn>
- <v-btn
+                        <v-btn
                             class="jog-panel__xy-btn"
                             size="large"
                             :disabled="['printing'].includes(printer_state) || !xyHomed"
@@ -142,7 +142,7 @@
                     <div class="text-center mb-3">
                         <span class="text-caption font-weight-bold">Z Jog</span>
                     </div>
- <v-btn
+                    <v-btn
                         class="jog-panel__jog-btn mb-2 d-block w-100"
                         size="large"
                         :disabled="['printing'].includes(printer_state) || !zHomed"
@@ -150,7 +150,7 @@
                         <v-icon>{{ mdiChevronUp }}</v-icon>
                         <span class="ml-2">+{{ currentStep }}</span>
                     </v-btn>
- <v-btn
+                    <v-btn
                         class="jog-panel__jog-btn d-block w-100"
                         size="large"
                         :disabled="['printing'].includes(printer_state) || !zHomed"
@@ -163,7 +163,7 @@
 
             <v-row density="compact" class="my-2">
                 <v-col cols="12">
- <v-btn
+                    <v-btn
                         size="small"
                         class="d-block w-100"
                         :color="keyboardNavEnabled ? 'primary' : ''"
@@ -179,7 +179,10 @@
             <v-row density="compact">
                 <v-col cols="6">
                     <span class="text-caption text-medium-emphasis">Status:</span>
-                    <v-chip size="small" :color="['printing'].includes(printer_state) ? 'warning' : 'primary'" class="mx-2">
+                    <v-chip
+                        size="small"
+                        :color="['printing'].includes(printer_state) ? 'warning' : 'primary'"
+                        class="mx-2">
                         {{ printer_state }}
                     </v-chip>
                 </v-col>
@@ -236,7 +239,7 @@ const selectedStepIndex = computed({
     get: () => store.state.gui.control.selectedCncStepIndex ?? 2,
     set: (value: number) => {
         store.dispatch('gui/saveSetting', { name: 'control.selectedCncStepIndex', value })
-    }
+    },
 })
 
 const homedAxesDisplay = computed(() => {
@@ -244,17 +247,13 @@ const homedAxesDisplay = computed(() => {
     return homedAxes.value || 'None'
 })
 
-const allAxesHomed = computed(() =>
-    homedAxes.value.includes('x') && homedAxes.value.includes('y') && homedAxes.value.includes('z')
+const allAxesHomed = computed(
+    () => homedAxes.value.includes('x') && homedAxes.value.includes('y') && homedAxes.value.includes('z')
 )
 
-const xyHomed = computed(() =>
-    homedAxes.value.includes('x') && homedAxes.value.includes('y')
-)
+const xyHomed = computed(() => homedAxes.value.includes('x') && homedAxes.value.includes('y'))
 
-const zHomed = computed(() =>
-    homedAxes.value.includes('z')
-)
+const zHomed = computed(() => homedAxes.value.includes('z'))
 
 const loadings = computed(() => store.state.server.loadings ?? [])
 
@@ -262,14 +261,14 @@ const feedrateXY = computed({
     get: () => store.state.gui.control.cncFeedrateXY ?? 500,
     set: (value: number) => {
         store.dispatch('gui/saveSetting', { name: 'control.cncFeedrateXY', value })
-    }
+    },
 })
 
 const feedrateZ = computed({
     get: () => store.state.gui.control.cncFeedrateZ ?? 100,
     set: (value: number) => {
         store.dispatch('gui/saveSetting', { name: 'control.cncFeedrateZ', value })
-    }
+    },
 })
 
 function saveFeedrates() {

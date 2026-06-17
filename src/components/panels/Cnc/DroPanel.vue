@@ -13,7 +13,9 @@
                 <section v-for="axis in axes" :key="axis.id" class="dro-panel__axis-card">
                     <div class="dro-panel__axis-header">
                         <span class="dro-panel__axis-name">{{ axis.id }}</span>
-                        <v-chip size="x-small" :color="axis.homed ? 'primary' : 'warning'">{{ axis.homed ? 'HOMED' : 'OPEN' }}</v-chip>
+                        <v-chip size="x-small" :color="axis.homed ? 'primary' : 'warning'">
+                            {{ axis.homed ? 'HOMED' : 'OPEN' }}
+                        </v-chip>
                     </div>
                     <div v-if="showMachineCoords" class="dro-panel__axis-section">
                         <span class="dro-panel__label">Machine</span>
@@ -35,9 +37,15 @@
             </div>
 
             <div class="dro-panel__homed">
-                <v-chip size="small" :color="xAxisHomed ? 'primary' : 'warning'" class="mr-2">X {{ xAxisHomed ? 'OK' : '--' }}</v-chip>
-                <v-chip size="small" :color="yAxisHomed ? 'primary' : 'warning'" class="mr-2">Y {{ yAxisHomed ? 'OK' : '--' }}</v-chip>
-                <v-chip size="small" :color="zAxisHomed ? 'primary' : 'warning'">Z {{ zAxisHomed ? 'OK' : '--' }}</v-chip>
+                <v-chip size="small" :color="xAxisHomed ? 'primary' : 'warning'" class="mr-2">
+                    X {{ xAxisHomed ? 'OK' : '--' }}
+                </v-chip>
+                <v-chip size="small" :color="yAxisHomed ? 'primary' : 'warning'" class="mr-2">
+                    Y {{ yAxisHomed ? 'OK' : '--' }}
+                </v-chip>
+                <v-chip size="small" :color="zAxisHomed ? 'primary' : 'warning'">
+                    Z {{ zAxisHomed ? 'OK' : '--' }}
+                </v-chip>
             </div>
         </v-container>
     </panel>
@@ -84,18 +92,14 @@ const axisMaximum = computed(() => {
     return { x: p[0] ?? 0, y: p[1] ?? 0, z: p[2] ?? 0 }
 })
 
-const coordinateModeLabel = computed(() =>
-    absolute_coordinates.value ? 'Absolute (G90)' : 'Relative (G91)'
-)
+const coordinateModeLabel = computed(() => (absolute_coordinates.value ? 'Absolute (G90)' : 'Relative (G91)'))
 
 const liveVelocity = computed(() => {
     const v = store.state.printer?.motion_report?.live_velocity ?? 0
     return `${Number(v).toFixed(2)} mm/s`
 })
 
-const allAxesHomed = computed(() =>
-    xAxisHomed.value && yAxisHomed.value && zAxisHomed.value
-)
+const allAxesHomed = computed(() => xAxisHomed.value && yAxisHomed.value && zAxisHomed.value)
 
 function formatAxis(value: number, digits: number) {
     return Number(value ?? 0).toFixed(digits)

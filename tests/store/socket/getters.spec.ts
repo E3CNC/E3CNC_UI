@@ -1,6 +1,6 @@
 /**
  * Tests for src/store/socket/getters.ts
- * 
+ *
  * Tests the socket store getters which compute URLs for WebSocket connections.
  */
 

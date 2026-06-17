@@ -49,7 +49,10 @@ describe('useWebcam', () => {
         expect(webcam.generateTransform(true, true, 90, 2)).toBe('scaleX(-1) scaleY(-1) rotate(90deg) scale(0.5)')
         expect(webcam.getWrapperStyle(0.5, 90)).toEqual({ aspectRatio: 2 })
         expect(webcam.updateAspectRatioFromVideo({ videoWidth: 1920, videoHeight: 1080 } as any)).toBeCloseTo(1.778, 3)
-        expect(webcam.updateAspectRatioFromImage({ naturalWidth: 800, naturalHeight: 600 } as any)).toBeCloseTo(1.333, 3)
+        expect(webcam.updateAspectRatioFromImage({ naturalWidth: 800, naturalHeight: 600 } as any)).toBeCloseTo(
+            1.333,
+            3
+        )
     })
 
     it('converts webcam icons', () => {

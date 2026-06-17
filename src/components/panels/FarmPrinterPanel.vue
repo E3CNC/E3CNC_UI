@@ -10,7 +10,7 @@
         <template #buttons>
             <v-menu v-if="showWebcamSwitch" :offset-y="true" title="Webcam">
                 <template #activator="{ props }">
- <v-btn variant="text" v-bind="props">
+                    <v-btn variant="text" v-bind="props">
                         <v-icon size="small">{{ mdiWebcam }}</v-icon>
                         <v-icon size="small">{{ mdiMenuDown }}</v-icon>
                     </v-btn>
@@ -93,7 +93,7 @@
                     </v-card-text>
                     <v-fade-transition>
                         <v-overlay v-if="hover" absolute :z-index="4">
- <v-btn color="primary" @click="clickPrinter">
+                            <v-btn color="primary" @click="clickPrinter">
                                 {{
                                     printer.socket.isConnected
                                         ? $t('Panels.FarmPrinterPanel.SwitchToPrinter')
@@ -144,27 +144,21 @@ const printerUrl = computed(() => {
     return url
 })
 
-const isCurrentPrinter = computed(() =>
-    store.getters['farm/' + props.printer._namespace + '/isCurrentPrinter']
-)
+const isCurrentPrinter = computed(() => store.getters['farm/' + props.printer._namespace + '/isCurrentPrinter'])
 
 const currentCamName = computed({
     get: () => store.getters['farm/' + props.printer._namespace + '/getSetting']('currentCamName', 'off'),
     set: (newVal: string) => {
         store.dispatch('farm/' + props.printer._namespace + '/setSettings', { currentCamName: newVal })
-    }
+    },
 })
 
-const printer_name = computed(() =>
-    store.getters['farm/' + props.printer._namespace + '/getPrinterName']
-)
+const printer_name = computed(() => store.getters['farm/' + props.printer._namespace + '/getPrinterName'])
 
-const printer_status = computed(() =>
-    store.getters['farm/' + props.printer._namespace + '/getStatus']
-)
+const printer_status = computed(() => store.getters['farm/' + props.printer._namespace + '/getStatus'])
 
-const printer_current_filename = computed(() =>
-    store.getters['farm/' + props.printer._namespace + '/getCurrentFilename']
+const printer_current_filename = computed(
+    () => store.getters['farm/' + props.printer._namespace + '/getCurrentFilename']
 )
 
 const printer_image = computed(() => {
@@ -172,29 +166,21 @@ const printer_image = computed(() => {
     return store.getters['farm/' + props.printer._namespace + '/getImage'] ?? sidebarBgImage.value
 })
 
-const printer_logo = computed(() =>
-    store.getters['farm/' + props.printer._namespace + '/getLogo']
-)
+const printer_logo = computed(() => store.getters['farm/' + props.printer._namespace + '/getLogo'])
 
-const printerLogoColor = computed(() =>
-    store.getters['farm/' + props.printer._namespace + '/getLogoColor']
-)
+const printerLogoColor = computed(() => store.getters['farm/' + props.printer._namespace + '/getLogoColor'])
 
-const printer_position = computed(() =>
-    store.getters['farm/' + props.printer._namespace + '/getPosition']
-)
+const printer_position = computed(() => store.getters['farm/' + props.printer._namespace + '/getPosition'])
 
-const printer_preview = computed(() =>
-    store.getters['farm/' + props.printer._namespace + '/getPrinterPreview']
-)
+const printer_preview = computed(() => store.getters['farm/' + props.printer._namespace + '/getPrinterPreview'])
 
 const showWebcamSwitch = computed(() => {
     if (printer_webcams.value.length == 0) return false
     return props.printer.socket.isConnected
 })
 
-const printer_webcams = computed<GuiWebcamStateWebcam[]>(() =>
-    store.getters['farm/' + props.printer._namespace + '/getPrinterWebcams']
+const printer_webcams = computed<GuiWebcamStateWebcam[]>(
+    () => store.getters['farm/' + props.printer._namespace + '/getPrinterWebcams']
 )
 
 const currentWebcam = computed<GuiWebcamStateWebcam | null>(() => {

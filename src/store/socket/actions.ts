@@ -23,9 +23,7 @@ export const actions: ActionTree<SocketState, RootState> = {
             const path = normPath.length > 0 ? `/${normPath}` : ''
 
             await socket.close()
-            await socket.setUrl(
-                state.protocol + '://' + payload.hostname + ':' + payload.port + path + '/websocket'
-            )
+            await socket.setUrl(state.protocol + '://' + payload.hostname + ':' + payload.port + path + '/websocket')
             await socket.connect()
         } catch {
             // socket not initialized yet

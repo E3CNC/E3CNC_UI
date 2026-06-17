@@ -40,34 +40,55 @@ describe('server job queue store', () => {
                 'gcodes/other.gcode': { metadataPulled: true },
             }
 
-            const jobs = (getters as any).getJobs(state, {}, {}, {
-                'files/getFile': (path: string) => files[path as keyof typeof files] ?? null,
-            })
+            const jobs = (getters as any).getJobs(
+                state,
+                {},
+                {},
+                {
+                    'files/getFile': (path: string) => files[path as keyof typeof files] ?? null,
+                }
+            )
 
             expect(jobs).toHaveLength(2)
             expect(jobs[0].combinedIds).toEqual(['2'])
             expect(jobs[0].metadata).toEqual({ metadataPulled: false })
-            expect(mockSocket.emit).toHaveBeenCalledWith('server.files.metadata', { filename: 'test.gcode' }, { action: 'files/getMetadata' })
+            expect(mockSocket.emit).toHaveBeenCalledWith(
+                'server.files.metadata',
+                { filename: 'test.gcode' },
+                { action: 'files/getMetadata' }
+            )
             expect((getters as any).getJobsCount(state)).toBe(3)
         })
 
         it('getJobs does not re-fetch metadata when already pulled', () => {
-            state.queued_jobs = [
-                { job_id: '1', filename: 'known.gcode', time_added: 1, time_in_queue: 5 },
-            ]
+            state.queued_jobs = [{ job_id: '1', filename: 'known.gcode', time_added: 1, time_in_queue: 5 }]
 
-            const jobs = (getters as any).getJobs(state, {}, {}, {
-                'files/getFile': () => ({ metadataPulled: true }),
-            })
+            const jobs = (getters as any).getJobs(
+                state,
+                {},
+                {},
+                {
+                    'files/getFile': () => ({ metadataPulled: true }),
+                }
+            )
 
             expect(jobs).toHaveLength(1)
-            expect(mockSocket.emit).not.toHaveBeenCalledWith('server.files.metadata', expect.anything(), expect.anything())
+            expect(mockSocket.emit).not.toHaveBeenCalledWith(
+                'server.files.metadata',
+                expect.anything(),
+                expect.anything()
+            )
         })
 
         it('getJobs returns empty array when no queued jobs', () => {
-            const jobs = (getters as any).getJobs(state, {}, {}, {
-                'files/getFile': () => null,
-            })
+            const jobs = (getters as any).getJobs(
+                state,
+                {},
+                {},
+                {
+                    'files/getFile': () => null,
+                }
+            )
             expect(jobs).toEqual([])
         })
 
@@ -113,7 +134,10 @@ describe('server job queue store', () => {
             )
 
             actions.changeCount(
-                { dispatch, getters: { getJobs: [{ job_id: '1', filename: 'a.gcode', time_added: 1, time_in_queue: 1 }] } } as any,
+                {
+                    dispatch,
+                    getters: { getJobs: [{ job_id: '1', filename: 'a.gcode', time_added: 1, time_in_queue: 1 }] },
+                } as any,
                 { job_id: '1', count: 3 }
             )
             expect(dispatch).toHaveBeenCalledWith('sendNewQueueList', {
@@ -190,10 +214,7 @@ describe('server job queue store', () => {
 
         it('changeCount returns early for unknown job_id', () => {
             const dispatch = vi.fn()
-            actions.changeCount(
-                { dispatch, getters: { getJobs: [] } } as any,
-                { job_id: 'unknown', count: 3 }
-            )
+            actions.changeCount({ dispatch, getters: { getJobs: [] } } as any, { job_id: 'unknown', count: 3 })
             expect(dispatch).not.toHaveBeenCalled()
         })
 
@@ -204,10 +225,7 @@ describe('server job queue store', () => {
                 { job_id: '2', filename: 'b.gcode', time_added: 2, time_in_queue: 2, combinedIds: [] },
                 { job_id: '3', filename: 'c.gcode', time_added: 3, time_in_queue: 3, combinedIds: [] },
             ]
-            actions.changePosition(
-                { dispatch, getters: { getJobs: jobs } } as any,
-                { oldIndex: 2, newIndex: 0 }
-            )
+            actions.changePosition({ dispatch, getters: { getJobs: jobs } } as any, { oldIndex: 2, newIndex: 0 })
             expect(dispatch).toHaveBeenCalledWith('sendNewQueueList', {
                 jobs: [
                     { job_id: '3', filename: 'c.gcode', time_added: 3, time_in_queue: 3, combinedIds: [] },
@@ -223,10 +241,7 @@ describe('server job queue store', () => {
                 { job_id: '1', filename: 'a.gcode', time_added: 1, time_in_queue: 1, combinedIds: [] },
                 { job_id: '2', filename: 'b.gcode', time_added: 2, time_in_queue: 2, combinedIds: [] },
             ]
-            actions.startByJobId(
-                { dispatch, getters: { getJobs: jobs } } as any,
-                '2'
-            )
+            actions.startByJobId({ dispatch, getters: { getJobs: jobs } } as any, '2')
             expect(dispatch).toHaveBeenCalledWith('sendNewQueueList', {
                 jobs: [
                     { job_id: '2', filename: 'b.gcode', time_added: 2, time_in_queue: 2, combinedIds: [] },
@@ -238,10 +253,7 @@ describe('server job queue store', () => {
 
         it('startByJobId returns early for unknown job_id', () => {
             const dispatch = vi.fn()
-            actions.startByJobId(
-                { dispatch, getters: { getJobs: [] } } as any,
-                'unknown'
-            )
+            actions.startByJobId({ dispatch, getters: { getJobs: [] } } as any, 'unknown')
             expect(dispatch).not.toHaveBeenCalled()
         })
 
@@ -252,20 +264,12 @@ describe('server job queue store', () => {
 
         it('start emits job_queue.start', () => {
             actions.start()
-            expect(mockSocket.emit).toHaveBeenCalledWith(
-                'server.job_queue.start',
-                {},
-                { loading: 'startJobqueue' }
-            )
+            expect(mockSocket.emit).toHaveBeenCalledWith('server.job_queue.start', {}, { loading: 'startJobqueue' })
         })
 
         it('pause emits job_queue.pause', () => {
             actions.pause()
-            expect(mockSocket.emit).toHaveBeenCalledWith(
-                'server.job_queue.pause',
-                {},
-                { loading: 'pauseJobqueue' }
-            )
+            expect(mockSocket.emit).toHaveBeenCalledWith('server.job_queue.pause', {}, { loading: 'pauseJobqueue' })
         })
 
         it('sendNewQueueList without printStart does not set action option', () => {

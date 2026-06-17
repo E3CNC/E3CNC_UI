@@ -8,9 +8,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         loadings: new MockRef([]),
@@ -78,8 +84,16 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VCol: { name: 'VCol', props: ['cols', 'sm', 'md'], template: '<div class="v-col"><slot /></div>' },
     VCardText: { name: 'VCardText', template: '<div><slot /></div>' },
     VBtnToggle: { name: 'VBtnToggle', props: ['modelValue', 'size', 'mandatory'], template: '<div><slot /></div>' },
-    VBtn: { name: 'VBtn', props: ['size', 'value', 'variant', 'loading', 'color'], template: '<button><slot /></button>' },
-    VTooltip: { name: 'VTooltip', props: ['top', 'location', 'text'], template: '<div><slot name="activator" :props="{}" /><slot /></div>' },
+    VBtn: {
+        name: 'VBtn',
+        props: ['size', 'value', 'variant', 'loading', 'color'],
+        template: '<button><slot /></button>',
+    },
+    VTooltip: {
+        name: 'VTooltip',
+        props: ['top', 'location', 'text'],
+        template: '<div><slot name="activator" :props="{}" /><slot /></div>',
+    },
     VIcon: { name: 'VIcon', props: ['size', 'icon'], template: '<i><slot /></i>' },
 }))
 

@@ -110,7 +110,11 @@ describe('gui maintenance store', () => {
 
         it('init emits database get_item', () => {
             actions.init()
-            expect(mockSocket.emit).toHaveBeenCalledWith('server.database.get_item', { namespace: 'maintenance' }, { action: 'gui/maintenance/initStore' })
+            expect(mockSocket.emit).toHaveBeenCalledWith(
+                'server.database.get_item',
+                { namespace: 'maintenance' },
+                { action: 'gui/maintenance/initStore' }
+            )
         })
 
         it('initStore resets and loads entries', async () => {
@@ -148,7 +152,10 @@ describe('gui maintenance store', () => {
                 entry: makeEntry(),
             })
             expect(commit).toHaveBeenCalledWith('store', { id: 'mocked-uuid', values: makeEntry() })
-            expect(dispatch).toHaveBeenCalledWith('upload', { id: 'mocked-uuid', value: stateMock.entries['mocked-uuid'] })
+            expect(dispatch).toHaveBeenCalledWith('upload', {
+                id: 'mocked-uuid',
+                value: stateMock.entries['mocked-uuid'],
+            })
         })
 
         it('update commits and uploads', () => {
@@ -163,7 +170,10 @@ describe('gui maintenance store', () => {
             const commit = vi.fn()
             actions.delete({ commit } as any, 'e1')
             expect(commit).toHaveBeenCalledWith('delete', 'e1')
-            expect(mockSocket.emit).toHaveBeenCalledWith('server.database.delete_item', { namespace: 'maintenance', key: 'e1' })
+            expect(mockSocket.emit).toHaveBeenCalledWith('server.database.delete_item', {
+                namespace: 'maintenance',
+                key: 'e1',
+            })
         })
 
         it('perform updates entry with end stats and creates repeat entry', () => {
@@ -173,16 +183,34 @@ describe('gui maintenance store', () => {
                     e1: makeEntry({ reminder: { ...defaultReminder, type: 'repeat' } }),
                 },
             }
-            actions.perform({ dispatch, state: stateMock as any, rootState: { server: { history: { job_totals: { total_filament_used: 100, total_print_time: 3600 } } } } } as any, { id: 'e1', note: 'done' })
-            expect(dispatch).toHaveBeenCalledWith('update', expect.objectContaining({ end_filament: 100, end_printtime: 3600, perform_note: 'done' }))
-            expect(dispatch).toHaveBeenCalledWith('store', expect.objectContaining({
-                entry: expect.objectContaining({ name: 'Test', start_filament: 100, start_printtime: 3600 }),
-            }))
+            actions.perform(
+                {
+                    dispatch,
+                    state: stateMock as any,
+                    rootState: {
+                        server: { history: { job_totals: { total_filament_used: 100, total_print_time: 3600 } } },
+                    },
+                } as any,
+                { id: 'e1', note: 'done' }
+            )
+            expect(dispatch).toHaveBeenCalledWith(
+                'update',
+                expect.objectContaining({ end_filament: 100, end_printtime: 3600, perform_note: 'done' })
+            )
+            expect(dispatch).toHaveBeenCalledWith(
+                'store',
+                expect.objectContaining({
+                    entry: expect.objectContaining({ name: 'Test', start_filament: 100, start_printtime: 3600 }),
+                })
+            )
         })
 
         it('perform does nothing for non-existent entry', () => {
             const dispatch = vi.fn()
-            actions.perform({ dispatch, state: { entries: {} } as any, rootState: {} } as any, { id: 'nonexistent', note: 'done' })
+            actions.perform({ dispatch, state: { entries: {} } as any, rootState: {} } as any, {
+                id: 'nonexistent',
+                note: 'done',
+            })
             expect(dispatch).not.toHaveBeenCalled()
         })
     })
@@ -208,7 +236,11 @@ describe('gui maintenance store', () => {
                 }),
             }
             const rootState = { server: { history: { job_totals: { total_filament_used: 15000 } } } }
-            const result = (getters as any).getOverdueEntries(state, { getEntries: (getters as any).getEntries(state) }, rootState)
+            const result = (getters as any).getOverdueEntries(
+                state,
+                { getEntries: (getters as any).getEntries(state) },
+                rootState
+            )
             expect(result).toHaveLength(1)
             expect(result[0].name).toBe('Filament')
         })
@@ -222,7 +254,11 @@ describe('gui maintenance store', () => {
                 }),
             }
             const rootState = { server: { history: { job_totals: { total_print_time: 10800 } } } }
-            const result = (getters as any).getOverdueEntries(state, { getEntries: (getters as any).getEntries(state) }, rootState)
+            const result = (getters as any).getOverdueEntries(
+                state,
+                { getEntries: (getters as any).getEntries(state) },
+                rootState
+            )
             expect(result).toHaveLength(1)
             expect(result[0].name).toBe('Printtime')
         })
@@ -237,7 +273,11 @@ describe('gui maintenance store', () => {
             }
             // current time is now, so 0 + 1*86400 = 86400 which should be < current time
             const rootState = { server: { history: { job_totals: {} } } }
-            const result = (getters as any).getOverdueEntries(state, { getEntries: (getters as any).getEntries(state) }, rootState)
+            const result = (getters as any).getOverdueEntries(
+                state,
+                { getEntries: (getters as any).getEntries(state) },
+                rootState
+            )
             expect(result).toHaveLength(1)
             expect(result[0].name).toBe('Date')
         })
@@ -253,7 +293,11 @@ describe('gui maintenance store', () => {
                 }),
             }
             const rootState = { server: { history: { job_totals: {} } } }
-            const result = (getters as any).getOverdueEntries(state, { getEntries: (getters as any).getEntries(state) }, rootState)
+            const result = (getters as any).getOverdueEntries(
+                state,
+                { getEntries: (getters as any).getEntries(state) },
+                rootState
+            )
             expect(result).toEqual([])
         })
     })

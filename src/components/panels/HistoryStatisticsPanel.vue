@@ -20,20 +20,19 @@
                     <history-all-print-status-chart v-if="togglePrintStatus === 'chart'" :value-name="toggleValue" />
                     <history-all-print-status-table v-else :value-name="toggleValue" />
                     <div class="text-center mb-3">
- <v-btn-toggle v-model="togglePrintStatus" size="small" mandatory>
- <v-btn size="small" value="chart">{{ $t('History.Chart') }}</v-btn>
- <v-btn size="small" value="table">{{ $t('History.Table') }}</v-btn>
+                        <v-btn-toggle v-model="togglePrintStatus" size="small" mandatory>
+                            <v-btn size="small" value="chart">{{ $t('History.Chart') }}</v-btn>
+                            <v-btn size="small" value="table">{{ $t('History.Table') }}</v-btn>
                         </v-btn-toggle>
                         <v-tooltip v-if="!allLoaded" top>
                             <template #activator="{ props }">
- <v-btn
+                                <v-btn
                                     variant="outlined"
                                     size="small"
                                     :loading="loadings.includes('historyLoadAll')"
                                     class="ml-3 minwidth-0 px-2"
                                     color="primary"
                                     v-bind="props"
-                                    
                                     @click="refreshHistory">
                                     <v-icon size="small">{{ mdiDatabaseArrowDownOutline }}</v-icon>
                                 </v-btn>
@@ -42,8 +41,12 @@
                         </v-tooltip>
                     </div>
                     <div class="text-center mb-3">
- <v-btn-toggle v-model="toggleValue" size="small" mandatory>
- <v-btn v-for="option in toggleValueOptions" :key="option.value" size="small" :value="option.value">
+                        <v-btn-toggle v-model="toggleValue" size="small" mandatory>
+                            <v-btn
+                                v-for="option in toggleValueOptions"
+                                :key="option.value"
+                                size="small"
+                                :value="option.value">
                                 {{ option.text }}
                             </v-btn>
                         </v-btn-toggle>
@@ -52,8 +55,8 @@
                 <v-col class="v-col-12 v-col-sm-12 v-col-md-4">
                     <history-printtime-avg v-if="toggleChart === 'printtime_avg'" />
                     <div class="text-center mt-3">
- <v-btn-toggle v-model="toggleChart" size="small" mandatory>
- <v-btn size="small" value="printtime_avg">{{ $t('History.PrinttimeAvg') }}</v-btn>
+                        <v-btn-toggle v-model="toggleChart" size="small" mandatory>
+                            <v-btn size="small" value="printtime_avg">{{ $t('History.PrinttimeAvg') }}</v-btn>
                         </v-btn-toggle>
                     </div>
                 </v-col>
@@ -98,9 +101,7 @@ const toggleValueOptions = computed<{ text: TranslateResult; value: HistoryStats
 
 const existsSelectedJobs = computed(() => history.selectedJobs.value.length > 0)
 
-const totalPrintTime = computed(() =>
-    store.state.server.history.job_totals?.total_print_time ?? 0
-)
+const totalPrintTime = computed(() => store.state.server.history.job_totals?.total_print_time ?? 0)
 
 const selectedPrintTime = computed(() => {
     let printtime = 0
@@ -110,9 +111,7 @@ const selectedPrintTime = computed(() => {
     return printtime
 })
 
-const longestPrintTime = computed(() =>
-    store.state.server.history.job_totals?.longest_print ?? 0
-)
+const longestPrintTime = computed(() => store.state.server.history.job_totals?.longest_print ?? 0)
 
 const selectedLongestPrintTime = computed(() => {
     let printtime = 0
@@ -134,9 +133,7 @@ const selectedAvgPrintTime = computed(() => {
     return 0
 })
 
-const totalFilamentUsed = computed(() =>
-    store.state.server.history.job_totals?.total_filament_used ?? 0
-)
+const totalFilamentUsed = computed(() => store.state.server.history.job_totals?.total_filament_used ?? 0)
 
 const totalFilamentUsedFormat = computed(() => {
     const value = Math.round(totalFilamentUsed.value / 100) / 10
@@ -156,32 +153,31 @@ const selectedFilamentUsedFormat = computed(() => {
     return `${value} m`
 })
 
-const totalJobsCount = computed(() =>
-    store.state.server.history.job_totals?.total_jobs ?? 0
-)
+const totalJobsCount = computed(() => store.state.server.history.job_totals?.total_jobs ?? 0)
 
 const toggleChart = computed({
     get: () => store.state.gui.view.history.toggleChartCol3,
     set: (newVal: string) => {
         store.dispatch('gui/saveSetting', { name: 'view.history.toggleChartCol3', value: newVal })
-    }
+    },
 })
 
 const togglePrintStatus = computed({
     get: () => store.state.gui.view.history.toggleChartCol2,
     set: (newVal: string) => {
         store.dispatch('gui/saveSetting', { name: 'view.history.toggleChartCol2', value: newVal })
-    }
+    },
 })
 
-const allLoaded = computed(() =>
-    store.state.server.history.all_loaded ?? false
-)
+const allLoaded = computed(() => store.state.server.history.all_loaded ?? false)
 
 const selectedTotals = computed(() => {
     const output: { title: string; value: string }[] = [
         { title: t('History.SelectedPrinttime').toString(), value: formatPrintTime(selectedPrintTime.value, false) },
-        { title: t('History.LongestPrinttime').toString(), value: formatPrintTime(selectedLongestPrintTime.value, false) },
+        {
+            title: t('History.LongestPrinttime').toString(),
+            value: formatPrintTime(selectedLongestPrintTime.value, false),
+        },
         { title: t('History.AvgPrinttime').toString(), value: formatPrintTime(selectedAvgPrintTime.value, false) },
         { title: t('History.SelectedFilamentUsed').toString(), value: selectedFilamentUsedFormat.value },
         { title: t('History.SelectedJobs').toString(), value: history.selectedJobs.value.length.toString() },
@@ -241,9 +237,7 @@ const auxiliaryTotals = computed(() => {
     return output
 })
 
-const totals = computed(() =>
-    existsSelectedJobs.value ? selectedTotals.value : genericTotals.value
-)
+const totals = computed(() => (existsSelectedJobs.value ? selectedTotals.value : genericTotals.value))
 
 function refreshHistory() {
     store.dispatch('socket/addLoading', { name: 'historyLoadAll' })

@@ -51,8 +51,8 @@ const showDialog = ref(false)
 
 const outputName = computed(() => convertName(props.name))
 
-const guiMiscellaneousEntries = computed<{ [key: string]: GuiMiscellaneousStateEntry }>(() =>
-    store.state.gui.miscellaneous.entries ?? {}
+const guiMiscellaneousEntries = computed<{ [key: string]: GuiMiscellaneousStateEntry }>(
+    () => store.state.gui.miscellaneous.entries ?? {}
 )
 
 const guiEntry = computed(() => {
@@ -102,7 +102,7 @@ const isOn = computed(() => {
     const green = data[1] ?? 0
     const blue = data[2] ?? 0
     const white = data[3] ?? 0
-    return (red + green + blue + white) > 0
+    return red + green + blue + white > 0
 })
 
 function toggle() {

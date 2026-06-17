@@ -22,9 +22,7 @@ export function useHistory() {
 
     const selectedJobs = computed<ServerHistoryStateJob[]>(() => {
         const entries = store.state.gui.view.history.selectedJobs ?? []
-        return entries.filter(
-            (entry: HistoryListPanelRow) => entry.type === 'job'
-        ) as ServerHistoryStateJob[]
+        return entries.filter((entry: HistoryListPanelRow) => entry.type === 'job') as ServerHistoryStateJob[]
     })
 
     const moonrakerHistoryFields = computed(() => {

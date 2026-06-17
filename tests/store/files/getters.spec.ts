@@ -43,13 +43,16 @@ describe('files getters', () => {
                 makeFile('.hidden.gcode'),
                 makeFile('not-a-gcode.txt'),
             ]),
-            makeDir('config', [
-                makeDir('.theme', [makeFile('sidebar-logo.svg')]),
-            ]),
+            makeDir('config', [makeDir('.theme', [makeFile('sidebar-logo.svg')])]),
         ],
         upload: {
-            show: false, filename: '', currentNumber: 0, maxNumber: 0,
-            cancelTokenSource: null, percent: 0, speed: 0,
+            show: false,
+            filename: '',
+            currentNumber: 0,
+            maxNumber: 0,
+            cancelTokenSource: null,
+            percent: 0,
+            speed: 0,
         },
     })
 
@@ -114,7 +117,12 @@ describe('files getters', () => {
         it('returns all gcode files in flat mode', () => {
             const state = baseState()
             const getDirectory = (getters as any).getDirectory(state)
-            const result = (getters as any).getGcodeFiles(state, { getDirectory }, rootState, rootGetters)(null, false, true)
+            const result = (getters as any).getGcodeFiles(
+                state,
+                { getDirectory },
+                rootState,
+                rootGetters
+            )(null, false, true)
             expect(result.length).toBeGreaterThanOrEqual(2)
             expect(result.some((f: any) => f.filename === 'test.gcode')).toBe(true)
         })
@@ -122,7 +130,12 @@ describe('files getters', () => {
         it('filters out non-gcode and hidden files', () => {
             const state = baseState()
             const getDirectory = (getters as any).getDirectory(state)
-            const result = (getters as any).getGcodeFiles(state, { getDirectory }, rootState, rootGetters)(null, false, true)
+            const result = (getters as any).getGcodeFiles(
+                state,
+                { getDirectory },
+                rootState,
+                rootGetters
+            )(null, false, true)
             expect(result.some((f: any) => f.filename === 'not-a-gcode.txt')).toBe(false)
             expect(result.some((f: any) => f.filename === '.hidden.gcode')).toBe(false)
         })
@@ -130,7 +143,12 @@ describe('files getters', () => {
         it('includes hidden files when boolShowHiddenFiles is true', () => {
             const state = baseState()
             const getDirectory = (getters as any).getDirectory(state)
-            const result = (getters as any).getGcodeFiles(state, { getDirectory }, rootState, rootGetters)(null, true, true)
+            const result = (getters as any).getGcodeFiles(
+                state,
+                { getDirectory },
+                rootState,
+                rootGetters
+            )(null, true, true)
             expect(result.some((f: any) => f.filename === '.hidden.gcode')).toBe(true)
         })
     })
@@ -143,7 +161,12 @@ describe('files getters', () => {
         it('returns URL for matching theme file', () => {
             const state = baseState()
             const getDirectory = (getters as any).getDirectory(state)
-            const result = (getters as any).getThemeFileUrl(state, { getDirectory }, rootState, rootGetters)('sidebar-logo', ['svg'])
+            const result = (getters as any).getThemeFileUrl(
+                state,
+                { getDirectory },
+                rootState,
+                rootGetters
+            )('sidebar-logo', ['svg'])
             expect(result).toContain('sidebar-logo.svg')
             expect(result).toContain('/server/files/config/')
         })
@@ -151,7 +174,12 @@ describe('files getters', () => {
         it('returns null for non-existent theme file', () => {
             const state = baseState()
             const getDirectory = (getters as any).getDirectory(state)
-            const result = (getters as any).getThemeFileUrl(state, { getDirectory }, rootState, rootGetters)('nonexistent', ['svg'])
+            const result = (getters as any).getThemeFileUrl(
+                state,
+                { getDirectory },
+                rootState,
+                rootGetters
+            )('nonexistent', ['svg'])
             expect(result).toBeNull()
         })
     })

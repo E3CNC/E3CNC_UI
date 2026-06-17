@@ -6,9 +6,7 @@ export function useControl() {
     const store = useStore()
     const socket = useSocket()
 
-    const absolute_coordinates = computed(
-        () => store.state.printer?.gcode_move?.absolute_coordinates ?? true
-    )
+    const absolute_coordinates = computed(() => store.state.printer?.gcode_move?.absolute_coordinates ?? true)
 
     const enableXYHoming = computed(() => store.state.gui.control.enableXYHoming)
 
@@ -20,9 +18,7 @@ export function useControl() {
 
     const existsDeltaCalibrate = computed(() => store.getters['printer/existsDeltaCalibrate'])
 
-    const existsFirmwareRetraction = computed(
-        () => store.getters['printer/existsFirmwareRetraction']
-    )
+    const existsFirmwareRetraction = computed(() => store.getters['printer/existsFirmwareRetraction'])
 
     const colorQuadGantryLevel = computed(() => {
         const status = store.state.printer.quad_gantry_level?.applied ?? true

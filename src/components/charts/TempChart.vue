@@ -351,11 +351,7 @@ watch(source, (newVal: PrinterTempHistoryStateSourceEntry[]) => {
     })
 
     if (newVal.length > 0 && newSource.length < maxHistory.value * 0.8) {
-        socket.emit(
-            'server.temperature_store',
-            { include_monitors: true },
-            { action: 'printer/tempHistory/init' }
-        )
+        socket.emit('server.temperature_store', { include_monitors: true }, { action: 'printer/tempHistory/init' })
     }
 })
 </script>

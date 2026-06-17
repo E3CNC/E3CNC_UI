@@ -67,15 +67,27 @@ describe('files actions', () => {
         actions.initRootDirs({ state: stateMock, commit } as any, ['gcodes', 'config'])
         expect(commit).toHaveBeenCalledWith('createRootDir', { name: 'gcodes', permissions: 'r' })
         expect(commit).toHaveBeenCalledWith('createRootDir', { name: 'config', permissions: 'r' })
-        expect(mockSocket.emit).toHaveBeenCalledWith('server.files.get_directory', { path: 'gcodes' }, { action: 'files/getDirectory' })
-        expect(mockSocket.emit).toHaveBeenCalledWith('server.files.get_directory', { path: 'config' }, { action: 'files/getDirectory' })
+        expect(mockSocket.emit).toHaveBeenCalledWith(
+            'server.files.get_directory',
+            { path: 'gcodes' },
+            { action: 'files/getDirectory' }
+        )
+        expect(mockSocket.emit).toHaveBeenCalledWith(
+            'server.files.get_directory',
+            { path: 'config' },
+            { action: 'files/getDirectory' }
+        )
     })
 
     it('scanMetadata emits metascan for gcodes', () => {
         const commit = vi.fn()
         actions.scanMetadata({ commit } as any, { filename: 'gcodes/test.gcode' })
         expect(commit).toHaveBeenCalledWith('setMetadataRequested', { filename: 'test.gcode' })
-        expect(mockSocket.emit).toHaveBeenCalledWith('server.files.metascan', { filename: 'test.gcode' }, { action: 'files/getScanMetadata' })
+        expect(mockSocket.emit).toHaveBeenCalledWith(
+            'server.files.metascan',
+            { filename: 'test.gcode' },
+            { action: 'files/getScanMetadata' }
+        )
     })
 
     it('getScanMetadata dispatches getMetadata and shows toast', () => {
@@ -98,7 +110,11 @@ describe('files actions', () => {
         const rootState = { printer: { print_stats: { filename: 'gcodes/test.gcode' } } }
         actions.getMetadata({ commit, rootState } as any, { filename: 'gcodes/test.gcode', size: 100 })
         expect(commit).toHaveBeenCalledWith('printer/clearCurrentFile', null, { root: true })
-        expect(commit).toHaveBeenCalledWith('printer/setData', { current_file: { filename: 'gcodes/test.gcode', size: 100 } }, { root: true })
+        expect(commit).toHaveBeenCalledWith(
+            'printer/setData',
+            { current_file: { filename: 'gcodes/test.gcode', size: 100 } },
+            { root: true }
+        )
         expect(commit).toHaveBeenCalledWith('setMetadata', { filename: 'gcodes/test.gcode', size: 100 })
     })
 
@@ -106,7 +122,11 @@ describe('files actions', () => {
         const commit = vi.fn()
         actions.getMetadataCurrentFile({ commit } as any, { filename: 'test.gcode' })
         expect(commit).toHaveBeenCalledWith('printer/clearCurrentFile', null, { root: true })
-        expect(commit).toHaveBeenCalledWith('printer/setData', { current_file: { filename: 'test.gcode' } }, { root: true })
+        expect(commit).toHaveBeenCalledWith(
+            'printer/setData',
+            { current_file: { filename: 'test.gcode' } },
+            { root: true }
+        )
     })
 
     it('getMove shows error toast on error', () => {
@@ -166,7 +186,11 @@ describe('files actions', () => {
         })
         expect(mockToast.success).toHaveBeenCalled()
         await vi.advanceTimersByTimeAsync(500)
-        expect(mockSocket.emit).toHaveBeenCalledWith('server.files.get_directory', { path: 'logs' }, { action: 'files/getDirectory' })
+        expect(mockSocket.emit).toHaveBeenCalledWith(
+            'server.files.get_directory',
+            { path: 'logs' },
+            { action: 'files/getDirectory' }
+        )
         vi.useRealTimers()
     })
 })

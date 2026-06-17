@@ -8,9 +8,7 @@ export type ResponsiveElement = {
     }
 }
 
-export function useResponsive(
-    breakpoints?: { [key: string]: (el: DOMRect) => boolean }
-) {
+export function useResponsive(breakpoints?: { [key: string]: (el: DOMRect) => boolean }) {
     const base = useBase()
 
     const targetRef = ref<HTMLElement | null>(null)

@@ -24,7 +24,7 @@
             </template>
             <template v-if="hasSpinner" #append-outer>
                 <div class="_spin_button_group">
- <v-btn
+                    <v-btn
                         :disabled="(value >= max && max !== null) || error || disabled"
                         class="mt-n3"
                         icon
@@ -33,7 +33,7 @@
                         @click="incrementValue">
                         <v-icon>{{ mdiChevronUp }}</v-icon>
                     </v-btn>
- <v-btn
+                    <v-btn
                         :disabled="value <= min || error || disabled"
                         class="mb-n3"
                         icon
@@ -82,9 +82,12 @@ const value = ref(props.target.toString())
 const error = ref(false)
 const invalidChars = ['e', 'E', '+']
 
-watch(() => props.target, () => {
-    value.value = props.target.toString()
-})
+watch(
+    () => props.target,
+    () => {
+        value.value = props.target.toString()
+    }
+)
 
 function incrementValue(): void {
     if (inputValue.value + (props.step ?? 1) * (props.spinnerFactor ?? 1) < props.max! || props.max === null) {

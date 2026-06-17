@@ -1,15 +1,22 @@
 <template>
-    <v-dialog :model-value="showDialog" persistent :max-width="800" :fullscreen="isMobile" @update:model-value="emitValue">
+    <v-dialog
+        :model-value="showDialog"
+        persistent
+        :max-width="800"
+        :fullscreen="isMobile"
+        @update:model-value="emitValue">
         <panel
             :title="$t('Machine.UpdatePanel.Commits')"
             :icon="mdiUpdate"
             :margin-bottom="false"
             card-class="machine-update-commits-dialog">
             <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="closeDialog"/>
+                <v-btn :icon="mdiCloseThick" rounded="0" @click="closeDialog" />
             </template>
             <v-card-text class="py-0 px-0">
-                <OverlayScrollbarsComponent :style="overlayScrollbarsStyle" :options="{ overflowBehavior: { x: 'hidden' } }">
+                <OverlayScrollbarsComponent
+                    :style="overlayScrollbarsStyle"
+                    :options="{ overflowBehavior: { x: 'hidden' } }">
                     <v-timeline :class="timelineClassName" align-top density="compact" style="min-height: 100%">
                         <git-commits-list-day
                             v-for="group of groupedCommits"
@@ -25,7 +32,7 @@
                                     <v-alert density="compact" variant="text" color="info">
                                         <p>{{ $t('Machine.UpdatePanel.MoreCommitsInfo') }}</p>
                                         <div class="text-center mb-3">
- <v-btn :href="linkToGithub" target="_blank">
+                                            <v-btn :href="linkToGithub" target="_blank">
                                                 {{ $t('Machine.UpdatePanel.LinkToGithub') }}
                                             </v-btn>
                                         </div>
@@ -70,9 +77,7 @@ function emitValue(val: boolean) {
 
 const showDialog = computed(() => props['model-value'])
 
-const commitsBehind = computed<ServerUpdateManagerStateGitRepoCommit[]>(() =>
-    props.repo?.commits_behind ?? []
-)
+const commitsBehind = computed<ServerUpdateManagerStateGitRepoCommit[]>(() => props.repo?.commits_behind ?? [])
 
 const groupedCommits = computed(() => {
     const output: ServerUpdateManagerStateGitRepoGroupedCommits[] = []
@@ -100,8 +105,9 @@ const displayFullHistoryWaring = computed(() => commitsBehind.value.length >= 30
 
 const lastCommit = computed(() => commitsBehind.value.slice(-1)[0])
 
-const linkToGithub = computed(() =>
-    `https://github.com/${props.repo?.owner}/${props.repo?.repo_name}/commits/${props.repo?.branch}/?after=${lastCommit.value?.sha}+0`
+const linkToGithub = computed(
+    () =>
+        `https://github.com/${props.repo?.owner}/${props.repo?.repo_name}/commits/${props.repo?.branch}/?after=${lastCommit.value?.sha}+0`
 )
 
 const overlayScrollbarsStyle = computed(() => {

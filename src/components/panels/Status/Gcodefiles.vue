@@ -42,11 +42,7 @@ const gcodeFiles = computed(() => {
         gcodes = gcodes.filter((file: FileStateGcodefile) => {
             if (filesFilter.value.includes('new') && file.last_status === null) return true
             if (filesFilter.value.includes('completed') && file.last_status === 'completed') return true
-            if (
-                filesFilter.value.includes('failed') &&
-                file.last_status !== null &&
-                file.last_status !== 'completed'
-            )
+            if (filesFilter.value.includes('failed') && file.last_status !== null && file.last_status !== 'completed')
                 return true
             return false
         })
@@ -58,9 +54,7 @@ const gcodeFiles = computed(() => {
         })
         .slice(0, filesLimit.value)
 
-    const requestItems = gcodes.filter(
-        (file: FileStateGcodefile) => !file.metadataRequested && !file.metadataPulled
-    )
+    const requestItems = gcodes.filter((file: FileStateGcodefile) => !file.metadataRequested && !file.metadataPulled)
     store.dispatch(
         'files/requestMetadata',
         requestItems.map((file: FileStateGcodefile) => ({

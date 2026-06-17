@@ -20,7 +20,15 @@
                     :title="$t('Settings.EditorTab.TabSize')"
                     :sub-title="$t('Settings.EditorTab.TabSizeDescription')"
                     :dynamic-slot-width="true">
-                    <v-select v-model="tabSize" :items="tabSizes" item-title="text" item-value="value" hide-details variant="outlined" density="compact" attached />
+                    <v-select
+                        v-model="tabSize"
+                        :items="tabSizes"
+                        item-title="text"
+                        item-value="value"
+                        hide-details
+                        variant="outlined"
+                        density="compact"
+                        attached />
                 </settings-row>
                 <v-divider class="my-2" />
                 <settings-row

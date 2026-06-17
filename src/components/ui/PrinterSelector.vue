@@ -15,8 +15,7 @@
                 link
                 :title="getPrinterName(printer._namespace)"
                 :subtitle="getPrinterDescription(printer)"
-                @click="changePrinter(printer)">
-            </v-list-item>
+                @click="changePrinter(printer)"></v-list-item>
         </v-list>
     </v-menu>
 </template>

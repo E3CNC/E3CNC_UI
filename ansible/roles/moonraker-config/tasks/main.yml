@@ -1,31 +1,31 @@
 ---
 - name: Ensure [cnc_agent] section header in moonraker.conf
   ansible.builtin.lineinfile:
-    path: "{{ moonraker_conf }}"
+    path: '{{ moonraker_conf }}'
     line: '[cnc_agent]'
     insertbefore: EOF
     create: true
 
 - name: Ensure extractor_path in [cnc_metadata] section
   community.general.ini_file:
-    path: "{{ moonraker_conf }}"
+    path: '{{ moonraker_conf }}'
     section: cnc_metadata
     option: extractor_path
-    value: "{{ printer_data.scripts_dir }}/cnc_metadata_extractor.py"
-    value_delimiter: ": "
+    value: '{{ printer_data.scripts_dir }}/cnc_metadata_extractor.py'
+    value_delimiter: ': '
 
 - name: Ensure timeout in [cnc_metadata] section
   community.general.ini_file:
-    path: "{{ moonraker_conf }}"
+    path: '{{ moonraker_conf }}'
     section: cnc_metadata
     option: timeout
-    value: "30.0"
-    value_delimiter: ": "
+    value: '30.0'
+    value_delimiter: ': '
 
 - name: Ensure [update_manager mainsail-cnc] section in moonraker.conf
   ansible.builtin.blockinfile:
-    path: "{{ moonraker_conf }}"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK - update_manager mainsail-cnc"
+    path: '{{ moonraker_conf }}'
+    marker: '# {mark} ANSIBLE MANAGED BLOCK - update_manager mainsail-cnc'
     insertafter: EOF
     create: true
     block: |-

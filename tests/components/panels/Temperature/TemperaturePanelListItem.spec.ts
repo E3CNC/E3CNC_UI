@@ -39,7 +39,16 @@ vi.mock('@/components/inputs/TemperatureInput.vue', () => ({
 vi.mock('@/components/panels/Temperature/TemperaturePanelListItemEdit.vue', () => ({
     default: {
         name: 'TemperaturePanelListItemEdit',
-        props: ['modelValue', 'showDialog', 'objectName', 'name', 'formatName', 'additionalSensorName', 'icon', 'color'],
+        props: [
+            'modelValue',
+            'showDialog',
+            'objectName',
+            'name',
+            'formatName',
+            'additionalSensorName',
+            'icon',
+            'color',
+        ],
         template: '<div class="mock-edit-dialog" />',
     },
 }))

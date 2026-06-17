@@ -4,14 +4,14 @@ This directory contains CNC-focused dashboard panels for the Mainsail fork.
 
 ## Audit (June 2026)
 
-| Panel | Data source | Status |
-| --- | --- | --- |
-| `CncStatusPanel.vue` | native Mainsail store (`printer.print_stats`, `printer.gcode_move`, `printer.toolhead`, `printer.system_stats`) | wired, renders |
-| `JogPanel.vue` | native store + `ControlMixin.doSend` | wired, renders |
-| `Wcs.vue` | interactive WCS preview plus work-zero actions, manual offsets, click-to-move, hover tooltips, and grid-size selector | wired, renders |
-| `SpindleCoolantPanel.vue` | `doSend` (`M3`/`M4`/`M5`/`M7`/`M8`/`M9`) | wired, renders |
-| `MdiPanel.vue` | `ConsoleTextarea` + quick commands for G20/G21/G90/G91 and WCS shortcuts | wired, renders |
-| `DroPanel.vue` | `printer.motion_report`, `printer.gcode_move`, `printer.toolhead` | wired, renders |
+| Panel                     | Data source                                                                                                           | Status         |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------- | -------------- |
+| `CncStatusPanel.vue`      | native Mainsail store (`printer.print_stats`, `printer.gcode_move`, `printer.toolhead`, `printer.system_stats`)       | wired, renders |
+| `JogPanel.vue`            | native store + `ControlMixin.doSend`                                                                                  | wired, renders |
+| `Wcs.vue`                 | interactive WCS preview plus work-zero actions, manual offsets, click-to-move, hover tooltips, and grid-size selector | wired, renders |
+| `SpindleCoolantPanel.vue` | `doSend` (`M3`/`M4`/`M5`/`M7`/`M8`/`M9`)                                                                              | wired, renders |
+| `MdiPanel.vue`            | `ConsoleTextarea` + quick commands for G20/G21/G90/G91 and WCS shortcuts                                              | wired, renders |
+| `DroPanel.vue`            | `printer.motion_report`, `printer.gcode_move`, `printer.toolhead`                                                     | wired, renders |
 
 ## Integration points
 

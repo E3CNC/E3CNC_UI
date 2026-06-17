@@ -9,9 +9,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: T
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: T) { this._value = val }
-        get value() { return this._value }
-        set value(v: T) { this._value = v }
+        constructor(val: T) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v: T) {
+            this._value = v
+        }
     }
     return {
         printerIsPrinting: new MockRef(false),
@@ -30,7 +36,11 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
 
 vi.mock('vuetify/components', () => vuetifyComponentsMock)
 
-function makeJob(job_id: string, filename: string, overrides: Partial<ServerJobQueueStateJob> = {}): ServerJobQueueStateJob {
+function makeJob(
+    job_id: string,
+    filename: string,
+    overrides: Partial<ServerJobQueueStateJob> = {}
+): ServerJobQueueStateJob {
     return {
         job_id,
         filename,
@@ -74,7 +84,10 @@ function createTestStore(overrides: Record<string, any> = {}) {
                 current_file: null,
             },
             gui: {
-                dashboard: { nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] }, floatingPanels: {} },
+                dashboard: {
+                    nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] },
+                    floatingPanels: {},
+                },
                 general: { printername: 'Test' },
                 control: {},
                 uiSettings: {},
@@ -134,9 +147,7 @@ describe('JobqueueEntrySum.vue', () => {
 
     it('computes filament output with only length', () => {
         const store = createTestStore()
-        const jobs = [
-            makeJobWithMetadata('1', 'test1.gcode', { filament_total: 500, filament_weight_total: 0 }),
-        ]
+        const jobs = [makeJobWithMetadata('1', 'test1.gcode', { filament_total: 500, filament_weight_total: 0 })]
         const wrapper = mount(JobqueueEntrySum, {
             props: { jobs },
             global: {

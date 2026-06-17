@@ -8,9 +8,15 @@ const mockGcodeFilesValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         currentPath: new MockRef(''),
@@ -40,7 +46,11 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VRow: { name: 'VRow', template: '<div><slot /></div>' },
     VCol: { name: 'VCol', props: ['cols', 'class'], template: '<div :class="$attrs.class"><slot /></div>' },
     VSpacer: { name: 'VSpacer', template: '<div class="v-spacer" />' },
-    VTooltip: { name: 'VTooltip', props: ['location', 'disabled'], template: '<div><slot name="activator" :props="{}" /><slot /></div>' },
+    VTooltip: {
+        name: 'VTooltip',
+        props: ['location', 'disabled'],
+        template: '<div><slot name="activator" :props="{}" /><slot /></div>',
+    },
 }))
 
 vi.mock('vuetify/components', () => vuetifyComponentsMock)

@@ -9,12 +9,7 @@
         <template #activator="{ props }">
             <vue-load-image>
                 <template #image>
-                    <img
-                        :src="smallThumbnailUrl"
-                        width="32"
-                        height="32"
-                        :alt="item.filename"
-                        v-bind="props" />
+                    <img :src="smallThumbnailUrl" width="32" height="32" :alt="item.filename" v-bind="props" />
                 </template>
                 <template #preloader>
                     <v-progress-circular indeterminate color="primary" />
@@ -46,8 +41,8 @@ const props = defineProps<{
 const store = useStore()
 const { apiUrl } = useBase()
 
-const bigThumbnailBackground = computed(() =>
-    store.state.gui.uiSettings.bigThumbnailBackground ?? defaultBigThumbnailBackground
+const bigThumbnailBackground = computed(
+    () => store.state.gui.uiSettings.bigThumbnailBackground ?? defaultBigThumbnailBackground
 )
 
 const bigThumbnailTooltipColor = computed(() => {
@@ -83,9 +78,7 @@ const smallThumbnailUrl = computed(() => {
     return buildUrl(smallThumbnail.value.relative_path)
 })
 
-const bigThumbnail = computed(() =>
-    thumbnails.value.find((thumbnail) => thumbnail.width >= thumbnailBigMin)
-)
+const bigThumbnail = computed(() => thumbnails.value.find((thumbnail) => thumbnail.width >= thumbnailBigMin))
 
 const bigThumbnailUrl = computed(() => {
     if (bigThumbnail.value === undefined || !('relative_path' in bigThumbnail.value)) return null

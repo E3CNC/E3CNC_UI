@@ -8,7 +8,14 @@
         </v-col>
     </v-row>
     <v-row v-else>
-        <v-alert density="compact" variant="text" color="warning" elevation="2" class="mx-auto mt-6" max-width="500" :icon="mdiLockOutline">
+        <v-alert
+            density="compact"
+            variant="text"
+            color="warning"
+            elevation="2"
+            class="mx-auto mt-6"
+            max-width="500"
+            :icon="mdiLockOutline">
             {{ $t('Files.GcodesRootDirectoryDoesntExists') }}
         </v-alert>
     </v-row>

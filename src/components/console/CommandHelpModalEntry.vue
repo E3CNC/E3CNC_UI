@@ -29,7 +29,6 @@ const commandObject = computed(() => commands.value[props.command] ?? {})
 
 const description = computed<string | null>(() => commandObject.value.help ?? null)
 
-
 function onCommand() {
     emit('click-on-command', props.command)
 }

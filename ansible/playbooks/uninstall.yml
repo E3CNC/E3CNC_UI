@@ -7,60 +7,60 @@
   tasks:
     - name: Remove vendored cnc_agent component
       ansible.builtin.file:
-        path: "{{ agent.vender_dir }}/cnc_agent"
+        path: '{{ agent.vender_dir }}/cnc_agent'
         state: absent
 
     - name: Remove vendored cnc_metadata component
       ansible.builtin.file:
-        path: "{{ agent.vender_dir }}/cnc_metadata"
+        path: '{{ agent.vender_dir }}/cnc_metadata'
         state: absent
 
     - name: Remove cnc_metadata_extractor.py
       ansible.builtin.file:
-        path: "{{ printer_data.scripts_dir }}/cnc_metadata_extractor.py"
+        path: '{{ printer_data.scripts_dir }}/cnc_metadata_extractor.py'
         state: absent
 
     - name: Remove [cnc_agent] section header from moonraker.conf
       ansible.builtin.lineinfile:
-        path: "{{ moonraker_conf }}"
+        path: '{{ moonraker_conf }}'
         line: '[cnc_agent]'
         state: absent
 
     - name: Remove extractor_path from [cnc_metadata] section
       community.general.ini_file:
-        path: "{{ moonraker_conf }}"
+        path: '{{ moonraker_conf }}'
         section: cnc_metadata
         option: extractor_path
         state: absent
-        value_delimiter: ": "
+        value_delimiter: ': '
 
     - name: Remove timeout from [cnc_metadata] section
       community.general.ini_file:
-        path: "{{ moonraker_conf }}"
+        path: '{{ moonraker_conf }}'
         section: cnc_metadata
         option: timeout
         state: absent
-        value_delimiter: ": "
+        value_delimiter: ': '
 
     - name: Remove [update_manager mainsail-cnc] block from moonraker.conf
       ansible.builtin.blockinfile:
-        path: "{{ moonraker_conf }}"
-        marker: "# {mark} ANSIBLE MANAGED BLOCK - update_manager mainsail-cnc"
+        path: '{{ moonraker_conf }}'
+        marker: '# {mark} ANSIBLE MANAGED BLOCK - update_manager mainsail-cnc'
         state: absent
 
     - name: Remove work_coordinate_systems.py from klippy/extras/
       ansible.builtin.file:
-        path: "{{ klipper.extras_dir }}/work_coordinate_systems.py"
+        path: '{{ klipper.extras_dir }}/work_coordinate_systems.py'
         state: absent
 
     - name: Remove wcs_macros.cfg from printer_data/config/macros/
       ansible.builtin.file:
-        path: "{{ printer_data.macros_dir }}/wcs_macros.cfg"
+        path: '{{ printer_data.macros_dir }}/wcs_macros.cfg'
         state: absent
 
     - name: Remove macros directory if empty
       ansible.builtin.file:
-        path: "{{ printer_data.macros_dir }}"
+        path: '{{ printer_data.macros_dir }}'
         state: absent
       ignore_errors: true
 

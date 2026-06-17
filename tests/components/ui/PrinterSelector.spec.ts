@@ -24,7 +24,8 @@ vi.mock('vuetify/components', () => ({
     VListItem: {
         name: 'VListItem',
         props: { link: Boolean, disabled: Boolean, title: String, subtitle: String, lines: String },
-        template: '<div class="v-list-item" :class="{ disabled }" :data-title="title" :data-subtitle="subtitle"><slot name="title" /><slot name="subtitle" /><slot name="append" /></div>',
+        template:
+            '<div class="v-list-item" :class="{ disabled }" :data-title="title" :data-subtitle="subtitle"><slot name="title" /><slot name="subtitle" /><slot name="append" /></div>',
     },
     VListItemTitle: {
         name: 'VListItemTitle',
@@ -64,10 +65,8 @@ function createStoreWithPrinters(printers: any[] = []) {
     }
 
     printers.forEach((p) => {
-        getters[`farm/${p._namespace}/getPrinterName`] = () =>
-            p._namespace === 'machine1' ? 'Machine 1' : 'Machine 2'
-        getters[`farm/${p._namespace}/getStatus`] = () =>
-            p.socket.isConnected ? 'Connected' : 'Disconnected'
+        getters[`farm/${p._namespace}/getPrinterName`] = () => (p._namespace === 'machine1' ? 'Machine 1' : 'Machine 2')
+        getters[`farm/${p._namespace}/getStatus`] = () => (p.socket.isConnected ? 'Connected' : 'Disconnected')
     })
 
     return createStore({
@@ -136,10 +135,7 @@ describe('PrinterSelector.vue', () => {
     })
 
     it('renders printer list items when printers exist', () => {
-        store = createStoreWithPrinters([
-            createPrinter('machine1', true),
-            createPrinter('machine2', false),
-        ])
+        store = createStoreWithPrinters([createPrinter('machine1', true), createPrinter('machine2', false)])
         const wrapper = mount(PrinterSelector, {
             global: { plugins: [store] },
         })
@@ -159,9 +155,7 @@ describe('PrinterSelector.vue', () => {
     })
 
     it('shows printer name and subtitle for each printer', () => {
-        store = createStoreWithPrinters([
-            createPrinter('machine1', true),
-        ])
+        store = createStoreWithPrinters([createPrinter('machine1', true)])
         const wrapper = mount(PrinterSelector, {
             global: { plugins: [store] },
         })
@@ -172,10 +166,7 @@ describe('PrinterSelector.vue', () => {
     })
 
     it('disables disconnected printers', () => {
-        store = createStoreWithPrinters([
-            createPrinter('machine1', true),
-            createPrinter('machine2', false),
-        ])
+        store = createStoreWithPrinters([createPrinter('machine1', true), createPrinter('machine2', false)])
         const wrapper = mount(PrinterSelector, {
             global: { plugins: [store] },
         })
@@ -189,9 +180,7 @@ describe('PrinterSelector.vue', () => {
 
     it('dispatches changePrinter when clicking a connected printer', async () => {
         const dispatchMock = vi.fn()
-        store = createStoreWithPrinters([
-            createPrinter('machine1', true),
-        ])
+        store = createStoreWithPrinters([createPrinter('machine1', true)])
         store.dispatch = dispatchMock
 
         const wrapper = mount(PrinterSelector, {
@@ -208,9 +197,7 @@ describe('PrinterSelector.vue', () => {
 
     it('does not dispatch changePrinter when clicking a disconnected printer', async () => {
         const dispatchMock = vi.fn()
-        store = createStoreWithPrinters([
-            createPrinter('machine2', false),
-        ])
+        store = createStoreWithPrinters([createPrinter('machine2', false)])
         store.dispatch = dispatchMock
 
         const wrapper = mount(PrinterSelector, {
@@ -225,10 +212,7 @@ describe('PrinterSelector.vue', () => {
 
     it('dispatches changePrinter only for the clicked printer', async () => {
         const dispatchMock = vi.fn()
-        store = createStoreWithPrinters([
-            createPrinter('machine1', true),
-            createPrinter('machine2', true),
-        ])
+        store = createStoreWithPrinters([createPrinter('machine1', true), createPrinter('machine2', true)])
         store.dispatch = dispatchMock
 
         const wrapper = mount(PrinterSelector, {

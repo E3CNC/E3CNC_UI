@@ -7,9 +7,9 @@
   pre_tasks:
     - name: Clone or update monorepo on the target
       ansible.builtin.git:
-        repo: "{{ repo.url }}"
-        dest: "{{ repo.dest }}"
-        version: "{{ repo.branch }}"
+        repo: '{{ repo.url }}'
+        dest: '{{ repo.dest }}'
+        version: '{{ repo.branch }}'
         force: true
       register: repo_clone
   roles:
@@ -36,7 +36,7 @@
 
     - name: Wait for moonraker API to respond
       ansible.builtin.uri:
-        url: "http://127.0.0.1:7125/printer/info"
+        url: 'http://127.0.0.1:7125/printer/info'
         method: GET
       register: moonraker_api
       retries: 30

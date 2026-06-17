@@ -89,11 +89,11 @@
         </v-card-text>
         <v-card-actions>
             <v-spacer />
- <v-btn variant="text" @click="close">{{ $t('Buttons.Cancel') }}</v-btn>
- <v-btn v-if="presetId !== null" variant="text" color="primary" @click="updatePreset">
+            <v-btn variant="text" @click="close">{{ $t('Buttons.Cancel') }}</v-btn>
+            <v-btn v-if="presetId !== null" variant="text" color="primary" @click="updatePreset">
                 {{ $t('Settings.Update') }}
             </v-btn>
- <v-btn v-else variant="text" color="primary" @click="storePreset">{{ $t('Settings.Store') }}</v-btn>
+            <v-btn v-else variant="text" color="primary" @click="storePreset">{{ $t('Settings.Store') }}</v-btn>
         </v-card-actions>
     </div>
 </template>
@@ -217,10 +217,7 @@ const colorPickerOptions = computed(() => {
     const layout: ColorPickerProps['layout'] = []
 
     if (existRed.value && existGreen.value && existBlue.value) {
-        options.layout = [
-            { component: iro.ui.Wheel },
-            { component: iro.ui.Slider, options: { sliderType: 'value' } },
-        ]
+        options.layout = [{ component: iro.ui.Wheel }, { component: iro.ui.Slider, options: { sliderType: 'value' } }]
         return options
     }
 
@@ -242,9 +239,7 @@ const colorPickerWhiteOptions = computed(() => {
     const options: ColorPickerProps = {
         width: 200,
         margin: 15,
-        layout: [
-            { component: iro.ui.Slider, options: { sliderType: 'alpha' } },
-        ],
+        layout: [{ component: iro.ui.Slider, options: { sliderType: 'alpha' } }],
     }
     return options
 })
@@ -297,13 +292,17 @@ function colorChanged(color: ColorData) {
     white.value = color.white
 }
 
-watch(preset, (newPreset) => {
-    presetname.value = newPreset?.name ?? ''
-    red.value = newPreset?.red ?? null
-    green.value = newPreset?.green ?? null
-    blue.value = newPreset?.blue ?? null
-    white.value = newPreset?.white ?? null
-}, { immediate: true })
+watch(
+    preset,
+    (newPreset) => {
+        presetname.value = newPreset?.name ?? ''
+        red.value = newPreset?.red ?? null
+        green.value = newPreset?.green ?? null
+        blue.value = newPreset?.blue ?? null
+        white.value = newPreset?.white ?? null
+    },
+    { immediate: true }
+)
 
 function close() {
     emit('close')
@@ -342,9 +341,8 @@ function updatePreset() {
 
 function existsPresetName(name: string) {
     return (
-        presets.value.findIndex(
-            (p: GuiMiscellaneousStateEntryPreset) => p.name === name && p.id !== props.presetId
-        ) >= 0
+        presets.value.findIndex((p: GuiMiscellaneousStateEntryPreset) => p.name === name && p.id !== props.presetId) >=
+        0
     )
 }
 </script>

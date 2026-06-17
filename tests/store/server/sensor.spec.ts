@@ -73,7 +73,9 @@ describe('server sensor store', () => {
         it('getSensors commits sensors and removes init module', () => {
             const commit = vi.fn()
             const dispatch = vi.fn()
-            const payload = { sensors: { temp1: { friendly_name: 'temp1', id: 't1', type: 'temperature', values: {} } } }
+            const payload = {
+                sensors: { temp1: { friendly_name: 'temp1', id: 't1', type: 'temperature', values: {} } },
+            }
             actions.getSensors({ commit, dispatch } as any, payload)
             expect(commit).toHaveBeenCalledWith('setSensors', payload.sensors)
             expect(dispatch).toHaveBeenCalledWith('socket/removeInitModule', 'server/sensor/init', { root: true })

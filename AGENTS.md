@@ -7,6 +7,7 @@ This file documents the current state and capabilities of AI agents used in this
 **Branch**: `vue3-migration` (parallel to `develop`)
 
 ### Complete
+
 - Phase 1: All deps upgraded (Vue 3.5, Vuetify 3, vue-router 4, vue-i18n 11, vuex 4, Pinia 2, TS 5.7)
 - Phase 2: Global infra (`createApp`, `@vue/compat` MODE 2, Vuetify 3, mitt, WebSocket composable, directives, router v4, i18n v11, Vuex 4)
 - Phase 3: Router v4, i18n v11, Vuex 4 in place
@@ -40,10 +41,12 @@ This file documents the current state and capabilities of AI agents used in this
 - `@vue/compat` fully removed — app now runs on pure Vue 3.5 + Vuetify 3
 
 ### Pending
+
 - Visual QA of Vuetify 3 component changes (list-item slots, tabs/window, etc.)
 - `/viewer` route verification (gcode viewer — large dependency, deferred)
 
 ### Key Commits
+
 ```text
 6c4ebe2c fix: eliminate remaining overlay-scrollbars and activator warnings
 eebb3c50 fix: resolve runtime errors across all routes
@@ -72,20 +75,20 @@ d5e768fc phase2: global infrastructure for Vue 3
 Replaced the bash-based `install_to_moonraker.sh` / `uninstall.sh` / `deploy.sh`
 with Ansible playbooks for idempotent deployment.
 
-| Phase | What | Status |
-|-------|------|--------|
-| 1 | `ansible/` skeleton (cfg, inventory, vars) | ✅ |
-| 2–7 | 6 roles: agent, extractor, moonraker-config, klipper-extras, macros, frontend | ✅ |
-| 8–10 | Playbooks: `install.yml`, `deploy.yml`, `uninstall.yml` | ✅ |
-| 11 | `--check` mode on all command tasks | ✅ |
-| 12 | INSTALLATION.md updated | ✅ |
-| 14 | Bash scripts deprecated in docs (kept for legacy) | ✅ |
+| Phase | What                                                                          | Status |
+| ----- | ----------------------------------------------------------------------------- | ------ |
+| 1     | `ansible/` skeleton (cfg, inventory, vars)                                    | ✅     |
+| 2–7   | 6 roles: agent, extractor, moonraker-config, klipper-extras, macros, frontend | ✅     |
+| 8–10  | Playbooks: `install.yml`, `deploy.yml`, `uninstall.yml`                       | ✅     |
+| 11    | `--check` mode on all command tasks                                           | ✅     |
+| 12    | INSTALLATION.md updated                                                       | ✅     |
+| 14    | Bash scripts deprecated in docs (kept for legacy)                             | ✅     |
 
 Plus fixes discovered during rollout:
 
 - **Nightly CI releases**: `.github/workflows/build-frontend.yml` builds on every
   push to `develop` and publishes `mainsail-cnc-<version>.zip` (semver) as a `nightly` GitHub release.
-  Low-RAM devices (CB1) download the pre-built zip instead of running `vite build`.
+  Low-RAM devices (32-bit ARM) download the pre-built zip instead of running `vite build`.
 - **`post_update_script`**: Moonraker update manager now runs `scripts/post_update.sh`
   after every `git pull`, which downloads the nightly release, re-vendors the agent,
   re-deploys plugins, and restarts Moonraker automatically.
@@ -110,7 +113,7 @@ a9144473 spec: add Ansible migration plan
 
 - **Purpose**: Interactive CLI agent specializing in software engineering tasks for this project.
 - **Current Role**: Frontend maintenance, docs sync, Ansible deployment for the Mainsail fork (Vue 3.5, Vuetify 3)
-- **Access**: shell commands, file system, Chrome DevTools, SSH to CB1 (`ssh cnc`)
+- **Access**: shell commands, file system, Chrome DevTools, SSH to the CNC host (`ssh <user>@<cnc-host-ip>`)
 - **Package Manager**: Bun (not npm). Use `bun install`, `bun run`, `bunx`.
 - **Dev Server**: Run within `tmux`; check for existing sessions first. HMR is active.
 - **Ansible**: Playbooks at `ansible/playbooks/`. Run `ansible-playbook ansible/playbooks/install.yml` for full install.
@@ -123,6 +126,6 @@ a9144473 spec: add Ansible migration plan
 - **Store layer**: Store migration is complete — all Vue 2 patterns (`Vue.set`, `Vue.$socket`, `Vue.$toast`, `import Vue`) removed.
 - **`@vue/compat`**: Fully removed — app runs on pure Vue 3.5 + Vuetify 3.
 - **Runtime fixes applied**: `i18n.global.t`, `useDisplay()`, `boolMenu`, removed `const mdiXxx = mdiXxx` TDZ bugs across 100+ files.
-- **CB1 builds**: Do NOT run `bun run build` on the CB1 — it OOMs. Use `scripts/download_frontend.sh` or CI nightly releases instead.
+- **32-bit ARM builds**: Do NOT run `bun run build` on 32-bit ARM — it OOMs. Use `scripts/download_frontend.sh` or CI nightly releases instead.
 - **Moonraker update manager**: Has `post_update_script: ~/mainsail-cnc/scripts/post_update.sh` which auto-updates frontend + agent on git pull.
 - **Ask before pushing**: Never push to remote without asking the user first.

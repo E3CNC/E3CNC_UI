@@ -8,7 +8,8 @@ vi.mock('@/components/panels/Temperature/TemperaturePanelListItemAdditionalSenso
     default: {
         name: 'TemperaturePanelListItemAdditionalSensorValue',
         props: ['printerObject', 'objectName', 'keyName'],
-        template: '<div class="mock-additional-sensor-value" :data-key-name="keyName">{{ keyName }}: {{ printerObject?.[keyName] }}</div>',
+        template:
+            '<div class="mock-additional-sensor-value" :data-key-name="keyName">{{ keyName }}: {{ printerObject?.[keyName] }}</div>',
     },
 }))
 

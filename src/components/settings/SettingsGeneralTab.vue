@@ -3,31 +3,71 @@
         <v-card flat>
             <v-card-text>
                 <settings-row :title="$t('Settings.GeneralTab.PrinterName')">
-                    <v-text-field v-model="printerName" hide-details variant="outlined" density="compact"></v-text-field>
+                    <v-text-field
+                        v-model="printerName"
+                        hide-details
+                        variant="outlined"
+                        density="compact"></v-text-field>
                 </settings-row>
                 <v-divider class="my-2" />
                 <settings-row :title="$t('Settings.GeneralTab.Language')">
-                    <v-select v-model="currentLanguage" :items="availableLanguages" item-title="text" item-value="value" hide-details variant="outlined" density="compact" />
+                    <v-select
+                        v-model="currentLanguage"
+                        :items="availableLanguages"
+                        item-title="text"
+                        item-value="value"
+                        hide-details
+                        variant="outlined"
+                        density="compact" />
                 </settings-row>
                 <v-divider class="my-2" />
                 <settings-row :title="$t('Settings.GeneralTab.DateFormat')">
-                    <v-select v-model="dateFormat" :items="dateFormatItems" item-title="text" item-value="value" hide-details variant="outlined" density="compact" />
+                    <v-select
+                        v-model="dateFormat"
+                        :items="dateFormatItems"
+                        item-title="text"
+                        item-value="value"
+                        hide-details
+                        variant="outlined"
+                        density="compact" />
                 </settings-row>
                 <v-divider class="my-2" />
                 <settings-row :title="$t('Settings.GeneralTab.TimeFormat')">
-                    <v-select v-model="timeFormat" :items="timeFormatItems" item-title="text" item-value="value" hide-details variant="outlined" density="compact" />
+                    <v-select
+                        v-model="timeFormat"
+                        :items="timeFormatItems"
+                        item-title="text"
+                        item-value="value"
+                        hide-details
+                        variant="outlined"
+                        density="compact" />
                 </settings-row>
                 <v-divider class="my-2" />
                 <settings-row
                     :title="$t('Settings.GeneralTab.CalcPrintProgress')"
                     :sub-title="$t('Settings.GeneralTab.CalcPrintProgressDescription')">
-                    <v-select v-model="calcPrintProgress" :items="calcPrintProgressItems" item-title="text" item-value="value" hide-details density="compact" variant="outlined" />
+                    <v-select
+                        v-model="calcPrintProgress"
+                        :items="calcPrintProgressItems"
+                        item-title="text"
+                        item-value="value"
+                        hide-details
+                        density="compact"
+                        variant="outlined" />
                 </settings-row>
                 <v-divider class="my-2" />
                 <settings-row
                     :title="$t('Settings.GeneralTab.CalcEtaTime')"
                     :sub-title="$t('Settings.GeneralTab.CalcEtaTimeDescription')">
-                    <v-select v-model="calcEtaTime" :items="calcEtaTimeItems" item-title="text" item-value="value" multiple hide-details density="compact" variant="outlined" />
+                    <v-select
+                        v-model="calcEtaTime"
+                        :items="calcEtaTimeItems"
+                        item-title="text"
+                        item-value="value"
+                        multiple
+                        hide-details
+                        density="compact"
+                        variant="outlined" />
                 </settings-row>
                 <v-divider class="my-2" />
                 <settings-row :title="$t('Settings.GeneralTab.MainsailSettingsMoonrakerDb')" :dynamic-slot-width="true">
@@ -147,8 +187,7 @@ const timeFormat = computed({
 
 const timeFormatItems = computed(() => {
     const date = new Date()
-    const userLocale =
-        navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language
+    const userLocale = navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language
 
     return [
         { value: null, text: `Browser (${date.toLocaleTimeString(userLocale, { timeStyle: 'short' })})` },

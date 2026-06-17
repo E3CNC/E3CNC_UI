@@ -63,7 +63,7 @@
                 <div v-for="(filter, index) in consoleFilters" :key="index">
                     <v-divider v-if="index || moonrakerComponents.includes('timelapse')" class="my-2"></v-divider>
                     <settings-row :title="filter.name">
- <v-btn
+                        <v-btn
                             size="small"
                             variant="outlined"
                             class="minwidth-0 px-2"
@@ -71,11 +71,11 @@
                             @click="toggleFilter(filter)">
                             <v-icon size="small">{{ filter.bool ? mdiFilter : mdiFilterOff }}</v-icon>
                         </v-btn>
- <v-btn size="small" variant="outlined" class="ml-3" @click="editFilter(filter)">
+                        <v-btn size="small" variant="outlined" class="ml-3" @click="editFilter(filter)">
                             <v-icon start size="small">{{ mdiPencil }}</v-icon>
                             {{ $t('Settings.Edit') }}
                         </v-btn>
- <v-btn
+                        <v-btn
                             size="small"
                             variant="outlined"
                             class="ml-3 minwidth-0 px-2"
@@ -87,7 +87,9 @@
                 </div>
             </v-card-text>
             <v-card-actions class="d-flex justify-end">
- <v-btn variant="text" color="primary" @click="createFilter">{{ $t('Settings.ConsoleTab.AddFilter') }}</v-btn>
+                <v-btn variant="text" color="primary" @click="createFilter">
+                    {{ $t('Settings.ConsoleTab.AddFilter') }}
+                </v-btn>
             </v-card-actions>
         </v-card>
         <v-card v-else flat>
@@ -114,10 +116,10 @@
                     </settings-row>
                 </v-card-text>
                 <v-card-actions class="d-flex justify-end">
- <v-btn variant="text" @click="form.bool = false">
+                    <v-btn variant="text" @click="form.bool = false">
                         {{ $t('Buttons.Cancel') }}
                     </v-btn>
- <v-btn color="primary" variant="text" type="submit">
+                    <v-btn color="primary" variant="text" type="submit">
                         {{
                             form.id === null
                                 ? $t('Settings.ConsoleTab.StoreButton')

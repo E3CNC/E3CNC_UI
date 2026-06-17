@@ -9,7 +9,7 @@
         </div>
         <div class="gcode-dir-card__name" :title="item.filename">{{ item.filename }}</div>
         <div class="gcode-dir-card__meta">
-            <span v-if="item.childrens"> {{ item.childrens.length }} </span>
+            <span v-if="item.childrens">{{ item.childrens.length }}</span>
             <span v-else>--</span>
         </div>
 
@@ -113,7 +113,9 @@ onBeforeUnmount(() => {
     border-radius: 4px;
     background: rgb(var(--v-surface));
     border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
-    transition: transform 200ms cubic-bezier(0.25, 1, 0.5, 1), border-color 200ms cubic-bezier(0.25, 1, 0.5, 1);
+    transition:
+        transform 200ms cubic-bezier(0.25, 1, 0.5, 1),
+        border-color 200ms cubic-bezier(0.25, 1, 0.5, 1);
     cursor: pointer;
     min-height: 168px;
     user-select: none;

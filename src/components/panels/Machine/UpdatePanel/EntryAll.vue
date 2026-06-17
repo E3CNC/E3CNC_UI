@@ -2,7 +2,7 @@
     <div>
         <v-row class="pt-3">
             <v-col class="text-center">
- <v-btn
+                <v-btn
                     variant="text"
                     color="primary"
                     size="small"

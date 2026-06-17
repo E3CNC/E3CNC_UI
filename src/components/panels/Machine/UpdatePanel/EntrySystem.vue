@@ -45,13 +45,9 @@ const { t } = useI18n()
 
 const boolShowPackageList = ref(false)
 
-const package_count = computed(() =>
-    store.state.server.updateManager?.system?.package_count ?? 0
-)
+const package_count = computed(() => store.state.server.updateManager?.system?.package_count ?? 0)
 
-const package_list = computed(() =>
-    store.state.server.updateManager?.system?.package_list ?? []
-)
+const package_list = computed(() => store.state.server.updateManager?.system?.package_list ?? [])
 
 const btnDisabled = computed(() => {
     if (['printing', 'paused'].includes(printer_state.value)) return true

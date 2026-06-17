@@ -9,7 +9,7 @@
                             <v-item-group>
                                 <v-menu v-model="selectIcon" location="bottom end" title="Icon">
                                     <template #activator="{ props: activatorProps }">
- <v-btn
+                                        <v-btn
                                             class="px-2 mr-2 _transition _menu-button"
                                             color="transparent"
                                             v-bind="activatorProps"
@@ -172,7 +172,7 @@
                             <v-col v-if="localNozzleCrosshair" class="py-0">
                                 <v-menu location="bottom end" :close-on-content-click="false">
                                     <template #activator="{ props: activatorProps }">
- <v-btn
+                                        <v-btn
                                             v-bind="activatorProps"
                                             :color="localNozzleCrosshairColor"
                                             class="minwidth-0 px-5"
@@ -210,8 +210,8 @@
             </v-row>
         </v-card-text>
         <v-card-actions class="d-flex justify-end">
- <v-btn variant="text" @click="closeForm">{{ $t('Buttons.Cancel') }}</v-btn>
- <v-btn color="primary" variant="text" type="submit" :disabled="!valid">{{ actionButtonText }}</v-btn>
+            <v-btn variant="text" @click="closeForm">{{ $t('Buttons.Cancel') }}</v-btn>
+            <v-btn color="primary" variant="text" type="submit" :disabled="!valid">{{ actionButtonText }}</v-btn>
         </v-card-actions>
     </v-form>
 </template>
@@ -371,11 +371,21 @@ const classIconButtonArrow = computed(() => {
 })
 
 const hasTargetFps = computed(() => ['mjpegstreamer-adaptive', 'jmuxer-stream'].includes(form.service))
-const hasRotate = computed(() => [
-    'hlsstream', 'html-video', 'iframe', 'jmuxer-stream', 'mjpegstreamer',
-    'mjpegstreamer-adaptive', 'uv4l-mjpeg', 'webrtc-camerastreamer',
-    'webrtc-go2rtc', 'webrtc-janus', 'webrtc-mediamtx',
-].includes(form.service))
+const hasRotate = computed(() =>
+    [
+        'hlsstream',
+        'html-video',
+        'iframe',
+        'jmuxer-stream',
+        'mjpegstreamer',
+        'mjpegstreamer-adaptive',
+        'uv4l-mjpeg',
+        'webrtc-camerastreamer',
+        'webrtc-go2rtc',
+        'webrtc-janus',
+        'webrtc-mediamtx',
+    ].includes(form.service)
+)
 const hasFpsCounter = computed(() => ['mjpegstreamer', 'mjpegstreamer-adaptive'].includes(form.service))
 const hasAspectRatio = computed(() => ['iframe'].includes(form.service))
 const hasAudioOption = computed(() => ['webrtc-go2rtc'].includes(form.service))
@@ -397,8 +407,8 @@ function updateLogoColor(color: string | { hex: string }) {
 
 function existsWebcamName(name: string) {
     name = name.toLowerCase().trim()
-    const count = webcams.value.filter((webcam: GuiWebcamStateWebcam) =>
-        webcam.name.toLowerCase().trim() === name
+    const count = webcams.value.filter(
+        (webcam: GuiWebcamStateWebcam) => webcam.name.toLowerCase().trim() === name
     ).length
 
     if (props.type === 'create') return count !== 0

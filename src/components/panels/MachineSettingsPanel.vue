@@ -132,9 +132,7 @@ const minimumCruiseRatio = computed<number | null>(() => {
     return Math.round(value * 100)
 })
 
-const squareCornerVelocity = computed(() =>
-    Math.floor((toolhead.value.square_corner_velocity ?? 8) * 10) / 10
-)
+const squareCornerVelocity = computed(() => Math.floor((toolhead.value.square_corner_velocity ?? 8) * 10) / 10)
 
 const defaultVelocity = computed(() => Math.trunc(configPrinter.value.max_velocity ?? 300))
 

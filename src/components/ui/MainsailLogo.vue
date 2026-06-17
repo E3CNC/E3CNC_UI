@@ -31,9 +31,12 @@ const props = defineProps({
 
 const internalColor = ref(defaultLogoColor)
 
-watch(() => props.color, (newVal) => {
-    internalColor.value = newVal !== '' ? newVal : defaultLogoColor
-})
+watch(
+    () => props.color,
+    (newVal) => {
+        internalColor.value = newVal !== '' ? newVal : defaultLogoColor
+    }
+)
 
 if (props.color !== '') {
     internalColor.value = props.color

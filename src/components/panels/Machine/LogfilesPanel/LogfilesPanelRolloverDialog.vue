@@ -6,7 +6,7 @@
             :icon="mdiFileSyncOutline"
             :margin-bottom="false">
             <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="closeDialog"/>
+                <v-btn :icon="mdiCloseThick" rounded="0" @click="closeDialog" />
             </template>
             <v-card-text>
                 <v-row>
@@ -30,10 +30,10 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer />
- <v-btn variant="text" @click="closeDialog">
+                <v-btn variant="text" @click="closeDialog">
                     {{ $t('Buttons.Cancel') }}
                 </v-btn>
- <v-btn color="primary" variant="text" @click="btnRolloverLogs">
+                <v-btn color="primary" variant="text" @click="btnRolloverLogs">
                     {{ $t('Machine.LogfilesPanel.Accept') }}
                 </v-btn>
             </v-card-actions>
@@ -64,9 +64,12 @@ const socket = useSocket()
 const showDialog = ref(props['model-value'])
 const selectedRolloverLogs = ref<string[]>([])
 
-watch(() => props['model-value'], (val) => {
-    showDialog.value = val
-})
+watch(
+    () => props['model-value'],
+    (val) => {
+        showDialog.value = val
+    }
+)
 
 watch(showDialog, (val) => {
     emit('update:model-value', val)
@@ -82,9 +85,13 @@ const checkLoadingRolloverLogs = () => {
     loadingRolloverLogs.value = loadings.value.filter((log: string) => log?.startsWith('rolloverLog_')).length > 0
 }
 
-watch(loadings, () => {
-    checkLoadingRolloverLogs()
-}, { immediate: true })
+watch(
+    loadings,
+    () => {
+        checkLoadingRolloverLogs()
+    },
+    { immediate: true }
+)
 
 watch(loadingRolloverLogs, (newVal) => {
     if (newVal) closeDialog()

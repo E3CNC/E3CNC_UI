@@ -35,17 +35,15 @@ export function useBase() {
         () => klipperReadyForGui.value && ['printing', 'paused'].includes(printer_state.value)
     )
 
-    const printerIsPrintingOnly = computed(
-        () => klipperReadyForGui.value && printer_state.value === 'printing'
-    )
+    const printerIsPrintingOnly = computed(() => klipperReadyForGui.value && printer_state.value === 'printing')
 
     const printerPowerDevice = computed(() => {
         const deviceName = store.state.gui.uiSettings.powerDeviceName ?? null
         if (deviceName !== null) return deviceName
         const devices = store.getters['server/power/getDevices'] ?? []
         return (
-            devices.find((device: ServerPowerStateDevice) => device.device.toLowerCase() === 'printer')
-                ?.device ?? 'printer'
+            devices.find((device: ServerPowerStateDevice) => device.device.toLowerCase() === 'printer')?.device ??
+            'printer'
         )
     })
 
@@ -64,10 +62,8 @@ export function useBase() {
     const loadings = computed(() => store.state.socket.loadings ?? [])
 
     const printer_state = computed(() => {
-        const printer_state =
-            store.state.printer.print_stats?.state ?? store.state.printer.idle_timeout?.state ?? ''
-        const timelapse_pause =
-            store.state.printer['gcode_macro TIMELAPSE_TAKE_FRAME']?.is_paused ?? false
+        const printer_state = store.state.printer.print_stats?.state ?? store.state.printer.idle_timeout?.state ?? ''
+        const timelapse_pause = store.state.printer['gcode_macro TIMELAPSE_TAKE_FRAME']?.is_paused ?? false
         return printer_state === 'paused' && timelapse_pause ? 'printing' : printer_state
     })
 
@@ -87,10 +83,7 @@ export function useBase() {
     })
 
     const isTouchDevice = computed(() => {
-        return (
-            'ontouchstart' in window ||
-            (navigator.maxTouchPoints > 0 && navigator.maxTouchPoints !== 256)
-        )
+        return 'ontouchstart' in window || (navigator.maxTouchPoints > 0 && navigator.maxTouchPoints !== 256)
     })
 
     const isIOS = computed(() => {
@@ -208,8 +201,7 @@ export function useBase() {
         } catch {
             return 'UNKNOWN'
         }
-        if (boolSeconds)
-            return tmp.toLocaleTimeString(browserLocale.value, formatTimeWithSecondsOptions.value)
+        if (boolSeconds) return tmp.toLocaleTimeString(browserLocale.value, formatTimeWithSecondsOptions.value)
         return tmp.toLocaleTimeString(browserLocale.value, formatTimeOptions.value)
     }
 

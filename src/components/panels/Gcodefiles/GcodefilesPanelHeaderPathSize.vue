@@ -38,13 +38,9 @@ const { currentPath, setCurrentPath } = useGcodeFiles()
 
 const store = useStore()
 
-const directory = computed(() =>
-    store.getters['files/getDirectory']('gcodes' + currentPath.value)
-)
+const directory = computed(() => store.getters['files/getDirectory']('gcodes' + currentPath.value))
 
-const disk_usage = computed(() =>
-    directory.value?.disk_usage ?? { used: 0, free: 0, total: 0 }
-)
+const disk_usage = computed(() => directory.value?.disk_usage ?? { used: 0, free: 0, total: 0 })
 
 function clickPathNavGoToDirectory(segment: { location: string }) {
     setCurrentPath(segment.location)

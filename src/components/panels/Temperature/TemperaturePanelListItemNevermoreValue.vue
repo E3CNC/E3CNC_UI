@@ -80,7 +80,7 @@ const unit = computed(() => {
     return null
 })
 
-const digits = computed(() => ['gas', 'pressure'].includes(props.keyName) ? 0 : 1)
+const digits = computed(() => (['gas', 'pressure'].includes(props.keyName) ? 0 : 1))
 
 const formatValue = computed(() => getFormatedValue(intake_value.value, exhaust_value.value))
 
@@ -97,11 +97,12 @@ function getFormatedValue(intake: number | null, exhaust: number | null): string
     return `${intake_value_str} ${unit.value} > ${exhaust_value_str} ${unit.value}`
 }
 
-const disableTooltip = computed(() =>
-    intake_value_min.value === null ||
-    exhaust_value_min.value === null ||
-    intake_value_max.value === null ||
-    exhaust_value_max.value === null
+const disableTooltip = computed(
+    () =>
+        intake_value_min.value === null ||
+        exhaust_value_min.value === null ||
+        intake_value_max.value === null ||
+        exhaust_value_max.value === null
 )
 
 const guiSetting = computed(() =>

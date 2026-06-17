@@ -75,24 +75,29 @@ describe('farm store', () => {
             const ctx = { commit, dispatch } as any
             const that = { hasModule, registerModule }
 
-            farm.actions.registerPrinter.call(
-                that,
-                ctx,
-                { id: 'remote-1', hostname: 'printer.local', port: 7125, path: '', settings: { speed: 100 } }
-            )
+            farm.actions.registerPrinter.call(that, ctx, {
+                id: 'remote-1',
+                hostname: 'printer.local',
+                port: 7125,
+                path: '',
+                settings: { speed: 100 },
+            })
 
             expect(hasModule).toHaveBeenCalledWith(['farm', 'remote-1'])
             expect(registerModule).toHaveBeenCalledWith(['farm', 'remote-1'], printer)
             expect(commit).toHaveBeenCalledWith(
                 'farm/remote-1/setSocketData',
-                { id: 'remote-1', hostname: 'printer.local', port: 7125, path: '', settings: { speed: 100 }, _namespace: 'remote-1' },
+                {
+                    id: 'remote-1',
+                    hostname: 'printer.local',
+                    port: 7125,
+                    path: '',
+                    settings: { speed: 100 },
+                    _namespace: 'remote-1',
+                },
                 { root: true }
             )
-            expect(commit).toHaveBeenCalledWith(
-                'farm/remote-1/setSettings',
-                { speed: 100 },
-                { root: true }
-            )
+            expect(commit).toHaveBeenCalledWith('farm/remote-1/setSettings', { speed: 100 }, { root: true })
             expect(dispatch).toHaveBeenCalledWith('farm/remote-1/connect', {}, { root: true })
         })
 
@@ -105,11 +110,12 @@ describe('farm store', () => {
             const ctx = { commit, dispatch } as any
             const that = { hasModule, registerModule }
 
-            farm.actions.registerPrinter.call(
-                that,
-                ctx,
-                { id: 'remote-1', hostname: 'printer.local', port: 7125, path: '' }
-            )
+            farm.actions.registerPrinter.call(that, ctx, {
+                id: 'remote-1',
+                hostname: 'printer.local',
+                port: 7125,
+                path: '',
+            })
 
             expect(hasModule).toHaveBeenCalledWith(['farm', 'remote-1'])
             expect(registerModule).not.toHaveBeenCalled()
@@ -119,10 +125,10 @@ describe('farm store', () => {
             const commit = vi.fn()
             const dispatch = vi.fn()
 
-            farm.actions.updatePrinter(
-                { commit, dispatch } as any,
-                { id: 'remote-1', values: { hostname: 'new.local', port: 81, path: '/mainsail' } }
-            )
+            farm.actions.updatePrinter({ commit, dispatch } as any, {
+                id: 'remote-1',
+                values: { hostname: 'new.local', port: 81, path: '/mainsail' },
+            })
 
             expect(commit).toHaveBeenCalledWith('remote-1/setSocketData', {
                 hostname: 'new.local',
@@ -140,11 +146,7 @@ describe('farm store', () => {
             }
             const unregisterModule = vi.fn()
 
-            farm.actions.unregisterPrinter.call(
-                { unregisterModule },
-                { state } as any,
-                'remote-1'
-            )
+            farm.actions.unregisterPrinter.call({ unregisterModule }, { state } as any, 'remote-1')
 
             expect(close).toHaveBeenCalled()
             expect(unregisterModule).toHaveBeenCalledWith(['farm', 'remote-1'])
@@ -154,11 +156,7 @@ describe('farm store', () => {
             const state = {}
             const unregisterModule = vi.fn()
 
-            farm.actions.unregisterPrinter.call(
-                { unregisterModule },
-                { state } as any,
-                'missing'
-            )
+            farm.actions.unregisterPrinter.call({ unregisterModule }, { state } as any, 'missing')
 
             expect(unregisterModule).not.toHaveBeenCalled()
         })
@@ -286,9 +284,9 @@ describe('farm printer store', () => {
 
         it('setConfigDir adds theme files', () => {
             const payload = {
-                'file1': { path: '.theme/custom.css' },
-                'file2': { path: 'printer.cfg' },
-                'file3': { path: '.theme/logo.png' },
+                file1: { path: '.theme/custom.css' },
+                file2: { path: 'printer.cfg' },
+                file3: { path: '.theme/logo.png' },
             }
             printer.mutations.setConfigDir(state, payload)
             expect(state.theme_files).toEqual(['.theme/custom.css', '.theme/logo.png'])
@@ -537,7 +535,9 @@ describe('farm printer store', () => {
             state.socket.port = 81
             state.socket.path = ''
 
-            const result = (printer.getters as any).getLogo(state, { getThemeFileUrl: (printer.getters as any).getThemeFileUrl(state) })
+            const result = (printer.getters as any).getLogo(state, {
+                getThemeFileUrl: (printer.getters as any).getThemeFileUrl(state),
+            })
             expect(result).toContain('sidebar-logo.svg')
         })
 

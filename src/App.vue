@@ -86,9 +86,7 @@ const language = computed(() => store.state.gui.general.language)
 const current_file = computed(() => store.state.printer.print_stats?.filename ?? '')
 const mode = computed(() => store.state.gui.uiSettings.mode)
 const primaryColor = computed(() => store.state.gui.uiSettings.primary)
-const warningColor = computed((): string =>
-    vuetifyTheme.global.current.value.colors?.warning?.toString() ?? '#ff8300'
-)
+const warningColor = computed((): string => vuetifyTheme.global.current.value.colors?.warning?.toString() ?? '#ff8300')
 
 const primaryTextColor = computed((): string => {
     const splits = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(primaryColor.value)
@@ -113,14 +111,10 @@ const cssVars = computed((): { [key: string]: string } => ({
     '--sidebar-menu-item-height': navigationItemHeight + 'px',
 }))
 
-const print_percent = computed((): number =>
-    Math.floor(store.getters['printer/getPrintPercent'] * 100)
-)
+const print_percent = computed((): number => Math.floor(store.getters['printer/getPrintPercent'] * 100))
 
 const containerClasses = computed(() => {
-    const currentRouteOptions = router.options.routes?.find(
-        (r) => r.name === route.name
-    ) as AppRoute
+    const currentRouteOptions = router.options.routes?.find((r) => r.name === route.name) as AppRoute
     return {
         'px-3': true,
         'px-sm-6': true,
@@ -132,9 +126,13 @@ const containerClasses = computed(() => {
 
 const progressAsFavicon = computed(() => store.state.gui.uiSettings.progressAsFavicon)
 
-watch(title, (newVal: string): void => {
-    document.title = newVal
-}, { immediate: true })
+watch(
+    title,
+    (newVal: string): void => {
+        document.title = newVal
+    },
+    { immediate: true }
+)
 
 watch(language, async (newVal: string): Promise<void> => {
     await setAndLoadLocale(newVal)

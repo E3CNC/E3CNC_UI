@@ -23,7 +23,10 @@ vi.mock('@/store/runtime', () => ({
     getSocket: () => mockSocket,
 }))
 
-const createSerie = (name: string, overrides: Partial<PrinterTempHistoryStateSerie> = {}): PrinterTempHistoryStateSerie => ({
+const createSerie = (
+    name: string,
+    overrides: Partial<PrinterTempHistoryStateSerie> = {}
+): PrinterTempHistoryStateSerie => ({
     id: 1,
     color: '#FF0000',
     type: 'line',
@@ -74,10 +77,7 @@ describe('printer tempHistory store', () => {
         })
 
         it('addToSource appends data and enforces maxHistory', () => {
-            const source = [
-                { date: new Date(1000) },
-                { date: new Date(2000) },
-            ]
+            const source = [{ date: new Date(1000) }, { date: new Date(2000) }]
             state.source = source
             mutations.addToSource(state, {
                 data: { date: new Date(3000) },
@@ -94,7 +94,7 @@ describe('printer tempHistory store', () => {
         })
 
         it('setUpdateSourceInterval saves the interval id', () => {
-            const interval = setInterval(() => { }, 1000)
+            const interval = setInterval(() => {}, 1000)
             mutations.setUpdateSourceInterval(state, interval)
             expect(state.updateSourceInterval).toBe(interval)
             clearInterval(interval)
@@ -103,7 +103,14 @@ describe('printer tempHistory store', () => {
         it('setColor updates color on matching series', () => {
             state.series = [
                 createSerie('extruder-temperature', { id: 1 }),
-                createSerie('extruder-target', { id: 2, areaStyle: { color: '#FF0000', opacity: 0.1 }, emphasis: { lineStyle: { color: '#FF0000', width: 2, opacity: 0.9 }, areaStyle: { color: '#FF0000', opacity: 0.1 } } }),
+                createSerie('extruder-target', {
+                    id: 2,
+                    areaStyle: { color: '#FF0000', opacity: 0.1 },
+                    emphasis: {
+                        lineStyle: { color: '#FF0000', width: 2, opacity: 0.9 },
+                        areaStyle: { color: '#FF0000', opacity: 0.1 },
+                    },
+                }),
                 createSerie('heater_bed-temperature', { id: 3 }),
             ]
             mutations.setColor(state, { name: 'extruder', value: '#00FF00' })
@@ -119,9 +126,7 @@ describe('printer tempHistory store', () => {
         })
 
         it('setColor handles missing areaStyle gracefully', () => {
-            state.series = [
-                createSerie('extruder-target', { id: 1 }),
-            ]
+            state.series = [createSerie('extruder-target', { id: 1 })]
             mutations.setColor(state, { name: 'extruder', value: '#00FF00' })
             expect(state.series[0].color).toBe('#00FF00')
         })
@@ -129,7 +134,7 @@ describe('printer tempHistory store', () => {
 
     describe('actions', () => {
         it('reset clears interval and commits reset', () => {
-            const interval = setInterval(() => { }, 1000)
+            const interval = setInterval(() => {}, 1000)
             state.updateSourceInterval = interval as any
             const commit = vi.fn()
             actions.reset({ commit, state } as any)
@@ -146,14 +151,17 @@ describe('printer tempHistory store', () => {
                 'printer/tempHistory/getTemperatureStoreSize': 5,
                 'gui/getDatasetValue': vi.fn(() => null),
             }
-            await (actions as any).init({ commit, rootGetters, dispatch, state }, {
-                extruder: {
-                    temperatures: [200, 210, 220],
-                    targets: [0, 180, 180],
-                    powers: [0, 0.5, 0.5],
-                },
-                'temperature_sensor chamber': { temperatures: [25, 26, 27] },
-            })
+            await (actions as any).init(
+                { commit, rootGetters, dispatch, state },
+                {
+                    extruder: {
+                        temperatures: [200, 210, 220],
+                        targets: [0, 180, 180],
+                        powers: [0, 0.5, 0.5],
+                    },
+                    'temperature_sensor chamber': { temperatures: [25, 26, 27] },
+                }
+            )
             expect(dispatch).toHaveBeenCalledWith('reset')
             expect(dispatch).toHaveBeenCalledWith('socket/removeInitModule', 'printer/initTempHistory', { root: true })
             expect(commit).toHaveBeenNthCalledWith(1, 'setInitSource', expect.any(Array))
@@ -187,10 +195,13 @@ describe('printer tempHistory store', () => {
                 'printer/tempHistory/getTemperatureStoreSize': 5,
                 'gui/getDatasetValue': vi.fn(() => null),
             }
-            await (actions as any).init({ commit, rootGetters, dispatch, state }, {
-                extruder: { temperatures: [200], targets: [0], powers: [0] },
-                'temperature_sensor _internal': { temperatures: [30] },
-            })
+            await (actions as any).init(
+                { commit, rootGetters, dispatch, state },
+                {
+                    extruder: { temperatures: [200], targets: [0], powers: [0] },
+                    'temperature_sensor _internal': { temperatures: [30] },
+                }
+            )
             expect(commit).toHaveBeenCalledWith('setInitSource', expect.any(Array))
         })
 
@@ -218,13 +229,23 @@ describe('printer tempHistory store', () => {
 
         describe('getDatasetColor', () => {
             it('returns color from matching series', () => {
-                state.series = [createSerie('extruder-temperature', { id: 1, color: '#00FF00', lineStyle: { color: '#00FF00', width: 2, opacity: 0.9 } })]
-                const result = (getters as any).getDatasetColor(state, { getSeries: (getters as any).getSeries(state) })('extruder')
+                state.series = [
+                    createSerie('extruder-temperature', {
+                        id: 1,
+                        color: '#00FF00',
+                        lineStyle: { color: '#00FF00', width: 2, opacity: 0.9 },
+                    }),
+                ]
+                const result = (getters as any).getDatasetColor(state, {
+                    getSeries: (getters as any).getSeries(state),
+                })('extruder')
                 expect(result).toBe('#00FF00')
             })
 
             it('returns null when series not found', () => {
-                const result = (getters as any).getDatasetColor(state, { getSeries: (getters as any).getSeries(state) })('nonexistent')
+                const result = (getters as any).getDatasetColor(state, {
+                    getSeries: (getters as any).getSeries(state),
+                })('nonexistent')
                 expect(result).toBeNull()
             })
         })
@@ -248,12 +269,16 @@ describe('printer tempHistory store', () => {
 
         describe('getBoolDisplayPwmAxis', () => {
             it('returns true when a power/speed legend is selected', () => {
-                const result = (getters as any).getBoolDisplayPwmAxis(state, { getSelectedLegends: { 'extruder-power': true, 'extruder-temperature': true } })
+                const result = (getters as any).getBoolDisplayPwmAxis(state, {
+                    getSelectedLegends: { 'extruder-power': true, 'extruder-temperature': true },
+                })
                 expect(result).toBe(true)
             })
 
             it('returns false when no power/speed legends selected', () => {
-                const result = (getters as any).getBoolDisplayPwmAxis(state, { getSelectedLegends: { 'extruder-temperature': true } })
+                const result = (getters as any).getBoolDisplayPwmAxis(state, {
+                    getSelectedLegends: { 'extruder-temperature': true },
+                })
                 expect(result).toBe(false)
             })
         })
@@ -275,9 +300,7 @@ describe('printer tempHistory store', () => {
 
             it('multiplies by 100 for percent datasets (power, speed)', () => {
                 const now = Date.now()
-                state.source = [
-                    createSourceEntry(new Date(now - 10000), { 'extruder-power': 0.5 }),
-                ]
+                state.source = [createSourceEntry(new Date(now - 10000), { 'extruder-power': 0.5 })]
                 const result = (getters as any).getAvg(state)('extruder', 'power')
                 expect(result).toBe(50)
             })
@@ -328,7 +351,11 @@ describe('printer tempHistory store', () => {
                         },
                         heaters: {
                             available_heaters: [],
-                            available_sensors: ['temperature_sensor mcu_temp', 'temperature_sensor host_temp', 'temperature_sensor other'],
+                            available_sensors: [
+                                'temperature_sensor mcu_temp',
+                                'temperature_sensor host_temp',
+                                'temperature_sensor other',
+                            ],
                         },
                     },
                 }
@@ -403,7 +430,11 @@ describe('printer tempHistory store', () => {
                 const rootState = {
                     printer: {
                         configfile: { settings: { 'temperature_sensor mcu_temp': { sensor_type: 'temperature_mcu' } } },
-                        heaters: { available_heaters: [], available_sensors: ['temperature_sensor mcu_temp'], available_monitors: [] },
+                        heaters: {
+                            available_heaters: [],
+                            available_sensors: ['temperature_sensor mcu_temp'],
+                            available_monitors: [],
+                        },
                     },
                     gui: {
                         view: {

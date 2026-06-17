@@ -72,9 +72,11 @@ function formatRange(axis: 'X' | 'Y' | 'Z', minValue?: number, maxValue?: number
 
 function formatTool(tool?: CncMetadataTool): string {
     if (!tool) return '--'
-    const parts = [tool.id, tool.type, tool.diameter_mm === undefined ? null : `${formatNumber(tool.diameter_mm)} mm`].filter(
-        Boolean
-    )
+    const parts = [
+        tool.id,
+        tool.type,
+        tool.diameter_mm === undefined ? null : `${formatNumber(tool.diameter_mm)} mm`,
+    ].filter(Boolean)
     return parts.length ? parts.join(' · ') : '--'
 }
 
@@ -107,9 +109,18 @@ export function buildCncMetadataViewModel(metadata: CncMetadata | null | undefin
         tool: formatTool(tool),
         spindle: metadata.spindle_rpm === undefined ? '--' : `${formatNumber(metadata.spindle_rpm)} RPM`,
         feeds: formatFeeds(metadata.feeds_mm_per_min),
-        plungeFeed: metadata.feeds_mm_per_min?.plunge === undefined ? '--' : `${formatNumber(metadata.feeds_mm_per_min.plunge)} mm/min`,
-        cutFeed: metadata.feeds_mm_per_min?.cut === undefined ? '--' : `${formatNumber(metadata.feeds_mm_per_min.cut)} mm/min`,
-        rapidFeed: metadata.feeds_mm_per_min?.rapid === undefined ? '--' : `${formatNumber(metadata.feeds_mm_per_min.rapid)} mm/min`,
+        plungeFeed:
+            metadata.feeds_mm_per_min?.plunge === undefined
+                ? '--'
+                : `${formatNumber(metadata.feeds_mm_per_min.plunge)} mm/min`,
+        cutFeed:
+            metadata.feeds_mm_per_min?.cut === undefined
+                ? '--'
+                : `${formatNumber(metadata.feeds_mm_per_min.cut)} mm/min`,
+        rapidFeed:
+            metadata.feeds_mm_per_min?.rapid === undefined
+                ? '--'
+                : `${formatNumber(metadata.feeds_mm_per_min.rapid)} mm/min`,
         fields: [
             { label: 'Work Envelope', value: envelope ? formatRange('X', envelope.x_min, envelope.x_max) : '--' },
             { label: 'Tool', value: formatTool(tool) },

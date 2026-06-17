@@ -1,6 +1,6 @@
 /**
  * Tests for src/plugins/helpers.ts
- * 
+ *
  * These are pure utility functions with no dependencies, making them
  * ideal candidates for unit testing.
  */
@@ -141,9 +141,7 @@ describe('findDirectory', () => {
                 {
                     isDirectory: true,
                     filename: 'subdir',
-                    childrens: [
-                        { isDirectory: false, filename: 'test.gcode' },
-                    ],
+                    childrens: [{ isDirectory: false, filename: 'test.gcode' }],
                 },
                 { isDirectory: false, filename: 'file.gcode' },
             ],
@@ -177,21 +175,13 @@ describe('findDirectory', () => {
 
 describe('caseInsensitiveSort', () => {
     it('sorts strings case-insensitively', () => {
-        const items = [
-            { name: 'Banana' },
-            { name: 'apple' },
-            { name: 'Cherry' },
-        ]
+        const items = [{ name: 'Banana' }, { name: 'apple' }, { name: 'Cherry' }]
         const result = caseInsensitiveSort(items, 'name')
         expect(result.map((i) => i.name)).toEqual(['apple', 'Banana', 'Cherry'])
     })
 
     it('sorts with numeric awareness', () => {
-        const items = [
-            { name: 'file10' },
-            { name: 'file2' },
-            { name: 'file1' },
-        ]
+        const items = [{ name: 'file10' }, { name: 'file2' }, { name: 'file1' }]
         const result = caseInsensitiveSort(items, 'name')
         expect(result.map((i) => i.name)).toEqual(['file1', 'file2', 'file10'])
     })
@@ -685,15 +675,15 @@ describe('sortFiles with filetype key', () => {
     it('sorts by filetype in ascending order, directories first', () => {
         const sorted = sortFiles([...files], ['filetype'], [false])
         expect(sorted[0].filename).toBe('subdir') // directory first
-        expect(sorted[1].filename).toBe('printer.cfg')  // 01-config
-        expect(sorted[2].filename).toBe('script.py')    // 02-python
-        expect(sorted[3].filename).toBe('notes.txt')    // 07-text
-        expect(sorted[4].filename).toBe('photo.png')    // 09-image
+        expect(sorted[1].filename).toBe('printer.cfg') // 01-config
+        expect(sorted[2].filename).toBe('script.py') // 02-python
+        expect(sorted[3].filename).toBe('notes.txt') // 07-text
+        expect(sorted[4].filename).toBe('photo.png') // 09-image
     })
 
     it('sorts by filetype in descending order', () => {
         const sorted = sortFiles([...files], ['filetype'], [true])
         expect(sorted[0].filename).toBe('subdir') // directory first always
-        expect(sorted[4].filename).toBe('printer.cfg')  // 01-config last in desc
+        expect(sorted[4].filename).toBe('printer.cfg') // 01-config last in desc
     })
 })

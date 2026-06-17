@@ -25,7 +25,9 @@ function mockFetchResponse(payload: unknown, ok = true, status = 200) {
 
 describe('cncApi helper', () => {
     it('posts spindle commands to the CNC API', async () => {
-        const fetchMock = vi.fn(async (_url: string, init?: RequestInit) => mockFetchResponse({ ok: true, type: 'spindle' }))
+        const fetchMock = vi.fn(async (_url: string, init?: RequestInit) =>
+            mockFetchResponse({ ok: true, type: 'spindle' })
+        )
         vi.stubGlobal('fetch', fetchMock)
 
         await setCncSpindle('http://localhost:7125', { state: 'cw', rpm: 18000 })

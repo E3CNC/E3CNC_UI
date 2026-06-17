@@ -59,7 +59,10 @@ describe('vResponsiveClass', () => {
 
     it('cleanup disconnects observer on unmount', () => {
         const disconnect = vi.fn()
-        vi.stubGlobal('ResizeObserver', vi.fn(() => ({ observe: vi.fn(), disconnect })))
+        vi.stubGlobal(
+            'ResizeObserver',
+            vi.fn(() => ({ observe: vi.fn(), disconnect }))
+        )
 
         const wrapper = mount({
             template: '<div v-responsive-class="{ wide: () => true }"></div>',

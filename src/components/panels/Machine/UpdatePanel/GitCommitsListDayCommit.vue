@@ -4,7 +4,12 @@
             <v-col>
                 <h4 class="subtitle-2 text--white mb-0">
                     {{ title }}
-                    <v-chip variant="outlined" label size="x-small" class="ml-2 px-2" @click="showDetails = !showDetails">
+                    <v-chip
+                        variant="outlined"
+                        label
+                        size="x-small"
+                        class="ml-2 px-2"
+                        @click="showDetails = !showDetails">
                         <v-icon size="small">{{ mdiDotsHorizontal }}</v-icon>
                     </v-chip>
                 </h4>
@@ -79,8 +84,8 @@ const commitFormatDate = computed(() => {
 
 const repo_name = computed(() => props.repo.repo_name ?? props.repo.name ?? '')
 
-const commitHref = computed(() =>
-    `https://github.com/${props.repo.owner}/${repo_name.value}/commit/${props.commit.sha}`
+const commitHref = computed(
+    () => `https://github.com/${props.repo.owner}/${repo_name.value}/commit/${props.commit.sha}`
 )
 
 const commitShortSha = computed(() => props.commit.sha.substring(0, 6))

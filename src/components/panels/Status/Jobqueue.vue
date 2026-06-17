@@ -29,7 +29,7 @@ const store = useStore()
 
 const jobs = computed(() => store.getters['server/jobQueue/getJobs'] ?? [])
 
-const maxLength = computed(() => jobs.value.length > 5 ? 4 : 5)
+const maxLength = computed(() => (jobs.value.length > 5 ? 4 : 5))
 
 const jobsTable = computed(() => jobs.value.slice(0, maxLength.value))
 

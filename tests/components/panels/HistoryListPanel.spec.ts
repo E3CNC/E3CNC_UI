@@ -8,9 +8,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         loadings: new MockRef([]),
@@ -77,16 +83,51 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VCardText: { name: 'VCardText', template: '<div><slot /></div>' },
     VRow: { name: 'VRow', template: '<div><slot /></div>' },
     VCol: { name: 'VCol', props: ['cols'], template: '<div><slot /></div>' },
-    VTextField: { name: 'VTextField', props: ['modelValue', 'appendIcon', 'label', 'singleLine', 'variant', 'clearable', 'hideDetails', 'density'], template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />' },
-    VTooltip: { name: 'VTooltip', props: ['top', 'location', 'text'], template: '<div><slot name="activator" :props="{}" /><slot /></div>' },
-    VBtn: { name: 'VBtn', props: ['color', 'loading', 'rounded', 'size', 'variant'], template: '<button :class="$attrs.class"><slot /></button>' },
+    VTextField: {
+        name: 'VTextField',
+        props: ['modelValue', 'appendIcon', 'label', 'singleLine', 'variant', 'clearable', 'hideDetails', 'density'],
+        template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+    },
+    VTooltip: {
+        name: 'VTooltip',
+        props: ['top', 'location', 'text'],
+        template: '<div><slot name="activator" :props="{}" /><slot /></div>',
+    },
+    VBtn: {
+        name: 'VBtn',
+        props: ['color', 'loading', 'rounded', 'size', 'variant'],
+        template: '<button :class="$attrs.class"><slot /></button>',
+    },
     VIcon: { name: 'VIcon', props: ['start', 'icon', 'size'], template: '<i><slot /></i>' },
-    VMenu: { name: 'VMenu', props: ['location', 'closeOnContentClick'], template: '<div><slot name="activator" :props="{onClick: () => {}}" /><slot /></div>' },
+    VMenu: {
+        name: 'VMenu',
+        props: ['location', 'closeOnContentClick'],
+        template: '<div><slot name="activator" :props="{onClick: () => {}}" /><slot /></div>',
+    },
     VList: { name: 'VList', template: '<div><slot /></div>' },
     VListItem: { name: 'VListItem', template: '<div class="v-list-item"><slot /></div>' },
-    VCheckbox: { name: 'VCheckbox', props: ['modelValue', 'label', 'hideDetails', 'density'], template: '<label><input type="checkbox" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" /> {{ label }}</label>' },
+    VCheckbox: {
+        name: 'VCheckbox',
+        props: ['modelValue', 'label', 'hideDetails', 'density'],
+        template:
+            '<label><input type="checkbox" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" /> {{ label }}</label>',
+    },
     VDivider: { name: 'VDivider', template: '<hr />' },
-    VDataTable: { name: 'VDataTable', props: ['items', 'headers', 'search', 'itemsPerPage', 'showSelect', 'disableSort', 'itemKey', 'mobileBreakpoint'], template: '<div class="v-data-table"><slot name="no-data" /><slot name="item" :item="{ type: \'job\' }" :isSelected="() => false" :select="() => {}" /></div>' },
+    VDataTable: {
+        name: 'VDataTable',
+        props: [
+            'items',
+            'headers',
+            'search',
+            'itemsPerPage',
+            'showSelect',
+            'disableSort',
+            'itemKey',
+            'mobileBreakpoint',
+        ],
+        template:
+            '<div class="v-data-table"><slot name="no-data" /><slot name="item" :item="{ type: \'job\' }" :isSelected="() => false" :select="() => {}" /></div>',
+    },
     VSpacer: { name: 'VSpacer', template: '<span style="flex:1" />' },
 }))
 

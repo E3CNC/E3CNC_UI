@@ -66,7 +66,8 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VSelect: {
         name: 'VSelect',
         props: ['modelValue', 'items', 'itemTitle', 'itemValue', 'multiple', 'hideDetails', 'density', 'variant'],
-        template: '<select class="v-select" :value="modelValue"><option v-for="item in items" :key="item.value" :value="item.value">{{ item.text }}</option></select>',
+        template:
+            '<select class="v-select" :value="modelValue"><option v-for="item in items" :key="item.value" :value="item.value">{{ item.text }}</option></select>',
     },
 }))
 

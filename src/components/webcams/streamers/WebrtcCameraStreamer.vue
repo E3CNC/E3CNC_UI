@@ -69,13 +69,17 @@ const expanded = computed(() => {
     return store.getters['gui/getPanelExpand']('webcam-panel', viewport.value) ?? false
 })
 
-watch(expanded, (newExpanded) => {
-    if (!newExpanded) {
-        terminate()
-        return
-    }
-    start()
-}, { immediate: true })
+watch(
+    expanded,
+    (newExpanded) => {
+        if (!newExpanded) {
+            terminate()
+            return
+        }
+        start()
+    },
+    { immediate: true }
+)
 
 async function start() {
     if (restartTimer) {

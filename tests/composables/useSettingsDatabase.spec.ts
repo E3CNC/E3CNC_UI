@@ -61,9 +61,14 @@ describe('useSettingsDatabase', () => {
     })
 
     it('loads backupable namespaces from the API', async () => {
-        const fetchMock = vi.fn()
-            .mockResolvedValueOnce({ json: async () => ({ result: { namespaces: ['mainsail', 'maintenance', 'webcams'] } }) })
-            .mockResolvedValueOnce({ json: async () => ({ result: { value: { general: {}, timelapse: {}, initVersion: {} } } }) })
+        const fetchMock = vi
+            .fn()
+            .mockResolvedValueOnce({
+                json: async () => ({ result: { namespaces: ['mainsail', 'maintenance', 'webcams'] } }),
+            })
+            .mockResolvedValueOnce({
+                json: async () => ({ result: { value: { general: {}, timelapse: {}, initVersion: {} } } }),
+            })
 
         // @ts-expect-error test override
         global.fetch = fetchMock

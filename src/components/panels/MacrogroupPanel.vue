@@ -40,13 +40,9 @@ const { klipperReadyForGui, printer_state } = useBase()
 
 const store = useStore()
 
-const macrogroup = computed(() =>
-    store.getters['gui/macros/getMacrogroup'](props.panelId)
-)
+const macrogroup = computed(() => store.getters['gui/macros/getMacrogroup'](props.panelId))
 
-const allMacros = computed(() =>
-    store.getters['printer/getMacros'] ?? []
-)
+const allMacros = computed(() => store.getters['printer/getMacros'] ?? [])
 
 const macros = computed(() => {
     let result = macrogroup.value?.macros ?? []
@@ -69,13 +65,12 @@ const macros = computed(() => {
     return result.sort((a: GuiMacrosStateMacrogroupMacro, b: GuiMacrosStateMacrogroupMacro) => a.pos - b.pos)
 })
 
-const macrogroupStatus = computed(() =>
-    (
+const macrogroupStatus = computed(
+    () =>
         (macrogroup.value.showInStandby &&
             ['standby', 'cancelled', 'complete', 'error'].includes(printer_state.value)) ||
         (macrogroup.value.showInPause && printer_state.value === 'paused') ||
         (macrogroup.value.showInPrinting && printer_state.value === 'printing')
-    )
 )
 
 function getColor(macro: GuiMacrosStateMacrogroupMacro) {

@@ -4,10 +4,10 @@ This directory contains Klipper macros for CNC operation.
 
 ## Files
 
-| File | Description |
-|------|-------------|
-| `cnc_base.cfg` | Scaffold macros (`CNC_SAFE_Z`, `CNC_GO_TO_WORK_ZERO`, `CNC_PARK`) — replace with machine-safe implementations |
-| `wcs_macros.cfg` | WCS selector macros (`WCS_1`..`WCS_6`), per-WCS zero macros (`ZERO_X`/`Y`/`Z`/`ALL`), and `MACHINE_COORDS` |
+| File             | Description                                                                                                   |
+| ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| `cnc_base.cfg`   | Scaffold macros (`CNC_SAFE_Z`, `CNC_GO_TO_WORK_ZERO`, `CNC_PARK`) — replace with machine-safe implementations |
+| `wcs_macros.cfg` | WCS selector macros (`WCS_1`..`WCS_6`), per-WCS zero macros (`ZERO_X`/`Y`/`Z`/`ALL`), and `MACHINE_COORDS`    |
 
 ## WCS Macros (`wcs_macros.cfg`)
 
@@ -25,12 +25,12 @@ Requires the `[work_coordinate_systems]` Klipper extra plugin
 
 The macros in `wcs_macros.cfg` provide dashboard-friendly aliases:
 
-| Macro | Equivalent |
-|-------|------------|
-| `WCS_1` .. `WCS_6` | `G54` .. `G59` |
-| `MACHINE_COORDS` | `G53` |
-| `ZERO_X` / `ZERO_Y` / `ZERO_Z` | `G10 L20 P{active_p} X0` / `Y0` / `Z0` |
-| `ZERO_ALL` | `G10 L20 P{active_p} X0 Y0 Z0` + `WCS_STATUS` |
+| Macro                          | Equivalent                                    |
+| ------------------------------ | --------------------------------------------- |
+| `WCS_1` .. `WCS_6`             | `G54` .. `G59`                                |
+| `MACHINE_COORDS`               | `G53`                                         |
+| `ZERO_X` / `ZERO_Y` / `ZERO_Z` | `G10 L20 P{active_p} X0` / `Y0` / `Z0`        |
+| `ZERO_ALL`                     | `G10 L20 P{active_p} X0 Y0 Z0` + `WCS_STATUS` |
 
 ## Installation
 
@@ -63,11 +63,11 @@ Stock Klipper does **not** support `G10` (Klipper logs
 the project used `G92` for work-zero operations. The table below
 documents what changed:
 
-| Intent | LinuxCNC / GRBL | Old approach (G92) | New approach (WCS plugin) |
-| --- | --- | --- | --- |
-| Set work zero | `G10 L20 Pn X0 Y0` | `G92 X0 Y0` | `G10 L20 Pn X0 Y0` (per-WCS) |
-| Zero a single axis | `G10 L20 Pn Z0` | `G92 Z0` | `G10 L20 Pn Z0` (per-WCS) |
-| Apply manual offset | `G10 L2 Pn X<x>` | `G92 X<x>` | `G10 L2 Pn X<x>` (absolute) |
-| Switch active WCS | `G54`..`G59` | `G54`..`G59` (accepted, no effect) | `G54`..`G59` (backed by offset table) |
-| Query active WCS | system var | not exposed | `printer.work_coordinate_systems.active_wcs` |
-| Persist offsets | per-WCS | `SAVE_VARIABLE` (manual) | JSON file (automatic) |
+| Intent              | LinuxCNC / GRBL    | Old approach (G92)                 | New approach (WCS plugin)                    |
+| ------------------- | ------------------ | ---------------------------------- | -------------------------------------------- |
+| Set work zero       | `G10 L20 Pn X0 Y0` | `G92 X0 Y0`                        | `G10 L20 Pn X0 Y0` (per-WCS)                 |
+| Zero a single axis  | `G10 L20 Pn Z0`    | `G92 Z0`                           | `G10 L20 Pn Z0` (per-WCS)                    |
+| Apply manual offset | `G10 L2 Pn X<x>`   | `G92 X<x>`                         | `G10 L2 Pn X<x>` (absolute)                  |
+| Switch active WCS   | `G54`..`G59`       | `G54`..`G59` (accepted, no effect) | `G54`..`G59` (backed by offset table)        |
+| Query active WCS    | system var         | not exposed                        | `printer.work_coordinate_systems.active_wcs` |
+| Persist offsets     | per-WCS            | `SAVE_VARIABLE` (manual)           | JSON file (automatic)                        |

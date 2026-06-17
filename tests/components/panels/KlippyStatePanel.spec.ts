@@ -11,9 +11,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         klipperState: new MockRef('shutdown'),
@@ -63,10 +69,23 @@ vi.mock('vue-i18n', () => ({
 }))
 
 const vuetifyComponentsMock = vi.hoisted(() => ({
-    VAlert: { name: 'VAlert', inheritAttrs: false, props: ['color', 'density', 'variant', 'border'], template: '<div :class="$attrs.class" :style="$attrs.style"><slot /><slot name="text" /></div>' },
+    VAlert: {
+        name: 'VAlert',
+        inheritAttrs: false,
+        props: ['color', 'density', 'variant', 'border'],
+        template: '<div :class="$attrs.class" :style="$attrs.style"><slot /><slot name="text" /></div>',
+    },
     VIcon: { name: 'VIcon', props: ['start', 'icon', 'color'], template: '<i :class="$attrs.class"><slot /></i>' },
-    VBtn: { name: 'VBtn', props: ['icon', 'ripple', 'size', 'variant', 'href', 'color', 'disabled'], template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>' },
-    VProgressCircular: { name: 'VProgressCircular', props: ['indeterminate', 'color'], template: '<span><slot /></span>' },
+    VBtn: {
+        name: 'VBtn',
+        props: ['icon', 'ripple', 'size', 'variant', 'href', 'color', 'disabled'],
+        template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>',
+    },
+    VProgressCircular: {
+        name: 'VProgressCircular',
+        props: ['indeterminate', 'color'],
+        template: '<span><slot /></span>',
+    },
     VRow: { name: 'VRow', template: '<div><slot /></div>' },
     VCol: { name: 'VCol', template: '<div><slot /></div>' },
     VCardText: { name: 'VCardText', template: '<div><slot /></div>' },

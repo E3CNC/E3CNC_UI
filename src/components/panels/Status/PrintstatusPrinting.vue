@@ -58,7 +58,7 @@
                 <v-col class="v-col-3 pa-0 text-center">
                     <v-tooltip top>
                         <template #activator="{ props }">
-                            <div v-bind="props" class="text-center" >
+                            <div v-bind="props" class="text-center">
                                 <strong>{{ $t('Panels.StatusPanel.Layer') }}</strong>
                                 <br />
                                 <span class="text-no-wrap">{{ current_layer }} of {{ max_layers }}</span>
@@ -77,7 +77,7 @@
                 <v-col class="v-col-3 pa-0">
                     <v-tooltip top>
                         <template #activator="{ props }">
-                            <div v-bind="props" class="text-center" >
+                            <div v-bind="props" class="text-center">
                                 <strong>{{ $t('Panels.StatusPanel.Estimate') }}</strong>
                                 <br />
                                 <span class="text-no-wrap">
@@ -104,7 +104,7 @@
                 <v-col class="v-col-3 pa-0">
                     <v-tooltip top>
                         <template #activator="{ props }">
-                            <div v-bind="props" class="text-center" >
+                            <div v-bind="props" class="text-center">
                                 <strong>{{ $t('Panels.StatusPanel.Total') }}</strong>
                                 <br />
                                 <span class="text-no-wrap">
@@ -156,7 +156,7 @@ const live_flow = computed(() => {
     return currentFlow?.toFixed(1)
 })
 
-const outputMaxFlow = computed(() => maxFlow ? maxFlow.toFixed(1) + ' mm³/s' : '--')
+const outputMaxFlow = computed(() => (maxFlow ? maxFlow.toFixed(1) + ' mm³/s' : '--'))
 
 const requested_speed = computed(() => {
     const requestedSpeed = store.state.printer.gcode_move?.speed ?? 0

@@ -1,7 +1,7 @@
 <template>
     <v-tooltip top>
         <template #activator="{ props: activatorProps }">
- <v-btn class="px-2 minwidth-0 ml-3" v-bind="activatorProps" @click="exportHistory">
+            <v-btn class="px-2 minwidth-0 ml-3" v-bind="activatorProps" @click="exportHistory">
                 <v-icon>{{ mdiDatabaseExportOutline }}</v-icon>
             </v-btn>
         </template>
@@ -26,9 +26,7 @@ const props = defineProps<{
 const { browserLocale, formatDateTime } = useBase()
 const { selectedJobs, jobs } = useHistory()
 
-const existsSlicerCol = computed(() =>
-    props.headers.find((header) => header.value === 'slicer')?.visible ?? false
-)
+const existsSlicerCol = computed(() => props.headers.find((header) => header.value === 'slicer')?.visible ?? false)
 
 const exportJobs = computed(() => {
     if (selectedJobs.value.length) return [...selectedJobs.value]
@@ -46,9 +44,11 @@ function exportHistory() {
 
     const csvContent =
         'data:text/csv;charset=utf-8,' +
-        content.map((entry) =>
-            entry.map((field) => (field.indexOf(csvSeperator) === -1 ? field : `"${field}"`)).join(csvSeperator)
-        ).join('\n')
+        content
+            .map((entry) =>
+                entry.map((field) => (field.indexOf(csvSeperator) === -1 ? field : `"${field}"`)).join(csvSeperator)
+            )
+            .join('\n')
 
     const link = document.createElement('a')
     link.setAttribute('href', encodeURI(csvContent))

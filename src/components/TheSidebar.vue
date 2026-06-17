@@ -10,7 +10,7 @@
         class="sidebar-shell"
         :style="sidebarCssVars">
         <div class="v-navigation-drawer__image" aria-hidden="true">
-            <v-img :src="sidebarBackground" class="sidebar-background-image" style="height: 100%;" cover />
+            <v-img :src="sidebarBackground" class="sidebar-background-image" style="height: 100%" cover />
         </div>
 
         <OverlayScrollbarsComponent class="nav-scrollbar">
@@ -69,13 +69,11 @@ const naviDrawer = computed({
     set: (newVal) => store.dispatch('setNaviDrawer', newVal),
 })
 
-const sidebarBackground = computed((): string =>
-    store.getters['files/getCustomSidebarBackground'] ?? sidebarBgImage.value
+const sidebarBackground = computed(
+    (): string => store.getters['files/getCustomSidebarBackground'] ?? sidebarBgImage.value
 )
 
-const boolNaviTemp = computed((): boolean =>
-    !isMobile.value && display.mdAndDown.value
-)
+const boolNaviTemp = computed((): boolean => !isMobile.value && display.mdAndDown.value)
 
 const sidebarCssVars = computed((): Record<string, string> => {
     const output: Record<string, string> = {}

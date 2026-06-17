@@ -77,9 +77,7 @@ export function useHistoryStats(valueName: HistoryStatsValueNames): UseHistorySt
 
     const printStatusArray = computed<ServerHistoryStateAllPrintStatusEntry[]>(() => {
         return allPrintStati.value.map((status: string) => {
-            const filterdJobs = history.allJobs.value.filter(
-                (job: ServerHistoryStateJob) => job.status === status
-            )
+            const filterdJobs = history.allJobs.value.filter((job: ServerHistoryStateJob) => job.status === status)
 
             return {
                 name: status,
@@ -99,9 +97,7 @@ export function useHistoryStats(valueName: HistoryStatsValueNames): UseHistorySt
 
     const printStatusArrayChart = computed<ServerHistoryStateAllPrintStatusEntry[]>(() => {
         if (valueName === 'filament') {
-            const jobs = history.selectedJobs.value.length
-                ? history.selectedJobs.value
-                : history.jobs.value
+            const jobs = history.selectedJobs.value.length ? history.selectedJobs.value : history.jobs.value
 
             return printStatusArray.value
                 .map((entry) => {
@@ -120,9 +116,7 @@ export function useHistoryStats(valueName: HistoryStatsValueNames): UseHistorySt
         }
 
         if (valueName === 'time') {
-            const jobs = history.selectedJobs.value.length
-                ? history.selectedJobs.value
-                : history.jobs.value
+            const jobs = history.selectedJobs.value.length ? history.selectedJobs.value : history.jobs.value
 
             return printStatusArray.value
                 .map((entry) => {

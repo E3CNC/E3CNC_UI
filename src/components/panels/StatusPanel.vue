@@ -19,7 +19,7 @@
                     class="mr-3" />
             </template>
             <template #buttons>
- <v-btn
+                <v-btn
                     v-for="button in filteredToolbarButtons"
                     :key="button.loadingName"
                     :color="button.color"
@@ -56,7 +56,9 @@
                     <v-row class="flex-nowrap">
                         <v-col class="py-2" style="min-width: 0">
                             <span class="text-subtitle-2 px-0 text-disabled">
-                                <v-icon class="mr-2 mt-1 float-start" size="small">{{ mdiMessageProcessingOutline }}</v-icon>
+                                <v-icon class="mr-2 mt-1 float-start" size="small">
+                                    {{ mdiMessageProcessingOutline }}
+                                </v-icon>
                                 {{ display_message }}
                             </span>
                         </v-col>
@@ -160,17 +162,11 @@ const jobQueueBadgeColor = computed(() =>
     jobsCount.value > 0 ? 'primary darken-2' : 'rgba(var(--v-theme-on-surface), 0.4)'
 )
 
-const current_filename = computed(() =>
-    store.state.printer.print_stats?.filename ?? ''
-)
+const current_filename = computed(() => store.state.printer.print_stats?.filename ?? '')
 
-const current_file = computed(() =>
-    store.state.printer.current_file ?? {}
-)
+const current_file = computed(() => store.state.printer.current_file ?? {})
 
-const printPercent = computed(() =>
-    Math.floor(store.getters['printer/getPrintPercent'] * 100)
-)
+const printPercent = computed(() => Math.floor(store.getters['printer/getPrintPercent'] * 100))
 
 const printerStateOutput = computed(() => {
     if (printer_state.value !== '') {
@@ -238,21 +234,13 @@ const toolbarButtons = computed(() => [
     },
 ])
 
-const filteredToolbarButtons = computed(() =>
-    toolbarButtons.value.filter((button) => button.status())
-)
+const filteredToolbarButtons = computed(() => toolbarButtons.value.filter((button) => button.status()))
 
-const display_message = computed(() =>
-    store.state.printer.display_status?.message ?? null
-)
+const display_message = computed(() => store.state.printer.display_status?.message ?? null)
 
-const print_stats_message = computed(() =>
-    store.state.printer.print_stats?.message ?? null
-)
+const print_stats_message = computed(() => store.state.printer.print_stats?.message ?? null)
 
-const macros = computed(() =>
-    store.getters['printer/getMacros'] ?? []
-)
+const macros = computed(() => store.getters['printer/getMacros'] ?? [])
 
 const displayFilesTab = computed(() => {
     const count = store.state.gui.uiSettings.dashboardFilesLimit ?? 5

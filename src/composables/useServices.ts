@@ -4,9 +4,7 @@ import { useStore } from 'vuex'
 export function useServices() {
     const store = useStore()
 
-    const hideOtherInstances = computed(
-        () => store.state.gui.uiSettings.hideOtherInstances ?? false
-    )
+    const hideOtherInstances = computed(() => store.state.gui.uiSettings.hideOtherInstances ?? false)
 
     const instance_ids = computed(() => store.state.server.system_info?.instance_ids ?? {})
 

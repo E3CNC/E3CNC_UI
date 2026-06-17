@@ -249,23 +249,27 @@ describe('printer getters', () => {
         it('returns "--" when eta is not in the future', () => {
             vi.setSystemTime(new Date(2024, 0, 1, 10, 0, 0))
             const eta = new Date(2024, 0, 1, 10, 0, 0).getTime()
-            expect((getters as any).getEstimatedTimeETAFormat(
-                {} as PrinterState,
-                { getEstimatedTimeETA: eta },
-                {} as any,
-                { 'gui/getHours12Format': false },
-            )).toBe('--')
+            expect(
+                (getters as any).getEstimatedTimeETAFormat(
+                    {} as PrinterState,
+                    { getEstimatedTimeETA: eta },
+                    {} as any,
+                    { 'gui/getHours12Format': false }
+                )
+            ).toBe('--')
         })
 
         it('formats time in 24-hour mode', () => {
             vi.setSystemTime(new Date(2024, 0, 1, 10, 0, 0))
             const eta = new Date(2024, 0, 1, 16, 5, 0).getTime()
-            expect((getters as any).getEstimatedTimeETAFormat(
-                {} as PrinterState,
-                { getEstimatedTimeETA: eta },
-                {} as any,
-                { 'gui/getHours12Format': false },
-            )).toBe('16:05')
+            expect(
+                (getters as any).getEstimatedTimeETAFormat(
+                    {} as PrinterState,
+                    { getEstimatedTimeETA: eta },
+                    {} as any,
+                    { 'gui/getHours12Format': false }
+                )
+            ).toBe('16:05')
         })
     })
 
@@ -391,7 +395,11 @@ describe('printer getters', () => {
 
     describe('getFilamentSensors', () => {
         it('returns filament sensor objects from state', () => {
-            state['filament_switch_sensor my_sensor'] = { enabled: true, filament_detected: true, Diameter: 1.75 } as any
+            state['filament_switch_sensor my_sensor'] = {
+                enabled: true,
+                filament_detected: true,
+                Diameter: 1.75,
+            } as any
             const result = (getters as any).getFilamentSensors(state)
             expect(result).toHaveLength(1)
             expect(result[0].name).toBe('my_sensor')
@@ -554,7 +562,13 @@ describe('printer getters', () => {
 
         it('returns 0 when no calc methods active', () => {
             const rootState = { gui: { general: { calcEstimateTime: [] } } }
-            expect((getters as any).getEstimatedTimeAvg(state, { getEstimatedTimeFile: 0, getEstimatedTimeFilament: 0 }, rootState)).toBe(0)
+            expect(
+                (getters as any).getEstimatedTimeAvg(
+                    state,
+                    { getEstimatedTimeFile: 0, getEstimatedTimeFilament: 0 },
+                    rootState
+                )
+            ).toBe(0)
         })
     })
 
@@ -573,7 +587,13 @@ describe('printer getters', () => {
 
         it('returns 0 when no calc methods active', () => {
             const rootState = { gui: { general: { calcEtaTime: [] } } }
-            expect((getters as any).getEstimatedTimeETA(state, { getEstimatedTimeFile: 0, getEstimatedTimeFilament: 0, getEstimatedTimeSlicer: 0 }, rootState)).toBe(0)
+            expect(
+                (getters as any).getEstimatedTimeETA(
+                    state,
+                    { getEstimatedTimeFile: 0, getEstimatedTimeFilament: 0, getEstimatedTimeSlicer: 0 },
+                    rootState
+                )
+            ).toBe(0)
         })
     })
 
@@ -581,34 +601,40 @@ describe('printer getters', () => {
         it('formats time in 12-hour mode with AM/PM', () => {
             vi.setSystemTime(new Date(2024, 0, 1, 10, 0, 0))
             const eta = new Date(2024, 0, 1, 14, 30, 0).getTime()
-            expect((getters as any).getEstimatedTimeETAFormat(
-                {} as PrinterState,
-                { getEstimatedTimeETA: eta },
-                {} as any,
-                { 'gui/getHours12Format': true },
-            )).toBe('02:30 PM')
+            expect(
+                (getters as any).getEstimatedTimeETAFormat(
+                    {} as PrinterState,
+                    { getEstimatedTimeETA: eta },
+                    {} as any,
+                    { 'gui/getHours12Format': true }
+                )
+            ).toBe('02:30 PM')
         })
 
         it('shows +1 when ETA is next day', () => {
             vi.setSystemTime(new Date(2024, 0, 1, 23, 0, 0))
             const eta = new Date(2024, 0, 2, 1, 0, 0).getTime()
-            expect((getters as any).getEstimatedTimeETAFormat(
-                {} as PrinterState,
-                { getEstimatedTimeETA: eta },
-                {} as any,
-                { 'gui/getHours12Format': false },
-            )).toBe('01:00 +1')
+            expect(
+                (getters as any).getEstimatedTimeETAFormat(
+                    {} as PrinterState,
+                    { getEstimatedTimeETA: eta },
+                    {} as any,
+                    { 'gui/getHours12Format': false }
+                )
+            ).toBe('01:00 +1')
         })
 
         it('returns -- when ETA is not in the future', () => {
             vi.setSystemTime(new Date(2024, 0, 1, 10, 0, 0))
             const eta = new Date(2024, 0, 1, 9, 0, 0).getTime()
-            expect((getters as any).getEstimatedTimeETAFormat(
-                {} as PrinterState,
-                { getEstimatedTimeETA: eta },
-                {} as any,
-                { 'gui/getHours12Format': false },
-            )).toBe('--')
+            expect(
+                (getters as any).getEstimatedTimeETAFormat(
+                    {} as PrinterState,
+                    { getEstimatedTimeETA: eta },
+                    {} as any,
+                    { 'gui/getHours12Format': false }
+                )
+            ).toBe('--')
         })
     })
 })

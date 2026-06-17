@@ -145,9 +145,7 @@ const icon = computed(() => {
     return mdiThermometer
 })
 
-const color = computed(() =>
-    store.getters['printer/tempHistory/getDatasetColor'](props.objectName) ?? '#FFFFFF'
-)
+const color = computed(() => store.getters['printer/tempHistory/getDatasetColor'](props.objectName) ?? '#FFFFFF')
 
 const iconColor = computed(() => {
     if (target.value === null || target.value > 0) return `${color.value}${opacityHeaterActive}`
@@ -165,9 +163,7 @@ const iconClass = computed(() => {
 
 const isFan = computed(() => props.objectName.startsWith('temperature_fan'))
 
-const state = computed<number | null>(() =>
-    printerObject.value.power ?? printerObject.value.speed ?? null
-)
+const state = computed<number | null>(() => printerObject.value.power ?? printerObject.value.speed ?? null)
 
 const formatState = computed(() => {
     if (state.value === null) return null
@@ -186,9 +182,7 @@ const avgState = computed(() => {
 
 const temperature = computed<number | null>(() => printerObject.value?.temperature ?? null)
 
-const formatTemperature = computed(() =>
-    `${temperature.value?.toFixed(1) ?? '--'}°C`
-)
+const formatTemperature = computed(() => `${temperature.value?.toFixed(1) ?? '--'}°C`)
 
 const min_temp = computed(() => parseInt(printerObjectSettings.value.min_temp ?? 0))
 const max_temp = computed(() => parseInt(printerObjectSettings.value.max_temp ?? 0))

@@ -61,9 +61,7 @@ const name = computed(() => {
 
 const formatName = computed(() => convertName(name.value))
 
-const color = computed(() =>
-    store.state.gui?.view?.tempchart?.datasetSettings?.[props.objectName]?.color ?? '#ffffff'
-)
+const color = computed(() => store.state.gui?.view?.tempchart?.datasetSettings?.[props.objectName]?.color ?? '#ffffff')
 
 const iconColor = computed(() => {
     if (state.value === null || state.value > 0) return `${color.value}${opacityHeaterActive}`

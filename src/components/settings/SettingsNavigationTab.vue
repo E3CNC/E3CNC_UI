@@ -10,10 +10,7 @@
                 item-key="title"
                 :force-fallback="true">
                 <template #item="{ element: naviPoint }">
-                    <settings-navigation-tab-item
-                        class="my-2 mx-0"
-                        :style="draggableBgStyle"
-                        :navi-point="naviPoint" />
+                    <settings-navigation-tab-item class="my-2 mx-0" :style="draggableBgStyle" :navi-point="naviPoint" />
                 </template>
             </draggable>
         </v-card-text>

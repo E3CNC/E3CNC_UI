@@ -16,15 +16,14 @@
         </form>
         <v-menu v-if="presets" :offset-y="true" left title="Preheat">
             <template #activator="{ props }">
- <v-btn
+                <v-btn
                     :disabled="['printing', 'paused'].includes(printer_state)"
                     tabindex="-1"
                     size="x-small"
                     variant="plain"
                     v-bind="props"
                     class="pa-0"
-                    style="min-width: 24px"
-                    >
+                    style="min-width: 24px">
                     <v-icon>{{ mdiMenuDown }}</v-icon>
                 </v-btn>
             </template>
@@ -121,9 +120,12 @@ onMounted(() => {
     value.value = props.target ?? 0
 })
 
-watch(() => props.target, (newVal: number) => {
-    value.value = newVal
-})
+watch(
+    () => props.target,
+    (newVal: number) => {
+        value.value = newVal
+    }
+)
 </script>
 
 <style scoped>

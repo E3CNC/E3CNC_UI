@@ -78,7 +78,11 @@ describe('gui actions', () => {
     })
 
     it('updateSettings emits database post_item', () => {
-        actions.updateSettings({} as any, { keyName: 'view.gcodefiles.hideMetadataColumns', value: ['size'], newVal: ['size'] })
+        actions.updateSettings({} as any, {
+            keyName: 'view.gcodefiles.hideMetadataColumns',
+            value: ['size'],
+            newVal: ['size'],
+        })
         expect(mockSocket.emit).toHaveBeenCalledWith('server.database.post_item', {
             namespace: 'mainsail',
             key: 'view.gcodefiles.hideMetadataColumns',
@@ -230,7 +234,11 @@ describe('gui actions', () => {
             dataset: 'temperature',
             value: true,
         })
-        expect(commit).toHaveBeenCalledWith('setChartDatasetStatus', { objectName: 'extruder', dataset: 'temperature', value: true })
+        expect(commit).toHaveBeenCalledWith('setChartDatasetStatus', {
+            objectName: 'extruder',
+            dataset: 'temperature',
+            value: true,
+        })
         expect(dispatch).toHaveBeenCalledWith('updateSettings', {
             keyName: 'view.tempchart.datasetSettings',
             newVal: {},
@@ -245,13 +253,17 @@ describe('gui actions', () => {
             id: 'panel1',
             position: { x: 100, y: 50, width: 300, height: 200, zIndex: 1 },
         })
-        expect(commit).toHaveBeenCalledWith('setFloatingPanels', { panel1: { x: 100, y: 50, width: 300, height: 200, zIndex: 1 } })
+        expect(commit).toHaveBeenCalledWith('setFloatingPanels', {
+            panel1: { x: 100, y: 50, width: 300, height: 200, zIndex: 1 },
+        })
     })
 
     it('saveFloatingPanelPosition removes panel', () => {
         const commit = vi.fn()
         const dispatch = vi.fn()
-        const stateMock = { dashboard: { floatingPanels: { panel1: { x: 100, y: 50, width: 300, height: 200, zIndex: 1 } } } }
+        const stateMock = {
+            dashboard: { floatingPanels: { panel1: { x: 100, y: 50, width: 300, height: 200, zIndex: 1 } } },
+        }
         actions.saveFloatingPanelPosition({ commit, dispatch, state: stateMock as any } as any, {
             id: 'panel1',
             remove: true,

@@ -32,7 +32,8 @@ const mockT = vi.fn((key: string) => {
         'App.TopCornerMenu.ConfirmationDialog.Title.KlipperRestart': 'Restart Klipper?',
         'App.TopCornerMenu.ConfirmationDialog.Description.KlipperRestart': 'This will restart Klipper.',
         'App.TopCornerMenu.ConfirmationDialog.Title.KlipperFirmwareRestart': 'Firmware Restart?',
-        'App.TopCornerMenu.ConfirmationDialog.Description.KlipperFirmwareRestart': 'This will perform a firmware restart.',
+        'App.TopCornerMenu.ConfirmationDialog.Description.KlipperFirmwareRestart':
+            'This will perform a firmware restart.',
         'App.TopCornerMenu.ConfirmationDialog.Title.HostReboot': 'Reboot Host?',
         'App.TopCornerMenu.ConfirmationDialog.Description.HostReboot': 'This will reboot the host.',
         'App.TopCornerMenu.ConfirmationDialog.Title.HostShutdown': 'Shutdown Host?',
@@ -365,9 +366,7 @@ describe('TheTopCornerMenu.vue', () => {
 
     // ── 11. Power device click with confirmOnPowerDeviceChange shows dialog ──
     it('power device click with confirmOnPowerDeviceChange shows dialog', async () => {
-        const mockDevices = [
-            { device: 'Light', status: 'off', locked_while_printing: false, type: 'gpio' },
-        ]
+        const mockDevices = [{ device: 'Light', status: 'off', locked_while_printing: false, type: 'gpio' }]
         const wrapper = await mountComponent({
             state: {
                 gui: {
@@ -395,9 +394,7 @@ describe('TheTopCornerMenu.vue', () => {
 
     // ── 12. Fires toggle without confirmation when confirmOnPowerDeviceChange is false ──
     it('fires toggle without confirmation when confirmOnPowerDeviceChange is false', async () => {
-        const mockDevices = [
-            { device: 'Light', status: 'off', locked_while_printing: false, type: 'gpio' },
-        ]
+        const mockDevices = [{ device: 'Light', status: 'off', locked_while_printing: false, type: 'gpio' }]
         const wrapper = await mountComponent({
             state: {
                 gui: {
@@ -430,9 +427,7 @@ describe('TheTopCornerMenu.vue', () => {
 
     // ── 13. Power device toggle emits correct RPC (on → off) ──
     it('power device toggle emits correct RPC for turning off', async () => {
-        const mockDevices = [
-            { device: 'Fan', status: 'on', locked_while_printing: false, type: 'gpio' },
-        ]
+        const mockDevices = [{ device: 'Fan', status: 'on', locked_while_printing: false, type: 'gpio' }]
         const wrapper = await mountComponent({
             getters: {
                 'server/power/getDevices': () => mockDevices,
@@ -454,9 +449,7 @@ describe('TheTopCornerMenu.vue', () => {
 
     // ── 14. Power device toggle emits correct RPC (off → on) ──
     it('power device toggle emits correct RPC for turning on', async () => {
-        const mockDevices = [
-            { device: 'Fan', status: 'off', locked_while_printing: false, type: 'gpio' },
-        ]
+        const mockDevices = [{ device: 'Fan', status: 'off', locked_while_printing: false, type: 'gpio' }]
         const wrapper = await mountComponent({
             getters: {
                 'server/power/getDevices': () => mockDevices,

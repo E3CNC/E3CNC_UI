@@ -34,7 +34,8 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VTextarea: {
         name: 'VTextarea',
         props: ['modelValue', 'label', 'hideDetails', 'variant'],
-        template: '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
+        template:
+            '<textarea :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)"></textarea>',
     },
     VBtn: { name: 'VBtn', props: ['icon', 'rounded', 'color', 'variant'], template: '<button><slot /></button>' },
     VIcon: { name: 'VIcon', props: ['icon'], template: '<i><slot /></i>' },
@@ -198,7 +199,12 @@ describe('HistoryListPanelPerformMaintenance.vue', () => {
     it('hides perform button when item has no reminder', () => {
         const store = createStoreWithState()
         const item = createMockItem({
-            reminder: { type: null, filament: { bool: false, value: null }, printtime: { bool: false, value: null }, date: { bool: false, value: null } },
+            reminder: {
+                type: null,
+                filament: { bool: false, value: null },
+                printtime: { bool: false, value: null },
+                date: { bool: false, value: null },
+            },
         })
         const wrapper = mount(HistoryListPanelPerformMaintenance, {
             props: {
@@ -219,7 +225,12 @@ describe('HistoryListPanelPerformMaintenance.vue', () => {
     it('shows "Performed and Reschedule" text for repeat reminders', () => {
         const store = createStoreWithState()
         const item = createMockItem({
-            reminder: { type: 'repeat', filament: { bool: true, value: 1000 }, printtime: { bool: false, value: null }, date: { bool: false, value: null } },
+            reminder: {
+                type: 'repeat',
+                filament: { bool: true, value: 1000 },
+                printtime: { bool: false, value: null },
+                date: { bool: false, value: null },
+            },
         })
         const wrapper = mount(HistoryListPanelPerformMaintenance, {
             props: {

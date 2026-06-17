@@ -1,6 +1,6 @@
 /**
  * Tests for src/store/files/mutations.ts
- * 
+ *
  * Tests the files store mutations which manage the file tree,
  * upload state, and file operations.
  */
@@ -185,9 +185,7 @@ describe('files mutations', () => {
                 {
                     isDirectory: true,
                     filename: 'gcodes',
-                    childrens: [
-                        { isDirectory: false, filename: 'test.gcode' },
-                    ],
+                    childrens: [{ isDirectory: false, filename: 'test.gcode' }],
                 } as any,
             ]
 

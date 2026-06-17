@@ -167,9 +167,7 @@ describe('DroPanel.vue', () => {
         mockShowMachineCoords.value = false
         const wrapper = createWrapper()
         // Should not see the Machine labels
-        const machineLabels = wrapper.findAll('.dro-panel__label').filter(
-            (el) => el.text() === 'Machine'
-        )
+        const machineLabels = wrapper.findAll('.dro-panel__label').filter((el) => el.text() === 'Machine')
         expect(machineLabels.length).toBe(0)
     })
 

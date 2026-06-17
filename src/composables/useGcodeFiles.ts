@@ -33,41 +33,29 @@ export function useGcodeFiles() {
         store.dispatch('gui/saveSetting', { name: 'view.gcodefiles.currentPath', value: newVal })
     }
 
-    const showHiddenFiles = computed(
-        () => store.state.gui.view.gcodefiles.showHiddenFiles ?? false
-    )
+    const showHiddenFiles = computed(() => store.state.gui.view.gcodefiles.showHiddenFiles ?? false)
 
     function setShowHiddenFiles(newVal: boolean) {
         store.dispatch('gui/saveSetting', { name: 'view.gcodefiles.showHiddenFiles', value: newVal })
     }
 
-    const showCompletedFiles = computed(
-        () => store.state.gui.view.gcodefiles.showCompletedFiles ?? true
-    )
+    const showCompletedFiles = computed(() => store.state.gui.view.gcodefiles.showCompletedFiles ?? true)
 
     function setShowCompletedFiles(newVal: boolean) {
         store.dispatch('gui/saveSetting', { name: 'view.gcodefiles.showCompletedFiles', value: newVal })
     }
 
     const files = computed(() =>
-        store.getters['files/getGcodeFiles'](
-            currentPath.value,
-            showHiddenFiles.value,
-            showCompletedFiles.value
-        )
+        store.getters['files/getGcodeFiles'](currentPath.value, showHiddenFiles.value, showCompletedFiles.value)
     )
 
-    const hideMetadataColumns = computed(
-        () => store.state.gui.view.gcodefiles.hideMetadataColumns ?? []
-    )
+    const hideMetadataColumns = computed(() => store.state.gui.view.gcodefiles.hideMetadataColumns ?? [])
 
     function setHideMetadataColumns(newVal: string[]) {
         store.dispatch('gui/saveSetting', { name: 'view.gcodefiles.hideMetadataColumns', value: newVal })
     }
 
-    const orderMetadataColumns = computed(
-        () => store.state.gui.view.gcodefiles.orderMetadataColumns ?? []
-    )
+    const orderMetadataColumns = computed(() => store.state.gui.view.gcodefiles.orderMetadataColumns ?? [])
 
     function setOrderMetadataColumns(newVal: string[]) {
         store.dispatch('gui/saveSetting', { name: 'view.gcodefiles.orderMetadataColumns', value: newVal })
@@ -143,9 +131,7 @@ export function useGcodeFiles() {
         headers.forEach((header) => {
             header.visible = !hideMetadataColumns.value.includes(header.value)
 
-            let pos = orderMetadataColumns.value?.findIndex(
-                (value: string) => value === header.value
-            )
+            let pos = orderMetadataColumns.value?.findIndex((value: string) => value === header.value)
             if (pos === -1) {
                 unknownPos++
                 pos = orderMetadataColumns.value.length + unknownPos
@@ -166,9 +152,7 @@ export function useGcodeFiles() {
 
     const filteredHeaders = computed(() => headers.value.filter((header) => header.visible))
 
-    const tableColumns = computed(() =>
-        configurableHeaders.value.filter((column) => column.visible)
-    )
+    const tableColumns = computed(() => configurableHeaders.value.filter((column) => column.visible))
 
     const selectedFiles = computed(() => store.state.gui.view.gcodefiles.selectedFiles ?? [])
 

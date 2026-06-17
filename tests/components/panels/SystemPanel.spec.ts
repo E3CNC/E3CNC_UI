@@ -8,9 +8,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         klipperReadyForGui: new MockRef(true),
@@ -30,7 +36,11 @@ vi.mock('vue-i18n', () => ({
 const vuetifyComponentsMock = vi.hoisted(() => ({
     VCardText: { name: 'VCardText', template: '<div><slot /></div>' },
     VDivider: { name: 'VDivider', template: '<hr />' },
-    VBtn: { name: 'VBtn', props: ['icon', 'rounded', 'variant'], template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>' },
+    VBtn: {
+        name: 'VBtn',
+        props: ['icon', 'rounded', 'variant'],
+        template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>',
+    },
     VIcon: { name: 'VIcon', props: ['size'], template: '<i><slot /></i>' },
 }))
 
@@ -139,10 +149,7 @@ describe('SystemPanel.vue', () => {
     it('renders with MCU items when MCUs exist', () => {
         const store = createStoreWithState({
             getters: {
-                'printer/getMcus': () => [
-                    { name: 'mcu' },
-                    { name: 'rpi' },
-                ],
+                'printer/getMcus': () => [{ name: 'mcu' }, { name: 'rpi' }],
                 'server/getHostStats': () => null,
                 'gui/getPanelExpand': () => () => true,
             },
@@ -183,9 +190,7 @@ describe('SystemPanel.vue', () => {
     it('renders MCUs and host together when both exist', () => {
         const store = createStoreWithState({
             getters: {
-                'printer/getMcus': () => [
-                    { name: 'mcu' },
-                ],
+                'printer/getMcus': () => [{ name: 'mcu' }],
                 'server/getHostStats': () => ({ cpu: 25, memory: 50 }),
                 'gui/getPanelExpand': () => () => true,
             },

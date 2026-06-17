@@ -1,8 +1,8 @@
 <template>
     <v-dialog v-model="isOpen" transition="dialog-bottom-transition" max-width="600" :fullscreen="isMobile">
         <template #activator="{ props: activatorProps }">
- <v-btn v-if="inToolbar" :icon="mdiHelp" rounded="0" v-bind="activatorProps"/>
- <v-btn
+            <v-btn v-if="inToolbar" :icon="mdiHelp" rounded="0" v-bind="activatorProps" />
+            <v-btn
                 v-else
                 class="gcode-command-btn px-2 minwidth-0"
                 color="lightgray"
@@ -18,7 +18,7 @@
                 card-class="command-help-dialog"
                 :margin-bottom="false">
                 <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="isOpen = false"/>
+                    <v-btn :icon="mdiCloseThick" rounded="0" @click="isOpen = false" />
                 </template>
                 <v-card-title>
                     <v-row>
@@ -34,7 +34,9 @@
                     </v-row>
                 </v-card-title>
                 <v-divider />
-                <OverlayScrollbarsComponent class="command-help-content" :class="isMobile ? 'mobileHeight' : 'height300'">
+                <OverlayScrollbarsComponent
+                    class="command-help-content"
+                    :class="isMobile ? 'mobileHeight' : 'height300'">
                     <v-card-text class="pt-0">
                         <v-list>
                             <command-help-modal-entry
@@ -77,9 +79,7 @@ const isOpen = ref(false)
 const helplist = computed<string[]>(() => Object.keys(store.state.printer.gcode?.commands ?? {}))
 
 const helplistFiltered = computed<string[]>(() =>
-    helplist.value
-        .filter((cmd) => cmd.includes(cmdListSearch.value.toUpperCase()))
-        .sort((a, b) => a.localeCompare(b))
+    helplist.value.filter((cmd) => cmd.includes(cmdListSearch.value.toUpperCase())).sort((a, b) => a.localeCompare(b))
 )
 
 function onCommand(gcode: string): void {

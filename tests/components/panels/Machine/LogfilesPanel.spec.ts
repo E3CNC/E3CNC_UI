@@ -27,10 +27,18 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VCol: { name: 'VCol', template: '<div :class="$attrs.class"><slot /></div>' },
     VTooltip: { name: 'VTooltip', template: '<div><slot name="activator" /><slot /></div>' },
     VIcon: { name: 'VIcon', template: '<i class="v-icon"><slot /></i>' },
-    VBtn: { name: 'VBtn', props: ['icon', 'rounded', 'ripple', 'color', 'loading', 'disabled'], template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>' },
+    VBtn: {
+        name: 'VBtn',
+        props: ['icon', 'rounded', 'ripple', 'color', 'loading', 'disabled'],
+        template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>',
+    },
     VCard: { name: 'VCard', template: '<div><slot /></div>' },
     VCardText: { name: 'VCardText', template: '<div><slot /></div>' },
-    VDialog: { name: 'VDialog', props: ['modelValue', 'persistent', 'width', 'fullscreen'], template: '<div v-if="modelValue" class="v-dialog"><slot /></div>' },
+    VDialog: {
+        name: 'VDialog',
+        props: ['modelValue', 'persistent', 'width', 'fullscreen'],
+        template: '<div v-if="modelValue" class="v-dialog"><slot /></div>',
+    },
 }))
 
 vi.mock('vuetify/components', () => vuetifyComponentsMock)

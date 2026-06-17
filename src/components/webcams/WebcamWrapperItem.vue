@@ -49,13 +49,17 @@ const props = defineProps({
 const service = computed(() => (props.webcam as GuiWebcamStateWebcam)?.service ?? 'unknown')
 
 const MjpegstreamerAsync = defineAsyncComponent(() => import('@/components/webcams/streamers/Mjpegstreamer.vue'))
-const MjpegstreamerAdaptiveAsync = defineAsyncComponent(() => import('@/components/webcams/streamers/MjpegstreamerAdaptive.vue'))
+const MjpegstreamerAdaptiveAsync = defineAsyncComponent(
+    () => import('@/components/webcams/streamers/MjpegstreamerAdaptive.vue')
+)
 const Uv4lMjpegAsync = defineAsyncComponent(() => import('@/components/webcams/streamers/Uv4lMjpeg.vue'))
 const HtmlIframeAsync = defineAsyncComponent(() => import('@/components/webcams/streamers/HtmlIframe.vue'))
 const HtmlVideoAsync = defineAsyncComponent(() => import('@/components/webcams/streamers/HtmlVideo.vue'))
 const HlsstreamerAsync = defineAsyncComponent(() => import('@/components/webcams/streamers/Hlsstreamer.vue'))
 const JMuxerStreamAsync = defineAsyncComponent(() => import('@/components/webcams/streamers/JMuxerStream.vue'))
-const WebrtcCameraStreamerAsync = defineAsyncComponent(() => import('@/components/webcams/streamers/WebrtcCameraStreamer.vue'))
+const WebrtcCameraStreamerAsync = defineAsyncComponent(
+    () => import('@/components/webcams/streamers/WebrtcCameraStreamer.vue')
+)
 const JanusStreamerAsync = defineAsyncComponent(() => import('@/components/webcams/streamers/JanusStreamer.vue'))
 const WebrtcMediaMTXAsync = defineAsyncComponent(() => import('@/components/webcams/streamers/WebrtcMediaMTX.vue'))
 const WebrtcGo2rtcAsync = defineAsyncComponent(() => import('@/components/webcams/streamers/WebrtcGo2rtc.vue'))

@@ -8,7 +8,7 @@
             style="overflow: hidden"
             :height="isMobile ? 0 : 548">
             <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="closePrompt"/>
+                <v-btn :icon="mdiCloseThick" rounded="0" @click="closePrompt" />
             </template>
             <v-card-text>
                 <template v-for="(event, index) in activePromptContent" :key="'prompt_' + index">
@@ -124,10 +124,7 @@ const showDialog = computed(() => {
     if (lastPromptBeginPos.value === -1) return false
 
     const lastBeginEvent = macroPromptEvents.value[lastPromptBeginPos.value] ?? null
-    if (
-        internalCloseCommand.value !== null &&
-        internalCloseCommand.value == (lastBeginEvent?.date?.getTime() ?? null)
-    )
+    if (internalCloseCommand.value !== null && internalCloseCommand.value == (lastBeginEvent?.date?.getTime() ?? null))
         return false
 
     return lastPromptBeginPos.value > lastPromptClosePos.value && activePromptContent.value.length > 0

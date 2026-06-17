@@ -8,9 +8,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         apiUrl: new MockRef('//localhost:8080'),
@@ -46,11 +52,27 @@ vi.mock('vue-toast-notification', () => ({
 }))
 
 const vuetifyComponentsMock = vi.hoisted(() => ({
-    VCheckbox: { name: 'VCheckbox', props: ['modelValue', 'density', 'hideDetails', 'ripple'], template: '<input type="checkbox" :checked="modelValue" @click="$emit(\'update:modelValue\', !modelValue)" />' },
+    VCheckbox: {
+        name: 'VCheckbox',
+        props: ['modelValue', 'density', 'hideDetails', 'ripple'],
+        template: '<input type="checkbox" :checked="modelValue" @click="$emit(\'update:modelValue\', !modelValue)" />',
+    },
     VIcon: { name: 'VIcon', props: ['start', 'icon', 'size', 'color', 'disabled'], template: '<i><slot /></i>' },
-    VProgressCircular: { name: 'VProgressCircular', props: ['indeterminate', 'color'], template: '<span><slot /></span>' },
-    VTooltip: { name: 'VTooltip', props: ['location', 'top', 'text'], template: '<div><slot name="activator" :props="{}" /><slot /></div>' },
-    VMenu: { name: 'VMenu', props: ['modelValue', 'positionX', 'positionY', 'absolute', 'offsetY'], template: '<div><slot /></div>' },
+    VProgressCircular: {
+        name: 'VProgressCircular',
+        props: ['indeterminate', 'color'],
+        template: '<span><slot /></span>',
+    },
+    VTooltip: {
+        name: 'VTooltip',
+        props: ['location', 'top', 'text'],
+        template: '<div><slot name="activator" :props="{}" /><slot /></div>',
+    },
+    VMenu: {
+        name: 'VMenu',
+        props: ['modelValue', 'positionX', 'positionY', 'absolute', 'offsetY'],
+        template: '<div><slot /></div>',
+    },
     VList: { name: 'VList', template: '<div><slot /></div>' },
     VListItem: { name: 'VListItem', props: ['disabled'], template: '<div @click="$attrs.onClick"><slot /></div>' },
 }))
@@ -76,7 +98,8 @@ vi.mock('@/directives/longpress', () => ({
 vi.mock('vue-load-image', () => ({
     default: {
         name: 'VueLoadImage',
-        template: '<div class="vue-load-image"><slot name="image" /><slot name="preloader" /><slot name="error" /></div>',
+        template:
+            '<div class="vue-load-image"><slot name="image" /><slot name="preloader" /><slot name="error" /></div>',
     },
 }))
 
@@ -194,8 +217,26 @@ describe('HistoryListEntryJob.vue', () => {
         const store = createStoreWithState()
         const item = createMockJob()
         const tableFields = [
-            { title: 'Size', key: 'size', text: 'Size', value: 'size', align: 'left', configable: true, visible: true, outputType: 'filesize' },
-            { title: 'Print Time', key: 'print_duration', text: 'Print Time', value: 'print_duration', align: 'left', configable: true, visible: true, outputType: 'time' },
+            {
+                title: 'Size',
+                key: 'size',
+                text: 'Size',
+                value: 'size',
+                align: 'left',
+                configable: true,
+                visible: true,
+                outputType: 'filesize',
+            },
+            {
+                title: 'Print Time',
+                key: 'print_duration',
+                text: 'Print Time',
+                value: 'print_duration',
+                align: 'left',
+                configable: true,
+                visible: true,
+                outputType: 'time',
+            },
         ]
         const wrapper = mount(HistoryListEntryJob, {
             props: {

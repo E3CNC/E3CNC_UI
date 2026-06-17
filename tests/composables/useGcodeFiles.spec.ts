@@ -24,17 +24,23 @@ describe('useGcodeFiles', () => {
                             showHiddenFiles: true,
                             showCompletedFiles: false,
                             hideMetadataColumns: ['slicer'],
-                            orderMetadataColumns: ['size', 'modified', 'estimated_time', 'last_start_time', 'last_end_time', 'last_print_duration', 'last_total_duration', 'slicer'],
+                            orderMetadataColumns: [
+                                'size',
+                                'modified',
+                                'estimated_time',
+                                'last_start_time',
+                                'last_end_time',
+                                'last_print_duration',
+                                'last_total_duration',
+                                'slicer',
+                            ],
                             selectedFiles: ['benchy.gcode'],
                         },
                     },
                 },
             },
             getters: {
-                'files/getGcodeFiles': () => () => [
-                    { filename: 'benchy.gcode' },
-                    { filename: 'other.gcode' },
-                ],
+                'files/getGcodeFiles': () => () => [{ filename: 'benchy.gcode' }, { filename: 'other.gcode' }],
             },
             actions: {
                 'gui/saveSetting': vi.fn(),

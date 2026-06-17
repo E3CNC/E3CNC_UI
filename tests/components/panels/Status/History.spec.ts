@@ -8,7 +8,11 @@ vi.mock('@/composables/useBase', () => ({
 }))
 
 const vuetifyComponentsMock = vi.hoisted(() => ({
-    VCard: { name: 'VCard', inheritAttrs: false, template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>' },
+    VCard: {
+        name: 'VCard',
+        inheritAttrs: false,
+        template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>',
+    },
     VRow: { name: 'VRow', template: '<div :class="$attrs.class"><slot /></div>' },
     VCol: { name: 'VCol', template: '<div :class="$attrs.class"><slot /></div>' },
 }))
@@ -35,7 +39,14 @@ function createTestStore(overrides: Record<string, any> = {}) {
                 components: [],
                 history: {
                     jobs: [],
-                    job_totals: { total_jobs: 0, total_time: 0, total_print_time: 0, total_filament_used: 0, longest_job: 0, longest_print: 0 },
+                    job_totals: {
+                        total_jobs: 0,
+                        total_time: 0,
+                        total_print_time: 0,
+                        total_filament_used: 0,
+                        longest_job: 0,
+                        longest_print: 0,
+                    },
                     auxiliary_totals: [],
                     all_loaded: false,
                     ...(serverOverrides.history || {}),
@@ -48,7 +59,10 @@ function createTestStore(overrides: Record<string, any> = {}) {
                 toolhead: { homed_axes: 'xyz' },
             },
             gui: {
-                dashboard: { nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] }, floatingPanels: {} },
+                dashboard: {
+                    nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] },
+                    floatingPanels: {},
+                },
                 general: { printername: 'Test' },
                 control: {},
                 uiSettings: {
@@ -132,7 +146,12 @@ describe('History.vue', () => {
         const uuid = 'abc-123'
         const jobs = [
             makeJob('1', 'test.gcode', { metadata: { uuid } }),
-            makeJob('2', 'test.gcode', { metadata: { uuid }, filament_used: 300, print_duration: 2000, total_duration: 2500 }),
+            makeJob('2', 'test.gcode', {
+                metadata: { uuid },
+                filament_used: 300,
+                print_duration: 2000,
+                total_duration: 2500,
+            }),
         ]
         const store = createTestStore({
             server: { history: { jobs } },

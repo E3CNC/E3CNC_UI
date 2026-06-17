@@ -4,10 +4,7 @@
         <template v-if="filteredLights.length">
             <template v-for="(light, index) in filteredLights" :key="index">
                 <v-divider v-if="index" class="my-2" />
-                <settings-miscellaneous-tab-list-light
-                    :type="light.type"
-                    :name="light.name"
-                    @open-page="openPage" />
+                <settings-miscellaneous-tab-list-light :type="light.type" :name="light.name" @open-page="openPage" />
             </template>
         </template>
         <p v-else class="mb-0 text-center font-italic">{{ $t('Settings.MiscellaneousTab.NoDevicesFound') }}</p>

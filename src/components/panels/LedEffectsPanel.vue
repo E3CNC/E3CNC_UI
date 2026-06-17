@@ -8,13 +8,12 @@
         <template #buttons>
             <v-tooltip left>
                 <template #activator="{ props }">
- <v-btn
+                    <v-btn
                         v-bind="props"
                         icon
                         rounded="0"
                         :loading="isLoadingAllEffects"
                         :disabled="printerIsPrintingOnly"
-                        
                         @click="stopAllEffects">
                         <v-icon>{{ mdiStop }}</v-icon>
                     </v-btn>
@@ -62,16 +61,10 @@ const ledEffects = computed(() => {
         .sort((a, b) => a.localeCompare(b))
 })
 
-const isLoadingAllEffects = computed(() =>
-    loadings.value.includes(STOP_LED_EFFECTS_COMMAND)
-)
+const isLoadingAllEffects = computed(() => loadings.value.includes(STOP_LED_EFFECTS_COMMAND))
 
 function stopAllEffects() {
     store.dispatch('server/addEvent', { message: STOP_LED_EFFECTS_COMMAND, type: 'command' })
-    socket.emit(
-        'printer.gcode.script',
-        { script: STOP_LED_EFFECTS_COMMAND },
-        { loading: STOP_LED_EFFECTS_COMMAND }
-    )
+    socket.emit('printer.gcode.script', { script: STOP_LED_EFFECTS_COMMAND }, { loading: STOP_LED_EFFECTS_COMMAND })
 }
 </script>

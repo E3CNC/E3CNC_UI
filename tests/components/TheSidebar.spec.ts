@@ -118,8 +118,22 @@ describe('TheSidebar.vue', () => {
 
     it('shows nav items when visibleNaviPoints has entries', () => {
         mockVisibleNaviPoints.value = [
-            { type: 'route' as const, title: 'Dashboard', icon: 'mdi-view-dashboard', to: '/', position: 0, visible: true },
-            { type: 'route' as const, title: 'Console', icon: 'mdi-console', to: '/console', position: 1, visible: true },
+            {
+                type: 'route' as const,
+                title: 'Dashboard',
+                icon: 'mdi-view-dashboard',
+                to: '/',
+                position: 0,
+                visible: true,
+            },
+            {
+                type: 'route' as const,
+                title: 'Console',
+                icon: 'mdi-console',
+                to: '/console',
+                position: 1,
+                visible: true,
+            },
         ]
         const store = createStoreWithState()
         const wrapper = mount(TheSidebar, {

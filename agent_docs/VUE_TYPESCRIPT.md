@@ -43,14 +43,14 @@ Always clean up resources:
 
 ## Vuetify 3 Component API
 
-| Vuetify 2 | Vuetify 3 |
-|-----------|-----------|
-| `<v-btn text>` | `<v-btn variant="text">` |
-| `<v-btn outlined>` | `<v-btn variant="outlined">` |
-| `<v-btn small>` | `<v-btn size="small">` |
-| `<v-btn tile>` | `<v-btn rounded="0">` |
-| `<v-btn block>` | `<v-btn class="d-block w-100">` |
-| `<v-alert dense>` | `<v-alert density="compact">` |
-| `col-6` class | `v-col-6` class |
-| `$vuetify.breakpoint` | `useDisplay()` |
-| `$vuetify.theme` | `useTheme()` |
+| Vuetify 2             | Vuetify 3                       |
+| --------------------- | ------------------------------- |
+| `<v-btn text>`        | `<v-btn variant="text">`        |
+| `<v-btn outlined>`    | `<v-btn variant="outlined">`    |
+| `<v-btn small>`       | `<v-btn size="small">`          |
+| `<v-btn tile>`        | `<v-btn rounded="0">`           |
+| `<v-btn block>`       | `<v-btn class="d-block w-100">` |
+| `<v-alert dense>`     | `<v-alert density="compact">`   |
+| `col-6` class         | `v-col-6` class                 |
+| `$vuetify.breakpoint` | `useDisplay()`                  |
+| `$vuetify.theme`      | `useTheme()`                    |

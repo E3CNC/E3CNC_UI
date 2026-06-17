@@ -24,14 +24,23 @@ vi.mock('@/store/variables', () => ({
 vi.mock('vue-load-image', () => ({
     default: {
         name: 'VueLoadImage',
-        template: '<div class="vue-load-image"><slot name="image" /><slot name="preloader" /><slot name="error" /></div>',
+        template:
+            '<div class="vue-load-image"><slot name="image" /><slot name="preloader" /><slot name="error" /></div>',
     },
 }))
 
 const vuetifyComponentsMock = vi.hoisted(() => ({
     VIcon: { name: 'VIcon', props: ['size', 'color'], template: '<i><slot /></i>' },
-    VTooltip: { name: 'VTooltip', props: ['location', 'disabled', 'contentClass', 'color'], template: '<div class="v-tooltip-mock"><slot name="activator" :props="{}" /><slot /></div>' },
-    VProgressCircular: { name: 'VProgressCircular', props: ['indeterminate', 'color'], template: '<span class="v-progress-circular" />' },
+    VTooltip: {
+        name: 'VTooltip',
+        props: ['location', 'disabled', 'contentClass', 'color'],
+        template: '<div class="v-tooltip-mock"><slot name="activator" :props="{}" /><slot /></div>',
+    },
+    VProgressCircular: {
+        name: 'VProgressCircular',
+        props: ['indeterminate', 'color'],
+        template: '<span class="v-progress-circular" />',
+    },
 }))
 
 vi.mock('vuetify/components', () => vuetifyComponentsMock)
@@ -83,7 +92,7 @@ function mountOptions(store: ReturnType<typeof createStore>) {
             plugins: [store],
             stubs: {
                 'vue-load-image': true,
-                'VueLoadImage': true,
+                VueLoadImage: true,
             },
         },
     }
@@ -122,9 +131,7 @@ describe('GcodefilesThumbnail.vue', () => {
     it('renders with vue-load-image when thumbnails exist', () => {
         const store = createStoreWithState()
         const item = makeItem('test.gcode', {
-            thumbnails: [
-                { width: 32, height: 32, size: 1024, relative_path: '.thumbs/test_32.png' },
-            ],
+            thumbnails: [{ width: 32, height: 32, size: 1024, relative_path: '.thumbs/test_32.png' }],
         })
         const wrapper = mount(GcodefilesThumbnail, {
             props: { item },
@@ -155,9 +162,7 @@ describe('GcodefilesThumbnail.vue', () => {
     it('does not show big thumbnail tooltip when only small thumbnail exists', () => {
         const store = createStoreWithState()
         const item = makeItem('test.gcode', {
-            thumbnails: [
-                { width: 32, height: 32, size: 1024, relative_path: '.thumbs/test_32.png' },
-            ],
+            thumbnails: [{ width: 32, height: 32, size: 1024, relative_path: '.thumbs/test_32.png' }],
         })
         const wrapper = mount(GcodefilesThumbnail, {
             props: { item },
@@ -171,9 +176,7 @@ describe('GcodefilesThumbnail.vue', () => {
     it('builds correct thumbnail URL', () => {
         const store = createStoreWithState()
         const item = makeItem('test.gcode', {
-            thumbnails: [
-                { width: 32, height: 32, size: 1024, relative_path: '.thumbs/test_32.png' },
-            ],
+            thumbnails: [{ width: 32, height: 32, size: 1024, relative_path: '.thumbs/test_32.png' }],
         })
         const wrapper = mount(GcodefilesThumbnail, {
             props: { item },
@@ -188,9 +191,7 @@ describe('GcodefilesThumbnail.vue', () => {
         const store = createStoreWithState()
         const item = makeItem('test.gcode', {
             full_filename: 'subdir/test.gcode',
-            thumbnails: [
-                { width: 32, height: 32, size: 1024, relative_path: '.thumbs/test_32.png' },
-            ],
+            thumbnails: [{ width: 32, height: 32, size: 1024, relative_path: '.thumbs/test_32.png' }],
         })
         const wrapper = mount(GcodefilesThumbnail, {
             props: { item },
@@ -205,9 +206,7 @@ describe('GcodefilesThumbnail.vue', () => {
         const store = createStoreWithState()
         const item = makeItem('test.gcode', {
             modified: undefined as unknown as Date,
-            thumbnails: [
-                { width: 32, height: 32, size: 1024, relative_path: '.thumbs/test_32.png' },
-            ],
+            thumbnails: [{ width: 32, height: 32, size: 1024, relative_path: '.thumbs/test_32.png' }],
         })
         // Should not throw - fileTimestamp should handle this safely
         expect(() => {
@@ -258,9 +257,7 @@ describe('GcodefilesThumbnail.vue', () => {
     it('renders progress spinner for preloader slot', () => {
         const store = createStoreWithState()
         const item = makeItem('test.gcode', {
-            thumbnails: [
-                { width: 32, height: 32, size: 1024, relative_path: '.thumbs/test_32.png' },
-            ],
+            thumbnails: [{ width: 32, height: 32, size: 1024, relative_path: '.thumbs/test_32.png' }],
         })
         const wrapper = mount(GcodefilesThumbnail, {
             props: { item },

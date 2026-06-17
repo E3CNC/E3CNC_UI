@@ -96,8 +96,7 @@ const printtimeAvgArray = computed<number[]>(() => {
 
     let jobsFiltered = [
         ...allJobs.value.filter(
-            (job: ServerHistoryStateJob) =>
-                new Date(job.start_time * 1000) >= startDate && job.status === 'completed'
+            (job: ServerHistoryStateJob) => new Date(job.start_time * 1000) >= startDate && job.status === 'completed'
         ),
     ]
     if (selectedJobs.value.length)

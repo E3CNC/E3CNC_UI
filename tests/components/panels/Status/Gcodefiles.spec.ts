@@ -8,9 +8,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v: any) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v: any) {
+            this._value = v
+        }
     }
     return { loadings: new MockRef([]) }
 })
@@ -24,7 +30,11 @@ vi.mock('@/composables/useControl', () => ({
 }))
 
 const vuetifyComponentsMock = vi.hoisted(() => ({
-    VCard: { name: 'VCard', inheritAttrs: false, template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>' },
+    VCard: {
+        name: 'VCard',
+        inheritAttrs: false,
+        template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>',
+    },
     VTable: { name: 'VTable', template: '<table><slot /></table>' },
 }))
 
@@ -43,7 +53,10 @@ const mockResizeObserverInstance = vi.hoisted(() => ({
     disconnect: vi.fn(),
 }))
 
-vi.stubGlobal('ResizeObserver', vi.fn(() => mockResizeObserverInstance))
+vi.stubGlobal(
+    'ResizeObserver',
+    vi.fn(() => mockResizeObserverInstance)
+)
 
 function createTestStore(overrides: Record<string, any> = {}) {
     const guiOverrides = overrides.gui || {}
@@ -59,7 +72,10 @@ function createTestStore(overrides: Record<string, any> = {}) {
                 toolhead: { homed_axes: 'xyz' },
             },
             gui: {
-                dashboard: { nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] }, floatingPanels: {} },
+                dashboard: {
+                    nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] },
+                    floatingPanels: {},
+                },
                 general: { printername: 'Test' },
                 control: {},
                 uiSettings: {
@@ -172,9 +188,7 @@ describe('Gcodefiles.vue', () => {
     })
 
     it('respects dashboardFilesLimit', () => {
-        const gcodes = Array.from({ length: 10 }, (_, i) =>
-            makeGcodefile(`test${i}.gcode`, { last_status: null })
-        )
+        const gcodes = Array.from({ length: 10 }, (_, i) => makeGcodefile(`test${i}.gcode`, { last_status: null }))
         const store = createTestStore({
             gui: {
                 uiSettings: { dashboardFilesLimit: 3, dashboardFilesFilter: [] },

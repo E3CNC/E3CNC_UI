@@ -12,15 +12,17 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
 
 vi.mock('vuetify/components', () => vuetifyComponentsMock)
 
-const mockT = vi.hoisted(() => vi.fn((key: string) => {
-    const translations: Record<string, string> = {
-        'Panels.StatusPanel.Filament': 'Filament',
-        'Panels.StatusPanel.Slicer': 'Slicer',
-        'Panels.StatusPanel.Print': 'Print',
-        'Panels.StatusPanel.Total': 'Total',
-    }
-    return translations[key] ?? key
-}))
+const mockT = vi.hoisted(() =>
+    vi.fn((key: string) => {
+        const translations: Record<string, string> = {
+            'Panels.StatusPanel.Filament': 'Filament',
+            'Panels.StatusPanel.Slicer': 'Slicer',
+            'Panels.StatusPanel.Print': 'Print',
+            'Panels.StatusPanel.Total': 'Total',
+        }
+        return translations[key] ?? key
+    })
+)
 
 vi.mock('vue-i18n', () => ({
     useI18n: () => ({

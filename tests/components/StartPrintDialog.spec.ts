@@ -33,7 +33,8 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VBtn: {
         name: 'VBtn',
         props: { variant: String, color: String, disabled: Boolean },
-        template: '<button :disabled="disabled" :data-color="color" @click="$emit(\'click\', $event)"><slot /></button>',
+        template:
+            '<button :disabled="disabled" :data-color="color" @click="$emit(\'click\', $event)"><slot /></button>',
     },
     VSpacer: { name: 'VSpacer', template: '<span />' },
     VDivider: { name: 'VDivider', template: '<hr />' },
@@ -149,7 +150,10 @@ describe('StartPrintDialog.vue', () => {
             global: { plugins: [store, i18n] },
         })
 
-        console.log('All buttons:', wrapper.findAll('button').map(b => b.text()))
+        console.log(
+            'All buttons:',
+            wrapper.findAll('button').map((b) => b.text())
+        )
         console.log('Full text:', wrapper.text())
 
         // The component uses $t which might not resolve in this test setup

@@ -21,8 +21,10 @@ vi.mock('@/plugins/i18n', () => ({
                 if (key === 'App.Titles.Error') return 'Error'
                 if (key === 'App.Titles.Pause') return 'Pause'
                 if (key === 'App.Titles.Complete') return `Complete - ${(params as any)?.filename}`
-                if (key === 'App.Titles.PrintingETA') return `Printing ${(params as any)?.percent}% - ${(params as any)?.filename} - ETA ${(params as any)?.eta}`
-                if (key === 'App.Titles.Printing') return `Printing ${(params as any)?.percent}% - ${(params as any)?.filename}`
+                if (key === 'App.Titles.PrintingETA')
+                    return `Printing ${(params as any)?.percent}% - ${(params as any)?.filename} - ETA ${(params as any)?.eta}`
+                if (key === 'App.Titles.Printing')
+                    return `Printing ${(params as any)?.percent}% - ${(params as any)?.filename}`
                 return key
             },
         },
@@ -32,7 +34,20 @@ vi.mock('@/plugins/i18n', () => ({
 vi.mock('semver', () => ({
     default: {
         valid: (v: string) => {
-            const validVersions = ['0.11.0', '0.8.0', '0.12.0', '0.9.0', '0.10.0', '0.7.0', 'v0.11.0', 'v0.8.0', 'v0.12.0', 'v0.9.0', 'v0.10.0', 'v0.7.0']
+            const validVersions = [
+                '0.11.0',
+                '0.8.0',
+                '0.12.0',
+                '0.9.0',
+                '0.10.0',
+                '0.7.0',
+                'v0.11.0',
+                'v0.8.0',
+                'v0.12.0',
+                'v0.9.0',
+                'v0.10.0',
+                'v0.7.0',
+            ]
             if (validVersions.includes(v)) return v
             return null
         },
@@ -99,7 +114,10 @@ describe('root store', () => {
 
         it('importConfigJson sets hostname when instancesDB is moonraker', async () => {
             const commit = vi.fn()
-            await (actions.importConfigJson as any)({ commit }, { hostname: 'myprinter', port: '7125', path: '/mainsail' })
+            await (actions.importConfigJson as any)(
+                { commit },
+                { hostname: 'myprinter', port: '7125', path: '/mainsail' }
+            )
             expect(commit).toHaveBeenCalledWith('socket/setData', { hostname: 'myprinter' })
             expect(commit).toHaveBeenCalledWith('socket/setData', { port: 7125 })
             expect(commit).toHaveBeenCalledWith('socket/setData', { route_prefix: '/mainsail' })
@@ -113,7 +131,10 @@ describe('root store', () => {
 
         it('importConfigJson skips instances when instancesDB is browser', async () => {
             const commit = vi.fn()
-            await (actions.importConfigJson as any)({ commit }, { instancesDB: 'browser', instances: [{ hostname: 'p1' }] })
+            await (actions.importConfigJson as any)(
+                { commit },
+                { instancesDB: 'browser', instances: [{ hostname: 'p1' }] }
+            )
             expect(commit).not.toHaveBeenCalledWith('setConfigInstances', expect.anything())
         })
 
@@ -132,12 +153,7 @@ describe('root store', () => {
         })
 
         it('getTitle returns Mainsail when not connected', () => {
-            const result = (getters as any).getTitle(
-                { ...state, socket: { isConnected: false } },
-                {},
-                {},
-                {}
-            )
+            const result = (getters as any).getTitle({ ...state, socket: { isConnected: false } }, {}, {}, {})
             expect(result).toBe('Mainsail')
         })
 

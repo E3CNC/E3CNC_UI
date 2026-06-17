@@ -84,9 +84,7 @@ describe('ConnectionStatus.vue', () => {
 
     it('muteColor correctly dims RGB values to 45% through rendered output', () => {
         // Set a known CSS var so getOnSurface() returns a parseable value
-        const origValue = document.documentElement.style.getPropertyValue(
-            '--v-theme-on-surface',
-        )
+        const origValue = document.documentElement.style.getPropertyValue('--v-theme-on-surface')
         document.documentElement.style.setProperty('--v-theme-on-surface', '100 150 200')
 
         const wrapper = mount(ConnectionStatus, {
@@ -110,10 +108,7 @@ describe('ConnectionStatus.vue', () => {
         // Clean up
         document.documentElement.style.removeProperty('--v-theme-on-surface')
         if (origValue) {
-            document.documentElement.style.setProperty(
-                '--v-theme-on-surface',
-                origValue,
-            )
+            document.documentElement.style.setProperty('--v-theme-on-surface', origValue)
         }
     })
 

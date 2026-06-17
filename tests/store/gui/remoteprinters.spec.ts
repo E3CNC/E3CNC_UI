@@ -80,14 +80,21 @@ describe('gui remoteprinters store', () => {
             const commit = vi.fn()
             const dispatch = vi.fn()
             actions.store({ commit, dispatch } as any, { values: { hostname: 'printer1', port: 7125, name: 'P1' } })
-            expect(commit).toHaveBeenCalledWith('store', { id: 'mocked-uuid', values: { hostname: 'printer1', port: 7125, name: 'P1' } })
-            expect(dispatch).toHaveBeenCalledWith('farm/registerPrinter', {
+            expect(commit).toHaveBeenCalledWith('store', {
                 id: 'mocked-uuid',
-                hostname: 'printer1',
-                port: 7125,
-                path: '',
-                name: 'P1',
-            }, { root: true })
+                values: { hostname: 'printer1', port: 7125, name: 'P1' },
+            })
+            expect(dispatch).toHaveBeenCalledWith(
+                'farm/registerPrinter',
+                {
+                    id: 'mocked-uuid',
+                    hostname: 'printer1',
+                    port: 7125,
+                    path: '',
+                    name: 'P1',
+                },
+                { root: true }
+            )
             expect(dispatch).toHaveBeenCalledWith('upload', 'mocked-uuid')
         })
 
@@ -96,7 +103,11 @@ describe('gui remoteprinters store', () => {
             const dispatch = vi.fn()
             actions.update({ commit, dispatch } as any, { id: 'p1', values: { hostname: 'new' } })
             expect(commit).toHaveBeenCalledWith('update', { id: 'p1', values: { hostname: 'new' } })
-            expect(dispatch).toHaveBeenCalledWith('farm/updatePrinter', { id: 'p1', values: { hostname: 'new' } }, { root: true })
+            expect(dispatch).toHaveBeenCalledWith(
+                'farm/updatePrinter',
+                { id: 'p1', values: { hostname: 'new' } },
+                { root: true }
+            )
             expect(dispatch).toHaveBeenCalledWith('upload', 'p1')
         })
 
@@ -150,13 +161,17 @@ describe('gui remoteprinters store', () => {
             actions.initStore({ commit, dispatch } as any, { p1: { hostname: 'p1', port: 7125 } })
             expect(dispatch).toHaveBeenCalledWith('reset')
             expect(commit).toHaveBeenCalledWith('store', { id: 'p1', values: { hostname: 'p1', port: 7125 } })
-            expect(dispatch).toHaveBeenCalledWith('farm/registerPrinter', {
-                id: 'p1',
-                hostname: 'p1',
-                port: 7125,
-                path: '',
-                settings: {},
-            }, { root: true })
+            expect(dispatch).toHaveBeenCalledWith(
+                'farm/registerPrinter',
+                {
+                    id: 'p1',
+                    hostname: 'p1',
+                    port: 7125,
+                    path: '',
+                    settings: {},
+                },
+                { root: true }
+            )
         })
 
         it('updateSettings commits update and uploads', () => {
@@ -213,7 +228,12 @@ describe('gui remoteprinters store', () => {
         })
 
         it('getRemoteprinters returns empty array when no printers', () => {
-            const result = (getters as any).getRemoteprinters(state, {}, {}, { 'farm/getPrinterSocketState': () => ({}) })
+            const result = (getters as any).getRemoteprinters(
+                state,
+                {},
+                {},
+                { 'farm/getPrinterSocketState': () => ({}) }
+            )
             expect(result).toEqual([])
         })
     })

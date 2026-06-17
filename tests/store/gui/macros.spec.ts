@@ -49,7 +49,13 @@ describe('gui macros store', () => {
         })
 
         it('groupUpdate updates an existing macrogroup', () => {
-            state.macrogroups['g1'] = { name: 'Old', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true }
+            state.macrogroups['g1'] = {
+                name: 'Old',
+                color: 'primary',
+                showInStandby: true,
+                showInPrinting: true,
+                showInPause: true,
+            }
             mutations.groupUpdate(state, { id: 'g1', values: { name: 'New' } })
             expect(state.macrogroups['g1'].name).toBe('New')
         })
@@ -60,7 +66,14 @@ describe('gui macros store', () => {
         })
 
         it('addMacroToMacrogroup adds a macro to the group', () => {
-            state.macrogroups['g1'] = { name: 'Group1', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true, macros: [] }
+            state.macrogroups['g1'] = {
+                name: 'Group1',
+                color: 'primary',
+                showInStandby: true,
+                showInPrinting: true,
+                showInPause: true,
+                macros: [],
+            }
             mutations.addMacroToMacrogroup(state, { id: 'g1', macro: 'G28' })
             expect(state.macrogroups['g1'].macros).toHaveLength(1)
             expect(state.macrogroups['g1'].macros![0].name).toBe('G28')
@@ -69,15 +82,34 @@ describe('gui macros store', () => {
 
         it('removeMacroFromMacrogroup removes a macro', () => {
             state.macrogroups['g1'] = {
-                name: 'Group1', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true,
-                macros: [{ pos: 1, name: 'G28', color: 'group', showInStandby: true, showInPrinting: true, showInPause: true }],
+                name: 'Group1',
+                color: 'primary',
+                showInStandby: true,
+                showInPrinting: true,
+                showInPause: true,
+                macros: [
+                    {
+                        pos: 1,
+                        name: 'G28',
+                        color: 'group',
+                        showInStandby: true,
+                        showInPrinting: true,
+                        showInPause: true,
+                    },
+                ],
             }
             mutations.removeMacroFromMacrogroup(state, { id: 'g1', macro: 'G28' })
             expect(state.macrogroups['g1'].macros).toHaveLength(0)
         })
 
         it('groupDelete removes a macrogroup', () => {
-            state.macrogroups['g1'] = { name: 'Group1', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true }
+            state.macrogroups['g1'] = {
+                name: 'Group1',
+                color: 'primary',
+                showInStandby: true,
+                showInPrinting: true,
+                showInPause: true,
+            }
             mutations.groupDelete(state, 'g1')
             expect(state.macrogroups).toEqual({})
         })
@@ -93,11 +125,25 @@ describe('gui macros store', () => {
         it('saveSetting dispatches to gui/saveSetting', () => {
             const dispatch = vi.fn()
             actions.saveSetting({ dispatch } as any, { name: 'mode', value: 'expert' })
-            expect(dispatch).toHaveBeenCalledWith('gui/saveSetting', { name: 'macros.mode', value: 'expert' }, { root: true })
+            expect(dispatch).toHaveBeenCalledWith(
+                'gui/saveSetting',
+                { name: 'macros.mode', value: 'expert' },
+                { root: true }
+            )
         })
 
         it('groupUpload emits database post_item', () => {
-            const stateMock = { macrogroups: { g1: { name: 'Group1', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true } } }
+            const stateMock = {
+                macrogroups: {
+                    g1: {
+                        name: 'Group1',
+                        color: 'primary',
+                        showInStandby: true,
+                        showInPrinting: true,
+                        showInPause: true,
+                    },
+                },
+            }
             actions.groupUpload({ state: stateMock as any } as any, 'g1')
             expect(mockSocket.emit).toHaveBeenCalledWith('server.database.post_item', {
                 namespace: 'mainsail',
@@ -165,12 +211,20 @@ describe('gui macros store', () => {
             }
             actions.groupDelete({ commit, dispatch, rootState: rootState as any } as any, 'g1')
             expect(commit).toHaveBeenCalledWith('groupDelete', 'g1')
-            expect(commit).toHaveBeenCalledWith('gui/deleteFromDashboardLayout', { layoutname: 'mobileLayout', index: 0 }, { root: true })
+            expect(commit).toHaveBeenCalledWith(
+                'gui/deleteFromDashboardLayout',
+                { layoutname: 'mobileLayout', index: 0 },
+                { root: true }
+            )
             expect(mockSocket.emit).toHaveBeenCalledWith('server.database.delete_item', {
                 namespace: 'mainsail',
                 key: 'macros.macrogroups.g1',
             })
-            expect(dispatch).toHaveBeenCalledWith('gui/updateSettings', { keyName: 'dashboard.mobileLayout', newVal: [{ name: 'macrogroup_g1', visible: true }] }, { root: true })
+            expect(dispatch).toHaveBeenCalledWith(
+                'gui/updateSettings',
+                { keyName: 'dashboard.mobileLayout', newVal: [{ name: 'macrogroup_g1', visible: true }] },
+                { root: true }
+            )
         })
 
         it('groupDelete does not dispatch when macrogroup not in layout', () => {
@@ -196,15 +250,33 @@ describe('gui macros store', () => {
                 namespace: 'mainsail',
                 key: 'macros.macrogroups.g1',
             })
-            expect(dispatch).not.toHaveBeenCalledWith('gui/deleteFromDashboardLayout', expect.anything(), expect.anything())
+            expect(dispatch).not.toHaveBeenCalledWith(
+                'gui/deleteFromDashboardLayout',
+                expect.anything(),
+                expect.anything()
+            )
         })
     })
 
     describe('getters', () => {
         it('getAllMacrogroups returns sorted macrogroups', () => {
             state.macrogroups = {
-                g2: { id: null, name: 'Z group', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true },
-                g1: { id: null, name: 'A group', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true },
+                g2: {
+                    id: null,
+                    name: 'Z group',
+                    color: 'primary',
+                    showInStandby: true,
+                    showInPrinting: true,
+                    showInPause: true,
+                },
+                g1: {
+                    id: null,
+                    name: 'A group',
+                    color: 'primary',
+                    showInStandby: true,
+                    showInPrinting: true,
+                    showInPause: true,
+                },
             }
             const result = (getters as any).getAllMacrogroups(state)
             expect(result).toHaveLength(2)
@@ -213,7 +285,14 @@ describe('gui macros store', () => {
         })
 
         it('getMacrogroup returns a specific group', () => {
-            state.macrogroups['g1'] = { id: null, name: 'Group1', color: 'primary', showInStandby: true, showInPrinting: true, showInPause: true }
+            state.macrogroups['g1'] = {
+                id: null,
+                name: 'Group1',
+                color: 'primary',
+                showInStandby: true,
+                showInPrinting: true,
+                showInPause: true,
+            }
             expect((getters as any).getMacrogroup(state)('g1').name).toBe('Group1')
         })
 

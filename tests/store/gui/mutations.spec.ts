@@ -1,6 +1,6 @@
 /**
  * Tests for src/store/gui/mutations.ts
- * 
+ *
  * Tests the GUI store mutations which manage UI settings,
  * dashboard layout, and view preferences.
  */
@@ -81,9 +81,7 @@ describe('gui mutations', () => {
                 name: 'extruder',
                 hidden: true,
             })
-            expect(
-                state.view.tempchart.hiddenDataset.filter((h) => h === 'EXTRUDER').length
-            ).toBe(1)
+            expect(state.view.tempchart.hiddenDataset.filter((h) => h === 'EXTRUDER').length).toBe(1)
         })
     })
 
@@ -170,10 +168,7 @@ describe('gui mutations', () => {
                 viewport: 'desktop',
                 name: 'temperature',
             })
-            expect(
-                state.dashboard.nonExpandPanels['desktop'].filter((p) => p === 'temperature')
-                    .length
-            ).toBe(1)
+            expect(state.dashboard.nonExpandPanels['desktop'].filter((p) => p === 'temperature').length).toBe(1)
         })
 
         it('removes panel from non-expand list', () => {
@@ -226,17 +221,13 @@ describe('gui mutations', () => {
         })
 
         it('removes the last item from a dashboard layout', () => {
-            state.dashboard.desktopLayout1 = [
-                { name: 'webcam', visible: true },
-            ]
+            state.dashboard.desktopLayout1 = [{ name: 'webcam', visible: true }]
             mutations.deleteFromDashboardLayout(state, { layoutname: 'desktopLayout1', index: 0 })
             expect(state.dashboard.desktopLayout1).toHaveLength(0)
         })
 
         it('does nothing when index is out of bounds', () => {
-            state.dashboard.desktopLayout1 = [
-                { name: 'webcam', visible: true },
-            ]
+            state.dashboard.desktopLayout1 = [{ name: 'webcam', visible: true }]
             mutations.deleteFromDashboardLayout(state, { layoutname: 'desktopLayout1', index: 5 })
             expect(state.dashboard.desktopLayout1).toHaveLength(1)
         })

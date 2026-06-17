@@ -205,9 +205,7 @@ const versionOutput = computed(() => {
 
 const configuredType = computed(() => props.repo.configured_type ?? 'git_repo')
 
-const isSemverType = computed(() =>
-    ['web', 'python', 'executable', 'zip'].includes(type.value)
-)
+const isSemverType = computed(() => ['web', 'python', 'executable', 'zip'].includes(type.value))
 
 const isValid = computed(() => props.repo.is_valid ?? true)
 
@@ -261,8 +259,7 @@ const btnText = computed(() => {
     if (!isValid.value) return t('Machine.UpdatePanel.Invalid')
     if (isSemverType.value) {
         if (semverUpdatable.value) return t('Machine.UpdatePanel.Update')
-        else if (localVersion.value === null || remoteVersion.value === null)
-            return t('Machine.UpdatePanel.Unknown')
+        else if (localVersion.value === null || remoteVersion.value === null) return t('Machine.UpdatePanel.Unknown')
     }
     if (type.value === 'git_repo' && commitsBehind.value.length) return t('Machine.UpdatePanel.Update')
     return t('Machine.UpdatePanel.UpToDate')
@@ -280,13 +277,9 @@ const semverUpdatable = computed(() => {
 
 const repo_name = computed(() => props.repo.repo_name ?? props.repo.name ?? '')
 
-const githubRepoUrl = computed(() =>
-    `https://github.com/${props.repo.owner}/${repo_name.value}`
-)
+const githubRepoUrl = computed(() => `https://github.com/${props.repo.owner}/${repo_name.value}`)
 
-const webLinkRelease = computed(() =>
-    `${githubRepoUrl.value}/releases/tag/${props.repo.remote_version}`
-)
+const webLinkRelease = computed(() => `${githubRepoUrl.value}/releases/tag/${props.repo.remote_version}`)
 
 const pythonChangelog = computed(() => {
     if (props.repo.channel === 'dev')
@@ -295,9 +288,7 @@ const pythonChangelog = computed(() => {
     return webLinkRelease.value
 })
 
-const hideUpdateWarning = computed(() =>
-    store.state.gui.uiSettings.hideUpdateWarnings ?? false
-)
+const hideUpdateWarning = computed(() => store.state.gui.uiSettings.hideUpdateWarnings ?? false)
 
 function clickUpdate() {
     if (hideUpdateWarning.value) {

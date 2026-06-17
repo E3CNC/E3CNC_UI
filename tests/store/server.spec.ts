@@ -237,7 +237,14 @@ describe('server store', () => {
         expect(mockToast.error).toHaveBeenCalled()
 
         actions.getGcodeStore(
-            { commit, dispatch, rootGetters: { 'gui/console/getConsolefilterRules': ['skip'], 'gui/console/getConsoleClearedSince': 2000 } } as any,
+            {
+                commit,
+                dispatch,
+                rootGetters: {
+                    'gui/console/getConsolefilterRules': ['skip'],
+                    'gui/console/getConsoleClearedSince': 2000,
+                },
+            } as any,
             {
                 gcode_store: [
                     { time: 1, type: 'response', message: 'old' },
@@ -248,9 +255,7 @@ describe('server store', () => {
         )
 
         expect(commit).toHaveBeenCalledWith('clearGcodeStore')
-        expect(commit).toHaveBeenCalledWith('setGcodeStore', [
-            { time: 4, type: 'response', message: 'keep me' },
-        ])
+        expect(commit).toHaveBeenCalledWith('setGcodeStore', [{ time: 4, type: 'response', message: 'keep me' }])
         expect(dispatch).toHaveBeenCalledWith('socket/removeInitModule', 'server/gcode_store', { root: true })
     })
 
@@ -270,7 +275,11 @@ describe('server store', () => {
         const commit = vi.fn()
         const dispatch = vi.fn()
         actions.getGcodeStore(
-            { commit, dispatch, rootGetters: { 'gui/console/getConsolefilterRules': [], 'gui/console/getConsoleClearedSince': 0 } } as any,
+            {
+                commit,
+                dispatch,
+                rootGetters: { 'gui/console/getConsolefilterRules': [], 'gui/console/getConsoleClearedSince': 0 },
+            } as any,
             {
                 gcode_store: [
                     { time: 1, type: 'response', message: 'hello' },
@@ -289,11 +298,13 @@ describe('server store', () => {
         const commit = vi.fn()
         const dispatch = vi.fn()
         actions.getGcodeStore(
-            { commit, dispatch, rootGetters: { 'gui/console/getConsolefilterRules': ['[bad'], 'gui/console/getConsoleClearedSince': 0 } } as any,
             {
-                gcode_store: [
-                    { time: 1, type: 'response', message: 'test' },
-                ],
+                commit,
+                dispatch,
+                rootGetters: { 'gui/console/getConsolefilterRules': ['[bad'], 'gui/console/getConsoleClearedSince': 0 },
+            } as any,
+            {
+                gcode_store: [{ time: 1, type: 'response', message: 'test' }],
             }
         )
         expect(consoleSpy).toHaveBeenCalledWith("Custom console filter '[bad' doesn't work")
@@ -323,7 +334,11 @@ describe('server store', () => {
             registered_directories: [],
             klippy_state: 'ready',
         })
-        expect(dispatch).not.toHaveBeenCalledWith('socket/addInitModule', expect.stringContaining('server/'), expect.anything())
+        expect(dispatch).not.toHaveBeenCalledWith(
+            'socket/addInitModule',
+            expect.stringContaining('server/'),
+            expect.anything()
+        )
         expect(dispatch).not.toHaveBeenCalledWith('files/initRootDirs', expect.anything(), expect.anything())
         expect(commit).toHaveBeenCalledWith('setData', {
             components: [],
@@ -338,7 +353,11 @@ describe('server store', () => {
         const dispatch = vi.fn()
         const now = Date.now()
         actions.getGcodeStore(
-            { commit, dispatch, rootGetters: { 'gui/console/getConsolefilterRules': [], 'gui/console/getConsoleClearedSince': now } } as any,
+            {
+                commit,
+                dispatch,
+                rootGetters: { 'gui/console/getConsolefilterRules': [], 'gui/console/getConsoleClearedSince': now },
+            } as any,
             {
                 gcode_store: [
                     { time: Math.floor(now / 1000) + 100, type: 'response', message: 'future event' },
@@ -346,9 +365,10 @@ describe('server store', () => {
                 ],
             }
         )
-        expect(commit).toHaveBeenCalledWith('setGcodeStore', expect.arrayContaining([
-            expect.objectContaining({ message: 'future event' }),
-        ]))
+        expect(commit).toHaveBeenCalledWith(
+            'setGcodeStore',
+            expect.arrayContaining([expect.objectContaining({ message: 'future event' })])
+        )
     })
 
     it('init handles non-Error exception', async () => {

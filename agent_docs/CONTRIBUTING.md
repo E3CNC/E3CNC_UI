@@ -31,7 +31,13 @@ Types:
 ## Before Submitting
 
 ```bash
+# Using bun (default)
 bun run format
 bun run lint:fix
 bun run test:unit
+
+# Using npm (alternative on 32-bit ARM or non-macOS hosts)
+npm run format
+npm run lint:fix
+npm run test:unit
 ```

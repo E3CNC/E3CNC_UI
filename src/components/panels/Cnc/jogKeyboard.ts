@@ -2,12 +2,7 @@ export function isEditableTarget(target: EventTarget | null): boolean {
     const element = target as HTMLElement | null
     const tagName = element?.tagName?.toUpperCase()
 
-    return !!(
-        element?.isContentEditable ||
-        tagName === 'INPUT' ||
-        tagName === 'TEXTAREA' ||
-        tagName === 'SELECT'
-    )
+    return !!(element?.isContentEditable || tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT')
 }
 
 export function buildJogScript(axis: string, distance: number, feedrate: number): string {

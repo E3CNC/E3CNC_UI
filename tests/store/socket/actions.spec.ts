@@ -73,7 +73,10 @@ describe('socket actions', () => {
         it('handles notify_status_update', () => {
             const commit = vi.fn()
             const dispatch = vi.fn()
-            ;(actions.onMessage as any)({ commit, dispatch }, { method: 'notify_status_update', params: [{ extruder: { temperature: 200 } }] })
+            ;(actions.onMessage as any)(
+                { commit, dispatch },
+                { method: 'notify_status_update', params: [{ extruder: { temperature: 200 } }] }
+            )
             expect(dispatch).toHaveBeenCalledWith('printer/getData', { extruder: { temperature: 200 } }, { root: true })
         })
 
@@ -108,7 +111,10 @@ describe('socket actions', () => {
 
         it('handles notify_proc_stat_update', () => {
             const dispatch = vi.fn()
-            ;(actions.onMessage as any)({ dispatch } as any, { method: 'notify_proc_stat_update', params: [{ cpu: 12 }] })
+            ;(actions.onMessage as any)({ dispatch } as any, {
+                method: 'notify_proc_stat_update',
+                params: [{ cpu: 12 }],
+            })
             expect(dispatch).toHaveBeenCalledWith('server/updateProcStats', { cpu: 12 }, { root: true })
         })
 
@@ -120,61 +126,99 @@ describe('socket actions', () => {
 
         it('handles notify_filelist_changed', () => {
             const dispatch = vi.fn()
-            ;(actions.onMessage as any)({ dispatch } as any, { method: 'notify_filelist_changed', params: [{ action: 'create_file' }] })
+            ;(actions.onMessage as any)({ dispatch } as any, {
+                method: 'notify_filelist_changed',
+                params: [{ action: 'create_file' }],
+            })
             expect(dispatch).toHaveBeenCalledWith('files/filelist_changed', { action: 'create_file' }, { root: true })
         })
 
         it('handles notify_metadata_update', () => {
             const commit = vi.fn()
-            ;(actions.onMessage as any)({ commit } as any, { method: 'notify_metadata_update', params: [{ filename: 'test.gcode' }] })
+            ;(actions.onMessage as any)({ commit } as any, {
+                method: 'notify_metadata_update',
+                params: [{ filename: 'test.gcode' }],
+            })
             expect(commit).toHaveBeenCalledWith('files/setMetadata', { filename: 'test.gcode' }, { root: true })
         })
 
         it('handles notify_power_changed', () => {
             const commit = vi.fn()
-            ;(actions.onMessage as any)({ commit } as any, { method: 'notify_power_changed', params: [{ device: 'psu' }] })
+            ;(actions.onMessage as any)({ commit } as any, {
+                method: 'notify_power_changed',
+                params: [{ device: 'psu' }],
+            })
             expect(commit).toHaveBeenCalledWith('server/power/setStatus', { device: 'psu' }, { root: true })
         })
 
         it('handles notify_update_response', () => {
             const commit = vi.fn()
-            ;(actions.onMessage as any)({ commit } as any, { method: 'notify_update_response', params: [{ message: 'updating' }] })
-            expect(commit).toHaveBeenCalledWith('server/updateManager/addUpdateResponse', { message: 'updating' }, { root: true })
+            ;(actions.onMessage as any)({ commit } as any, {
+                method: 'notify_update_response',
+                params: [{ message: 'updating' }],
+            })
+            expect(commit).toHaveBeenCalledWith(
+                'server/updateManager/addUpdateResponse',
+                { message: 'updating' },
+                { root: true }
+            )
         })
 
         it('handles notify_update_refreshed', () => {
             const dispatch = vi.fn()
-            ;(actions.onMessage as any)({ dispatch } as any, { method: 'notify_update_refreshed', params: [{ version_info: {} }] })
-            expect(dispatch).toHaveBeenCalledWith('server/updateManager/onUpdateStatus', { version_info: {} }, { root: true })
+            ;(actions.onMessage as any)({ dispatch } as any, {
+                method: 'notify_update_refreshed',
+                params: [{ version_info: {} }],
+            })
+            expect(dispatch).toHaveBeenCalledWith(
+                'server/updateManager/onUpdateStatus',
+                { version_info: {} },
+                { root: true }
+            )
         })
 
         it('handles notify_history_changed', () => {
             const dispatch = vi.fn()
-            ;(actions.onMessage as any)({ dispatch } as any, { method: 'notify_history_changed', params: [{ action: 'added' }] })
+            ;(actions.onMessage as any)({ dispatch } as any, {
+                method: 'notify_history_changed',
+                params: [{ action: 'added' }],
+            })
             expect(dispatch).toHaveBeenCalledWith('server/history/getChanged', { action: 'added' }, { root: true })
         })
 
         it('handles notify_service_state_changed', () => {
             const dispatch = vi.fn()
-            ;(actions.onMessage as any)({ dispatch } as any, { method: 'notify_service_state_changed', params: [{ service: 'klipper' }] })
+            ;(actions.onMessage as any)({ dispatch } as any, {
+                method: 'notify_service_state_changed',
+                params: [{ service: 'klipper' }],
+            })
             expect(dispatch).toHaveBeenCalledWith('server/serviceStateChanged', { service: 'klipper' }, { root: true })
         })
 
         it('handles notify_timelapse_event', () => {
             const dispatch = vi.fn()
-            ;(actions.onMessage as any)({ dispatch } as any, { method: 'notify_timelapse_event', params: [{ action: 'newframe' }] })
+            ;(actions.onMessage as any)({ dispatch } as any, {
+                method: 'notify_timelapse_event',
+                params: [{ action: 'newframe' }],
+            })
             expect(dispatch).toHaveBeenCalledWith('server/timelapse/getEvent', { action: 'newframe' }, { root: true })
         })
 
         it('handles notify_job_queue_changed', () => {
             const dispatch = vi.fn()
-            ;(actions.onMessage as any)({ dispatch } as any, { method: 'notify_job_queue_changed', params: [{ action: 'changed' }] })
+            ;(actions.onMessage as any)({ dispatch } as any, {
+                method: 'notify_job_queue_changed',
+                params: [{ action: 'changed' }],
+            })
             expect(dispatch).toHaveBeenCalledWith('server/jobQueue/getEvent', { action: 'changed' }, { root: true })
         })
 
         it('handles notify_announcement_update', () => {
             const dispatch = vi.fn()
-            ;(actions.onMessage as any)({ dispatch } as any, { method: 'notify_announcement_update', params: [{ entries: [] }] })
+            ;(actions.onMessage as any)({ dispatch } as any, {
+                method: 'notify_announcement_update',
+                params: [{ entries: [] }],
+            })
             expect(dispatch).toHaveBeenCalledWith('server/announcements/getList', { entries: [] }, { root: true })
         })
 
@@ -184,12 +228,19 @@ describe('socket actions', () => {
                 method: 'notify_sensor_update',
                 params: [{ sensor: { temperature: 25 } }],
             })
-            expect(dispatch).toHaveBeenCalledWith('server/sensor/updateSensors', { sensor: { temperature: 25 } }, { root: true })
+            expect(dispatch).toHaveBeenCalledWith(
+                'server/sensor/updateSensors',
+                { sensor: { temperature: 25 } },
+                { root: true }
+            )
         })
 
         it('handles notify_webcams_changed', () => {
             const dispatch = vi.fn()
-            ;(actions.onMessage as any)({ dispatch } as any, { method: 'notify_webcams_changed', params: [{ webcams: [] }] })
+            ;(actions.onMessage as any)({ dispatch } as any, {
+                method: 'notify_webcams_changed',
+                params: [{ webcams: [] }],
+            })
             expect(dispatch).toHaveBeenCalledWith('gui/webcams/initStore', { webcams: [] }, { root: true })
         })
 

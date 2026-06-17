@@ -4,15 +4,15 @@
 
 ## Project Structure
 
-| Directory                | Purpose                                                                             |
-| ------------------------ | ----------------------------------------------------------------------------------- |
-| `src/components/`        | Vue components by feature (dialogs/, panels/, inputs/, webcams/, console/, charts/) |
-| `src/composables/`       | Reusable Vue composables (replacing Vue 2 mixins)                                   |
-| `src/pages/`             | Page components (Dashboard, Console, Files, Settings)                               |
-| `src/store/`             | Vuex modules                                                                        |
-| `src/plugins/`           | Vue plugins and utilities                                                           |
-| `src/locales/`           | Translation JSON files                                                              |
-| `src/types/`             | TypeScript type definitions                                                         |
+| Directory          | Purpose                                                                             |
+| ------------------ | ----------------------------------------------------------------------------------- |
+| `src/components/`  | Vue components by feature (dialogs/, panels/, inputs/, webcams/, console/, charts/) |
+| `src/composables/` | Reusable Vue composables (replacing Vue 2 mixins)                                   |
+| `src/pages/`       | Page components (Dashboard, Console, Files, Settings)                               |
+| `src/store/`       | Vuex modules                                                                        |
+| `src/plugins/`     | Vue plugins and utilities                                                           |
+| `src/locales/`     | Translation JSON files                                                              |
+| `src/types/`       | TypeScript type definitions                                                         |
 
 ## Vuex Store Modules
 

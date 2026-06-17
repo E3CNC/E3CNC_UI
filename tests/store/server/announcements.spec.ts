@@ -53,12 +53,14 @@ describe('server announcements store', () => {
         })
 
         it('setDismissed marks entry as not dismissed', () => {
-            state.entries = [{
-                entry_id: '1',
-                dismissed: true,
-                date_dismissed: new Date(),
-                dismiss_wake: new Date(),
-            } as any]
+            state.entries = [
+                {
+                    entry_id: '1',
+                    dismissed: true,
+                    date_dismissed: new Date(),
+                    dismiss_wake: new Date(),
+                } as any,
+            ]
             mutations.setDismissed(state, { entry_id: '1', status: false })
             expect(state.entries[0].dismissed).toBe(false)
             expect(state.entries[0].date_dismissed).toBeNull()
@@ -98,7 +100,9 @@ describe('server announcements store', () => {
             expect(commit).toHaveBeenCalledWith('setEntries', expect.any(Array))
             expect((commit.mock.calls[0][1] as any[])[0].date).toBeInstanceOf(Date)
             expect(commit).toHaveBeenCalledWith('setFeeds', ['feed1'])
-            expect(dispatch).toHaveBeenCalledWith('socket/removeInitModule', 'server/announcements/init', { root: true })
+            expect(dispatch).toHaveBeenCalledWith('socket/removeInitModule', 'server/announcements/init', {
+                root: true,
+            })
         })
 
         it('getDismissed commits dismiss status', () => {
@@ -129,10 +133,7 @@ describe('server announcements store', () => {
 
     describe('getters', () => {
         it('getAnnouncements filters out dismissed entries', () => {
-            state.entries = [
-                { entry_id: '1', dismissed: false } as any,
-                { entry_id: '2', dismissed: true } as any,
-            ]
+            state.entries = [{ entry_id: '1', dismissed: false } as any, { entry_id: '2', dismissed: true } as any]
             const result = (getters as any).getAnnouncements(state)
             expect(result).toHaveLength(1)
             expect(result[0].entry_id).toBe('1')

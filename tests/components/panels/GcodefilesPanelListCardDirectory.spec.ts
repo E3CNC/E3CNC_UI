@@ -8,9 +8,15 @@ const mockGcodeFilesValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         currentPath: new MockRef(''),
@@ -35,11 +41,24 @@ vi.mock('vue-i18n', () => ({
 }))
 
 const vuetifyComponentsMock = vi.hoisted(() => ({
-    VCard: { name: 'VCard', inheritAttrs: false, template: '<div :class="$attrs.class" :style="$attrs.style" @click="$attrs.onClick || $attrs.click"><slot /></div>' },
+    VCard: {
+        name: 'VCard',
+        inheritAttrs: false,
+        template:
+            '<div :class="$attrs.class" :style="$attrs.style" @click="$attrs.onClick || $attrs.click"><slot /></div>',
+    },
     VIcon: { name: 'VIcon', props: ['size', 'color'], template: '<i><slot /></i>' },
-    VMenu: { name: 'VMenu', props: ['modelValue', 'positionX', 'positionY', 'absolute', 'offsetY'], template: '<div class="v-menu"><slot /><slot name="activator" /></div>' },
+    VMenu: {
+        name: 'VMenu',
+        props: ['modelValue', 'positionX', 'positionY', 'absolute', 'offsetY'],
+        template: '<div class="v-menu"><slot /><slot name="activator" /></div>',
+    },
     VList: { name: 'VList', template: '<div><slot /></div>' },
-    VListItem: { name: 'VListItem', props: ['class'], template: '<div :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></div>' },
+    VListItem: {
+        name: 'VListItem',
+        props: ['class'],
+        template: '<div :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></div>',
+    },
 }))
 
 vi.mock('vuetify/components', () => vuetifyComponentsMock)

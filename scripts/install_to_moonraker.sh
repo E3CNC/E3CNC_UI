@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploy mainsail-cnc to a BTT-CB1 (or any Moonraker host).
+# Deploy mainsail-cnc to a 32-bit ARM host (or any Moonraker host).
 #
 # Idempotent. Re-runnable. Safe to interrupt before the restart step.
 #

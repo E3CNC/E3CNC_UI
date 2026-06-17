@@ -135,11 +135,8 @@ describe('useControl', () => {
         expect(emit).toHaveBeenCalledWith('printer.gcode.script', { script: 'G28 Z' }, { loading: 'homeZ' })
         expect(emit).toHaveBeenCalledWith('printer.gcode.script', { script: 'QUAD_GANTRY_LEVEL' }, { loading: 'qgl' })
         expect(emit).toHaveBeenCalledWith('printer.gcode.script', { script: 'M114' })
-        expect(emit).toHaveBeenCalledWith(
-            'printer.gcode.script',
-            {
-                script: '_CLIENT_LINEAR_MOVE X=10 Y=5 F=15000',
-            }
-        )
+        expect(emit).toHaveBeenCalledWith('printer.gcode.script', {
+            script: '_CLIENT_LINEAR_MOVE X=10 Y=5 F=15000',
+        })
     })
 })

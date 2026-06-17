@@ -41,11 +41,11 @@
         </v-card-text>
         <v-card-actions>
             <v-spacer />
- <v-btn variant="text" @click="close">{{ $t('Buttons.Cancel') }}</v-btn>
- <v-btn v-if="groupId !== null" variant="text" color="primary" :disabled="!formValid" @click="updateGroup">
+            <v-btn variant="text" @click="close">{{ $t('Buttons.Cancel') }}</v-btn>
+            <v-btn v-if="groupId !== null" variant="text" color="primary" :disabled="!formValid" @click="updateGroup">
                 {{ $t('Settings.Update') }}
             </v-btn>
- <v-btn v-else variant="text" color="primary" :disabled="!formValid" @click="storeGroup">
+            <v-btn v-else variant="text" color="primary" :disabled="!formValid" @click="storeGroup">
                 {{ $t('Settings.Store') }}
             </v-btn>
         </v-card-actions>
@@ -82,11 +82,9 @@ const end = ref(1)
 
 const rules = computed(() => ({
     required: (value: string) => value !== '' || t('Settings.MiscellaneousTab.Required'),
-    groupUnique: (value: string) =>
-        !existsGroupName(value) || t('Settings.MiscellaneousTab.NameExists'),
+    groupUnique: (value: string) => !existsGroupName(value) || t('Settings.MiscellaneousTab.NameExists'),
     minStart: (value: string) => parseInt(value) > 0 || t('Settings.MiscellaneousTab.GreaterThanZero'),
-    minEnd: (value: string) =>
-        parseInt(value) >= start.value || t('Settings.MiscellaneousTab.HigherThanStart'),
+    minEnd: (value: string) => parseInt(value) >= start.value || t('Settings.MiscellaneousTab.HigherThanStart'),
     max: (value: string) =>
         parseInt(value) <= chainCount.value ||
         t('Settings.MiscellaneousTab.LessThanChainCount', { count: chainCount.value }),
@@ -136,11 +134,15 @@ const group = computed(() => {
     return groups.value.find((g) => g.id === props.groupId) ?? null
 })
 
-watch(group, (newGroup) => {
-    groupname.value = newGroup?.name ?? ''
-    start.value = newGroup?.start ?? 1
-    end.value = newGroup?.end ?? 1
-}, { immediate: true })
+watch(
+    group,
+    (newGroup) => {
+        groupname.value = newGroup?.name ?? ''
+        start.value = newGroup?.start ?? 1
+        end.value = newGroup?.end ?? 1
+    },
+    { immediate: true }
+)
 
 function close() {
     emit('close')
@@ -180,10 +182,6 @@ function updateGroup() {
 }
 
 function existsGroupName(name: string) {
-    return (
-        groups.value.findIndex(
-            (g: GuiMacrosStateMacrogroup) => g.name === name && g.id !== props.groupId
-        ) >= 0
-    )
+    return groups.value.findIndex((g: GuiMacrosStateMacrogroup) => g.name === name && g.id !== props.groupId) >= 0
 }
 </script>

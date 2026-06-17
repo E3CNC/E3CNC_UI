@@ -8,7 +8,7 @@
             style="overflow: hidden"
             :height="isMobile ? 0 : 548">
             <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="sendAbort"/>
+                <v-btn :icon="mdiCloseThick" rounded="0" @click="sendAbort" />
             </template>
             <v-container>
                 <v-row>
@@ -22,23 +22,23 @@
                 </v-row>
                 <v-row>
                     <v-col class="text-left">
- <v-btn class="" color="primary" @click="sendTestZ('--')">
+                        <v-btn class="" color="primary" @click="sendTestZ('--')">
                             <v-icon size="small">{{ mdiMinusThick }}</v-icon>
                             <v-icon size="small">{{ mdiMinusThick }}</v-icon>
                         </v-btn>
                     </v-col>
                     <v-col class="text-left">
- <v-btn class="" color="primary" @click="sendTestZ('-')">
+                        <v-btn class="" color="primary" @click="sendTestZ('-')">
                             <v-icon size="small">{{ mdiMinusThick }}</v-icon>
                         </v-btn>
                     </v-col>
                     <v-col class="text-right">
- <v-btn class="" color="primary" @click="sendTestZ('+')">
+                        <v-btn class="" color="primary" @click="sendTestZ('+')">
                             <v-icon size="small">{{ mdiPlusThick }}</v-icon>
                         </v-btn>
                     </v-col>
                     <v-col class="text-right">
- <v-btn class="" color="primary" @click="sendTestZ('++')">
+                        <v-btn class="" color="primary" @click="sendTestZ('++')">
                             <v-icon size="small">{{ mdiPlusThick }}</v-icon>
                             <v-icon size="small">{{ mdiPlusThick }}</v-icon>
                         </v-btn>
@@ -48,7 +48,7 @@
             <sub-panel :title="$t('ManualProbe.Advanced')" sub-panel-class="manual-probe-dialog-advanced" class="mb-n2">
                 <v-container>
                     <v-item-group class="_btn-group">
- <v-btn
+                        <v-btn
                             v-for="(offset, index) in offsetsZ"
                             :key="`offsetsUp-${index}`"
                             size="small"
@@ -61,7 +61,7 @@
                         </v-btn>
                     </v-item-group>
                     <v-item-group class="_btn-group mt-6 mt-sm-3">
- <v-btn
+                        <v-btn
                             v-for="(offset, index) in offsetsZ"
                             :key="`offsetsDown-${index}`"
                             size="small"
@@ -77,10 +77,10 @@
             </sub-panel>
             <v-card-actions>
                 <v-spacer></v-spacer>
- <v-btn variant="text" :loading="loadingAbort" @click="sendAbort">
+                <v-btn variant="text" :loading="loadingAbort" @click="sendAbort">
                     {{ $t('ManualProbe.Abort') }}
                 </v-btn>
- <v-btn color="primary" variant="text" :loading="loadingAccept" @click="sendAccept">
+                <v-btn color="primary" variant="text" :loading="loadingAccept" @click="sendAccept">
                     {{ $t('ManualProbe.Accept') }}
                 </v-btn>
             </v-card-actions>

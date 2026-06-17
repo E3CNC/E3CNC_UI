@@ -8,9 +8,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         socketIsConnected: new MockRef(true),
@@ -24,9 +30,15 @@ const mockConsoleValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         direction: new MockRef('table'),
@@ -75,19 +87,40 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VCardText: { name: 'VCardText', template: '<div><slot /></div>' },
     VRow: { name: 'VRow', template: '<div><slot /></div>' },
     VCol: { name: 'VCol', template: '<div><slot /></div>' },
-    VBtn: { name: 'VBtn', props: ['icon', 'ripple', 'rounded'], template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>' },
+    VBtn: {
+        name: 'VBtn',
+        props: ['icon', 'ripple', 'rounded'],
+        template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>',
+    },
     VIcon: { name: 'VIcon', props: ['start', 'icon'], template: '<i><slot /></i>' },
-    VMenu: { name: 'VMenu', props: ['offsetY', 'closeOnContentClick', 'title'], template: '<div class="v-menu"><slot /><slot name="activator" /></div>' },
+    VMenu: {
+        name: 'VMenu',
+        props: ['offsetY', 'closeOnContentClick', 'title'],
+        template: '<div class="v-menu"><slot /><slot name="activator" /></div>',
+    },
     VList: { name: 'VList', template: '<div><slot /></div>' },
     VListItem: { name: 'VListItem', props: ['class'], template: '<div :class="$attrs.class"><slot /></div>' },
-    VCheckbox: { name: 'VCheckbox', props: ['modelValue', 'hideDetails', 'label', 'class'], template: '<label class="v-checkbox"><input type="checkbox" :checked="modelValue" /><span>{{ label }}</span></label>' },
+    VCheckbox: {
+        name: 'VCheckbox',
+        props: ['modelValue', 'hideDetails', 'label', 'class'],
+        template:
+            '<label class="v-checkbox"><input type="checkbox" :checked="modelValue" /><span>{{ label }}</span></label>',
+    },
     VDivider: { name: 'VDivider', template: '<hr />' },
-    VToolbar: { name: 'VToolbar', inheritAttrs: false, template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>' },
+    VToolbar: {
+        name: 'VToolbar',
+        inheritAttrs: false,
+        template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>',
+    },
     VToolbarTitle: { name: 'VToolbarTitle', template: '<span><slot /></span>' },
     VToolbarItems: { name: 'VToolbarItems', template: '<div><slot /></div>' },
     VSpacer: { name: 'VSpacer', template: '<span style="flex:1" />' },
     VExpandTransition: { name: 'VExpandTransition', template: '<div><slot /></div>' },
-    VCard: { name: 'VCard', inheritAttrs: false, template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>' },
+    VCard: {
+        name: 'VCard',
+        inheritAttrs: false,
+        template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>',
+    },
 }))
 
 vi.mock('vuetify/components', () => vuetifyComponentsMock)

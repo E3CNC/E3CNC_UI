@@ -5,17 +5,32 @@
                 <settings-row
                     :title="$t('Settings.UiSettingsTab.Mode')"
                     :sub-title="$t('Settings.UiSettingsTab.ModeDescription')">
-                    <v-select v-model="mode" :items="modes" item-title="text" item-value="value" class="mt-0" hide-details variant="outlined" density="compact" />
+                    <v-select
+                        v-model="mode"
+                        :items="modes"
+                        item-title="text"
+                        item-value="value"
+                        class="mt-0"
+                        hide-details
+                        variant="outlined"
+                        density="compact" />
                 </settings-row>
                 <v-divider class="my-2" />
                 <settings-row
                     :title="$t('Settings.UiSettingsTab.Theme')"
                     :sub-title="$t('Settings.UiSettingsTab.ThemeDescription')">
-                    <v-select v-model="themeName" :items="themesList" item-value="value" class="mt-0" hide-details variant="outlined" density="compact" />
+                    <v-select
+                        v-model="themeName"
+                        :items="themesList"
+                        item-value="value"
+                        class="mt-0"
+                        hide-details
+                        variant="outlined"
+                        density="compact" />
                 </settings-row>
                 <v-divider class="my-2" />
                 <settings-row :title="$t('Settings.UiSettingsTab.Logo')">
- <v-btn
+                    <v-btn
                         v-if="logoColor.toLowerCase() !== defaultLogoColor.toLowerCase()"
                         size="small"
                         variant="text"
@@ -25,7 +40,7 @@
                     </v-btn>
                     <v-menu location="bottom end" :close-on-content-click="false">
                         <template #activator="{ props: activatorProps }">
- <v-btn v-bind="activatorProps" :color="logoColor" class="minwidth-0 px-5" size="small"/>
+                            <v-btn v-bind="activatorProps" :color="logoColor" class="minwidth-0 px-5" size="small" />
                         </template>
                         <v-color-picker
                             :value="logoColor"
@@ -36,7 +51,7 @@
                 </settings-row>
                 <v-divider class="my-2" />
                 <settings-row :title="$t('Settings.UiSettingsTab.Primary')">
- <v-btn
+                    <v-btn
                         v-if="primaryColor.toLowerCase() !== defaultPrimaryColor.toLowerCase()"
                         size="small"
                         variant="text"
@@ -46,7 +61,7 @@
                     </v-btn>
                     <v-menu location="bottom end" :close-on-content-click="false">
                         <template #activator="{ props: activatorProps }">
- <v-btn v-bind="activatorProps" :color="primaryColor" class="minwidth-0 px-5" size="small"/>
+                            <v-btn v-bind="activatorProps" :color="primaryColor" class="minwidth-0 px-5" size="small" />
                         </template>
                         <v-color-picker
                             :value="primaryColor"
@@ -420,9 +435,7 @@ const powerDeviceName = computed({
 })
 
 const powerDeviceOptions = computed(() => {
-    const items: { text: string; value: string | null }[] = [
-        { text: `Auto (${autoPowerDevice.value})`, value: null },
-    ]
+    const items: { text: string; value: string | null }[] = [{ text: `Auto (${autoPowerDevice.value})`, value: null }]
 
     powerDevices.value.forEach((device: ServerPowerStateDevice) => {
         items.push({

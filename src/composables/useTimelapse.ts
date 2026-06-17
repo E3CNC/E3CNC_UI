@@ -10,41 +10,31 @@ export function useTimelapse() {
         store.dispatch('server/timelapse/saveSetting', { variable_fps: newVal })
     }
 
-    const variable_fps_min = computed(
-        () => store.state.server.timelapse?.settings?.variable_fps_min ?? 5
-    )
+    const variable_fps_min = computed(() => store.state.server.timelapse?.settings?.variable_fps_min ?? 5)
 
     function setVariable_fps_min(newVal: number) {
         store.dispatch('server/timelapse/saveSetting', { variable_fps_min: newVal })
     }
 
-    const variable_fps_max = computed(
-        () => store.state.server.timelapse?.settings?.variable_fps_max ?? 60
-    )
+    const variable_fps_max = computed(() => store.state.server.timelapse?.settings?.variable_fps_max ?? 60)
 
     function setVariable_fps_max(newVal: number) {
         store.dispatch('server/timelapse/saveSetting', { variable_fps_max: newVal })
     }
 
-    const targetlength = computed(
-        () => store.state.server.timelapse?.settings?.targetlength ?? 10
-    )
+    const targetlength = computed(() => store.state.server.timelapse?.settings?.targetlength ?? 10)
 
     function setTargetlength(newVal: number) {
         store.dispatch('server/timelapse/saveSetting', { targetlength: newVal })
     }
 
-    const output_framerate = computed(
-        () => store.state.server.timelapse?.settings?.output_framerate ?? 30
-    )
+    const output_framerate = computed(() => store.state.server.timelapse?.settings?.output_framerate ?? 30)
 
     function setOutput_framerate(newVal: number) {
         store.dispatch('server/timelapse/saveSetting', { output_framerate: newVal })
     }
 
-    const duplicatelastframe = computed(
-        () => store.state.server.timelapse?.settings?.duplicatelastframe ?? 0
-    )
+    const duplicatelastframe = computed(() => store.state.server.timelapse?.settings?.duplicatelastframe ?? 0)
 
     function setDuplicatelastframe(newVal: number) {
         store.dispatch('server/timelapse/saveSetting', { duplicatelastframe: newVal })
@@ -60,14 +50,10 @@ export function useTimelapse() {
     })
 
     const estimatedVideoLength = computed(() => {
-        let seconds = Math.round(
-            (framesCount.value + duplicatelastframe.value) / output_framerate.value
-        )
+        let seconds = Math.round((framesCount.value + duplicatelastframe.value) / output_framerate.value)
 
         if (variable_fps.value) {
-            seconds = Math.round(
-                (framesCount.value + duplicatelastframe.value) / variableTargetFps.value
-            )
+            seconds = Math.round((framesCount.value + duplicatelastframe.value) / variableTargetFps.value)
             if (seconds < targetlength.value) seconds = targetlength.value
         }
 

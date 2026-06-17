@@ -99,38 +99,40 @@ app.directive('observe-visibility', ObserveVisibility)
 app.component('VueLoadImage', VueLoadImage)
 app.component('EChart', EChart)
 
-initLoad().then(() => {
-    app.use(store)
-    app.mount('#app')
+initLoad()
+    .then(() => {
+        app.use(store)
+        app.mount('#app')
 
-    window.console.log(
-        '%c\n' +
-        ' ███████╗ ██████╗   ██████╗ ███╗   ██╗  ██████╗ \n' +
-        ' ██╔════╝ ╚════██╗ ██╔════╝ ████╗  ██║ ██╔════╝ \n' +
-        ' █████╗    █████╔╝ ██║      ██╔██╗ ██║ ██║      \n' +
-        ' ██╔══╝    ╚═══██╗ ██║      ██║╚██╗██║ ██║      \n' +
-        ' ███████╗ ██████╔╝ ╚██████╗ ██║ ╚████║ ╚██████╗ \n' +
-        ' ╚══════╝ ╚═════╝   ╚═════╝ ╚═╝  ╚═══╝  ╚═════╝ \n' +
-        '                                                \n',
-        'color: #4CAF50; font-weight: bold;'
-    )
+        window.console.log(
+            '%c\n' +
+                ' ███████╗ ██████╗   ██████╗ ███╗   ██╗  ██████╗ \n' +
+                ' ██╔════╝ ╚════██╗ ██╔════╝ ████╗  ██║ ██╔════╝ \n' +
+                ' █████╗    █████╔╝ ██║      ██╔██╗ ██║ ██║      \n' +
+                ' ██╔══╝    ╚═══██╗ ██║      ██║╚██╗██║ ██║      \n' +
+                ' ███████╗ ██████╔╝ ╚██████╗ ██║ ╚████║ ╚██████╗ \n' +
+                ' ╚══════╝ ╚═════╝   ╚═════╝ ╚═╝  ╚═══╝  ╚═════╝ \n' +
+                '                                                \n',
+            'color: #4CAF50; font-weight: bold;'
+        )
 
-    // Restore scroll position after DOM renders
-    const savedScroll = Number(localStorage.getItem('cncBodyScrollTop'))
-    if (savedScroll) {
-        const restoreScroll = (attempts = 0) => {
-            document.documentElement.scrollTop = savedScroll
-            if (document.documentElement.scrollTop !== savedScroll && attempts < 10) {
-                setTimeout(() => restoreScroll(attempts + 1), 200)
+        // Restore scroll position after DOM renders
+        const savedScroll = Number(localStorage.getItem('cncBodyScrollTop'))
+        if (savedScroll) {
+            const restoreScroll = (attempts = 0) => {
+                document.documentElement.scrollTop = savedScroll
+                if (document.documentElement.scrollTop !== savedScroll && attempts < 10) {
+                    setTimeout(() => restoreScroll(attempts + 1), 200)
+                }
             }
+            nextTick(() => restoreScroll())
         }
-        nextTick(() => restoreScroll())
-    }
 
-    // Persist scroll position on unload
-    window.addEventListener('beforeunload', () => {
-        localStorage.setItem('cncBodyScrollTop', String(document.documentElement.scrollTop))
+        // Persist scroll position on unload
+        window.addEventListener('beforeunload', () => {
+            localStorage.setItem('cncBodyScrollTop', String(document.documentElement.scrollTop))
+        })
     })
-}).catch((e) => {
-    window.console.error('Init failed:', e)
-})
+    .catch((e) => {
+        window.console.error('Init failed:', e)
+    })

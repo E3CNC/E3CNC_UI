@@ -90,18 +90,26 @@ const showNozzleCrosshair = computed(() => {
     return nozzleCrosshair && status.value === 'connected'
 })
 
-watch(expanded, (newExpanded) => {
-    if (!newExpanded) {
-        stopStream()
-        return
-    }
-    startStream()
-}, { immediate: true })
+watch(
+    expanded,
+    (newExpanded) => {
+        if (!newExpanded) {
+            stopStream()
+            return
+        }
+        startStream()
+    },
+    { immediate: true }
+)
 
-watch(() => props.camSettings, () => {
-    aspectRatio.value = null
-    restartStream()
-}, { deep: true })
+watch(
+    () => props.camSettings,
+    () => {
+        aspectRatio.value = null
+        restartStream()
+    },
+    { deep: true }
+)
 
 function log(msg: string, obj?: unknown) {
     if (obj) {

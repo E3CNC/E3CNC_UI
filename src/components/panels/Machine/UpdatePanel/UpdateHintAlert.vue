@@ -7,14 +7,14 @@
         <p v-if="description1">{{ description1 }}</p>
         <p v-if="description2">{{ description2 }}</p>
         <div class="text-center">
- <v-btn
+            <v-btn
                 v-if="configured_type === 'git_repo' && repo.commits_behind?.length"
                 class="mx-2 mt-3 mt-sm-0"
                 @click="openCommitHistory">
                 <v-icon start size="small">{{ mdiEye }}</v-icon>
                 {{ $t('Machine.UpdatePanel.CommitHistory') }}
             </v-btn>
- <v-btn v-if="externalLink" class="mx-2 mt-3 mt-sm-0" :href="externalLink" target="_blank">
+            <v-btn v-if="externalLink" class="mx-2 mt-3 mt-sm-0" :href="externalLink" target="_blank">
                 <v-icon start size="small">{{ mdiOpenInNew }}</v-icon>
                 {{ externalLinkText }}
             </v-btn>

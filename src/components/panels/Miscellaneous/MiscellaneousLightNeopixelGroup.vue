@@ -65,7 +65,7 @@ const isOn = computed(() => {
     const green = colorData.value[1] ?? 0
     const blue = colorData.value[2] ?? 0
     const white = colorData.value[3] ?? 0
-    return (red + green + blue + white) > 0
+    return red + green + blue + white > 0
 })
 
 function toggle() {

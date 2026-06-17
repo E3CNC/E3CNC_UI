@@ -104,7 +104,11 @@ describe('gui console store', () => {
         it('saveSetting dispatches to gui/saveSetting', () => {
             const dispatch = vi.fn()
             actions.saveSetting({ dispatch } as any, { name: 'hideWaitTemperatures', value: false })
-            expect(dispatch).toHaveBeenCalledWith('gui/saveSetting', { name: 'console.hideWaitTemperatures', value: false }, { root: true })
+            expect(dispatch).toHaveBeenCalledWith(
+                'gui/saveSetting',
+                { name: 'console.hideWaitTemperatures', value: false },
+                { root: true }
+            )
         })
 
         it('filterUpload emits database post_item', () => {
@@ -123,7 +127,10 @@ describe('gui console store', () => {
             actions.filterStore({ commit, dispatch, state: stateMock as any } as any, {
                 values: { name: 'Test', regex: 'test', bool: true },
             })
-            expect(commit).toHaveBeenCalledWith('filterStore', { id: 'mocked-uuid', values: { name: 'Test', regex: 'test', bool: true } })
+            expect(commit).toHaveBeenCalledWith('filterStore', {
+                id: 'mocked-uuid',
+                values: { name: 'Test', regex: 'test', bool: true },
+            })
             expect(dispatch).toHaveBeenCalledWith('filterUpload', {
                 id: 'mocked-uuid',
                 value: stateMock.consolefilters['mocked-uuid'],

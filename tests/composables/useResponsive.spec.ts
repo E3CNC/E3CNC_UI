@@ -17,9 +17,18 @@ function mountComposable(breakpoints?: Record<string, (cr: DOMRect) => boolean>)
     const store = createStore({
         state: {
             socket: { isConnected: true, initializationList: [], loadings: [], port: 80, hostname: 'localhost' },
-            server: { klippy_connected: true, klippy_state: 'ready', components: [], registered_directories: [], config: { config: {} } },
+            server: {
+                klippy_connected: true,
+                klippy_state: 'ready',
+                components: [],
+                registered_directories: [],
+                config: { config: {} },
+            },
             printer: { app_name: 'Klipper', print_stats: { state: 'standby' }, idle_timeout: { state: 'Idle' } },
-            gui: { general: { timeFormat: '24hours', dateFormat: 'yyyy-mm-dd' }, uiSettings: { powerDeviceName: null } },
+            gui: {
+                general: { timeFormat: '24hours', dateFormat: 'yyyy-mm-dd' },
+                uiSettings: { powerDeviceName: null },
+            },
             instancesDB: 'moonraker',
         },
         getters: {
@@ -46,9 +55,18 @@ function mountComposableNoRef(breakpoints?: Record<string, (cr: DOMRect) => bool
     const store = createStore({
         state: {
             socket: { isConnected: true, initializationList: [], loadings: [], port: 80, hostname: 'localhost' },
-            server: { klippy_connected: true, klippy_state: 'ready', components: [], registered_directories: [], config: { config: {} } },
+            server: {
+                klippy_connected: true,
+                klippy_state: 'ready',
+                components: [],
+                registered_directories: [],
+                config: { config: {} },
+            },
             printer: { app_name: 'Klipper', print_stats: { state: 'standby' }, idle_timeout: { state: 'Idle' } },
-            gui: { general: { timeFormat: '24hours', dateFormat: 'yyyy-mm-dd' }, uiSettings: { powerDeviceName: null } },
+            gui: {
+                general: { timeFormat: '24hours', dateFormat: 'yyyy-mm-dd' },
+                uiSettings: { powerDeviceName: null },
+            },
             instancesDB: 'moonraker',
         },
         getters: {
@@ -101,11 +119,14 @@ function makeResizeEntry(rect: Partial<DOMRectReadOnly>): ResizeObserverEntry {
 describe('useResponsive', () => {
     beforeEach(() => {
         vi.useFakeTimers()
-        vi.stubGlobal('ResizeObserver', vi.fn((cb: Function) => {
-            const instance = { observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn() }
-            ;(instance as any)._callback = cb
-            return instance
-        }))
+        vi.stubGlobal(
+            'ResizeObserver',
+            vi.fn((cb: Function) => {
+                const instance = { observe: vi.fn(), unobserve: vi.fn(), disconnect: vi.fn() }
+                ;(instance as any)._callback = cb
+                return instance
+            })
+        )
     })
 
     it('spreads useBase properties', () => {

@@ -27,11 +27,9 @@ const name = computed(() => {
     return convertName(props.item.name)
 })
 
-const chipColor = computed(() => props.item.value === 'open' ? 'success' : 'error')
+const chipColor = computed(() => (props.item.value === 'open' ? 'success' : 'error'))
 
 const value = computed(() =>
-    props.item.value === 'open'
-        ? t('Machine.EndstopPanel.open')
-        : t('Machine.EndstopPanel.TRIGGERED')
+    props.item.value === 'open' ? t('Machine.EndstopPanel.open') : t('Machine.EndstopPanel.TRIGGERED')
 )
 </script>

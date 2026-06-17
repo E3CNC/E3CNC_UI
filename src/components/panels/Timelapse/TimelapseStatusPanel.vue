@@ -37,18 +37,14 @@
                     </settings-row>
                     <v-divider class="my-2" />
                     <settings-row :title="$t('Timelapse.Autorender')" :dynamic-slot-width="true">
-                        <v-switch
-                            v-model="autorender"
-                            hide-details
-                            class="mt-0"
-                            @change="toggleAutorender"></v-switch>
+                        <v-switch v-model="autorender" hide-details class="mt-0" @change="toggleAutorender"></v-switch>
                     </settings-row>
                     <v-divider v-if="!disableRenderButton" class="my-2" />
                     <settings-row
                         v-if="!disableRenderButton"
                         :title="$t('Timelapse.Render')"
                         :dynamic-slot-width="true">
- <v-btn size="x-small" @click="saveFrames">
+                        <v-btn size="x-small" @click="saveFrames">
                             {{ $t('Timelapse.SaveFrames') }}
                         </v-btn>
                     </settings-row>
@@ -97,34 +93,20 @@ const frameUrl = computed(() => {
 const enabled = computed(() => store.state.server.timelapse?.settings?.enabled ?? false)
 
 function toggleEnabled(newVal: boolean) {
-    socket.emit(
-        'machine.timelapse.post_settings',
-        { enabled: newVal },
-        { action: 'server/timelapse/initSettings' }
-    )
+    socket.emit('machine.timelapse.post_settings', { enabled: newVal }, { action: 'server/timelapse/initSettings' })
 }
 
 const autorender = computed(() => store.state.server.timelapse?.settings?.autorender ?? false)
 
 function toggleAutorender(newVal: boolean) {
-    socket.emit(
-        'machine.timelapse.post_settings',
-        { autorender: newVal },
-        { action: 'server/timelapse/initSettings' }
-    )
+    socket.emit('machine.timelapse.post_settings', { autorender: newVal }, { action: 'server/timelapse/initSettings' })
 }
 
-const disableRenderButton = computed(() =>
-    (store.state.server.timelapse?.rendering.status ?? '') === 'running'
-)
+const disableRenderButton = computed(() => (store.state.server.timelapse?.rendering.status ?? '') === 'running')
 
-const existsSnapshoturlInMoonrakerConfig = computed(() =>
-    'snapshoturl' in store.state.server.config.orig.timelapse
-)
+const existsSnapshoturlInMoonrakerConfig = computed(() => 'snapshoturl' in store.state.server.config.orig.timelapse)
 
-const moonrakerTimelapseConfig = computed(() =>
-    store.state.server.config.config.timelapse ?? {}
-)
+const moonrakerTimelapseConfig = computed(() => store.state.server.config.config.timelapse ?? {})
 
 const camId = computed(() => store.state.server.timelapse.settings.camera ?? '')
 

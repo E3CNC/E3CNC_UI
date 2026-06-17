@@ -14,7 +14,7 @@
         </v-card-text>
         <v-card-actions class="pt-3">
             <v-spacer />
- <v-btn icon :loading="loadings.includes('queryEndstops')" @click="syncEndstops">
+            <v-btn icon :loading="loadings.includes('queryEndstops')" @click="syncEndstops">
                 <v-icon>{{ mdiSync }}</v-icon>
             </v-btn>
         </v-card-actions>
@@ -60,11 +60,7 @@ const existsQueryProbe = computed(() => {
 })
 
 function syncEndstops() {
-    socket.emit(
-        'printer.query_endstops.status',
-        {},
-        { action: 'printer/getEndstopStatus', loading: 'queryEndstops' }
-    )
+    socket.emit('printer.query_endstops.status', {}, { action: 'printer/getEndstopStatus', loading: 'queryEndstops' })
     if (existsQueryProbe.value) {
         store.dispatch('server/addEvent', { message: 'QUERY_PROBE', type: 'command' })
         socket.emit('printer.gcode.script', { script: 'QUERY_PROBE' })

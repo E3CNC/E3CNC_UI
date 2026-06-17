@@ -61,12 +61,23 @@ describe('server history store', () => {
             expect((getters as any).getTotalFilamentUsed(state)).toBe(10)
             expect((getters as any).getTotalJobsCount(state)).toBe(2)
             expect((getters as any).getTotalCompletedJobsCount(state)).toBe(1)
-            expect((getters as any).getAvgPrintTime(state, { getTotalCompletedPrintTime: 10, getTotalCompletedJobsCount: 1 })).toBe(10)
+            expect(
+                (getters as any).getAvgPrintTime(state, {
+                    getTotalCompletedPrintTime: 10,
+                    getTotalCompletedJobsCount: 1,
+                })
+            ).toBe(10)
             expect((getters as any).getPrintJobById(state)('1')?.filename).toBe('one.gcode')
             expect((getters as any).getPrintStatusByFilename(state)('one.gcode', 10_000)).toBe('completed')
-            expect((getters as any).getPrintJobsForGcodes(state)('one.gcode', 10_000, 100, 'uuid-1', null)).toHaveLength(1)
             expect(
-                (getters as any).getFilteredJobList(state, {}, { gui: { view: { history: { hidePrintStatus: ['failed'] } } } })
+                (getters as any).getPrintJobsForGcodes(state)('one.gcode', 10_000, 100, 'uuid-1', null)
+            ).toHaveLength(1)
+            expect(
+                (getters as any).getFilteredJobList(
+                    state,
+                    {},
+                    { gui: { view: { history: { hidePrintStatus: ['failed'] } } } }
+                )
             ).toHaveLength(1)
         })
 
@@ -84,10 +95,7 @@ describe('server history store', () => {
         })
 
         it('getPrintStatus returns status by job id', () => {
-            state.jobs = [
-                { job_id: '1', status: 'completed' } as any,
-                { job_id: '2', status: 'failed' } as any,
-            ]
+            state.jobs = [{ job_id: '1', status: 'completed' } as any, { job_id: '2', status: 'failed' } as any]
             expect((getters as any).getPrintStatus(state)('1')).toBe('completed')
             expect((getters as any).getPrintStatus(state)('2')).toBe('failed')
             expect((getters as any).getPrintStatus(state)('unknown')).toBe('')
@@ -117,9 +125,7 @@ describe('server history store', () => {
         })
 
         it('getPrintJobsForGcodes filters by job_id when uuid lookup fails', () => {
-            state.jobs = [
-                { job_id: '1', metadata: { size: 100, modified: 10 }, filename: 'a.gcode' } as any,
-            ]
+            state.jobs = [{ job_id: '1', metadata: { size: 100, modified: 10 }, filename: 'a.gcode' } as any]
             // non-matching metadata
             const result = (getters as any).getPrintJobsForGcodes(state)('different.gcode', 0, 999, null, 'nonexistent')
             expect(result).toEqual([])
@@ -130,7 +136,12 @@ describe('server history store', () => {
         })
 
         it('getAvgPrintTime returns 0 when no completed jobs', () => {
-            expect((getters as any).getAvgPrintTime(state, { getTotalCompletedPrintTime: 0, getTotalCompletedJobsCount: 0 })).toBe(0)
+            expect(
+                (getters as any).getAvgPrintTime(state, {
+                    getTotalCompletedPrintTime: 0,
+                    getTotalCompletedJobsCount: 0,
+                })
+            ).toBe(0)
         })
     })
 
@@ -233,7 +244,9 @@ describe('server history store', () => {
                 auxiliary_totals: [{ field: 'temp', maximum: 100, provider: 'sensor', total: 50 }],
             })
             expect(commit).toHaveBeenCalledWith('setTotals', { total_jobs: 5 })
-            expect(commit).toHaveBeenCalledWith('setAuxiliaryTotals', [{ field: 'temp', maximum: 100, provider: 'sensor', total: 50 }])
+            expect(commit).toHaveBeenCalledWith('setAuxiliaryTotals', [
+                { field: 'temp', maximum: 100, provider: 'sensor', total: 50 },
+            ])
         })
 
         it('getTotals skips auxiliary_totals when empty', () => {
@@ -247,26 +260,23 @@ describe('server history store', () => {
             const commit = vi.fn()
             const dispatch = vi.fn()
 
-            await actions.getHistory(
-                { commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any,
-                {
-                    jobs: [
-                        {
-                            job_id: '1',
-                            exists: true,
-                            end_time: 0,
-                            filament_used: 1,
-                            filename: 'one.gcode',
-                            metadata: {},
-                            print_duration: 1,
-                            status: 'completed',
-                            start_time: 0,
-                            total_duration: 1,
-                        },
-                    ],
-                    requestParams: { start: 0, limit: 50, max: 100 },
-                }
-            )
+            await actions.getHistory({ commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any, {
+                jobs: [
+                    {
+                        job_id: '1',
+                        exists: true,
+                        end_time: 0,
+                        filament_used: 1,
+                        filename: 'one.gcode',
+                        metadata: {},
+                        print_duration: 1,
+                        status: 'completed',
+                        start_time: 0,
+                        total_duration: 1,
+                    },
+                ],
+                requestParams: { start: 0, limit: 50, max: 100 },
+            })
 
             expect(commit).toHaveBeenCalledWith('resetJobs')
             expect(commit).toHaveBeenCalledWith('addJob', expect.any(Object))
@@ -300,10 +310,10 @@ describe('server history store', () => {
                 total_duration: 1,
             }))
 
-            await actions.getHistory(
-                { commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any,
-                { jobs, requestParams: { start: 0, limit: 50, max: 100 } }
-            )
+            await actions.getHistory({ commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any, {
+                jobs,
+                requestParams: { start: 0, limit: 50, max: 100 },
+            })
 
             // Should emit a follow-up request since jobs.length === limit and max > start + limit
             expect(mockSocket.emit).toHaveBeenCalledWith(
@@ -317,23 +327,27 @@ describe('server history store', () => {
         it('getHistory does not paginate when start+limit >= max', async () => {
             const commit = vi.fn()
             const dispatch = vi.fn()
-            const jobs = Array.from({ length: 50 }, (_, i) => ({
-                job_id: `${i}`,
-                exists: true,
-                end_time: 0,
-                filament_used: 1,
-                filename: `${i}.gcode`,
-                metadata: {},
-                print_duration: 1,
-                status: 'completed',
-                start_time: 0,
-                total_duration: 1,
-            }) as any)
-
-            await actions.getHistory(
-                { commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any,
-                { jobs, requestParams: { start: 0, limit: 50, max: 50 } }
+            const jobs = Array.from(
+                { length: 50 },
+                (_, i) =>
+                    ({
+                        job_id: `${i}`,
+                        exists: true,
+                        end_time: 0,
+                        filament_used: 1,
+                        filename: `${i}.gcode`,
+                        metadata: {},
+                        print_duration: 1,
+                        status: 'completed',
+                        start_time: 0,
+                        total_duration: 1,
+                    }) as any
             )
+
+            await actions.getHistory({ commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any, {
+                jobs,
+                requestParams: { start: 0, limit: 50, max: 50 },
+            })
 
             // With start=0, limit=50, max=50 → max > start + limit is false (50 > 50 is false)
             // So it should NOT paginate, and should setAllLoaded + loadHistoryNotes
@@ -345,10 +359,10 @@ describe('server history store', () => {
             const dispatch = vi.fn()
             state.jobs = [{ job_id: 'existing', filename: 'existing.gcode' } as any]
 
-            await actions.getHistory(
-                { commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any,
-                { jobs: [{ job_id: 'new', filename: 'new.gcode' } as any], requestParams: { start: 50, limit: 50 } }
-            )
+            await actions.getHistory({ commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any, {
+                jobs: [{ job_id: 'new', filename: 'new.gcode' } as any],
+                requestParams: { start: 50, limit: 50 },
+            })
 
             expect(commit).not.toHaveBeenCalledWith('resetJobs')
             expect(commit).toHaveBeenCalledWith('addJob', expect.objectContaining({ job_id: 'new' }))
@@ -387,7 +401,11 @@ describe('server history store', () => {
             const job = { job_id: '1', filename: 'new.gcode' } as any
             actions.getChanged({ commit } as any, { action: 'added', job })
             expect(commit).toHaveBeenCalledWith('addJob', job)
-            expect(mockSocket.emit).toHaveBeenCalledWith('server.history.totals', {}, { action: 'server/history/getTotals' })
+            expect(mockSocket.emit).toHaveBeenCalledWith(
+                'server.history.totals',
+                {},
+                { action: 'server/history/getTotals' }
+            )
         })
 
         it('getChanged handles finished action', () => {
@@ -395,7 +413,11 @@ describe('server history store', () => {
             const job = { job_id: '1', filename: 'updated.gcode' } as any
             actions.getChanged({ commit } as any, { action: 'finished', job })
             expect(commit).toHaveBeenCalledWith('updateJob', job)
-            expect(mockSocket.emit).toHaveBeenCalledWith('server.history.totals', {}, { action: 'server/history/getTotals' })
+            expect(mockSocket.emit).toHaveBeenCalledWith(
+                'server.history.totals',
+                {},
+                { action: 'server/history/getTotals' }
+            )
         })
 
         it('getDeletedJobs deletes each job', () => {
@@ -414,14 +436,22 @@ describe('server history store', () => {
         it('getHistory without requestParams skips resetJobs and uses defaults', async () => {
             const commit = vi.fn()
             const dispatch = vi.fn()
-            await actions.getHistory(
-                { commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any,
-                {
-                    jobs: [
-                        { job_id: '1', filename: 'a.gcode', metadata: {}, print_duration: 1, status: 'completed', start_time: 0, end_time: 1, total_duration: 1, exists: true, filament_used: 1 } as any,
-                    ],
-                }
-            )
+            await actions.getHistory({ commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any, {
+                jobs: [
+                    {
+                        job_id: '1',
+                        filename: 'a.gcode',
+                        metadata: {},
+                        print_duration: 1,
+                        status: 'completed',
+                        start_time: 0,
+                        end_time: 1,
+                        total_duration: 1,
+                        exists: true,
+                        filament_used: 1,
+                    } as any,
+                ],
+            })
             expect(commit).not.toHaveBeenCalledWith('resetJobs')
             expect(commit).toHaveBeenCalledWith('addJob', expect.any(Object))
             expect(dispatch).toHaveBeenCalledWith('loadHistoryNotes')
@@ -430,15 +460,23 @@ describe('server history store', () => {
         it('getHistory with requestParams missing start/limit/max uses defaults', async () => {
             const commit = vi.fn()
             const dispatch = vi.fn()
-            await actions.getHistory(
-                { commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any,
-                {
-                    jobs: [
-                        { job_id: '1', filename: 'a.gcode', metadata: {}, print_duration: 1, status: 'completed', start_time: 0, end_time: 1, total_duration: 1, exists: true, filament_used: 1 } as any,
-                    ],
-                    requestParams: {},
-                }
-            )
+            await actions.getHistory({ commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any, {
+                jobs: [
+                    {
+                        job_id: '1',
+                        filename: 'a.gcode',
+                        metadata: {},
+                        print_duration: 1,
+                        status: 'completed',
+                        start_time: 0,
+                        end_time: 1,
+                        total_duration: 1,
+                        exists: true,
+                        filament_used: 1,
+                    } as any,
+                ],
+                requestParams: {},
+            })
             expect(commit).toHaveBeenCalledWith('resetJobs')
             expect(dispatch).toHaveBeenCalledWith('loadHistoryNotes')
         })
@@ -446,13 +484,10 @@ describe('server history store', () => {
         it('getHistory with requestParams.start non-zero skips resetJobs', async () => {
             const commit = vi.fn()
             const dispatch = vi.fn()
-            await actions.getHistory(
-                { commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any,
-                {
-                    jobs: [],
-                    requestParams: { start: 50, limit: 50 },
-                }
-            )
+            await actions.getHistory({ commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any, {
+                jobs: [],
+                requestParams: { start: 50, limit: 50 },
+            })
             expect(commit).not.toHaveBeenCalledWith('resetJobs')
             expect(dispatch).toHaveBeenCalledWith('loadHistoryNotes')
         })
@@ -461,14 +496,22 @@ describe('server history store', () => {
             const commit = vi.fn()
             const dispatch = vi.fn()
             const jobs = Array.from({ length: 50 }, (_, i) => ({
-                job_id: `${i}`, filename: `${i}.gcode`, metadata: {}, print_duration: 1, status: 'completed',
-                start_time: 0, end_time: 1, total_duration: 1, exists: true, filament_used: 1,
+                job_id: `${i}`,
+                filename: `${i}.gcode`,
+                metadata: {},
+                print_duration: 1,
+                status: 'completed',
+                start_time: 0,
+                end_time: 1,
+                total_duration: 1,
+                exists: true,
+                filament_used: 1,
             }))
 
-            await actions.getHistory(
-                { commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any,
-                { jobs, requestParams: { start: 50, limit: 50 } }
-            )
+            await actions.getHistory({ commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any, {
+                jobs,
+                requestParams: { start: 50, limit: 50 },
+            })
             expect(commit).not.toHaveBeenCalledWith('setAllLoaded')
             expect(mockSocket.emit).toHaveBeenCalledWith(
                 'server.history.list',
@@ -481,14 +524,22 @@ describe('server history store', () => {
             const commit = vi.fn()
             const dispatch = vi.fn()
             const jobs = Array.from({ length: 50 }, (_, i) => ({
-                job_id: `${i}`, filename: `${i}.gcode`, metadata: {}, print_duration: 1, status: 'completed',
-                start_time: 0, end_time: 1, total_duration: 1, exists: true, filament_used: 1,
+                job_id: `${i}`,
+                filename: `${i}.gcode`,
+                metadata: {},
+                print_duration: 1,
+                status: 'completed',
+                start_time: 0,
+                end_time: 1,
+                total_duration: 1,
+                exists: true,
+                filament_used: 1,
             }))
 
-            await actions.getHistory(
-                { commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any,
-                { jobs, requestParams: { start: 0, limit: 50 } }
-            )
+            await actions.getHistory({ commit, dispatch, state, rootState: { server: { dbNamespaces: [] } } } as any, {
+                jobs,
+                requestParams: { start: 0, limit: 50 },
+            })
             expect(mockSocket.emit).toHaveBeenCalledWith(
                 'server.history.list',
                 { start: 50, limit: 50, max: null },

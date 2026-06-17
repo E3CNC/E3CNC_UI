@@ -79,7 +79,8 @@ export const mutations: MutationTree<GuiState> = {
             ...(state.dashboard[payload.layoutname as keyof GuiStateDashboard] as GuiStateLayoutoption[]),
         ]
         layoutArray.splice(payload.index, 1)
-        state.dashboard[payload.layoutname as keyof GuiStateDashboard] = layoutArray as unknown as GuiStateLayoutoption[]
+        state.dashboard[payload.layoutname as keyof GuiStateDashboard] =
+            layoutArray as unknown as GuiStateLayoutoption[]
     },
 
     setFloatingPanels(state, payload: Record<string, PanelFloatingState>) {

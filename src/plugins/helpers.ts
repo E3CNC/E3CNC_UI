@@ -207,8 +207,10 @@ export const sortFiles = (items: FileStateFile[] | null, sortBy: string[], sortD
     if (items !== null) {
         // Sort by index
         items.sort((a: FileStateFile, b: FileStateFile) => {
-            const valueA = sortBySingle === 'filetype' ? typeSortValue(a.filename) : a[sortBySingle as keyof FileStateFile]
-            const valueB = sortBySingle === 'filetype' ? typeSortValue(b.filename) : b[sortBySingle as keyof FileStateFile]
+            const valueA =
+                sortBySingle === 'filetype' ? typeSortValue(a.filename) : a[sortBySingle as keyof FileStateFile]
+            const valueB =
+                sortBySingle === 'filetype' ? typeSortValue(b.filename) : b[sortBySingle as keyof FileStateFile]
 
             if (valueA === valueB) return 0
             if (valueA === null || valueA === undefined) return -1

@@ -9,9 +9,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: T
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: T) { this._value = val }
-        get value() { return this._value }
-        set value(v: T) { this._value = v }
+        constructor(val: T) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v: T) {
+            this._value = v
+        }
     }
     return {
         printerIsPrinting: new MockRef(false),
@@ -35,9 +41,18 @@ vi.mock('@/directives/longpress', () => ({
 const vuetifyComponentsMock = vi.hoisted(() => ({
     VRow: { name: 'VRow', template: '<div :class="$attrs.class"><slot /></div>' },
     VCol: { name: 'VCol', props: ['cols'], template: '<div :class="$attrs.class"><slot /></div>' },
-    VMenu: { name: 'VMenu', props: ['modelValue', 'positionX', 'positionY', 'absolute', 'offsetY'], template: '<div class="v-menu" :class="{ visible: modelValue }"><slot name="activator" :props="{onClick: () => {}}" /><div v-if="modelValue"><slot /></div></div>' },
+    VMenu: {
+        name: 'VMenu',
+        props: ['modelValue', 'positionX', 'positionY', 'absolute', 'offsetY'],
+        template:
+            '<div class="v-menu" :class="{ visible: modelValue }"><slot name="activator" :props="{onClick: () => {}}" /><div v-if="modelValue"><slot /></div></div>',
+    },
     VList: { name: 'VList', template: '<div class="v-list"><slot /></div>' },
-    VListItem: { name: 'VListItem', props: ['disabled'], template: '<div class="v-list-item" :class="{disabled: disabled}" @click="$emit(\'click\')"><slot /></div>' },
+    VListItem: {
+        name: 'VListItem',
+        props: ['disabled'],
+        template: '<div class="v-list-item" :class="{disabled: disabled}" @click="$emit(\'click\')"><slot /></div>',
+    },
     VIcon: { name: 'VIcon', props: ['size', 'color', 'icon'], template: '<i :class="$attrs.class"><slot /></i>' },
     VBtn: { name: 'VBtn', props: ['icon', 'color'], template: '<button @click="$emit(\'click\')"><slot /></button>' },
 }))
@@ -49,7 +64,11 @@ vi.mock('@/components/panels/Gcodefiles/GcodefilesThumbnail.vue', () => ({
 }))
 
 vi.mock('@/components/dialogs/JobqueueEntryChangeCountDialog.vue', () => ({
-    default: { name: 'JobqueueEntryChangeCountDialog', props: ['modelValue', 'job'], template: '<div class="change-count-dialog" />' },
+    default: {
+        name: 'JobqueueEntryChangeCountDialog',
+        props: ['modelValue', 'job'],
+        template: '<div class="change-count-dialog" />',
+    },
 }))
 
 function createTestStore(overrides: Record<string, any> = {}) {
@@ -69,7 +88,10 @@ function createTestStore(overrides: Record<string, any> = {}) {
                 toolhead: { homed_axes: 'xyz' },
             },
             gui: {
-                dashboard: { nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] }, floatingPanels: {} },
+                dashboard: {
+                    nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] },
+                    floatingPanels: {},
+                },
                 general: { printername: 'Test' },
                 control: {},
                 uiSettings: {},
@@ -94,7 +116,11 @@ function createTestStore(overrides: Record<string, any> = {}) {
     })
 }
 
-function makeJob(job_id: string, filename: string, overrides: Partial<ServerJobQueueStateJob> = {}): ServerJobQueueStateJob {
+function makeJob(
+    job_id: string,
+    filename: string,
+    overrides: Partial<ServerJobQueueStateJob> = {}
+): ServerJobQueueStateJob {
     return {
         job_id,
         filename,

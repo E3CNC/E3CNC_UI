@@ -1,12 +1,7 @@
 <template>
     <v-row>
         <v-col class="v-col-12 py-1">
-            <v-checkbox
-                :model-value="value"
-                :label="label"
-                hide-details
-                class="mt-0"
-                @update:model-value="setValue" />
+            <v-checkbox :model-value="value" :label="label" hide-details class="mt-0" @update:model-value="setValue" />
         </v-col>
     </v-row>
 </template>

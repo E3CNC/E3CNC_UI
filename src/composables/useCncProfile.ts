@@ -48,12 +48,8 @@ export function useCncProfile() {
     const showMachineHealth = computed(() => frontend.value.show_machine_health !== false)
 
     const requireConfirmForZeroReset = computed(() => safety.value.require_confirm_for_zero_reset !== false)
-    const requireConfirmForSpindleStart = computed(
-        () => safety.value.require_confirm_for_spindle_start !== false
-    )
-    const requireHomingBeforeOffsets = computed(
-        () => safety.value.require_homing_before_offsets !== false
-    )
+    const requireConfirmForSpindleStart = computed(() => safety.value.require_confirm_for_spindle_start !== false)
+    const requireHomingBeforeOffsets = computed(() => safety.value.require_homing_before_offsets !== false)
 
     async function load() {
         const apiUrl = store.getters['socket/getUrl']

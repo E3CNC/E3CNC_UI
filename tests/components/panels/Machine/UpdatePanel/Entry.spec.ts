@@ -27,7 +27,7 @@ vi.mock('vue-i18n', () => ({
 
 vi.mock('semver', () => ({
     default: { valid: vi.fn(() => true), gt: vi.fn((a: string, b: string) => a !== b) },
-    valid: vi.fn((v: string) => v && v !== '?' ? v : null),
+    valid: vi.fn((v: string) => (v && v !== '?' ? v : null)),
     gt: vi.fn((a: string, b: string) => {
         if (a === 'v2.13.0' && b === 'v2.12.0') return true
         if (a === 'v0.13.0' && b === 'v0.12.0') return true
@@ -39,12 +39,28 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VRow: { name: 'VRow', template: '<div :class="$attrs.class"><slot /></div>' },
     VCol: { name: 'VCol', template: '<div :class="$attrs.class"><slot /></div>' },
     VIcon: { name: 'VIcon', props: ['size', 'start'], template: '<i class="v-icon" />' },
-    VBtn: { name: 'VBtn', props: ['variant', 'color', 'size', 'disabled'], template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>' },
-    VAlert: { name: 'VAlert', props: ['density', 'variant', 'color', 'border', 'icon'], template: '<div><slot /></div>' },
-    VChip: { name: 'VChip', props: ['size', 'label', 'variant', 'outlined', 'color', 'disabled'], template: '<span :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></span>' },
+    VBtn: {
+        name: 'VBtn',
+        props: ['variant', 'color', 'size', 'disabled'],
+        template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>',
+    },
+    VAlert: {
+        name: 'VAlert',
+        props: ['density', 'variant', 'color', 'border', 'icon'],
+        template: '<div><slot /></div>',
+    },
+    VChip: {
+        name: 'VChip',
+        props: ['size', 'label', 'variant', 'outlined', 'color', 'disabled'],
+        template: '<span :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></span>',
+    },
     VMenu: { name: 'VMenu', props: ['offsetY'], template: '<div><slot name="activator" /><slot /></div>' },
     VList: { name: 'VList', props: ['density'], template: '<div><slot /></div>' },
-    VListItem: { name: 'VListItem', props: ['disabled'], template: '<div @click="$attrs.onClick || $attrs.click"><slot name="prepend" /><slot name="title" /></div>' },
+    VListItem: {
+        name: 'VListItem',
+        props: ['disabled'],
+        template: '<div @click="$attrs.onClick || $attrs.click"><slot name="prepend" /><slot name="title" /></div>',
+    },
     VListItemTitle: { name: 'VListItemTitle', template: '<span><slot /></span>' },
     VDivider: { name: 'VDivider', template: '<hr />' },
 }))
@@ -156,7 +172,9 @@ describe('UpdatePanel Entry.vue', () => {
             ...sampleGitRepo,
             version: 'v2.12.0',
             remote_version: 'v2.12.0',
-            commits_behind: [{ sha: 'abc123', author: 'dev', date: 1700000000, subject: 'fix: bug', message: '', tag: null }],
+            commits_behind: [
+                { sha: 'abc123', author: 'dev', date: 1700000000, subject: 'fix: bug', message: '', tag: null },
+            ],
         }
         const wrapper = mount(Entry, {
             props: { repo },

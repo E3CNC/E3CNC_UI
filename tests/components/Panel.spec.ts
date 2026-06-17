@@ -10,8 +10,16 @@ vi.mock('@/composables/useBase', () => ({
 }))
 
 const vuetifyComponentsMock = vi.hoisted(() => ({
-    VCard: { name: 'VCard', inheritAttrs: false, template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>' },
-    VToolbar: { name: 'VToolbar', inheritAttrs: false, template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>' },
+    VCard: {
+        name: 'VCard',
+        inheritAttrs: false,
+        template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>',
+    },
+    VToolbar: {
+        name: 'VToolbar',
+        inheritAttrs: false,
+        template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>',
+    },
     VToolbarTitle: { name: 'VToolbarTitle', template: '<span><slot /></span>' },
     VToolbarItems: { name: 'VToolbarItems', template: '<div><slot /></div>' },
     VIcon: { name: 'VIcon', props: ['start', 'icon'], template: '<i><slot /></i>' },
@@ -242,21 +250,16 @@ function createExpandTrackingStore(initialExpand: boolean = true) {
         },
         getters: {
             'socket/getUrl': () => '//localhost:8080',
-            'gui/getPanelExpand':
-                (state: any) =>
-                (cardClass: string, viewport: string) => {
-                    const key = `${cardClass}-${viewport}`
-                    if (!(key in state.gui.dashboard._expandState)) {
-                        state.gui.dashboard._expandState[key] = initialExpand
-                    }
-                    return state.gui.dashboard._expandState[key]
-                },
+            'gui/getPanelExpand': (state: any) => (cardClass: string, viewport: string) => {
+                const key = `${cardClass}-${viewport}`
+                if (!(key in state.gui.dashboard._expandState)) {
+                    state.gui.dashboard._expandState[key] = initialExpand
+                }
+                return state.gui.dashboard._expandState[key]
+            },
         },
         mutations: {
-            'gui/saveExpandPanel': (
-                state: any,
-                payload: { name: string; value: boolean; viewport: string }
-            ) => {
+            'gui/saveExpandPanel': (state: any, payload: { name: string; value: boolean; viewport: string }) => {
                 const key = `${payload.name}-${payload.viewport}`
                 state.gui.dashboard._expandState[key] = payload.value
             },
@@ -326,7 +329,7 @@ describe('Panel.vue - collapsible behavior', () => {
         })
 
         const content = wrapper.find('.panel-content')
-        expect((content.attributes('style') ?? '')).not.toContain('display: none')
+        expect(content.attributes('style') ?? '').not.toContain('display: none')
     })
 
     it('toggles expand state when collapsible button is clicked', async () => {
@@ -338,7 +341,7 @@ describe('Panel.vue - collapsible behavior', () => {
 
         // Initially expanded → content visible (no style or no display:none)
         let content = wrapper.find('.panel-content')
-        expect((content.attributes('style') ?? '')).not.toContain('display: none')
+        expect(content.attributes('style') ?? '').not.toContain('display: none')
 
         // Click collapse button
         const btn = wrapper.find('.btn-collapsible')
@@ -347,14 +350,14 @@ describe('Panel.vue - collapsible behavior', () => {
 
         // Now collapsed → content hidden
         content = wrapper.find('.panel-content')
-        expect((content.attributes('style') ?? '')).toContain('display: none')
+        expect(content.attributes('style') ?? '').toContain('display: none')
 
         // Click again to expand
         await btn.trigger('click')
         await wrapper.vm.$nextTick()
 
         content = wrapper.find('.panel-content')
-        expect((content.attributes('style') ?? '')).not.toContain('display: none')
+        expect(content.attributes('style') ?? '').not.toContain('display: none')
     })
 
     it('applies icon-rotate-90 class on the collapse icon when collapsed', async () => {
@@ -556,7 +559,7 @@ describe('Panel.vue - hideButtonsOnCollapse', () => {
 
         // The outer toolbar-items should be visible (hasButtonsSlot is true)
         const toolbarItems = wrapper.findComponent({ name: 'v-toolbar-items' })
-        expect((toolbarItems.attributes('style') ?? '')).not.toContain('display: none')
+        expect(toolbarItems.attributes('style') ?? '').not.toContain('display: none')
 
         // But the inner div with slot should NOT be rendered (v-if is false)
         expect(wrapper.find('.btn-test-action').exists()).toBe(false)
@@ -681,7 +684,7 @@ describe('Panel.vue - hasButtonsSlot detection', () => {
         })
 
         const toolbarItems = wrapper.findComponent({ name: 'v-toolbar-items' })
-        expect((toolbarItems.attributes('style') ?? '')).not.toContain('display: none')
+        expect(toolbarItems.attributes('style') ?? '').not.toContain('display: none')
     })
 
     it('shows toolbar-items when collapsible is true even without buttons slot', () => {
@@ -693,7 +696,7 @@ describe('Panel.vue - hasButtonsSlot detection', () => {
         })
 
         const toolbarItems = wrapper.findComponent({ name: 'v-toolbar-items' })
-        expect((toolbarItems.attributes('style') ?? '')).not.toContain('display: none')
+        expect(toolbarItems.attributes('style') ?? '').not.toContain('display: none')
     })
 
     it('shows toolbar-items when floatable is true and panel is actually floating', () => {
@@ -711,7 +714,7 @@ describe('Panel.vue - hasButtonsSlot detection', () => {
         })
 
         const toolbarItems = wrapper.findComponent({ name: 'v-toolbar-items' })
-        expect((toolbarItems.attributes('style') ?? '')).not.toContain('display: none')
+        expect(toolbarItems.attributes('style') ?? '').not.toContain('display: none')
     })
 
     it('hides toolbar-items when no buttons slot, not collapsible, not floating', () => {

@@ -48,12 +48,15 @@ let content = ''
 let codemirror: null | EditorView = null
 let cminstance: null | EditorView = null
 
-watch(() => props.modelValue ?? props.value, (newVal) => {
-    const cm_value = cminstance?.state?.doc.toString()
-    if (newVal !== cm_value) {
-        setCmValue(newVal ?? '')
+watch(
+    () => props.modelValue ?? props.value,
+    (newVal) => {
+        const cm_value = cminstance?.state?.doc.toString()
+        if (newVal !== cm_value) {
+            setCmValue(newVal ?? '')
+        }
     }
-})
+)
 
 onMounted(() => {
     initialize()

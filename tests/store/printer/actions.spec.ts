@@ -52,7 +52,11 @@ describe('printer actions', () => {
             cpu_info: { cpu_count: 4 },
         }
         actions.getInfo({ commit, dispatch } as any, payload)
-        expect(commit).toHaveBeenCalledWith('server/setData', { klippy_state: 'ready', klippy_message: 'ok' }, { root: true })
+        expect(commit).toHaveBeenCalledWith(
+            'server/setData',
+            { klippy_state: 'ready', klippy_message: 'ok' },
+            { root: true }
+        )
         expect(commit).toHaveBeenCalledWith('setData', {
             app_name: 'Klipper',
             hostname: 'myprinter',
@@ -65,7 +69,13 @@ describe('printer actions', () => {
     it('getInfo handles null app field', () => {
         const commit = vi.fn()
         const dispatch = vi.fn()
-        actions.getInfo({ commit, dispatch } as any, { state: 'ready', state_message: '', hostname: '', software_version: '', cpu_info: null })
+        actions.getInfo({ commit, dispatch } as any, {
+            state: 'ready',
+            state_message: '',
+            hostname: '',
+            software_version: '',
+            cpu_info: null,
+        })
         expect(commit).toHaveBeenCalledWith('setData', {
             app_name: null,
             hostname: '',
@@ -84,11 +94,19 @@ describe('printer actions', () => {
 
         expect(mockSocket.emitAndWait).toHaveBeenCalledWith('printer.objects.list')
         // 'menu' is in blocklist, others should be subscribed
-        expect(mockSocket.emitAndWait).toHaveBeenCalledWith('printer.objects.subscribe', {
-            objects: { toolhead: null, extruder: null, 'gcode_macro START_PRINT': null },
-        }, {})
+        expect(mockSocket.emitAndWait).toHaveBeenCalledWith(
+            'printer.objects.subscribe',
+            {
+                objects: { toolhead: null, extruder: null, 'gcode_macro START_PRINT': null },
+            },
+            {}
+        )
         expect(dispatch).toHaveBeenCalledWith('getData', { status: { extruder: { temperature: 200 } } })
-        expect(mockSocket.emit).toHaveBeenCalledWith('server.temperature_store', { include_monitors: true }, { action: 'printer/tempHistory/init' })
+        expect(mockSocket.emit).toHaveBeenCalledWith(
+            'server.temperature_store',
+            { include_monitors: true },
+            { action: 'printer/tempHistory/init' }
+        )
         expect(dispatch).toHaveBeenCalledWith('socket/removeInitModule', 'printer/initSubscripts', { root: true })
     })
 
@@ -120,15 +138,23 @@ describe('printer actions', () => {
                 extruder: { temperature: 200 },
             },
         }
-        actions.getData.call(
-            { dispatch: thisDispatch },
-            { commit, dispatch, state } as any,
-            payload,
+        actions.getData.call({ dispatch: thisDispatch }, { commit, dispatch, state } as any, payload)
+        expect(thisDispatch).toHaveBeenCalledWith(
+            'server/getData',
+            { klippy_state: 'ready', klippy_message: 'ok' },
+            { root: true }
         )
-        expect(thisDispatch).toHaveBeenCalledWith('server/getData', { klippy_state: 'ready', klippy_message: 'ok' }, { root: true })
         expect(dispatch).toHaveBeenCalledWith('gui/updateGcodeviewerCache', { kinematics: 'corexy' }, { root: true })
-        expect(dispatch).toHaveBeenCalledWith('gui/updateGcodeviewerCache', { axis_maximum: [300, 300, 200] }, { root: true })
-        expect(dispatch).toHaveBeenCalledWith('gui/updateGcodeviewerCache', { axis_minimum: [0, 0, -5] }, { root: true })
+        expect(dispatch).toHaveBeenCalledWith(
+            'gui/updateGcodeviewerCache',
+            { axis_maximum: [300, 300, 200] },
+            { root: true }
+        )
+        expect(dispatch).toHaveBeenCalledWith(
+            'gui/updateGcodeviewerCache',
+            { axis_minimum: [0, 0, -5] },
+            { root: true }
+        )
     })
 
     it('getData strips requestParams', () => {
@@ -157,15 +183,11 @@ describe('printer actions', () => {
                 extruder: { temperature: 200 },
             },
         }
-        actions.getData.call(
-            { dispatch: thisDispatch },
-            { commit, dispatch, state } as any,
-            payload,
-        )
+        actions.getData.call({ dispatch: thisDispatch }, { commit, dispatch, state } as any, payload)
         expect(thisDispatch).toHaveBeenCalledWith(
             'server/getData',
             { klippy_state: 'error', klippy_message: 'klippy shutdown' },
-            { root: true },
+            { root: true }
         )
         expect(dispatch).not.toHaveBeenCalledWith('gui/updateGcodeviewerCache', expect.anything())
         expect(commit).toHaveBeenCalledWith('setData', { extruder: { temperature: 200 } })
@@ -175,7 +197,11 @@ describe('printer actions', () => {
         mockSocket.emitAndWait.mockResolvedValue({ status: { gcode: { commands: { G28: {} } } } })
         const commit = vi.fn()
         await actions.initGcodes({ commit } as any)
-        expect(mockSocket.emitAndWait).toHaveBeenCalledWith('printer.objects.query', { objects: { gcode: ['commands'] } }, {})
+        expect(mockSocket.emitAndWait).toHaveBeenCalledWith(
+            'printer.objects.query',
+            { objects: { gcode: ['commands'] } },
+            {}
+        )
         expect(commit).toHaveBeenCalledWith('setData', { gcode: { commands: { G28: {} } } })
     })
 
@@ -184,9 +210,13 @@ describe('printer actions', () => {
         const dispatch = vi.fn()
         const stateWithExtruder = { extruder: { temperature: 200 }, extruder1: { temperature: 180 } }
         await actions.initExtruderCanExtrude({ dispatch, state: stateWithExtruder as any } as any)
-        expect(mockSocket.emitAndWait).toHaveBeenCalledWith('printer.objects.query', {
-            objects: { extruder: ['can_extrude'], extruder1: ['can_extrude'] },
-        }, {})
+        expect(mockSocket.emitAndWait).toHaveBeenCalledWith(
+            'printer.objects.query',
+            {
+                objects: { extruder: ['can_extrude'], extruder1: ['can_extrude'] },
+            },
+            {}
+        )
         expect(dispatch).toHaveBeenCalledWith('getData', { extruder: { can_extrude: true } })
     })
 
@@ -202,7 +232,11 @@ describe('printer actions', () => {
         const dispatch = vi.fn()
         actions.sendGcode({ dispatch } as any, 'G28')
         expect(dispatch).toHaveBeenCalledWith('server/addEvent', { message: 'G28', type: 'command' }, { root: true })
-        expect(mockSocket.emit).toHaveBeenCalledWith('printer.gcode.script', { script: 'G28' }, { loading: 'sendGcode' })
+        expect(mockSocket.emit).toHaveBeenCalledWith(
+            'printer.gcode.script',
+            { script: 'G28' },
+            { loading: 'sendGcode' }
+        )
     })
 
     it('sendGcode emits emergency_stop for M112', () => {

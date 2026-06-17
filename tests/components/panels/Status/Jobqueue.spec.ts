@@ -8,7 +8,11 @@ vi.mock('@/composables/useBase', () => ({
 }))
 
 const vuetifyComponentsMock = vi.hoisted(() => ({
-    VCard: { name: 'VCard', inheritAttrs: false, template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>' },
+    VCard: {
+        name: 'VCard',
+        inheritAttrs: false,
+        template: '<div :class="$attrs.class" :style="$attrs.style"><slot /></div>',
+    },
     VRow: { name: 'VRow', template: '<div :class="$attrs.class"><slot /></div>' },
     VCol: { name: 'VCol', template: '<div :class="$attrs.class"><slot /></div>' },
 }))
@@ -52,7 +56,10 @@ function createStoreWithState(overrides: Record<string, any> = {}) {
                 toolhead: { homed_axes: 'xyz' },
             },
             gui: {
-                dashboard: { nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] }, floatingPanels: {} },
+                dashboard: {
+                    nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] },
+                    floatingPanels: {},
+                },
                 general: { printername: 'Test' },
                 control: {},
                 uiSettings: {},
@@ -103,11 +110,7 @@ describe('Jobqueue.vue', () => {
     })
 
     it('renders job entries when jobs exist (<= 5)', () => {
-        const jobs = [
-            makeJob('1', 'test1.gcode'),
-            makeJob('2', 'test2.gcode'),
-            makeJob('3', 'test3.gcode'),
-        ]
+        const jobs = [makeJob('1', 'test1.gcode'), makeJob('2', 'test2.gcode'), makeJob('3', 'test3.gcode')]
         const store = createStoreWithState({
             getters: { 'server/jobQueue/getJobs': () => jobs },
         })
@@ -172,10 +175,7 @@ describe('Jobqueue.vue', () => {
     })
 
     it('sets showPrintButton only for first entry', () => {
-        const jobs = [
-            makeJob('1', 'first.gcode'),
-            makeJob('2', 'second.gcode'),
-        ]
+        const jobs = [makeJob('1', 'first.gcode'), makeJob('2', 'second.gcode')]
         const store = createStoreWithState({
             getters: { 'server/jobQueue/getJobs': () => jobs },
         })

@@ -1,6 +1,10 @@
 <template>
     <v-col v-if="exists" cols="12" :class="classes">
- <v-btn :href="href" variant="flat" class="d-block w-100 machine-logfiles-panel__log-button" @click="downloadLog">
+        <v-btn
+            :href="href"
+            variant="flat"
+            class="d-block w-100 machine-logfiles-panel__log-button"
+            @click="downloadLog">
             <v-icon class="mr-2">{{ mdiDownload }}</v-icon>
             {{ name }}
         </v-btn>
@@ -21,9 +25,7 @@ const props = defineProps<{
 const { apiUrl, klipperState } = useBase()
 const store = useStore()
 
-const logfiles = computed(() =>
-    store.getters['files/getDirectory']('logs')?.childrens ?? []
-)
+const logfiles = computed(() => store.getters['files/getDirectory']('logs')?.childrens ?? [])
 
 const filename = computed(() => props.name + '.log')
 

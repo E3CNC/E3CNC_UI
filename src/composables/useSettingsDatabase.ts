@@ -40,8 +40,7 @@ export function useSettingsDatabase() {
             })
 
         if (availableNamespaces.includes('mainsail')) {
-            const urlRequestMainsailNamespace =
-                base.apiUrl.value + '/server/database/item?namespace=mainsail'
+            const urlRequestMainsailNamespace = base.apiUrl.value + '/server/database/item?namespace=mainsail'
             backupableNamespaces = await fetch(urlRequestMainsailNamespace)
                 .then((response) => response?.json())
                 .then((response) => response?.result?.value ?? {})
@@ -49,9 +48,7 @@ export function useSettingsDatabase() {
                 .then((keys) => keys.filter((key) => key !== 'initVersion'))
                 .then((keys) =>
                     keys.map((key) => {
-                        const namespace = availableKeys.value.find(
-                            (namespace) => namespace.value === key
-                        )
+                        const namespace = availableKeys.value.find((namespace) => namespace.value === key)
                         if (namespace) return namespace
                         return { value: key, label: key }
                     })

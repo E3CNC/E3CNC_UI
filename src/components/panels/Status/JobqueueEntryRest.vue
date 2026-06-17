@@ -41,9 +41,7 @@ const count = computed(() => {
     return total
 })
 
-const headline = computed(() =>
-    t('Panels.StatusPanel.JobqueueMoreFiles', { count: count.value })
-)
+const headline = computed(() => t('Panels.StatusPanel.JobqueueMoreFiles', { count: count.value }))
 
 const description = computed(() => {
     const filamentArray: string[] = []

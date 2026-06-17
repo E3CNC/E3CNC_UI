@@ -11,6 +11,7 @@ ansible-playbook ansible/playbooks/install.yml   # or: ./deploy.sh --live
 ```
 
 **Features:**
+
 - **DRO** — live machine/work position, velocity, homed flags, axis limits
 - **Jog** — directional pad, step-size selector, configurable feedrates, keyboard nav
 - **Offsets** — G54–G59 WCS manager with interactive SVG OffsetPreview

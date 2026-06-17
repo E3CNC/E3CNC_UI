@@ -8,7 +8,8 @@ vi.mock('vuetify/components', () => ({
     VMenu: {
         name: 'VMenu',
         props: { offsetY: Boolean, closeOnContentClick: Boolean, title: String },
-        template: '<div class="v-menu-wrap"><slot name="activator" :props=\'{ onClick: () => true }\' /><div class="v-menu-content"><slot /></div></div>',
+        template:
+            '<div class="v-menu-wrap"><slot name="activator" :props=\'{ onClick: () => true }\' /><div class="v-menu-content"><slot /></div></div>',
     },
     VBtn: {
         name: 'VBtn',
@@ -26,7 +27,8 @@ vi.mock('vuetify/components', () => ({
     VCheckbox: {
         name: 'VCheckbox',
         props: ['modelValue', 'label', 'hideDetails'],
-        template: '<label class="v-checkbox"><input type="checkbox" :checked="modelValue" @change="$emit(\'update:modelValue\', ($event.target).checked)" /><span>{{ label }}</span></label>',
+        template:
+            '<label class="v-checkbox"><input type="checkbox" :checked="modelValue" @change="$emit(\'update:modelValue\', ($event.target).checked)" /><span>{{ label }}</span></label>',
     },
 }))
 

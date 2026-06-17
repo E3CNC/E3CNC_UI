@@ -27,11 +27,15 @@ useBase()
 let colorPicker: IroCP | null = null
 const picker = ref<HTMLElement | null>(null)
 
-watch(() => props.color, (value) => {
-    if (colorPicker && colorPicker.color.rgbString !== value) {
-        colorPicker.color.rgbString = value as string
-    }
-}, { deep: true })
+watch(
+    () => props.color,
+    (value) => {
+        if (colorPicker && colorPicker.color.rgbString !== value) {
+            colorPicker.color.rgbString = value as string
+        }
+    },
+    { deep: true }
+)
 
 const internalOptions = computed<ColorPickerProps>(() => ({
     ...(props.options ?? {}),

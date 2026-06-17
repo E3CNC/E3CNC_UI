@@ -88,5 +88,4 @@ describe('useCncProfile', () => {
         expect(profile.requireConfirmForSpindleStart.value).toBe(false)
         expect(profile.requireHomingBeforeOffsets.value).toBe(true)
     })
-
 })

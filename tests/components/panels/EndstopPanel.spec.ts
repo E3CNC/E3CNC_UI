@@ -8,9 +8,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         loadings: new MockRef([]),
@@ -39,7 +45,11 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VRow: { name: 'VRow', template: '<div><slot /></div>' },
     VCol: { name: 'VCol', template: '<div><slot /></div>' },
     VSpacer: { name: 'VSpacer', template: '<span style="flex:1" />' },
-    VBtn: { name: 'VBtn', props: ['icon', 'loading'], template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>' },
+    VBtn: {
+        name: 'VBtn',
+        props: ['icon', 'loading'],
+        template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>',
+    },
     VIcon: { name: 'VIcon', props: ['start', 'icon'], template: '<i><slot /></i>' },
 }))
 

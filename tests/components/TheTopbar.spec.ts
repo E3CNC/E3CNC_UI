@@ -39,7 +39,8 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VBtn: {
         name: 'VBtn',
         props: { icon: Boolean, variant: String, color: String, disabled: Boolean, loading: Boolean },
-        template: '<button class="v-btn" :disabled="disabled" :class="{ \'v-btn--loading\': loading }" @click="$emit(\'click\')"><slot /></button>',
+        template:
+            '<button class="v-btn" :disabled="disabled" :class="{ \'v-btn--loading\': loading }" @click="$emit(\'click\')"><slot /></button>',
     },
     VSpacer: {
         name: 'VSpacer',
@@ -483,9 +484,13 @@ describe('TheTopbar.vue', () => {
             message: 'SAVE_CONFIG',
             type: 'command',
         })
-        expect(mockSocketEmit).toHaveBeenCalledWith('printer.gcode.script', {
-            script: 'SAVE_CONFIG',
-        }, { loading: 'topbarSaveConfig' })
+        expect(mockSocketEmit).toHaveBeenCalledWith(
+            'printer.gcode.script',
+            {
+                script: 'SAVE_CONFIG',
+            },
+            { loading: 'topbarSaveConfig' }
+        )
     })
 
     // ── 6. Shows upload and print button when conditions met ──
@@ -604,11 +609,7 @@ describe('TheTopbar.vue', () => {
         await emergencyBtn.trigger('click')
 
         // Socket emit for emergency stop should have been called
-        expect(mockSocketEmit).toHaveBeenCalledWith(
-            'printer.emergency_stop',
-            {},
-            { loading: 'topbarEmergencyStop' }
-        )
+        expect(mockSocketEmit).toHaveBeenCalledWith('printer.emergency_stop', {}, { loading: 'topbarEmergencyStop' })
         // Dialog should NOT be visible
         const dialog = wrapper.find('.mock-emergency-dialog')
         expect(dialog.exists()).toBe(false)
@@ -746,21 +747,19 @@ describe('TheTopbar.vue', () => {
         // Keep upload in progress - never resolve so snackbar stays visible
         const axios = await import('axios')
         let resolveUpload: (value: any) => void
-        ;(axios.default.post as any).mockImplementation(
-            (_url: string, _data: any, config: any) => {
-                // Trigger progress callback
-                if (config.onUploadProgress) {
-                    config.onUploadProgress({
-                        progress: 0.5,
-                        rate: 102400,
-                        total: 1024,
-                    })
-                }
-                return new Promise((resolve) => {
-                    resolveUpload = resolve
+        ;(axios.default.post as any).mockImplementation((_url: string, _data: any, config: any) => {
+            // Trigger progress callback
+            if (config.onUploadProgress) {
+                config.onUploadProgress({
+                    progress: 0.5,
+                    rate: 102400,
+                    total: 1024,
                 })
             }
-        )
+            return new Promise((resolve) => {
+                resolveUpload = resolve
+            })
+        })
 
         const wrapper = mountWithDefaults(TheTopbar, store)
 
@@ -798,9 +797,7 @@ describe('TheTopbar.vue', () => {
             name: 'btnUploadAndStart',
         })
 
-        expect(mockToast.success).toHaveBeenCalledWith(
-            expect.stringContaining('App.TopBar.UploadOfFileSuccessful')
-        )
+        expect(mockToast.success).toHaveBeenCalledWith(expect.stringContaining('App.TopBar.UploadOfFileSuccessful'))
     })
 
     it('handles upload failure gracefully', async () => {
@@ -830,9 +827,7 @@ describe('TheTopbar.vue', () => {
         await new Promise((r) => setTimeout(r, 0))
 
         // Should show error toast
-        expect(mockToast.error).toHaveBeenCalledWith(
-            expect.stringContaining('App.TopBar.CannotUploadTheFile')
-        )
+        expect(mockToast.error).toHaveBeenCalledWith(expect.stringContaining('App.TopBar.CannotUploadTheFile'))
     })
 
     it('gcode input accept is empty on iOS', () => {

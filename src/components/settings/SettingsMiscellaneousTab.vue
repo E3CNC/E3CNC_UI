@@ -105,14 +105,11 @@ watch(
     { immediate: true }
 )
 
-watch(
-    [page, pageType, pageName],
-    async () => {
-        await updateMiscellaneousQuery({
-            page: page.value,
-            type: pageType.value,
-            name: pageName.value,
-        })
-    }
-)
+watch([page, pageType, pageName], async () => {
+    await updateMiscellaneousQuery({
+        page: page.value,
+        type: pageType.value,
+        name: pageName.value,
+    })
+})
 </script>

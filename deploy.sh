@@ -1,18 +1,17 @@
 #!/bin/bash
 # Deploy mainsail-cnc fork to the web server directory.
+# Delegates to the Ansible deploy playbook.
+#
 # Usage: ./deploy.sh [--live]
-#   --live  Copy build to the live nginx directory (default: dry-run with status)
+#   --live  Actually build and deploy (default: dry-run with status)
 
 set -euo pipefail
 
-# Configurable paths — override as needed
-export PATH="${HOME}/.bun/bin:${PATH}"
-MAINSAIL_CNC_DIR="${MAINSAIL_CNC_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
+MAINSAIL_CNC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
 DEPLOY_DIR="${MAINSAIL_DEPLOY_DIR:-$HOME/mainsail}"
 
-REPO_DIR="${1:-}"
 MODE="dry-run"
-if [ "$REPO_DIR" = "--live" ]; then
+if [ "${1:-}" = "--live" ]; then
   MODE="live"
 fi
 
@@ -23,51 +22,21 @@ echo "  Mode:    $MODE"
 echo ""
 
 if [ "$MODE" = "dry-run" ]; then
-  echo "[dry-run] Would run: cd $MAINSAIL_CNC_DIR && bun install --frozen-lockfile && bun run build"
-  echo "[dry-run] Would deploy dist/ to $DEPLOY_DIR (preserving config.json)"
+  echo "[dry-run] Would run Ansible frontend deploy playbook:"
+  echo "  cd $MAINSAIL_CNC_DIR && ansible-playbook \\"
+  echo "    -i ansible/inventory/local.yml \\"
+  echo "    ansible/playbooks/deploy.yml \\"
+  echo "    --diff --check"
+  echo ""
   echo "Run: ./deploy.sh --live  to actually deploy."
   exit 0
 fi
 
-# Check prerequisites
-if ! command -v bun &>/dev/null; then
-  echo "ERROR: 'bun' not found in PATH."
-  echo "  Install it: curl -fsSL https://bun.sh/install | bash"
-  echo "  Or set: export PATH=\"\$HOME/.bun/bin:\$PATH\""
-  exit 1
-fi
-
 cd "$MAINSAIL_CNC_DIR"
-echo ">>> Installing dependencies..."
-bun install --frozen-lockfile
-
-echo ">>> Building..."
-bun run build
-
-echo ">>> Deploying to $DEPLOY_DIR..."
-mkdir -p "$DEPLOY_DIR"
-
-# Remove existing files (preserving config.json if present)
-if [ -d "$DEPLOY_DIR" ]; then
-  find "$DEPLOY_DIR" -type f -not -name 'config.json' -delete 2>/dev/null || true
-  find "$DEPLOY_DIR" -mindepth 1 -type d -empty -delete 2>/dev/null || true
-fi
-
-cp -a "$MAINSAIL_CNC_DIR/dist/"* "$DEPLOY_DIR/"
-# Copy hidden files too (e.g. .htaccess)
-cp "$MAINSAIL_CNC_DIR"/dist/.* "$DEPLOY_DIR/" 2>/dev/null || true
-
-# Write a build version stamp so the service worker detects the update
-echo "{\"buildTime\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"commit\":\"$(git -C "$MAINSAIL_CNC_DIR" rev-parse --short HEAD 2>/dev/null || echo unknown)\"}" > "$DEPLOY_DIR/version.json"
-
-# Reload nginx (use sudo if available)
-if command -v sudo &>/dev/null; then
-  sudo systemctl reload nginx 2>/dev/null || echo "Warning: could not reload nginx — do it manually."
-elif command -v systemctl &>/dev/null; then
-  systemctl reload nginx 2>/dev/null || echo "Warning: could not reload nginx — do it manually."
-else
-  echo "Warning: could not reload nginx — do it manually."
-fi
+ansible-playbook \
+  -i ansible/inventory/local.yml \
+  ansible/playbooks/deploy.yml \
+  --diff
 
 echo ""
 echo "deployed mainsail-cnc"

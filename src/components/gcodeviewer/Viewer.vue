@@ -2,7 +2,7 @@
     <div>
         <panel :title="panelTitle" :icon="mdiVideo3d" card-class="gcode-viewer-panel" :margin-bottom="false">
             <template #buttons>
- <v-btn
+                <v-btn
                     v-show="reloadRequired"
                     :icon="display.xs"
                     variant="text"
@@ -13,7 +13,7 @@
                     <span class="d-none d-sm-block">{{ $t('GCodeViewer.ReloadRequired') }}</span>
                     <v-icon class="d-sm-none">{{ mdiReloadAlert }}</v-icon>
                 </v-btn>
- <v-btn :icon="mdiCameraRetake" rounded="0" @click="resetCamera"/>
+                <v-btn :icon="mdiCameraRetake" rounded="0" @click="resetCamera" />
             </template>
             <v-card-text>
                 <v-row :class="showScrubber ? 'withScrubber' : ''">
@@ -42,19 +42,19 @@
                             persistent-hint />
                     </v-col>
                     <v-col class="v-col-auto pt-0 text-center">
- <v-btn class="px-2 minwidth-0" color="primary" @click="scrubPlaying = !scrubPlaying">
+                        <v-btn class="px-2 minwidth-0" color="primary" @click="scrubPlaying = !scrubPlaying">
                             <v-icon v-if="scrubPlaying">{{ mdiPause }}</v-icon>
                             <v-icon v-else>{{ mdiPlay }}</v-icon>
                         </v-btn>
- <v-btn class="px-2 minwidth-0 mx-3" color="primary" @click="fastForward">
+                        <v-btn class="px-2 minwidth-0 mx-3" color="primary" @click="fastForward">
                             <v-icon>{{ mdiFastForward }}</v-icon>
                         </v-btn>
- <v-btn-toggle v-model="scrubSpeed" class="mt-3 mt-sm-0" density="compact" mandatory rounded>
- <v-btn :value="1">1x</v-btn>
- <v-btn :value="2">2x</v-btn>
- <v-btn :value="5">5x</v-btn>
- <v-btn :value="10">10x</v-btn>
- <v-btn :value="20">20x</v-btn>
+                        <v-btn-toggle v-model="scrubSpeed" class="mt-3 mt-sm-0" density="compact" mandatory rounded>
+                            <v-btn :value="1">1x</v-btn>
+                            <v-btn :value="2">2x</v-btn>
+                            <v-btn :value="5">5x</v-btn>
+                            <v-btn :value="10">10x</v-btn>
+                            <v-btn :value="20">20x</v-btn>
                         </v-btn-toggle>
                     </v-col>
                 </v-row>
@@ -65,22 +65,22 @@
                                 order-md="2"
                                 class="d-flex align-content-space-around justify-center flex-wrap flex-md-nowrap v-col-12 v-col-md-4">
                                 <template v-if="loadedFile === null">
- <v-btn
+                                    <v-btn
                                         v-if="sdCardFilePath !== '' && sdCardFilePath !== loadedFile"
                                         class="mr-3"
                                         @click="loadCurrentFile">
                                         {{ $t('GCodeViewer.LoadCurrentFile') }}
                                     </v-btn>
- <v-btn @click="chooseFile">{{ $t('GCodeViewer.LoadLocal') }}</v-btn>
+                                    <v-btn @click="chooseFile">{{ $t('GCodeViewer.LoadLocal') }}</v-btn>
                                 </template>
                                 <template v-else>
- <v-btn v-if="showTrackingButton" class="mr-3" @click="tracking = !tracking">
+                                    <v-btn v-if="showTrackingButton" class="mr-3" @click="tracking = !tracking">
                                         <v-icon
                                             class="mr-2"
                                             v-html="tracking ? mdiToggleSwitch : mdiToggleSwitchOffOutline" />
                                         {{ $t('GCodeViewer.Tracking') }}
                                     </v-btn>
- <v-btn @click="clearLoadedFile">
+                                    <v-btn @click="clearLoadedFile">
                                         <v-icon start>{{ mdiBroom }}</v-icon>
                                         {{ $t('GCodeViewer.ClearLoadedFile') }}
                                     </v-btn>
@@ -112,7 +112,7 @@
                                     :close-on-content-click="false"
                                     :title="$t('Files.SetupCurrentList')">
                                     <template #activator="{ props }">
- <v-btn class="minwidth-0 px-2 ml-3" v-bind="props">
+                                        <v-btn class="minwidth-0 px-2 ml-3" v-bind="props">
                                             <v-icon>{{ mdiCog }}</v-icon>
                                         </v-btn>
                                     </template>
@@ -214,7 +214,13 @@
             </div>
             <v-progress-linear class="mt-2" :model-value="loadingPercent"></v-progress-linear>
             <template #actions="{ props }">
- <v-btn :icon="mdiClose" color="red" variant="text" v-bind="props" style="min-width: auto" @click="cancelRendering()"/>
+                <v-btn
+                    :icon="mdiClose"
+                    color="red"
+                    variant="text"
+                    v-bind="props"
+                    style="min-width: auto"
+                    @click="cancelRendering()" />
             </template>
         </v-snackbar>
         <v-snackbar v-model="downloadSnackbar.status" :timeout="-1" location="bottom right">
@@ -236,7 +242,13 @@
                 <v-progress-linear class="mt-2" indeterminate />
             </template>
             <template #actions="{ props }">
- <v-btn :icon="mdiClose" color="red" variant="text" v-bind="props" style="min-width: auto" @click="cancelDownload"/>
+                <v-btn
+                    :icon="mdiClose"
+                    color="red"
+                    variant="text"
+                    v-bind="props"
+                    style="min-width: auto"
+                    @click="cancelDownload" />
             </template>
         </v-snackbar>
     </div>
@@ -707,7 +719,9 @@ watch(printerIsPrinting, () => {
 
 const showCursor = computed({
     get: () => store.state.gui.gcodeViewer.showCursor ?? false,
-    set: (newVal: boolean) => { store.dispatch('gui/saveSetting', { name: 'gcodeViewer.showCursor', value: newVal }) },
+    set: (newVal: boolean) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.showCursor', value: newVal })
+    },
 })
 
 watch(showCursor, (newVal: boolean) => {
@@ -716,7 +730,9 @@ watch(showCursor, (newVal: boolean) => {
 
 const showTravelMoves = computed({
     get: () => store.state.gui.gcodeViewer.showTravelMoves ?? false,
-    set: (newVal: boolean) => { store.dispatch('gui/saveSetting', { name: 'gcodeViewer.showTravelMoves', value: newVal }) },
+    set: (newVal: boolean) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.showTravelMoves', value: newVal })
+    },
 })
 
 const showGCode = computed({
@@ -736,7 +752,9 @@ watch(showTravelMoves, (newVal: boolean) => {
 
 const showObjectSelection = computed({
     get: () => store.state.gui.gcodeViewer.showObjectSelection ?? false,
-    set: (newVal: boolean) => { store.dispatch('gui/saveSetting', { name: 'gcodeViewer.showObjectSelection', value: newVal }) },
+    set: (newVal: boolean) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.showObjectSelection', value: newVal })
+    },
 })
 
 watch(showObjectSelection, (newVal: boolean) => {
@@ -745,7 +763,9 @@ watch(showObjectSelection, (newVal: boolean) => {
 
 const hdRendering = computed({
     get: () => store.state.gui.gcodeViewer.hdRendering,
-    set: (newVal) => { store.dispatch('gui/saveSetting', { name: 'gcodeViewer.hdRendering', value: newVal }) },
+    set: (newVal) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.hdRendering', value: newVal })
+    },
 })
 
 watch(hdRendering, async (newVal: boolean) => {
@@ -757,7 +777,9 @@ watch(hdRendering, async (newVal: boolean) => {
 
 const forceLineRendering = computed({
     get: () => store.state.gui.gcodeViewer.forceLineRendering,
-    set: (newVal) => { store.dispatch('gui/saveSetting', { name: 'gcodeViewer.forceLineRendering', value: newVal }) },
+    set: (newVal) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.forceLineRendering', value: newVal })
+    },
 })
 
 watch(forceLineRendering, async (newVal: boolean) => {
@@ -769,7 +791,9 @@ watch(forceLineRendering, async (newVal: boolean) => {
 
 const transparency = computed({
     get: () => store.state.gui.gcodeViewer.transparency,
-    set: (newVal) => { store.dispatch('gui/saveSetting', { name: 'gcodeViewer.transparency', value: newVal }) },
+    set: (newVal) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.transparency', value: newVal })
+    },
 })
 
 watch(transparency, async (newVal: boolean) => {
@@ -781,7 +805,9 @@ watch(transparency, async (newVal: boolean) => {
 
 const voxelMode = computed({
     get: () => store.state.gui.gcodeViewer.voxelMode,
-    set: (newVal) => { store.dispatch('gui/saveSetting', { name: 'gcodeViewer.voxelMode', value: newVal }) },
+    set: (newVal) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.voxelMode', value: newVal })
+    },
 })
 
 watch(voxelMode, async (newVal: boolean) => {
@@ -795,17 +821,23 @@ watch(voxelMode, async (newVal: boolean) => {
 
 const voxelWidth = computed({
     get: () => store.state.gui.gcodeViewer.voxelWidth ?? 1,
-    set: (newVal) => { store.dispatch('gui/saveSetting', { name: 'gcodeViewer.voxelWidth', value: newVal }) },
+    set: (newVal) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.voxelWidth', value: newVal })
+    },
 })
 
 const voxelHeight = computed({
     get: () => store.state.gui.gcodeViewer.voxelHeight ?? 1,
-    set: (newVal) => { store.dispatch('gui/saveSetting', { name: 'gcodeViewer.voxelHeight', value: newVal }) },
+    set: (newVal) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.voxelHeight', value: newVal })
+    },
 })
 
 const specularLighting = computed({
     get: () => store.state.gui.gcodeViewer.specularLighting,
-    set: (newVal) => { store.dispatch('gui/saveSetting', { name: 'gcodeViewer.specularLighting', value: newVal }) },
+    set: (newVal) => {
+        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.specularLighting', value: newVal })
+    },
 })
 
 watch(specularLighting, async (newVal: boolean) => {
@@ -920,45 +952,54 @@ watch(maxFeedColor, (newVal: string) => {
     setReloadRequiredFlag()
 })
 
-const kinematics = computed(() =>
-    store.state.printer.configfile?.settings?.printer?.kinematics ??
-    store.state.gui?.gcodeViewer?.klipperCache?.kinematics ??
-    ''
+const kinematics = computed(
+    () =>
+        store.state.printer.configfile?.settings?.printer?.kinematics ??
+        store.state.gui?.gcodeViewer?.klipperCache?.kinematics ??
+        ''
 )
 
-const bedMaxSize = computed(() =>
-    store.state.printer.toolhead?.axis_maximum ??
-    store.state.gui?.gcodeViewer?.klipperCache?.axis_maximum ??
-    null
+const bedMaxSize = computed(
+    () => store.state.printer.toolhead?.axis_maximum ?? store.state.gui?.gcodeViewer?.klipperCache?.axis_maximum ?? null
 )
 
-const bedMinSize = computed(() =>
-    store.state.printer.toolhead?.axis_minimum ??
-    store.state.gui?.gcodeViewer?.klipperCache?.axis_minimum ??
-    null
+const bedMinSize = computed(
+    () => store.state.printer.toolhead?.axis_minimum ?? store.state.gui?.gcodeViewer?.klipperCache?.axis_minimum ?? null
 )
 
-watch(kinematics, (newVal: string) => {
-    if (viewer === null || !newVal) return
+watch(
+    kinematics,
+    (newVal: string) => {
+        if (viewer === null || !newVal) return
 
-    viewer.bed.setDelta(newVal.includes('delta'))
-}, { immediate: true })
+        viewer.bed.setDelta(newVal.includes('delta'))
+    },
+    { immediate: true }
+)
 
-watch(bedMinSize, (newVal: number[] | null) => {
-    if (newVal === null || viewer === null || viewer.bed === null) return
+watch(
+    bedMinSize,
+    (newVal: number[] | null) => {
+        if (newVal === null || viewer === null || viewer.bed === null) return
 
-    viewer.bed.buildVolume.x.min = newVal[0]
-    viewer.bed.buildVolume.y.min = newVal[1]
-    viewer.bed.buildVolume.z.min = newVal[2]
-}, { deep: true, immediate: true })
+        viewer.bed.buildVolume.x.min = newVal[0]
+        viewer.bed.buildVolume.y.min = newVal[1]
+        viewer.bed.buildVolume.z.min = newVal[2]
+    },
+    { deep: true, immediate: true }
+)
 
-watch(bedMaxSize, (newVal: number[] | null) => {
-    if (newVal === null || viewer === null || viewer.bed === null) return
+watch(
+    bedMaxSize,
+    (newVal: number[] | null) => {
+        if (newVal === null || viewer === null || viewer.bed === null) return
 
-    viewer.bed.buildVolume.x.max = newVal[0]
-    viewer.bed.buildVolume.y.max = newVal[1]
-    viewer.bed.buildVolume.z.max = newVal[2]
-}, { deep: true, immediate: true })
+        viewer.bed.buildVolume.x.max = newVal[0]
+        viewer.bed.buildVolume.y.max = newVal[1]
+        viewer.bed.buildVolume.z.max = newVal[2]
+    },
+    { deep: true, immediate: true }
+)
 
 const progressColor = computed(() => store.state.gui.gcodeViewer?.progressColor ?? '#FFFFFF')
 

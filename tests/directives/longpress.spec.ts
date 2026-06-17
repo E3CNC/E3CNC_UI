@@ -11,17 +11,21 @@ function createTestComponent(handler: any = vi.fn(), arg?: string) {
 }
 
 function triggerTouchstart(el: HTMLElement, x = 0, y = 0) {
-    el.dispatchEvent(new TouchEvent('touchstart', {
-        touches: [{ clientX: x, clientY: y, identifier: 0 } as Touch],
-        bubbles: true,
-    }))
+    el.dispatchEvent(
+        new TouchEvent('touchstart', {
+            touches: [{ clientX: x, clientY: y, identifier: 0 } as Touch],
+            bubbles: true,
+        })
+    )
 }
 
 function triggerTouchmove(el: HTMLElement, x = 0, y = 0) {
-    el.dispatchEvent(new TouchEvent('touchmove', {
-        touches: [{ clientX: x, clientY: y, identifier: 0 } as Touch],
-        bubbles: true,
-    }))
+    el.dispatchEvent(
+        new TouchEvent('touchmove', {
+            touches: [{ clientX: x, clientY: y, identifier: 0 } as Touch],
+            bubbles: true,
+        })
+    )
 }
 
 function triggerTouchend(el: HTMLElement) {
@@ -103,9 +107,7 @@ describe('vLongpress', () => {
             template: '<div v-longpress="123"></div>',
             directives: { longpress: vLongpress },
         })
-        expect(warnSpy).toHaveBeenCalledWith(
-            expect.stringContaining('[longpress:]')
-        )
+        expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('[longpress:]'))
         warnSpy.mockRestore()
     })
 

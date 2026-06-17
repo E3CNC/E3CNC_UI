@@ -26,9 +26,7 @@ describe('server power store', () => {
     })
 
     it('reads and mutates power device state', () => {
-        mutations.setDevices(state, [
-            { device: 'light', status: 'off', locked_while_printing: false, type: 'relay' },
-        ])
+        mutations.setDevices(state, [{ device: 'light', status: 'off', locked_while_printing: false, type: 'relay' }])
         mutations.setStatus(state, { device: 'light', status: 'on' })
         mutations.setStatus(state, { device: 'missing', status: 'error' })
 
@@ -44,7 +42,9 @@ describe('server power store', () => {
         await actions.getDevices({ commit, dispatch } as any, {
             devices: [{ device: 'bed', status: 'off', locked_while_printing: false, type: 'relay' }],
         })
-        expect(commit).toHaveBeenCalledWith('setDevices', [{ device: 'bed', status: 'off', locked_while_printing: false, type: 'relay' }])
+        expect(commit).toHaveBeenCalledWith('setDevices', [
+            { device: 'bed', status: 'off', locked_while_printing: false, type: 'relay' },
+        ])
         expect(dispatch).toHaveBeenCalledWith('socket/removeInitModule', 'server/power/init', { root: true })
 
         actions.getStatus({ commit } as any, { error: false, device: 'bed', status: 'on' })

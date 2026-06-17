@@ -6,7 +6,13 @@
         @contextmenu="showContextMenu($event)"
         @click="detailsDialogBool = true">
         <td class="pr-0">
-            <v-checkbox v-ripple :model-value="isSelected" density="compact" hide-details class="pa-0 mr-0" @click.stop="select(!isSelected)" />
+            <v-checkbox
+                v-ripple
+                :model-value="isSelected"
+                density="compact"
+                hide-details
+                class="pa-0 mr-0"
+                @click.stop="select(!isSelected)" />
         </td>
         <td class="px-0 text-center" style="width: 32px">
             <v-icon color="primary">{{ icon }}</v-icon>
@@ -141,8 +147,8 @@ const restTextDays = computed(() => {
 })
 
 const reminder = computed(() => props.item.reminder?.type ?? null)
-const alarmIcon = computed(() => reminder.value === 'repeat' ? mdiAlarmMultiple : mdiAlarm)
-const icon = computed(() => props.item.end_time !== null ? mdiNotebookCheck : mdiNotebook)
+const alarmIcon = computed(() => (reminder.value === 'repeat' ? mdiAlarmMultiple : mdiAlarm))
+const icon = computed(() => (props.item.end_time !== null ? mdiNotebookCheck : mdiNotebook))
 
 function select(newVal: boolean) {
     emit('select', newVal)

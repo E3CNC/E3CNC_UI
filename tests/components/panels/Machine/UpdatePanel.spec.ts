@@ -31,7 +31,11 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VCol: { name: 'VCol', template: '<div :class="$attrs.class"><slot /></div>' },
     VTooltip: { name: 'VTooltip', template: '<div><slot name="activator" /><slot /></div>' },
     VIcon: { name: 'VIcon', template: '<i class="v-icon"><slot /></i>' },
-    VBtn: { name: 'VBtn', props: ['icon', 'rounded', 'ripple', 'color', 'loading', 'disabled'], template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>' },
+    VBtn: {
+        name: 'VBtn',
+        props: ['icon', 'rounded', 'ripple', 'color', 'loading', 'disabled'],
+        template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>',
+    },
     VCard: { name: 'VCard', template: '<div><slot /></div>' },
     VCardText: { name: 'VCardText', template: '<div><slot /></div>' },
     VDivider: { name: 'VDivider', template: '<hr />' },
@@ -226,8 +230,16 @@ describe('UpdatePanel.vue', () => {
         const store = createStoreWithState({
             getters: {
                 'server/updateManager/getUpdateManagerList': () => [
-                    { name: 'mainsail', type: 'git', data: { name: 'mainsail', remote_version: 'v2.12.0', commits_behind: [{ sha: 'abc' }] } },
-                    { name: 'klipper', type: 'git', data: { name: 'klipper', remote_version: 'v0.12.0', commits_behind: [{ sha: 'def' }] } },
+                    {
+                        name: 'mainsail',
+                        type: 'git',
+                        data: { name: 'mainsail', remote_version: 'v2.12.0', commits_behind: [{ sha: 'abc' }] },
+                    },
+                    {
+                        name: 'klipper',
+                        type: 'git',
+                        data: { name: 'klipper', remote_version: 'v0.12.0', commits_behind: [{ sha: 'def' }] },
+                    },
                 ],
             },
         })
@@ -242,8 +254,16 @@ describe('UpdatePanel.vue', () => {
         const store = createStoreWithState({
             getters: {
                 'server/updateManager/getUpdateManagerList': () => [
-                    { name: 'mainsail', type: 'git', data: { name: 'mainsail', remote_version: 'v2.12.0', commits_behind: [{ sha: 'abc' }] } },
-                    { name: 'klipper', type: 'git', data: { name: 'klipper', remote_version: 'v0.12.0', commits_behind: [] } },
+                    {
+                        name: 'mainsail',
+                        type: 'git',
+                        data: { name: 'mainsail', remote_version: 'v2.12.0', commits_behind: [{ sha: 'abc' }] },
+                    },
+                    {
+                        name: 'klipper',
+                        type: 'git',
+                        data: { name: 'klipper', remote_version: 'v0.12.0', commits_behind: [] },
+                    },
                 ],
             },
         })

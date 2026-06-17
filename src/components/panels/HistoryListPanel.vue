@@ -16,7 +16,7 @@
                 <v-col class="offset-4 v-col-4 d-flex align-center justify-end">
                     <v-tooltip v-if="selectedJobsTable.length" top>
                         <template #activator="{ props: activatorProps }">
- <v-btn
+                            <v-btn
                                 color="error"
                                 class="px-2 minwidth-0 ml-3"
                                 v-bind="activatorProps"
@@ -28,7 +28,7 @@
                     </v-tooltip>
                     <v-tooltip top>
                         <template #activator="{ props: activatorProps }">
- <v-btn
+                            <v-btn
                                 class="px-2 minwidth-0 ml-3"
                                 v-bind="activatorProps"
                                 @click="addMaintenanceDialog = true">
@@ -39,7 +39,7 @@
                     </v-tooltip>
                     <v-tooltip v-if="!allLoaded" top>
                         <template #activator="{ props: activatorProps }">
- <v-btn
+                            <v-btn
                                 :loading="loadings.includes('historyLoadAll')"
                                 class="px-2 minwidth-0 ml-3"
                                 v-bind="activatorProps"
@@ -51,7 +51,7 @@
                     </v-tooltip>
                     <v-tooltip top>
                         <template #activator="{ props: activatorProps }">
- <v-btn class="px-2 minwidth-0 ml-3" v-bind="activatorProps" @click="exportHistory">
+                            <v-btn class="px-2 minwidth-0 ml-3" v-bind="activatorProps" @click="exportHistory">
                                 <v-icon>{{ mdiDatabaseExportOutline }}</v-icon>
                             </v-btn>
                         </template>
@@ -61,7 +61,7 @@
                         <template #activator="{ props: menuProps }">
                             <v-tooltip location="top" :text="$t('History.Settings')">
                                 <template #activator="{ props: tooltipProps }">
- <v-btn class="px-2 minwidth-0 ml-3" v-bind="{ ...menuProps, ...tooltipProps }">
+                                    <v-btn class="px-2 minwidth-0 ml-3" v-bind="{ ...menuProps, ...tooltipProps }">
                                         <v-icon>{{ mdiCog }}</v-icon>
                                     </v-btn>
                                 </template>
@@ -73,16 +73,14 @@
                                     v-model="showMaintenanceEntries"
                                     class="mt-0"
                                     hide-details
-                                    :label="$t('History.MaintenanceEntries')"
-                                     />
+                                    :label="$t('History.MaintenanceEntries')" />
                             </v-list-item>
                             <v-list-item class="minHeight36">
                                 <v-checkbox
                                     v-model="showPrintJobs"
                                     class="mt-0"
                                     hide-details
-                                    :label="$t('History.PrintJobs')"
-                                     />
+                                    :label="$t('History.PrintJobs')" />
                             </v-list-item>
                             <v-divider />
                             <template v-if="printStatusArray.length">
@@ -240,13 +238,9 @@ const sortDesc = ref([true])
 const addMaintenanceDialog = ref(false)
 const deleteSelectedDialog = ref(false)
 
-const allLoaded = computed(() =>
-    store.state.server.history.all_loaded ?? false
-)
+const allLoaded = computed(() => store.state.server.history.all_loaded ?? false)
 
-const maintenanceEntries = computed(() =>
-    store.getters['gui/maintenance/getEntries'] ?? []
-)
+const maintenanceEntries = computed(() => store.getters['gui/maintenance/getEntries'] ?? [])
 
 const entries = computed<HistoryListPanelRow[]>(() => {
     let entries: HistoryListPanelRow[] = []
@@ -278,13 +272,75 @@ const entries = computed<HistoryListPanelRow[]>(() => {
 const headers = computed<HistoryListPanelCol[]>(() => {
     const result: HistoryListPanelCol[] = [
         { title: '', key: '', text: '', value: '', align: 'left', configable: false, visible: true, filterable: false },
-        { title: t('History.Filename').toString(), key: 'filename', text: t('History.Filename').toString(), value: 'filename', align: 'left', configable: false, visible: true },
-        { title: '', key: 'status', text: '', value: 'status', align: 'left', configable: false, visible: true, filterable: false },
-        { title: t('History.Filesize').toString(), key: 'size', text: t('History.Filesize').toString(), value: 'size', align: 'left', configable: true, visible: true, outputType: 'filesize' },
-        { title: t('History.LastModified').toString(), key: 'modified', text: t('History.LastModified').toString(), value: 'modified', align: 'left', configable: true, visible: true, outputType: 'date' },
-        { title: t('History.StartTime').toString(), key: 'start_time', text: t('History.StartTime').toString(), value: 'start_time', align: 'left', configable: true, visible: true, outputType: 'date' },
-        { title: t('History.EndTime').toString(), key: 'end_time', text: t('History.EndTime').toString(), value: 'end_time', align: 'left', configable: true, visible: true, outputType: 'date' },
-        { title: t('History.PrintTime').toString(), key: 'print_duration', text: t('History.PrintTime').toString(), value: 'print_duration', align: 'left', configable: true, visible: true, outputType: 'time' },
+        {
+            title: t('History.Filename').toString(),
+            key: 'filename',
+            text: t('History.Filename').toString(),
+            value: 'filename',
+            align: 'left',
+            configable: false,
+            visible: true,
+        },
+        {
+            title: '',
+            key: 'status',
+            text: '',
+            value: 'status',
+            align: 'left',
+            configable: false,
+            visible: true,
+            filterable: false,
+        },
+        {
+            title: t('History.Filesize').toString(),
+            key: 'size',
+            text: t('History.Filesize').toString(),
+            value: 'size',
+            align: 'left',
+            configable: true,
+            visible: true,
+            outputType: 'filesize',
+        },
+        {
+            title: t('History.LastModified').toString(),
+            key: 'modified',
+            text: t('History.LastModified').toString(),
+            value: 'modified',
+            align: 'left',
+            configable: true,
+            visible: true,
+            outputType: 'date',
+        },
+        {
+            title: t('History.StartTime').toString(),
+            key: 'start_time',
+            text: t('History.StartTime').toString(),
+            value: 'start_time',
+            align: 'left',
+            configable: true,
+            visible: true,
+            outputType: 'date',
+        },
+        {
+            title: t('History.EndTime').toString(),
+            key: 'end_time',
+            text: t('History.EndTime').toString(),
+            value: 'end_time',
+            align: 'left',
+            configable: true,
+            visible: true,
+            outputType: 'date',
+        },
+        {
+            title: t('History.PrintTime').toString(),
+            key: 'print_duration',
+            text: t('History.PrintTime').toString(),
+            value: 'print_duration',
+            align: 'left',
+            configable: true,
+            visible: true,
+            outputType: 'time',
+        },
         { title: 'CAM', key: 'slicer', text: 'CAM', value: 'slicer', align: 'left', configable: true, visible: true },
     ]
 
@@ -334,35 +390,35 @@ const countPerPage = computed({
     get: () => store.state.gui.view.history.countPerPage ?? 10,
     set: (newVal: number) => {
         store.dispatch('gui/saveSetting', { name: 'view.history.countPerPage', value: newVal })
-    }
+    },
 })
 
 const hideColums = computed({
     get: () => store.state.gui.view.history.hideColums ?? [],
     set: (newVal: string[]) => {
         store.dispatch('gui/saveSetting', { name: 'view.history.hideColums', value: newVal })
-    }
+    },
 })
 
 const showMaintenanceEntries = computed({
     get: () => store.state.gui.view.history.showMaintenanceEntries,
     set: (newVal: boolean) => {
         store.dispatch('gui/saveSetting', { name: 'view.history.showMaintenanceEntries', value: newVal })
-    }
+    },
 })
 
 const showPrintJobs = computed({
     get: () => store.state.gui.view.history.showPrintJobs,
     set: (newVal: boolean) => {
         store.dispatch('gui/saveSetting', { name: 'view.history.showPrintJobs', value: newVal })
-    }
+    },
 })
 
 const selectedJobsTable = computed<HistoryListPanelRow[]>({
     get: () => store.state.gui.view.history.selectedJobs ?? [],
     set: (newVal: HistoryListPanelRow[]) => {
         store.dispatch('gui/saveSetting', { name: 'view.history.selectedJobs', value: newVal })
-    }
+    },
 })
 
 function refreshHistory() {
@@ -529,9 +585,11 @@ function exportHistory() {
 
     const csvContent =
         'data:text/csv;charset=utf-8,' +
-        content.map((entry) =>
-            entry.map((field) => (field?.indexOf(csvSeperator) === -1 ? field : `"${field}"`)).join(csvSeperator)
-        ).join('\n')
+        content
+            .map((entry) =>
+                entry.map((field) => (field?.indexOf(csvSeperator) === -1 ? field : `"${field}"`)).join(csvSeperator)
+            )
+            .join('\n')
 
     const link = document.createElement('a')
     link.setAttribute('href', encodeURI(csvContent))
@@ -595,11 +653,7 @@ function deleteSelectedJobs() {
 
         if (!('job_id' in item)) return
 
-        socket.emit(
-            'server.history.delete_job',
-            { uid: item.job_id },
-            { action: 'server/history/getDeletedJobs' }
-        )
+        socket.emit('server.history.delete_job', { uid: item.job_id }, { action: 'server/history/getDeletedJobs' })
     })
 
     selectedJobsTable.value = []

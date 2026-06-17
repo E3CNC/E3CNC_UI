@@ -58,7 +58,8 @@ const layoutname = computed(() => {
 const groupname = computed(() => `${props.viewportName}Viewport`)
 
 const layout = computed({
-    get: (): GuiStateLayoutoption[] => store.getters['gui/getPanels'](props.viewportName, props.column) as GuiStateLayoutoption[],
+    get: (): GuiStateLayoutoption[] =>
+        store.getters['gui/getPanels'](props.viewportName, props.column) as GuiStateLayoutoption[],
     set: (newVal: Array<GuiStateLayoutoption | undefined>) => {
         const filteredLayout = newVal.filter((element) => element !== undefined)
         store.dispatch('gui/saveSetting', { name: `dashboard.${layoutname.value}`, value: filteredLayout })

@@ -31,9 +31,7 @@ export function useTheme() {
 
     const fgColorFaint = computed(() => fgColor(0.1))
 
-    const machineButtonCol = computed(() =>
-        isDark.value ? '#424242' : '#bdbdbd'
-    )
+    const machineButtonCol = computed(() => (isDark.value ? '#424242' : '#bdbdbd'))
 
     const draggableBgStyle = computed(() => {
         const vCol = isDark.value ? '#282828' : '#e7e7e7'

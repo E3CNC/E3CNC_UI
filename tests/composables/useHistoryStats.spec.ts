@@ -69,7 +69,9 @@ describe('useHistoryStats', () => {
         historyState.jobs.value = historyState.allJobs.value
 
         const filament = mountComposable('filament')
-        expect(filament.printStatusArrayChart.value.some((e: any) => e.name === 'completed' && e.value === 15)).toBe(true)
+        expect(filament.printStatusArrayChart.value.some((e: any) => e.name === 'completed' && e.value === 15)).toBe(
+            true
+        )
         expect(filament.groupedPrintStatusArray.value.length).toBeGreaterThan(0)
 
         const time = mountComposable('time')

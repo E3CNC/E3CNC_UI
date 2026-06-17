@@ -137,17 +137,31 @@ describe('server updateManager store', () => {
             }
             await actions.onUpdateStatus({ commit, dispatch } as any, payload)
             expect(commit).toHaveBeenCalledWith('resetRepos')
-            expect(commit).toHaveBeenCalledWith('storeGitRepo', { configured_type: 'git_repo', name: 'klipper', version: 'v1.0' })
-            expect(commit).toHaveBeenCalledWith('storeWebRepo', { configured_type: 'web', name: 'mainsail', version: 'v2.0' })
+            expect(commit).toHaveBeenCalledWith('storeGitRepo', {
+                configured_type: 'git_repo',
+                name: 'klipper',
+                version: 'v1.0',
+            })
+            expect(commit).toHaveBeenCalledWith('storeWebRepo', {
+                configured_type: 'web',
+                name: 'mainsail',
+                version: 'v2.0',
+            })
             expect(commit).toHaveBeenCalledWith('updateSystem', { package_count: 2, package_list: ['pkg1'] })
-            expect(dispatch).toHaveBeenCalledWith('socket/removeInitModule', 'server/updateManager/init', { root: true })
+            expect(dispatch).toHaveBeenCalledWith('socket/removeInitModule', 'server/updateManager/init', {
+                root: true,
+            })
         })
     })
 
     describe('getters', () => {
         it('getUpdateManagerList returns sorted combined list', () => {
-            state.git_repos = [{ name: 'klipper', configured_type: 'git_repo', owner: '', version: 'v1.0', remote_version: 'v1.1' }]
-            state.web_repos = [{ name: 'mainsail', configured_type: 'web', owner: '', version: 'v2.0', remote_version: 'v2.1' }]
+            state.git_repos = [
+                { name: 'klipper', configured_type: 'git_repo', owner: '', version: 'v1.0', remote_version: 'v1.1' },
+            ]
+            state.web_repos = [
+                { name: 'mainsail', configured_type: 'web', owner: '', version: 'v2.0', remote_version: 'v2.1' },
+            ]
             const result = (getters as any).getUpdateManagerList(state)
             expect(result).toHaveLength(2)
             expect(result[0].name).toBe('klipper')

@@ -1,6 +1,6 @@
 /**
  * Tests for src/composables/useSocket.ts
- * 
+ *
  * Tests the socket composable which provides WebSocket access via Vue injection.
  */
 

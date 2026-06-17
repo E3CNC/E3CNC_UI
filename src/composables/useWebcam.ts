@@ -84,9 +84,7 @@ export function useWebcam() {
         return { aspectRatio: aspectRatio }
     }
 
-    function updateAspectRatioFromVideo(
-        videoElement: HTMLVideoElement | null | undefined
-    ): number | null {
+    function updateAspectRatioFromVideo(videoElement: HTMLVideoElement | null | undefined): number | null {
         const w = videoElement?.videoWidth
         const h = videoElement?.videoHeight
 
@@ -95,9 +93,7 @@ export function useWebcam() {
         return w / h
     }
 
-    function updateAspectRatioFromImage(
-        imageElement: HTMLImageElement | null | undefined
-    ): number | null {
+    function updateAspectRatioFromImage(imageElement: HTMLImageElement | null | undefined): number | null {
         const w = imageElement?.naturalWidth
         const h = imageElement?.naturalHeight
 

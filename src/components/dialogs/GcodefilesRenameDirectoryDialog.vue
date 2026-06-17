@@ -5,7 +5,7 @@
             card-class="gcodefiles-rename-directory-dialog"
             :margin-bottom="false">
             <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="closePrompt"/>
+                <v-btn :icon="mdiCloseThick" rounded="0" @click="closePrompt" />
             </template>
             <v-card-text>
                 <v-text-field
@@ -19,11 +19,8 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer />
- <v-btn variant="text" @click="closePrompt">{{ $t('Buttons.Cancel') }}</v-btn>
- <v-btn
-                    :disabled="isInvalidName || name.length === 0"
-                    color="primary"
-                    @click="renameDirectoryAction">
+                <v-btn variant="text" @click="closePrompt">{{ $t('Buttons.Cancel') }}</v-btn>
+                <v-btn :disabled="isInvalidName || name.length === 0" color="primary" @click="renameDirectoryAction">
                     {{ $t('Files.Rename') }}
                 </v-btn>
             </v-card-actions>

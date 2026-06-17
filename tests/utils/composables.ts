@@ -1,6 +1,6 @@
 /**
  * Mock composables for testing
- * 
+ *
  * Provides mock implementations of composables used throughout the app
  */
 

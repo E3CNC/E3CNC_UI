@@ -15,12 +15,7 @@
                 @click.stop="select(!isSelected)" />
             <v-tooltip v-if="item.last_status" top>
                 <template #activator="{ props }">
-                    <v-icon
-                        v-bind="props"
-                        size="small"
-                        class="gcode-card__status"
-                        :color="statusIconColor"
-                        >
+                    <v-icon v-bind="props" size="small" class="gcode-card__status" :color="statusIconColor">
                         {{ statusIcon }}
                     </v-icon>
                 </template>
@@ -40,17 +35,10 @@
                     <span>{{ formatDateTime(item.modified) }}</span>
                 </div>
                 <div class="gcode-card__chips">
-                    <v-chip
-                        v-if="item.slicer"
-                        x-small
-                        variant="outlined"
-                        class="mr-1 gcode-card__chip">
+                    <v-chip v-if="item.slicer" x-small variant="outlined" class="mr-1 gcode-card__chip">
                         {{ item.slicer }}
                     </v-chip>
-                    <v-chip
-                        v-if="item.count_printed > 0"
-                        x-small
-                        class="gcode-card__chip gcode-card__chip--runs">
+                    <v-chip v-if="item.count_printed > 0" x-small class="gcode-card__chip gcode-card__chip--runs">
                         {{ item.count_printed }} {{ $t('Files.Runs') }}
                     </v-chip>
                 </div>
@@ -110,7 +98,7 @@
         <v-divider class="gcode-card__divider" />
 
         <div class="gcode-card__action">
- <v-btn
+            <v-btn
                 block
                 size="small"
                 color="primary"
@@ -129,10 +117,7 @@
             absolute
             offset-y>
             <v-list>
-                <v-list-item
-                    v-if="isGcodeFile"
-                    :disabled="!canStart"
-                    @click="showStartPrintDialog = true">
+                <v-list-item v-if="isGcodeFile" :disabled="!canStart" @click="showStartPrintDialog = true">
                     <v-icon class="mr-1">{{ mdiPlay }}</v-icon>
                     {{ $t('Files.PrintStart') }}
                 </v-list-item>
@@ -225,7 +210,13 @@ import {
     mdiRenameBox,
     mdiVideo3d,
 } from '@mdi/js'
-import { convertPrintStatusIcon, convertPrintStatusIconColor, escapePath, formatFilesize, formatPrintTime } from '@/plugins/helpers'
+import {
+    convertPrintStatusIcon,
+    convertPrintStatusIconColor,
+    escapePath,
+    formatFilesize,
+    formatPrintTime,
+} from '@/plugins/helpers'
 import { buildCncMetadataViewModel, loadCncMetadata, type CncMetadataViewModel } from '@/store/files/cncMetadata'
 import GcodefilesRenameFileDialog from '@/components/dialogs/GcodefilesRenameFileDialog.vue'
 import GcodefilesDuplicateFileDialog from '@/components/dialogs/GcodefilesDuplicateFileDialog.vue'
@@ -266,25 +257,19 @@ const isGcodeFile = computed(() => {
     return validGcodeExtensions.includes(format)
 })
 
-const canStart = computed(() =>
-    klipperReadyForGui.value && !['error', 'printing', 'paused'].includes(printer_state.value)
+const canStart = computed(
+    () => klipperReadyForGui.value && !['error', 'printing', 'paused'].includes(printer_state.value)
 )
 
-const canPreheat = computed(() =>
-    klipperReadyForGui.value && !['error', 'printing', 'paused'].includes(printer_state.value)
+const canPreheat = computed(
+    () => klipperReadyForGui.value && !['error', 'printing', 'paused'].includes(printer_state.value)
 )
 
-const formattedSize = computed(() =>
-    props.item.size !== undefined ? formatFilesize(props.item.size) : '--'
-)
+const formattedSize = computed(() => (props.item.size !== undefined ? formatFilesize(props.item.size) : '--'))
 
-const statusIcon = computed(() =>
-    convertPrintStatusIcon(props.item.last_status ?? '')
-)
+const statusIcon = computed(() => convertPrintStatusIcon(props.item.last_status ?? ''))
 
-const statusIconColor = computed(() =>
-    convertPrintStatusIconColor(props.item.last_status ?? '')
-)
+const statusIconColor = computed(() => convertPrintStatusIconColor(props.item.last_status ?? ''))
 
 function dateOrDash(value: Date | null | undefined): string {
     if (value === null || value === undefined) return '--'
@@ -386,7 +371,9 @@ onBeforeUnmount(() => {
     flex-direction: column;
     border-radius: 4px;
     background: rgb(var(--v-surface));
-    transition: transform 200ms cubic-bezier(0.25, 1, 0.5, 1), box-shadow 200ms cubic-bezier(0.25, 1, 0.5, 1),
+    transition:
+        transform 200ms cubic-bezier(0.25, 1, 0.5, 1),
+        box-shadow 200ms cubic-bezier(0.25, 1, 0.5, 1),
         border-color 200ms cubic-bezier(0.25, 1, 0.5, 1);
     border: 1px solid rgba(var(--v-theme-on-surface), 0.08);
     overflow: hidden;

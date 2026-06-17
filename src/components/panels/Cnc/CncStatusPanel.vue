@@ -42,7 +42,9 @@
             <div v-if="showMachineHealth && cncMetadataViewModel" class="cnc-status-panel__metadata">
                 <div class="cnc-status-panel__metadata-header">
                     <span class="cnc-status-panel__metadata-title">CNC Metadata</span>
-                    <v-chip size="x-small" label variant="outlined" :loading="cncMetadataLoading">{{ cncMetadataLoading ? 'Loading' : 'Loaded' }}</v-chip>
+                    <v-chip size="x-small" label variant="outlined" :loading="cncMetadataLoading">
+                        {{ cncMetadataLoading ? 'Loading' : 'Loaded' }}
+                    </v-chip>
                 </div>
 
                 <div class="cnc-status-panel__metadata-grid">
@@ -65,7 +67,10 @@
                 </div>
 
                 <div class="cnc-status-panel__fields">
-                    <div v-for="field in cncMetadataViewModel.fields" :key="field.label" class="cnc-status-panel__field">
+                    <div
+                        v-for="field in cncMetadataViewModel.fields"
+                        :key="field.label"
+                        class="cnc-status-panel__field">
                         <span class="cnc-status-panel__label">{{ field.label }}</span>
                         <span class="cnc-status-panel__value">{{ field.value }}</span>
                     </div>
@@ -111,26 +116,18 @@ const stateColor = computed(() => {
     }
 })
 
-const printerStateLabel = computed(() =>
-    printer_state.value ? printer_state.value.toUpperCase() : 'UNKNOWN'
-)
+const printerStateLabel = computed(() => (printer_state.value ? printer_state.value.toUpperCase() : 'UNKNOWN'))
 
-const coordinateModeLabel = computed(() =>
-    absolute_coordinates.value ? 'Absolute (G90)' : 'Relative (G91)'
-)
+const coordinateModeLabel = computed(() => (absolute_coordinates.value ? 'Absolute (G90)' : 'Relative (G91)'))
 
 const homedAxesLabel = computed(() => {
     const axes = homedAxes.value.toUpperCase()
     return axes ? `Homed: ${axes}` : 'Homed: none'
 })
 
-const activeGcodeFilename = computed(() =>
-    store.state.printer.print_stats?.filename ?? ''
-)
+const activeGcodeFilename = computed(() => store.state.printer.print_stats?.filename ?? '')
 
-const activeFile = computed(() =>
-    activeGcodeFilename.value || 'No active file'
-)
+const activeFile = computed(() => activeGcodeFilename.value || 'No active file')
 
 const feedOverride = computed(() => {
     const factor = store.state.printer.gcode_move?.speed_factor ?? 1

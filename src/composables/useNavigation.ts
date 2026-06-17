@@ -91,17 +91,11 @@ export function useNavigation() {
         return points
     })
 
-    const naviPoints = computed<NaviPoint[]>(() =>
-        routesNaviPoints.value.sort((a, b) => a.position - b.position)
-    )
+    const naviPoints = computed<NaviPoint[]>(() => routesNaviPoints.value.sort((a, b) => a.position - b.position))
 
-    const visibleNaviPoints = computed<NaviPoint[]>(() =>
-        naviPoints.value.filter((entry) => entry.visible)
-    )
+    const visibleNaviPoints = computed<NaviPoint[]>(() => naviPoints.value.filter((entry) => entry.visible))
 
-    const uiSettings = computed<GuiNavigationStateEntry[]>(
-        () => store.state.gui.navigationSettings.entries
-    )
+    const uiSettings = computed<GuiNavigationStateEntry[]>(() => store.state.gui.navigationSettings.entries)
 
     const klippy_state = computed(() => store.state.server.klippy_state)
 
@@ -147,21 +141,12 @@ export function useNavigation() {
     )
 
     function showInNavi(route: AppRoute): boolean {
-        if (['shutdown', 'error', 'disconnected'].includes(klippy_state.value) && !route.alwaysShow)
-            return false
+        if (['shutdown', 'error', 'disconnected'].includes(klippy_state.value) && !route.alwaysShow) return false
         else if (route.title === 'Webcam' && webcamCount.value === 0) return false
-        else if (route.moonrakerComponent && !moonrakerComponents.value.includes(route.moonrakerComponent))
+        else if (route.moonrakerComponent && !moonrakerComponents.value.includes(route.moonrakerComponent)) return false
+        else if (route.registeredDirectory && !registeredDirectories.value.includes(route.registeredDirectory))
             return false
-        else if (
-            route.registeredDirectory &&
-            !registeredDirectories.value.includes(route.registeredDirectory)
-        )
-            return false
-        else if (
-            route.klipperComponent &&
-            !(route.klipperComponent in klipperConfigfileSettings.value)
-        )
-            return false
+        else if (route.klipperComponent && !(route.klipperComponent in klipperConfigfileSettings.value)) return false
         else if (route.klipperIsConnected && !base.klippyIsConnected.value) return false
 
         return true

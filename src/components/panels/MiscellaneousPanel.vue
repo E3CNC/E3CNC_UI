@@ -29,13 +29,7 @@
             <miscellaneous-sensor :name="sensor.name" :value="sensor.value" :unit="sensor.unit" />
         </div>
         <div v-for="(sensor, index) of moonrakerSensors" :key="'moonraker_sensor_' + index">
-            <v-divider
-                v-if="
-                    index ||
-                    miscellaneous.length ||
-                    lights.length ||
-                    miscellaneousSensors.length
-                " />
+            <v-divider v-if="index || miscellaneous.length || lights.length || miscellaneousSensors.length" />
             <moonraker-sensor :name="sensor" />
         </div>
     </panel>
@@ -58,23 +52,13 @@ const { lights } = useMiscellaneous()
 
 const store = useStore()
 
-const miscellaneous = computed(() =>
-    store.getters['printer/getMiscellaneous'] ?? []
-)
+const miscellaneous = computed(() => store.getters['printer/getMiscellaneous'] ?? [])
 
-const miscellaneousSensors = computed(() =>
-    store.getters['printer/getMiscellaneousSensors'] ?? []
-)
+const miscellaneousSensors = computed(() => store.getters['printer/getMiscellaneousSensors'] ?? [])
 
-const moonrakerSensors = computed(() =>
-    store.getters['server/sensor/getSensors'] ?? []
-)
+const moonrakerSensors = computed(() => store.getters['server/sensor/getSensors'] ?? [])
 
-const showMiscellaneousPanel = computed(() =>
-    klipperReadyForGui.value && (
-        miscellaneous.value.length ||
-        false ||
-        lights.value.length
-    )
+const showMiscellaneousPanel = computed(
+    () => klipperReadyForGui.value && (miscellaneous.value.length || false || lights.value.length)
 )
 </script>

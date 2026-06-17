@@ -6,7 +6,13 @@
         @contextmenu="showContextMenu($event)"
         @click="detailsDialogBool = true">
         <td class="pr-0">
-            <v-checkbox v-ripple :model-value="isSelected" density="compact" hide-details class="pa-0 mr-0" @click.stop="select(!isSelected)" />
+            <v-checkbox
+                v-ripple
+                :model-value="isSelected"
+                density="compact"
+                hide-details
+                class="pa-0 mr-0"
+                @click.stop="select(!isSelected)" />
         </td>
         <td class="px-0 text-center" style="width: 32px">
             <template v-if="!item.exists">
@@ -18,11 +24,11 @@
                         <vue-load-image>
                             <template #image>
                                 <img
-                                :alt="item.filename"
-                                :src="smallThumbnail"
-                                width="32"
-                                height="32"
-                                v-bind="activatorProps" />
+                                    :alt="item.filename"
+                                    :src="smallThumbnail"
+                                    width="32"
+                                    height="32"
+                                    v-bind="activatorProps" />
                             </template>
                             <template #preloader>
                                 <v-progress-circular indeterminate color="primary" />
@@ -264,11 +270,7 @@ function addToQueue() {
 }
 
 function deleteJob() {
-    socket.emit(
-        'server.history.delete_job',
-        { uid: props.item.job_id },
-        { action: 'server/history/getDeletedJobs' }
-    )
+    socket.emit('server.history.delete_job', { uid: props.item.job_id }, { action: 'server/history/getDeletedJobs' })
 }
 
 function outputValue(vCol: HistoryListPanelCol, item: ServerHistoryStateJob) {

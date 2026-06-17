@@ -61,7 +61,13 @@ describe('editor store', () => {
 
     describe('getters', () => {
         it('returns the configured klipper restart method', () => {
-            expect((getters as any).getKlipperRestartMethod(state, {}, { gui: { editor: { klipperRestartMethod: 'RESTART' } } })).toBe('RESTART')
+            expect(
+                (getters as any).getKlipperRestartMethod(
+                    state,
+                    {},
+                    { gui: { editor: { klipperRestartMethod: 'RESTART' } } }
+                )
+            ).toBe('RESTART')
             expect((getters as any).getKlipperRestartMethod(state, {}, { gui: {} })).toBe('FIRMWARE_RESTART')
         })
     })
@@ -85,7 +91,10 @@ describe('editor store', () => {
 
         it('updateSourcecode detects changes via hash', () => {
             mutations.openFile(state, {
-                filename: 'printer.cfg', fileroot: 'config', filepath: '', file: 'original',
+                filename: 'printer.cfg',
+                fileroot: 'config',
+                filepath: '',
+                file: 'original',
             })
             mutations.updateSourcecode(state, 'modified')
             expect(state.changed).toBe(true)
@@ -98,7 +107,10 @@ describe('editor store', () => {
 
         it('updateLoadedHash updates hash and clears changed', () => {
             mutations.openFile(state, {
-                filename: 'printer.cfg', fileroot: 'config', filepath: '', file: 'line1',
+                filename: 'printer.cfg',
+                fileroot: 'config',
+                filepath: '',
+                file: 'line1',
             })
             const originalHash = state.loadedHash
 
@@ -193,14 +205,11 @@ describe('editor store', () => {
         })
 
         it('downloadProgress commits updateLoader with formatted speed', () => {
-            actions.downloadProgress(
-                { commit } as any,
-                {
-                    direction: 'downloading',
-                    filesize: 200,
-                    progressEvent: { loaded: 50, total: 100, rate: 10 },
-                }
-            )
+            actions.downloadProgress({ commit } as any, {
+                direction: 'downloading',
+                filesize: 200,
+                progressEvent: { loaded: 50, total: 100, rate: 10 },
+            })
             expect(commit).toHaveBeenCalledWith('updateLoader', {
                 direction: 'downloading',
                 speed: 'FS:10',
@@ -243,7 +252,7 @@ describe('editor store', () => {
                 { state: actionState, commit, dispatch, rootGetters },
                 { root: 'config', path: '', filename: 'printer.cfg', permissions: 'rw', size: 1024 }
             )
-            await new Promise(resolve => setTimeout(resolve, 0))
+            await new Promise((resolve) => setTimeout(resolve, 0))
 
             expect(axios.default.get).toHaveBeenCalledWith(
                 expect.stringContaining('http://localhost:7125/server/files/config/printer.cfg?'),
@@ -274,7 +283,7 @@ describe('editor store', () => {
                 { state: actionState, commit, getters: localGetters, rootGetters, dispatch },
                 { content: 'new content', restartServiceName: 'klipper' }
             )
-            await new Promise(resolve => setTimeout(resolve, 0))
+            await new Promise((resolve) => setTimeout(resolve, 0))
 
             expect(axios.default.post).toHaveBeenCalledWith(
                 'http://localhost:7125/server/files/upload',
@@ -302,7 +311,7 @@ describe('editor store', () => {
                 { state: actionState, commit, getters: {}, rootGetters, dispatch },
                 { content: 'config', restartServiceName: 'moonraker' }
             )
-            await new Promise(resolve => setTimeout(resolve, 0))
+            await new Promise((resolve) => setTimeout(resolve, 0))
 
             expect(mockSocket.emit).toHaveBeenCalledWith('server.restart', {})
         })
@@ -321,7 +330,7 @@ describe('editor store', () => {
                 { state: actionState, commit, getters: {}, rootGetters, dispatch },
                 { content: 'data', restartServiceName: 'my-service' }
             )
-            await new Promise(resolve => setTimeout(resolve, 0))
+            await new Promise((resolve) => setTimeout(resolve, 0))
 
             expect(mockSocket.emit).toHaveBeenCalledWith('machine.services.restart', { service: 'my-service' })
         })
@@ -340,7 +349,7 @@ describe('editor store', () => {
                 { state: actionState, commit, getters: {}, rootGetters, dispatch },
                 { content: 'data', restartServiceName: null }
             )
-            await new Promise(resolve => setTimeout(resolve, 0))
+            await new Promise((resolve) => setTimeout(resolve, 0))
 
             expect(mockSocket.emit).not.toHaveBeenCalled()
             expect(mockToast.success).toHaveBeenCalled()
@@ -364,7 +373,7 @@ describe('editor store', () => {
                 { state: actionState, commit, getters: {}, rootGetters, dispatch },
                 { content: 'data', restartServiceName: null }
             )
-            await new Promise(resolve => setTimeout(resolve, 0))
+            await new Promise((resolve) => setTimeout(resolve, 0))
 
             expect(mockToast.error).toHaveBeenCalled()
         })
@@ -387,7 +396,7 @@ describe('editor store', () => {
                 { state: actionState, commit, dispatch: mockDispatch, rootGetters },
                 { root: 'config', path: '', filename: 'test.cfg', permissions: 'rw', size: 1024 }
             )
-            await new Promise(resolve => setTimeout(resolve, 0))
+            await new Promise((resolve) => setTimeout(resolve, 0))
 
             expect(cancelFn).toHaveBeenCalledWith('User canceled upload/download')
         })

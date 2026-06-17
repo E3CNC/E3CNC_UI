@@ -156,6 +156,13 @@ export default defineConfig({
         include: ['tests/**/*.spec.ts'],
         globals: true,
         setupFiles: ['tests/setup.ts'],
+        pool: 'threads',
+        poolOptions: {
+            threads: {
+                minThreads: 1,
+                maxThreads: 2,
+            },
+        },
         coverage: {
             provider: 'v8',
             reporter: ['text', 'text-summary'],

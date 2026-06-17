@@ -22,12 +22,24 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VCol: { name: 'VCol', template: '<div :class="$attrs.class"><slot /></div>' },
     VTooltip: { name: 'VTooltip', template: '<div><slot name="activator" /><slot /></div>' },
     VIcon: { name: 'VIcon', template: '<i class="v-icon"><slot /></i>' },
-    VBtn: { name: 'VBtn', props: ['icon', 'rounded', 'variant'], template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>' },
+    VBtn: {
+        name: 'VBtn',
+        props: ['icon', 'rounded', 'variant'],
+        template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>',
+    },
     VCard: { name: 'VCard', template: '<div><slot /></div>' },
     VCardText: { name: 'VCardText', template: '<div><slot /></div>' },
     VDivider: { name: 'VDivider', template: '<hr />' },
-    VDialog: { name: 'VDialog', props: ['modelValue', 'maxWidth', 'maxHeight', 'scrollable'], template: '<div v-if="modelValue" class="v-dialog"><slot /></div>' },
-    VProgressCircular: { name: 'VProgressCircular', props: ['rotate', 'size', 'width', 'value', 'color', 'ariaLabel'], template: '<div :class="`progress-${color}`">{{ value }}</div>' },
+    VDialog: {
+        name: 'VDialog',
+        props: ['modelValue', 'maxWidth', 'maxHeight', 'scrollable'],
+        template: '<div v-if="modelValue" class="v-dialog"><slot /></div>',
+    },
+    VProgressCircular: {
+        name: 'VProgressCircular',
+        props: ['rotate', 'size', 'width', 'value', 'color', 'ariaLabel'],
+        template: '<div :class="`progress-${color}`">{{ value }}</div>',
+    },
     VAlert: { name: 'VAlert', props: ['variant', 'density', 'type', 'border'], template: '<div><slot /></div>' },
 }))
 
@@ -228,7 +240,7 @@ describe('SystemPanelHost.vue', () => {
         })
 
         const gauges = wrapper.findAll('.system-load-gauge')
-        const cpuGauge = gauges.find(g => g.text().includes('42'))
+        const cpuGauge = gauges.find((g) => g.text().includes('42'))
         expect(cpuGauge).toBeTruthy()
         expect(cpuGauge!.text()).toContain('Machine.SystemPanel.Cpu')
     })
@@ -249,7 +261,7 @@ describe('SystemPanelHost.vue', () => {
         })
 
         const gauges = wrapper.findAll('.system-load-gauge')
-        const loadGauge = gauges.find(g => g.text().includes('Machine.SystemPanel.Load'))
+        const loadGauge = gauges.find((g) => g.text().includes('Machine.SystemPanel.Load'))
         expect(loadGauge).toBeTruthy()
     })
 
@@ -268,7 +280,7 @@ describe('SystemPanelHost.vue', () => {
         })
 
         const gauges = wrapper.findAll('.system-load-gauge')
-        const memGauge = gauges.find(g => g.text().includes('Machine.SystemPanel.Memory'))
+        const memGauge = gauges.find((g) => g.text().includes('Machine.SystemPanel.Memory'))
         expect(memGauge).toBeTruthy()
     })
 
@@ -294,7 +306,15 @@ describe('SystemPanelHost.vue', () => {
                     python: { version: ['3', '11', '2'], version_string: '3.11.2' },
                     system_uptime: 123456,
                     available_services: ['klipper', 'moonraker'],
-                    sd_info: { manufacturer_id: '123', manufacturer: 'SanDisk', oem_id: 'abc', product_name: 'SD32G', product_revision: '1.0', serial_number: '12345', capacity: '31.9G' },
+                    sd_info: {
+                        manufacturer_id: '123',
+                        manufacturer: 'SanDisk',
+                        oem_id: 'abc',
+                        product_name: 'SD32G',
+                        product_revision: '1.0',
+                        serial_number: '12345',
+                        capacity: '31.9G',
+                    },
                 },
             },
             getters: {
@@ -376,9 +396,7 @@ describe('SystemPanelHost.vue', () => {
                         rx_bytes: 500000,
                         tx_bytes: 300000,
                         details: {
-                            ip_addresses: [
-                                { family: 'ipv4', address: '192.168.1.100' },
-                            ],
+                            ip_addresses: [{ family: 'ipv4', address: '192.168.1.100' }],
                         },
                     },
                 }),

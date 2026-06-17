@@ -8,9 +8,15 @@ const mockBaseValues = vi.hoisted(() => {
         _value: any
         __v_isRef = true
         __v_isShallow = false
-        constructor(val: any) { this._value = val }
-        get value() { return this._value }
-        set value(v) { this._value = v }
+        constructor(val: any) {
+            this._value = val
+        }
+        get value() {
+            return this._value
+        }
+        set value(v) {
+            this._value = v
+        }
     }
     return {
         socketIsConnected: new MockRef(true),
@@ -47,11 +53,23 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VCardText: { name: 'VCardText', template: '<div><slot /></div>' },
     VRow: { name: 'VRow', template: '<div><slot /></div>' },
     VCol: { name: 'VCol', template: '<div><slot /></div>' },
-    VBtn: { name: 'VBtn', props: ['icon', 'ripple', 'rounded', 'variant', 'size'], template: '<button :class="$attrs.class"><slot /></button>' },
+    VBtn: {
+        name: 'VBtn',
+        props: ['icon', 'ripple', 'rounded', 'variant', 'size'],
+        template: '<button :class="$attrs.class"><slot /></button>',
+    },
     VIcon: { name: 'VIcon', props: ['start', 'icon', 'size'], template: '<i><slot /></i>' },
-    VMenu: { name: 'VMenu', props: ['offsetY', 'closeOnContentClick'], template: '<div><slot name="activator" :props="{onClick: () => {}}" /><slot /></div>' },
+    VMenu: {
+        name: 'VMenu',
+        props: ['offsetY', 'closeOnContentClick'],
+        template: '<div><slot name="activator" :props="{onClick: () => {}}" /><slot /></div>',
+    },
     VList: { name: 'VList', props: ['density'], template: '<div><slot /></div>' },
-    VListItem: { name: 'VListItem', props: ['link'], template: '<div class="v-list-item"><slot name="prepend" /><slot name="title" /></div>' },
+    VListItem: {
+        name: 'VListItem',
+        props: ['link'],
+        template: '<div class="v-list-item"><slot name="prepend" /><slot name="title" /></div>',
+    },
 }))
 
 vi.mock('vuetify/components', () => vuetifyComponentsMock)
@@ -170,9 +188,7 @@ describe('WebcamPanel.vue', () => {
         const store = createStoreWithState({
             gui: {
                 webcams: {
-                    webcams: [
-                        { name: 'TestCam', service: 'mjpegstreamer', icon: 'mdiWebcam' },
-                    ],
+                    webcams: [{ name: 'TestCam', service: 'mjpegstreamer', icon: 'mdiWebcam' }],
                 },
             },
         })
@@ -190,9 +206,7 @@ describe('WebcamPanel.vue', () => {
         const store = createStoreWithState({
             gui: {
                 webcams: {
-                    webcams: [
-                        { name: 'TestCam', service: 'mjpegstreamer', icon: 'mdiWebcam' },
-                    ],
+                    webcams: [{ name: 'TestCam', service: 'mjpegstreamer', icon: 'mdiWebcam' }],
                 },
             },
         })
@@ -210,9 +224,7 @@ describe('WebcamPanel.vue', () => {
         const store = createStoreWithState({
             gui: {
                 webcams: {
-                    webcams: [
-                        { name: 'Cam1', service: 'mjpegstreamer', icon: 'mdiWebcam' },
-                    ],
+                    webcams: [{ name: 'Cam1', service: 'mjpegstreamer', icon: 'mdiWebcam' }],
                 },
             },
         })

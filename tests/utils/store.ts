@@ -1,6 +1,6 @@
 /**
  * Mock Vuex store factory for testing
- * 
+ *
  * Creates a mock Vuex store with customizable state, getters, actions, and mutations.
  * Useful for testing components and composables that depend on Vuex.
  */
@@ -196,10 +196,7 @@ export function createSocketMockStore(
 /**
  * Creates a mock store with specific printer state
  */
-export function createPrinterMockStore(
-    klippyState: string = 'ready',
-    printState: string = 'ready'
-): Store<any> {
+export function createPrinterMockStore(klippyState: string = 'ready', printState: string = 'ready'): Store<any> {
     return createMockStore({
         state: {
             server: {

@@ -26,7 +26,8 @@ vi.mock('@/components/panels/Temperature/TemperaturePanelListItem.vue', () => ({
     default: {
         name: 'TemperaturePanelListItem',
         props: ['objectName', 'inputDigits', 'isResponsiveMobile'],
-        template: '<div class="mock-list-item" :data-object-name="objectName" :data-input-digits="inputDigits">{{ objectName }}</div>',
+        template:
+            '<div class="mock-list-item" :data-object-name="objectName" :data-input-digits="inputDigits">{{ objectName }}</div>',
     },
 }))
 
@@ -54,7 +55,11 @@ describe('TemperaturePanelList.vue', () => {
                 printer: {
                     heaters: {
                         available_heaters: ['extruder', 'heater_bed'],
-                        available_sensors: ['temperature_sensor chamber', 'temperature_fan hotend_fan', 'temperature_mcu mcu'],
+                        available_sensors: [
+                            'temperature_sensor chamber',
+                            'temperature_fan hotend_fan',
+                            'temperature_mcu mcu',
+                        ],
                         available_monitors: ['temperature_host raspberry_pi'],
                     },
                     configfile: {
@@ -108,7 +113,7 @@ describe('TemperaturePanelList.vue', () => {
         })
 
         const items = wrapper.findAll('.mock-list-item')
-        const objectNames = items.map(item => item.attributes('data-object-name'))
+        const objectNames = items.map((item) => item.attributes('data-object-name'))
         expect(objectNames).toContain('extruder')
         expect(objectNames).toContain('heater_bed')
     })
@@ -120,7 +125,7 @@ describe('TemperaturePanelList.vue', () => {
         })
 
         const items = wrapper.findAll('.mock-list-item')
-        const objectNames = items.map(item => item.attributes('data-object-name'))
+        const objectNames = items.map((item) => item.attributes('data-object-name'))
         expect(objectNames).toContain('temperature_fan hotend_fan')
     })
 
@@ -137,7 +142,7 @@ describe('TemperaturePanelList.vue', () => {
         })
 
         const nevermoreItems = wrapper.findAll('.mock-nevermore-item')
-        const objectNames = nevermoreItems.map(item => item.attributes('data-object-name'))
+        const objectNames = nevermoreItems.map((item) => item.attributes('data-object-name'))
         expect(objectNames).toContain('nevermore')
         expect(objectNames).toContain('nevermore carbon_filter')
     })
@@ -149,7 +154,7 @@ describe('TemperaturePanelList.vue', () => {
         })
 
         const items = wrapper.findAll('.mock-list-item')
-        const objectNames = items.map(item => item.attributes('data-object-name'))
+        const objectNames = items.map((item) => item.attributes('data-object-name'))
 
         expect(objectNames).toContain('temperature_sensor chamber')
     })
@@ -161,7 +166,7 @@ describe('TemperaturePanelList.vue', () => {
         })
 
         const items = wrapper.findAll('.mock-list-item')
-        const objectNames = items.map(item => item.attributes('data-object-name'))
+        const objectNames = items.map((item) => item.attributes('data-object-name'))
         expect(objectNames).toContain('temperature_host raspberry_pi')
     })
 
@@ -182,7 +187,7 @@ describe('TemperaturePanelList.vue', () => {
         })
 
         const items = wrapper.findAll('.mock-list-item')
-        const objectNames = items.map(item => item.attributes('data-object-name'))
+        const objectNames = items.map((item) => item.attributes('data-object-name'))
         expect(objectNames).not.toContain('temperature_host raspberry_pi')
     })
 
@@ -213,7 +218,7 @@ describe('TemperaturePanelList.vue', () => {
         })
 
         const items = wrapper.findAll('.mock-list-item')
-        const objectNames = items.map(item => item.attributes('data-object-name'))
+        const objectNames = items.map((item) => item.attributes('data-object-name'))
 
         expect(objectNames).not.toContain('temperature_mcu mcu')
         expect(objectNames).toContain('temperature_sensor chamber')
@@ -238,7 +243,7 @@ describe('TemperaturePanelList.vue', () => {
         })
 
         const items = wrapper.findAll('.mock-list-item')
-        const objectNames = items.map(item => item.attributes('data-object-name'))
+        const objectNames = items.map((item) => item.attributes('data-object-name'))
         expect(objectNames).not.toContain('temperature_sensor _hidden')
     })
 

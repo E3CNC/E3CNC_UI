@@ -1,5 +1,9 @@
 <template>
-    <v-alert :class="`notification-menu-entry--priority-${entry.priority}`" variant="text" :color="alertColor" border="start">
+    <v-alert
+        :class="`notification-menu-entry--priority-${entry.priority}`"
+        variant="text"
+        :color="alertColor"
+        border="start">
         <v-row align="start" class="flex-nowrap">
             <v-col class="grow pb-2">
                 <div class="notification-menu-entry__headline mb-1 text-subtitle-1">
@@ -18,7 +22,7 @@
                 <p
                     class="notification-menu-entry__description text-body-2 mb-0 text-disabled font-weight-light"
                     v-html="formatedText" />
- <v-btn
+                <v-btn
                     v-if="entryType === 'maintenance'"
                     variant="outlined"
                     size="small"
@@ -31,7 +35,7 @@
             <v-col
                 v-if="entry.priority !== 'critical'"
                 class="shrink pl-0 pb-1 pt-1 pr-2 d-flex flex-column align-self-stretch justify-space-between">
- <v-btn
+                <v-btn
                     v-if="entryType !== 'maintenance'"
                     :icon="mdiClose"
                     variant="plain"
@@ -39,7 +43,12 @@
                     class="mb-2"
                     @click="xButtonAction" />
                 <v-spacer />
- <v-btn :icon="mdiBellOffOutline" variant="plain" retain-focus-on-click :color="alertColor" @click="expand = !expand"/>
+                <v-btn
+                    :icon="mdiBellOffOutline"
+                    variant="plain"
+                    retain-focus-on-click
+                    :color="alertColor"
+                    @click="expand = !expand" />
             </v-col>
         </v-row>
         <v-row v-if="entry.priority !== 'critical'">
@@ -50,7 +59,7 @@
                         <span class="text-disabled text-caption font-weight-light">
                             {{ $t('App.Notifications.Remind') }}
                         </span>
- <v-btn
+                        <v-btn
                             v-for="reminder in reminderTimes"
                             :key="reminder.text"
                             :color="alertColor"
@@ -168,9 +177,12 @@ function dismiss(type: 'time' | 'reboot', time: number | null) {
     store.dispatch('gui/notifications/dismiss', { id: props.entry.id, type, time })
 }
 
-watch(() => props.parentState, (newVal: boolean) => {
-    if (!newVal) expand.value = false
-})
+watch(
+    () => props.parentState,
+    (newVal: boolean) => {
+        if (!newVal) expand.value = false
+    }
+)
 </script>
 
 <style scoped>

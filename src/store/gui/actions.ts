@@ -1,6 +1,12 @@
 import { ActionTree } from 'vuex'
 import { getSocket, $toast } from '@/store/runtime'
-import type { GuiState, GuiStateDashboard, GuiStateDashboardLayoutKey, GuiStateLayoutoption, PanelFloatingState } from '@/store/gui/types'
+import type {
+    GuiState,
+    GuiStateDashboard,
+    GuiStateDashboardLayoutKey,
+    GuiStateLayoutoption,
+    PanelFloatingState,
+} from '@/store/gui/types'
 import { GuiPresetsStatePreset } from '@/store/gui/presets/types'
 import { RootState } from '@/store/types'
 import { getDefaultState } from './index'
@@ -486,7 +492,10 @@ export const actions: ActionTree<GuiState, RootState> = {
         })
     },
 
-    saveFloatingPanelPosition({ commit, dispatch, state }, { id, position, remove }: { id: string; position?: PanelFloatingState; remove?: boolean }) {
+    saveFloatingPanelPosition(
+        { commit, dispatch, state },
+        { id, position, remove }: { id: string; position?: PanelFloatingState; remove?: boolean }
+    ) {
         const floatingPanels = { ...state.dashboard.floatingPanels }
 
         if (remove) {

@@ -21,7 +21,7 @@
                     </v-col>
                     <v-col class="v-col v-col-lg-auto pl-lg-0 text-right">
                         <input ref="fileUpload" type="file" style="display: none" multiple @change="uploadFile" />
- <v-btn
+                        <v-btn
                             v-for="button in filteredToolbarButtons"
                             :key="button.loadingName"
                             class="machine-configfiles-panel__tool-btn ml-3"
@@ -39,7 +39,11 @@
                         </v-btn>
                         <v-menu offset-y left :title="$t('Machine.ConfigFilesPanel.SetupCurrentList')">
                             <template #activator="{ props: activatorProps }">
- <v-btn class="machine-configfiles-panel__tool-btn ml-3" variant="text" density="comfortable" v-bind="activatorProps">
+                                <v-btn
+                                    class="machine-configfiles-panel__tool-btn ml-3"
+                                    variant="text"
+                                    density="comfortable"
+                                    v-bind="activatorProps">
                                     <v-icon class="machine-configfiles-panel__settings-icon">{{ mdiCog }}</v-icon>
                                 </v-btn>
                             </template>
@@ -96,22 +100,22 @@
                 </v-row>
             </v-card-text>
             <v-divider />
-                <v-data-table
-                    v-if="!showMissingConfigRootWarning"
-                    v-model="selectedFiles"
-                    v-model:page="currentPage"
-                    v-model:items-per-page="countPerPage"
-                    :items="sortedFiles"
-                    class="files-table"
-                    :headers="headers"
-                    disable-sort
+            <v-data-table
+                v-if="!showMissingConfigRootWarning"
+                v-model="selectedFiles"
+                v-model:page="currentPage"
+                v-model:items-per-page="countPerPage"
+                :items="sortedFiles"
+                class="files-table"
+                :headers="headers"
+                disable-sort
                 :footer-props="{
                     itemsPerPageText: $t('Machine.ConfigFilesPanel.Files'),
                     itemsPerPageAllText: $t('Machine.ConfigFilesPanel.AllFiles'),
                     itemsPerPageOptions: [10, 25, 50, 100, -1],
                 }"
                 mobile-breakpoint="0"
-                    item-key="filename">
+                item-key="filename">
                 <template #header.filename>
                     <span class="cursor-pointer text-no-wrap" @click="toggleSort('filename')">
                         {{ $t('Machine.ConfigFilesPanel.Name') }}
@@ -171,7 +175,9 @@
                         @drop.prevent.stop="dragDropFilelist($event, item)">
                         <td class="px-0 text-center" style="width: 32px">
                             <v-icon v-if="item.isDirectory" color="primary">{{ mdiFolder }}</v-icon>
-                            <v-icon v-else :color="getFileColor(item.filename)">{{ getFileIcon(item.filename) }}</v-icon>
+                            <v-icon v-else :color="getFileColor(item.filename)">
+                                {{ getFileIcon(item.filename) }}
+                            </v-icon>
                         </td>
                         <td class=" ">{{ item.filename }}</td>
                         <td class="text-no-wrap text-right">
@@ -258,10 +264,7 @@
                 card-class="maschine-configfiles-imageviewer-dialog"
                 style="position: relative">
                 <template #buttons>
- <v-btn
-                        icon
-                        rounded="0"
-                        @click="closeDialogImage">
+                    <v-btn icon rounded="0" @click="closeDialogImage">
                         <v-icon>{{ mdiCloseThick }}</v-icon>
                     </v-btn>
                 </template>
@@ -281,7 +284,7 @@
                 card-class="maschine-configfiles-create-file-dialog"
                 :margin-bottom="false">
                 <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="dialogCreateFile.show = false"/>
+                    <v-btn :icon="mdiCloseThick" rounded="0" @click="dialogCreateFile.show = false" />
                 </template>
                 <v-card-text>
                     <v-text-field
@@ -295,10 +298,10 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer />
- <v-btn color="" variant="text" @click="dialogCreateFile.show = false">
+                    <v-btn color="" variant="text" @click="dialogCreateFile.show = false">
                         {{ $t('Buttons.Cancel') }}
                     </v-btn>
- <v-btn :disabled="isInvalidName" color="primary" variant="text" @click="createFileAction">
+                    <v-btn :disabled="isInvalidName" color="primary" variant="text" @click="createFileAction">
                         {{ $t('Machine.ConfigFilesPanel.Create') }}
                     </v-btn>
                 </v-card-actions>
@@ -310,7 +313,7 @@
                 card-class="maschine-configfiles-rename-file-dialog"
                 :margin-bottom="false">
                 <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="dialogRenameFile.show = false"/>
+                    <v-btn :icon="mdiCloseThick" rounded="0" @click="dialogRenameFile.show = false" />
                 </template>
                 <v-card-text>
                     <v-text-field
@@ -324,10 +327,10 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer />
- <v-btn color="" variant="text" @click="dialogRenameFile.show = false">
+                    <v-btn color="" variant="text" @click="dialogRenameFile.show = false">
                         {{ $t('Buttons.Cancel') }}
                     </v-btn>
- <v-btn :disabled="isInvalidName" color="primary" variant="text" @click="renameFileAction">
+                    <v-btn :disabled="isInvalidName" color="primary" variant="text" @click="renameFileAction">
                         {{ $t('Machine.ConfigFilesPanel.Rename') }}
                     </v-btn>
                 </v-card-actions>
@@ -339,7 +342,7 @@
                 card-class="maschine-configfiles-duplicate-file-dialog"
                 :margin-bottom="false">
                 <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="dialogDuplicateFile.show = false"/>
+                    <v-btn :icon="mdiCloseThick" rounded="0" @click="dialogDuplicateFile.show = false" />
                 </template>
                 <v-card-text>
                     <v-text-field
@@ -353,10 +356,10 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer />
- <v-btn color="" variant="text" @click="dialogDuplicateFile.show = false">
+                    <v-btn color="" variant="text" @click="dialogDuplicateFile.show = false">
                         {{ $t('Buttons.Cancel') }}
                     </v-btn>
- <v-btn :disabled="isInvalidName" color="primary" variant="text" @click="duplicateFileAction">
+                    <v-btn :disabled="isInvalidName" color="primary" variant="text" @click="duplicateFileAction">
                         {{ $t('Machine.ConfigFilesPanel.Duplicate') }}
                     </v-btn>
                 </v-card-actions>
@@ -368,7 +371,7 @@
                 card-class="maschine-configfiles-create-directory-dialog"
                 :margin-bottom="false">
                 <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="dialogCreateDirectory.show = false"/>
+                    <v-btn :icon="mdiCloseThick" rounded="0" @click="dialogCreateDirectory.show = false" />
                 </template>
                 <v-card-text>
                     <v-text-field
@@ -382,10 +385,10 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer />
- <v-btn color="" variant="text" @click="dialogCreateDirectory.show = false">
+                    <v-btn color="" variant="text" @click="dialogCreateDirectory.show = false">
                         {{ $t('Buttons.Cancel') }}
                     </v-btn>
- <v-btn :disabled="isInvalidName" color="primary" variant="text" @click="createDirectoryAction">
+                    <v-btn :disabled="isInvalidName" color="primary" variant="text" @click="createDirectoryAction">
                         {{ $t('Machine.ConfigFilesPanel.Create') }}
                     </v-btn>
                 </v-card-actions>
@@ -397,7 +400,7 @@
                 card-class="maschine-configfiles-rename-directory-dialog"
                 :margin-bottom="false">
                 <template #buttons>
- <v-btn :icon="mdiCloseThick" rounded="0" @click="dialogRenameDirectory.show = false"/>
+                    <v-btn :icon="mdiCloseThick" rounded="0" @click="dialogRenameDirectory.show = false" />
                 </template>
                 <v-card-text>
                     <v-text-field
@@ -411,10 +414,10 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer />
- <v-btn color="" variant="text" @click="dialogRenameDirectory.show = false">
+                    <v-btn color="" variant="text" @click="dialogRenameDirectory.show = false">
                         {{ $t('Buttons.Cancel') }}
                     </v-btn>
- <v-btn :disabled="isInvalidName" color="primary" variant="text" @click="renameDirectoryAction">
+                    <v-btn :disabled="isInvalidName" color="primary" variant="text" @click="renameDirectoryAction">
                         {{ $t('Machine.ConfigFilesPanel.Rename') }}
                     </v-btn>
                 </v-card-actions>
@@ -453,7 +456,7 @@
             <br />
             <v-progress-linear class="mt-2" :model-value="uploadSnackbar.percent" />
             <template #actions="{ props }">
- <v-btn color="error" variant="text" v-bind="props" style="min-width: auto" @click="cancelUpload">
+                <v-btn color="error" variant="text" v-bind="props" style="min-width: auto" @click="cancelUpload">
                     <v-icon class="0">{{ mdiClose }}</v-icon>
                 </v-btn>
             </template>
@@ -494,7 +497,16 @@ import { useBase } from '@/composables/useBase'
 import { useTheme } from '@/composables/useTheme'
 import { useSocket } from '@/composables/useSocket'
 import { useToast } from 'vue-toast-notification'
-import { escapePath, formatFilesize, generateTimestamp, getFileColor, getFileIcon, getFileType, getFileTypeLabel, sortFiles } from '@/plugins/helpers'
+import {
+    escapePath,
+    formatFilesize,
+    generateTimestamp,
+    getFileColor,
+    getFileIcon,
+    getFileType,
+    getFileTypeLabel,
+    sortFiles,
+} from '@/plugins/helpers'
 import type { FileStateFile, FileStateGcodefile } from '@/store/files/types'
 import axios from 'axios'
 import type { CancelTokenSource } from 'axios'
@@ -700,66 +712,68 @@ const blockFileUpload = computed({
     set: (newVal) => store.dispatch('gui/saveSetting', { name: 'view.blockFileUpload', value: newVal }),
 })
 
-const toolbarButtons = computed(() => [
-    {
-        text: t('Machine.ConfigFilesPanel.Download'),
-        color: 'primary',
-        icon: mdiCloudDownload,
-        loadingName: 'configDownloadZip',
-        onlyWriteable: false,
-        condition: selectedFiles.value.length > 0,
-        click: () => {
-            downloadSelectedFiles()
+const toolbarButtons = computed(() =>
+    [
+        {
+            text: t('Machine.ConfigFilesPanel.Download'),
+            color: 'primary',
+            icon: mdiCloudDownload,
+            loadingName: 'configDownloadZip',
+            onlyWriteable: false,
+            condition: selectedFiles.value.length > 0,
+            click: () => {
+                downloadSelectedFiles()
+            },
         },
-    },
-    {
-        text: t('Buttons.Delete'),
-        color: 'error',
-        icon: mdiDelete,
-        loadingName: null,
-        onlyWriteable: true,
-        condition: selectedFiles.value.length > 0,
-        click: () => {
-            deleteSelectedDialog.value = true
+        {
+            text: t('Buttons.Delete'),
+            color: 'error',
+            icon: mdiDelete,
+            loadingName: null,
+            onlyWriteable: true,
+            condition: selectedFiles.value.length > 0,
+            click: () => {
+                deleteSelectedDialog.value = true
+            },
         },
-    },
-    {
-        text: t('Machine.ConfigFilesPanel.UploadFile'),
-        color: machineButtonCol.value,
-        icon: mdiFileUpload,
-        loadingName: null,
-        onlyWriteable: true,
-        condition: true,
-        click: uploadFileButton,
-    },
-    {
-        text: t('Machine.ConfigFilesPanel.CreateFile'),
-        color: machineButtonCol.value,
-        icon: mdiFilePlus,
-        loadingName: null,
-        onlyWriteable: true,
-        condition: true,
-        click: createFile,
-    },
-    {
-        text: t('Machine.ConfigFilesPanel.CreateDirectory'),
-        color: machineButtonCol.value,
-        icon: mdiFolderPlus,
-        loadingName: null,
-        onlyWriteable: true,
-        condition: true,
-        click: createDirectory,
-    },
-    {
-        text: t('Machine.ConfigFilesPanel.RefreshDirectory'),
-        color: machineButtonCol.value,
-        icon: mdiRefresh,
-        loadingName: null,
-        onlyWriteable: false,
-        condition: true,
-        click: refreshFileList,
-    },
-].filter((rule) => rule.condition))
+        {
+            text: t('Machine.ConfigFilesPanel.UploadFile'),
+            color: machineButtonCol.value,
+            icon: mdiFileUpload,
+            loadingName: null,
+            onlyWriteable: true,
+            condition: true,
+            click: uploadFileButton,
+        },
+        {
+            text: t('Machine.ConfigFilesPanel.CreateFile'),
+            color: machineButtonCol.value,
+            icon: mdiFilePlus,
+            loadingName: null,
+            onlyWriteable: true,
+            condition: true,
+            click: createFile,
+        },
+        {
+            text: t('Machine.ConfigFilesPanel.CreateDirectory'),
+            color: machineButtonCol.value,
+            icon: mdiFolderPlus,
+            loadingName: null,
+            onlyWriteable: true,
+            condition: true,
+            click: createDirectory,
+        },
+        {
+            text: t('Machine.ConfigFilesPanel.RefreshDirectory'),
+            color: machineButtonCol.value,
+            icon: mdiRefresh,
+            loadingName: null,
+            onlyWriteable: false,
+            condition: true,
+            click: refreshFileList,
+        },
+    ].filter((rule) => rule.condition)
+)
 
 const filteredToolbarButtons = computed(() =>
     toolbarButtons.value.filter((button) => {
@@ -867,12 +881,15 @@ const sortDesc = computed({
 
 const registeredDirectories = computed(() => store.state.server.registered_directories ?? [])
 
-const existConfigRoot = computed(() => registeredDirectories.value.findIndex((root: string) => root === 'config') !== -1)
+const existConfigRoot = computed(
+    () => registeredDirectories.value.findIndex((root: string) => root === 'config') !== -1
+)
 
-const showMissingConfigRootWarning = computed(() =>
-    absolutePath.value.startsWith('/config') &&
-    !absolutePath.value.startsWith('/config_example') &&
-    !existConfigRoot.value
+const showMissingConfigRootWarning = computed(
+    () =>
+        absolutePath.value.startsWith('/config') &&
+        !absolutePath.value.startsWith('/config_example') &&
+        !existConfigRoot.value
 )
 
 const registeredDirectoriesSelectItems = computed(() => {

@@ -17,11 +17,7 @@ const socket = useSocket()
 const timelapseEnabled = computed({
     get: () => store.state.server.timelapse?.settings?.enabled ?? false,
     set: (newVal) => {
-        socket.emit(
-            'machine.timelapse.post_settings',
-            { enabled: newVal },
-            { action: 'server/timelapse/initSettings' }
-        )
+        socket.emit('machine.timelapse.post_settings', { enabled: newVal }, { action: 'server/timelapse/initSettings' })
     },
 })
 </script>

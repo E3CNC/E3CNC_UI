@@ -23,7 +23,11 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
     VRow: { name: 'VRow', template: '<div :class="$attrs.class"><slot /></div>' },
     VCol: { name: 'VCol', template: '<div :class="$attrs.class"><slot /></div>' },
     VIcon: { name: 'VIcon', props: ['start'], template: '<i class="v-icon" />' },
-    VBtn: { name: 'VBtn', props: ['variant', 'color', 'size', 'disabled'], template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>' },
+    VBtn: {
+        name: 'VBtn',
+        props: ['variant', 'color', 'size', 'disabled'],
+        template: '<button :class="$attrs.class" @click="$attrs.onClick || $attrs.click"><slot /></button>',
+    },
 }))
 
 vi.mock('vuetify/components', () => vuetifyComponentsMock)

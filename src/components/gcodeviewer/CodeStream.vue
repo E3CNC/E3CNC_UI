@@ -48,30 +48,36 @@ function keyPress() {
     }
 }
 
-watch(() => props.document, () => {
-    if (editorView && props.shown) {
-        editorView.dispatch({
-            changes: {
-                from: 0,
-                to: editorView.state.doc.length,
-                insert: props.document ?? '',
-            },
-        })
+watch(
+    () => props.document,
+    () => {
+        if (editorView && props.shown) {
+            editorView.dispatch({
+                changes: {
+                    from: 0,
+                    to: editorView.state.doc.length,
+                    insert: props.document ?? '',
+                },
+            })
+        }
     }
-})
+)
 
-watch(() => props.currentline, (to: number) => {
-    if (editorView && props.shown) {
-        const line = editorView.state.doc.lineAt(to)
-        editorView.dispatch({
-            selection: {
-                anchor: line.from,
-                head: line.from,
-            },
-            scrollIntoView: true,
-        })
+watch(
+    () => props.currentline,
+    (to: number) => {
+        if (editorView && props.shown) {
+            const line = editorView.state.doc.lineAt(to)
+            editorView.dispatch({
+                selection: {
+                    anchor: line.from,
+                    head: line.from,
+                },
+                scrollIntoView: true,
+            })
+        }
     }
-})
+)
 </script>
 
 <style scoped>

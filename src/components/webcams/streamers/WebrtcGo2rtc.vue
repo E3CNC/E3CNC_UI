@@ -89,13 +89,17 @@ watch(enableAudio, () => {
     start()
 })
 
-watch(expanded, (newExpanded) => {
-    if (!newExpanded) {
-        terminate()
-        return
-    }
-    start()
-}, { immediate: true })
+watch(
+    expanded,
+    (newExpanded) => {
+        if (!newExpanded) {
+            terminate()
+            return
+        }
+        start()
+    },
+    { immediate: true }
+)
 
 function log(msg: string, obj?: unknown) {
     if (obj) {

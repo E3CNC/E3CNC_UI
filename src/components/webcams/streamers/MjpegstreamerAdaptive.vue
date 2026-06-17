@@ -104,20 +104,28 @@ function viewportVisibilityChanged(newVal: boolean) {
     isVisibleViewport.value = newVal
 }
 
-watch(isVisible, (newVal) => {
-    if (newVal) {
-        startStream()
-        return
-    }
-    stopStream()
-}, { immediate: true })
+watch(
+    isVisible,
+    (newVal) => {
+        if (newVal) {
+            startStream()
+            return
+        }
+        stopStream()
+    },
+    { immediate: true }
+)
 
-watch(() => props.camSettings, () => {
-    aspectRatio.value = null
-    stopStream()
-    status.value = 'connecting'
-    startStream()
-}, { deep: true })
+watch(
+    () => props.camSettings,
+    () => {
+        aspectRatio.value = null
+        stopStream()
+        status.value = 'connecting'
+        startStream()
+    },
+    { deep: true }
+)
 
 function refreshFrame() {
     if (!isVisible.value) return

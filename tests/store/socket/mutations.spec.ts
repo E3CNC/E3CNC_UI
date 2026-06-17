@@ -1,6 +1,6 @@
 /**
  * Tests for src/store/socket/mutations.ts
- * 
+ *
  * Tests the socket store mutations which manage connection state,
  * loading indicators, and initialization modules.
  */

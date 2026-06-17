@@ -14,25 +14,27 @@ const vuetifyComponentsMock = vi.hoisted(() => ({
 
 vi.mock('vuetify/components', () => vuetifyComponentsMock)
 
-const mockT = vi.hoisted(() => vi.fn((key: string) => {
-    const translations: Record<string, string> = {
-        'Panels.StatusPanel.Speed': 'Speed',
-        'Panels.StatusPanel.Requested': 'Requested',
-        'Panels.StatusPanel.Flow': 'Flow',
-        'Panels.StatusPanel.Max': 'Max',
-        'Panels.StatusPanel.Layer': 'Layer',
-        'Panels.StatusPanel.ObjectHeight': 'Object Height',
-        'Panels.StatusPanel.Estimate': 'Estimate',
-        'Panels.StatusPanel.File': 'File',
-        'Panels.StatusPanel.Filament': 'Filament',
-        'Panels.StatusPanel.Slicer': 'Slicer',
-        'Panels.StatusPanel.Total': 'Total',
-        'Panels.StatusPanel.Print': 'Print',
-        'Panels.StatusPanel.Difference': 'Difference',
-        'Panels.StatusPanel.ETA': 'ETA',
-    }
-    return translations[key] ?? key
-}))
+const mockT = vi.hoisted(() =>
+    vi.fn((key: string) => {
+        const translations: Record<string, string> = {
+            'Panels.StatusPanel.Speed': 'Speed',
+            'Panels.StatusPanel.Requested': 'Requested',
+            'Panels.StatusPanel.Flow': 'Flow',
+            'Panels.StatusPanel.Max': 'Max',
+            'Panels.StatusPanel.Layer': 'Layer',
+            'Panels.StatusPanel.ObjectHeight': 'Object Height',
+            'Panels.StatusPanel.Estimate': 'Estimate',
+            'Panels.StatusPanel.File': 'File',
+            'Panels.StatusPanel.Filament': 'Filament',
+            'Panels.StatusPanel.Slicer': 'Slicer',
+            'Panels.StatusPanel.Total': 'Total',
+            'Panels.StatusPanel.Print': 'Print',
+            'Panels.StatusPanel.Difference': 'Difference',
+            'Panels.StatusPanel.ETA': 'ETA',
+        }
+        return translations[key] ?? key
+    })
+)
 
 vi.mock('vue-i18n', () => ({
     useI18n: () => ({

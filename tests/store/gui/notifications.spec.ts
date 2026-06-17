@@ -98,7 +98,11 @@ describe('gui notifications store', () => {
         it('dismiss dispatches announcement dismiss for announcement category', () => {
             const dispatch = vi.fn()
             actions.dismiss({ dispatch } as any, { id: 'announcement/entry1', time: 3600, type: 'time' })
-            expect(dispatch).toHaveBeenCalledWith('server/announcements/dismiss', { entry_id: 'entry1', time: 3600 }, { root: true })
+            expect(dispatch).toHaveBeenCalledWith(
+                'server/announcements/dismiss',
+                { entry_id: 'entry1', time: 3600 },
+                { root: true }
+            )
         })
 
         it('dismiss stores dismiss for non-announcement', () => {
@@ -145,7 +149,12 @@ describe('gui notifications store', () => {
                 type: 'ever',
                 time: null,
             })
-            expect(commit).toHaveBeenCalledWith('removeDismiss', { id: 'e1', category: 'update', type: 'ever', date: expect.any(Number) })
+            expect(commit).toHaveBeenCalledWith('removeDismiss', {
+                id: 'e1',
+                category: 'update',
+                type: 'ever',
+                date: expect.any(Number),
+            })
             expect(commit).toHaveBeenCalledWith('addDismiss', expect.objectContaining({ id: 'e1' }))
         })
     })

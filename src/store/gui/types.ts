@@ -106,8 +106,8 @@ export interface GuiState {
         dashboardHistoryLimit: number
         hideOtherInstances: boolean
     }
-	view: {
-		blockFileUpload: boolean
+    view: {
+        blockFileUpload: boolean
         configfiles: {
             countPerPage: number
             sortBy: string

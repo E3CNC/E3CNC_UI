@@ -45,15 +45,18 @@
                                 </v-tabs>
                             </OverlayScrollbarsComponent>
                         </v-col>
-                    <v-col :class="isMobile ? '' : 'pl-0'" style="min-width: 0;" class="settings-contentcol">
-                        <OverlayScrollbarsComponent
-                            ref="settingsScroll"
-                            class="settings-tabs"
-                            :options="{ overflowBehavior: { x: 'hidden' } }"
-                            @focusin.capture="scrollFocusedSettingsElementIntoView">
-                            <component :is="tabComponents[activeTab]" @scroll-to-top="scrollToTop" @reset-layout="resetDashboardLayout" />
-                        </OverlayScrollbarsComponent>
-                    </v-col>
+                        <v-col :class="isMobile ? '' : 'pl-0'" style="min-width: 0" class="settings-contentcol">
+                            <OverlayScrollbarsComponent
+                                ref="settingsScroll"
+                                class="settings-tabs"
+                                :options="{ overflowBehavior: { x: 'hidden' } }"
+                                @focusin.capture="scrollFocusedSettingsElementIntoView">
+                                <component
+                                    :is="tabComponents[activeTab]"
+                                    @scroll-to-top="scrollToTop"
+                                    @reset-layout="resetDashboardLayout" />
+                            </OverlayScrollbarsComponent>
+                        </v-col>
                     </v-row>
                 </v-card-text>
             </v-card>
@@ -176,7 +179,7 @@ function getSettingsMenuTabFromQuery(): string | null {
 
 async function updateSettingsMenuQuery(tab: string | null): Promise<void> {
     const query = { ...route.query }
-    const allowedNestedKeys = new Set(tab ? nestedSettingsQueryKeysByTab[tab] ?? [] : [])
+    const allowedNestedKeys = new Set(tab ? (nestedSettingsQueryKeysByTab[tab] ?? []) : [])
 
     Object.values(nestedSettingsQueryKeysByTab)
         .flat()
@@ -306,7 +309,10 @@ function scrollFocusedSettingsElementIntoView(event: FocusEvent) {
 }
 
 function resetDashboardLayout() {
-    const viewport = (Array.isArray(route.query.dashboardViewport) ? route.query.dashboardViewport[0] : route.query.dashboardViewport) || 'desktop'
+    const viewport =
+        (Array.isArray(route.query.dashboardViewport)
+            ? route.query.dashboardViewport[0]
+            : route.query.dashboardViewport) || 'desktop'
     if (viewport === 'mobile') {
         store.dispatch('gui/resetLayout', 'mobileLayout')
     } else {

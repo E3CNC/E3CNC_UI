@@ -53,7 +53,13 @@ describe('gui navigation store', () => {
 
         it('changeVisibility uses orgTitle when provided', () => {
             state.entries = [{ type: 'route', title: 'Original', visible: true, position: 0 }]
-            mutations.changeVisibility(state, { type: 'route', orgTitle: 'Original', title: 'Changed', visible: true, position: 0 })
+            mutations.changeVisibility(state, {
+                type: 'route',
+                orgTitle: 'Original',
+                title: 'Changed',
+                visible: true,
+                position: 0,
+            })
             expect(state.entries[0].visible).toBe(false)
         })
 
@@ -84,14 +90,29 @@ describe('gui navigation store', () => {
         it('updatePos commits position update', () => {
             const commit = vi.fn()
             actions.updatePos({ commit } as any, { type: 'route', title: 'Dashboard', visible: true, position: 2 })
-            expect(commit).toHaveBeenCalledWith('updatePos', { type: 'route', title: 'Dashboard', visible: true, position: 2 })
+            expect(commit).toHaveBeenCalledWith('updatePos', {
+                type: 'route',
+                title: 'Dashboard',
+                visible: true,
+                position: 2,
+            })
         })
 
         it('changeVisibility commits and uploads', () => {
             const commit = vi.fn()
             const dispatch = vi.fn()
-            actions.changeVisibility({ commit, dispatch } as any, { type: 'route', title: 'Dashboard', visible: true, position: 0 })
-            expect(commit).toHaveBeenCalledWith('changeVisibility', { type: 'route', title: 'Dashboard', visible: true, position: 0 })
+            actions.changeVisibility({ commit, dispatch } as any, {
+                type: 'route',
+                title: 'Dashboard',
+                visible: true,
+                position: 0,
+            })
+            expect(commit).toHaveBeenCalledWith('changeVisibility', {
+                type: 'route',
+                title: 'Dashboard',
+                visible: true,
+                position: 0,
+            })
             expect(dispatch).toHaveBeenCalledWith('upload')
         })
     })
