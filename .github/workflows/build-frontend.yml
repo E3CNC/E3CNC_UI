@@ -68,17 +68,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if gh release view nightly-main >/dev/null 2>&1; then
-            echo "Nightly release exists — updating in place"
-            gh release edit nightly-main \
-              --title "${{ steps.pkgver.outputs.VERSION }}-nightly-main (${{ steps.commit.outputs.SHA_SHORT }})" \
-              --notes-file nightly-notes.md \
-              --target main
-            gh release upload nightly-main mainsail-cnc-${{ steps.pkgver.outputs.VERSION }}.zip --clobber
+            echo "Nightly release exists — deleting and recreating to work around immutable release assets"
+            gh release delete nightly-main --yes --cleanup-tag
           else
             echo "No existing nightly release — creating fresh"
-            gh release create nightly-main \
-              --title "${{ steps.pkgver.outputs.VERSION }}-nightly-main (${{ steps.commit.outputs.SHA_SHORT }})" \
-              --notes-file nightly-notes.md \
-              --target main \
-              mainsail-cnc-${{ steps.pkgver.outputs.VERSION }}.zip
           fi
+          gh release create nightly-main \
+            --title "${{ steps.pkgver.outputs.VERSION }}-nightly-main (${{ steps.commit.outputs.SHA_SHORT }})" \
+            --notes-file nightly-notes.md \
+            --target main \
+            mainsail-cnc-${{ steps.pkgver.outputs.VERSION }}.zip
