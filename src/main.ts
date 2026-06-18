@@ -48,7 +48,7 @@ const vuetify = createVuetify({
         },
     },
     defaults: {
-        VSwitch: { color: 'accent' },
+        VSwitch: { color: 'primary' },
     },
     display: {
         mobileBreakpoint: 768,
