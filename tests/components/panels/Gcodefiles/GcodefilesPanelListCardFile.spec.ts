@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import { createStore } from 'vuex'
 import GcodefilesPanelListCardFile from '@/components/panels/Gcodefiles/GcodefilesPanelListCardFile.vue'
 import type { FileStateGcodefile } from '@/store/files/types'
@@ -191,6 +192,8 @@ vi.mock('@/store/files/cncMetadata', () => ({
         plungeFeed: '100',
         cutFeed: '500',
         rapidFeed: '1000',
+        stock: 'X 150 mm · Y 157 mm · Z 20 mm',
+        fields: [],
     })),
     loadCncMetadata: vi.fn(() => Promise.resolve({})),
 }))
@@ -382,17 +385,22 @@ describe('GcodefilesPanelListCardFile.vue', () => {
         expect(wrapper.text()).toContain('Files.Runs')
     })
 
-    it('renders stats section', () => {
+    it('renders CNC stats section', async () => {
         const store = createStoreWithState()
         const item = makeItem('test.gcode', { estimated_time: 3600 })
         const wrapper = mount(GcodefilesPanelListCardFile, {
             props: { item, isSelected: false, select: vi.fn() },
             global: { plugins: [store], mocks: { $t: (key: string) => key } },
         })
-        expect(wrapper.text()).toContain('Files.PrintTime')
-        expect(wrapper.text()).toContain('Files.LastPrintDuration')
-        expect(wrapper.text()).toContain('Files.LastTotalDuration')
-        expect(wrapper.text()).toContain('Files.LastStartTime')
+        await Promise.resolve()
+        await nextTick()
+        expect(wrapper.text()).toContain('CAM Tool')
+        expect(wrapper.text()).toContain('Tool')
+        expect(wrapper.text()).toContain('Spindle')
+        expect(wrapper.text()).toContain('Plunge')
+        expect(wrapper.text()).toContain('Cut')
+        expect(wrapper.text()).toContain('Rapid')
+        expect(wrapper.text()).toContain('Stock')
     })
 
     it('renders print start button with play icon', () => {
@@ -453,15 +461,16 @@ describe('GcodefilesPanelListCardFile.vue', () => {
         expect(wrapper.findComponent({ name: 'StartPrintDialog' }).exists()).toBe(true)
     })
 
-    it('shows __ for estimated_time when null', () => {
+    it('does not render legacy print time stats when estimated_time is null', () => {
         const store = createStoreWithState()
         const item = makeItem('test.gcode', { estimated_time: null as unknown as number })
         const wrapper = mount(GcodefilesPanelListCardFile, {
             props: { item, isSelected: false, select: vi.fn() },
             global: { plugins: [store], mocks: { $t: (key: string) => key } },
         })
-        // The component uses secondsOrDash which returns '--' for null/undefined
-        expect(wrapper.text()).toContain('--')
+        expect(wrapper.text()).not.toContain('Files.PrintTime')
+        expect(wrapper.text()).not.toContain('Files.LastPrintDuration')
+        expect(wrapper.text()).toContain('Files.PrintStart')
     })
 
     it('calls EventBus.$on on mount', async () => {

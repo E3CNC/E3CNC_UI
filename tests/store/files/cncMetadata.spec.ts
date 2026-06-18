@@ -23,6 +23,11 @@ describe('cncMetadata helper', () => {
                 z_min: -1.5,
                 z_max: 16,
             },
+            stock: {
+                x: { size: 150 },
+                y: { size: 157 },
+                z: { size: 20 },
+            },
             tools: [{ id: 'T0', type: 'flat end mill', diameter_mm: 6 }],
             spindle_rpm: 5000,
             feeds_mm_per_min: { plunge: 333, cut: 1000, rapid: 99999 },
@@ -38,7 +43,8 @@ describe('cncMetadata helper', () => {
         expect(viewModel?.spindle).toBe('5000 RPM')
         expect(viewModel?.feeds).toContain('333')
         expect(viewModel?.workEnvelope).toContain('X 42')
-        expect(viewModel?.fields).toHaveLength(4)
+        expect(viewModel?.stock).toContain('X 150 mm')
+        expect(viewModel?.fields).toHaveLength(5)
     })
 
     it('returns null when the sidecar is missing', async () => {
