@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="100%" height="100%" viewBox="0 0 32 36" version="1.1" xmlns="http://www.w3.org/2000/svg" style="fill-rule:nonzero;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-14,-10)">
+        <path fill="var(--color-logo, #00FF00)" d="M28,10L12.412,19L12.412,37.001L28,46L43.588,37.001L43.588,19Z M19,17L19,39L22,39L22,17Z M19,17L37,17L37,20L22,20Z M19,27L33,27L33,30L22,30Z M19,37L37,37L37,40L22,40Z"/>
+    </g>
+</svg>
