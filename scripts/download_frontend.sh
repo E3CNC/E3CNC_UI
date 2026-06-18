@@ -14,15 +14,36 @@ REPO="mainsail-cnc"
 
 echo "=== Downloading pre-built frontend ==="
 
-# Try to download from nightly release first
+# Try to download from the latest nightly-main release asset first
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 PKG_VER="v$(node -p "require('$REPO_ROOT/package.json').version")"
-ZIP_URL="https://github.com/${OWNER}/${REPO}/releases/download/nightly/mainsail-cnc-${PKG_VER}.zip"
-ZIP_FILE="$TMP_DIR/mainsail-cnc-${PKG_VER}.zip"
+ASSET_NAME="mainsail-cnc-${PKG_VER}.zip"
+ZIP_FILE="$TMP_DIR/$ASSET_NAME"
 
-if curl -sfL "$ZIP_URL" -o "$ZIP_FILE" && [[ -s "$ZIP_FILE" ]]; then
+RELEASES_API_URL="https://api.github.com/repos/${OWNER}/${REPO}/releases?per_page=10"
+ZIP_URL=$(curl -sfL "$RELEASES_API_URL" | node -e "
+let data = '';
+process.stdin.on('data', c => data += c);
+process.stdin.on('end', () => {
+  try {
+    const releases = JSON.parse(data);
+    for (const release of releases) {
+      const asset = (release.assets || []).find(a => a.name === '$ASSET_NAME');
+      if (asset) {
+        console.log(asset.browser_download_url);
+        return;
+      }
+    }
+    console.log('');
+  } catch (e) {
+    console.log('');
+  }
+});
+")
+
+if [[ -n "$ZIP_URL" ]] && curl -sfL "$ZIP_URL" -o "$ZIP_FILE" && [[ -s "$ZIP_FILE" ]]; then
     echo "    downloaded nightly build ($(du -h "$ZIP_FILE" | cut -f1))"
 
     mkdir -p "$WEB_ROOT"

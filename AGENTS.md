@@ -87,7 +87,7 @@ with Ansible playbooks for idempotent deployment.
 Plus fixes discovered during rollout:
 
 - **Nightly CI releases**: `.github/workflows/build-frontend.yml` builds on every
-  push to `main` and publishes `mainsail-cnc-<version>.zip` (semver) as a `nightly-main` GitHub release.
+  push to `main` and publishes `mainsail-cnc-<version>.zip` (semver) as a `nightly-main-<YYYYMMDD>-<run_id>` GitHub release.
   Low-RAM devices (32-bit ARM) download the pre-built zip instead of running `vite build`.
 - **`post_update_script`**: Moonraker update manager now runs `scripts/post_update.sh`
   after every `git pull`, which downloads the nightly release, re-vendors the agent,
