@@ -20,9 +20,9 @@
         "start": "vite build && vite preview",
         "test": "start-server-and-test preview http://127.0.0.1:4173/ 'cypress run'",
         "test:ui": "cypress open",
-        "test:unit": "NODE_OPTIONS=\"--max-old-space-size=4096\" vitest run",
-        "test:unit:watch": "NODE_OPTIONS=\"--max-old-space-size=4096\" vitest",
-        "test:coverage": "NODE_OPTIONS=\"--max-old-space-size=4096\" vitest run --coverage",
+        "test:unit": "NODE_OPTIONS=\"${NODE_OPTIONS:---max-old-space-size=4096}\" vitest run",
+        "test:unit:watch": "NODE_OPTIONS=\"${NODE_OPTIONS:---max-old-space-size=4096}\" vitest",
+        "test:coverage": "NODE_OPTIONS=\"${NODE_OPTIONS:---max-old-space-size=4096}\" vitest run --coverage",
         "test:scripts": "bats tests/scripts/"
     },
     "dependencies": {
