@@ -11,8 +11,7 @@ Invocation:
     python3 cnc_metadata_extractor.py [--force] <path-to-gcode>
 
 Flags:
-    --force   re-extract even if the file was just modified
-              (bypasses the 60-second mtime safety check)
+    --force   re-extract even if the file was already processed
 
 Exit codes:
     0  processed (sidecar written or file skipped as a no-op)
@@ -20,18 +19,27 @@ Exit codes:
     2  bad arguments
 """
 
+import base64
 import json
 import logging
 import os
 import re
 import sys
+from io import BytesIO
 from typing import Any, Dict, List, Optional, Tuple
 
-SCHEMA_VERSION = 1
+try:
+    from PIL import Image, ImageDraw
+except ImportError:
+    Image = None  # type: ignore
+    ImageDraw = None
+
+SCHEMA_VERSION = 2
 FOOTER_MARKER = "; CNC-METADATA-V1"
 HEADER_READ_BYTES = 1_048_576
 MOVE_SAMPLE_LIMIT = 10_000
-MIN_FILE_AGE_SECONDS = 60
+
+THUMB_SIZE = 256
 
 log = logging.getLogger("cnc_metadata_extractor")
 
@@ -69,15 +77,6 @@ def is_already_processed(gcode_path: str) -> bool:
     except OSError:
         return False
     return FOOTER_MARKER.encode("ascii") in tail
-
-
-def is_too_young(gcode_path: str) -> bool:
-    try:
-        mtime = os.path.getmtime(gcode_path)
-    except OSError:
-        return False
-    import time
-    return (time.time() - mtime) < MIN_FILE_AGE_SECONDS
 
 
 def read_head_and_tail(gcode_path: str) -> Tuple[str, str]:
@@ -153,6 +152,37 @@ def extract_envelope(gcode_path: str) -> Optional[Dict[str, float]]:
     }
 
 
+def extract_stock_from_ranges(head: str) -> Optional[Dict[str, float]]:
+    """Parse the Ranges Table comment block from Fusion CAM gcode headers.
+
+    Format:
+        ;   X: Min=10.356 Max=138.698 Size=128.342
+        ;   Y: Min=-91.759 Max=-61.76 Size=29.998
+        ;   Z: Min=18.6 Max=32 Size=13.4
+    """
+    axes = {}
+    for axis in ("X", "Y", "Z"):
+        m = re.search(
+            rf"^;\s+{axis}:\s+Min=([+-]?\d*\.?\d+)\s+Max=([+-]?\d*\.?\d+)\s+Size=([+-]?\d*\.?\d+)",
+            head,
+            re.MULTILINE,
+        )
+        if m:
+            axes[axis.lower()] = {
+                "min": round(float(m.group(1)), 3),
+                "max": round(float(m.group(2)), 3),
+                "size": round(float(m.group(3)), 3),
+            }
+    if not axes:
+        return None
+    result = {
+        "x": axes.get("x", {}),
+        "y": axes.get("y", {}),
+        "z": axes.get("z", {}),
+    }
+    return result
+
+
 def extract_tools_fusion(head: str) -> List[Dict[str, Any]]:
     tools: List[Dict[str, Any]] = []
     for m in re.finditer(r"\bT(\d+)\s+D([+-]?\d*\.?\d+)(?:\s+CR([+-]?\d*\.?\d+))?", head):
@@ -213,6 +243,112 @@ def extract_feeds(head: str) -> Dict[str, float]:
     return feeds
 
 
+def collect_toolpath(gcode_path: str) -> List[Tuple[float, float, float]]:
+    """Collect G0/G1 move coordinates from the gcode file."""
+    path: List[Tuple[float, float, float]] = []
+    move_re = re.compile(r"^G[01]\b")
+    coord_re = re.compile(r"\b([XYZ])([+-]?\d*\.?\d+)")
+    with open(gcode_path, "r", errors="replace") as f:
+        for i, line in enumerate(f):
+            if i > MOVE_SAMPLE_LIMIT * 5:
+                break
+            if not move_re.match(line):
+                continue
+            coords = {axis: float(val) for axis, val in coord_re.findall(line)}
+            if not coords:
+                continue
+            path.append((coords.get("X", 0), coords.get("Y", 0), coords.get("Z", 0)))
+    return path
+
+
+def render_toolpath_thumbnail(
+    toolpath: List[Tuple[float, float, float]],
+    envelope: Optional[Dict[str, float]],
+    size: int = THUMB_SIZE,
+) -> Optional[bytes]:
+    """Render a top-down (XY) toolpath preview as a PNG byte array."""
+    if Image is None or not toolpath:
+        return None
+
+    # Determine bounds from envelope or toolpath
+    if envelope:
+        x_min, x_max = envelope["x_min"], envelope["x_max"]
+        y_min, y_max = envelope["y_min"], envelope["y_max"]
+    else:
+        xs = [p[0] for p in toolpath]
+        ys = [p[1] for p in toolpath]
+        x_min, x_max = min(xs), max(xs)
+        y_min, y_max = min(ys), max(ys)
+
+    range_x = x_max - x_min or 1
+    range_y = y_max - y_min or 1
+    padding = max(range_x, range_y) * 0.05 or 1
+
+    def to_screen(x: float, y: float) -> Tuple[float, float]:
+        sx = (x - x_min + padding) / (range_x + 2 * padding) * (size - 4) + 2
+        sy = (y - y_min + padding) / (range_y + 2 * padding) * (size - 4) + 2
+        # Flip Y for screen coords
+        return (sx, size - sy)
+
+    img = Image.new("RGB", (size, size), (35, 35, 35))
+    draw = ImageDraw.Draw(img)
+
+    # Draw work envelope outline
+    if envelope:
+        x1, y1 = to_screen(x_min, y_min)
+        x2, y2 = to_screen(x_max, y_max)
+        draw.rectangle([x1, y2, x2, y1], outline=(60, 60, 60), width=1)
+
+    # Draw toolpath
+    prev = toolpath[0]
+    for point in toolpath[1:]:
+        sx1, sy1 = to_screen(prev[0], prev[1])
+        sx2, sy2 = to_screen(point[0], point[1])
+        draw.line([sx1, sy1, sx2, sy2], fill=(76, 175, 80), width=1)
+        prev = point
+
+    buf = BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
+
+
+def embed_thumbnail(gcode_path: str, thumb_data: bytes) -> None:
+    """Embed a PNG thumbnail as gcode comments that Moonraker can parse.
+
+    Format:
+        ; thumbnail begin {width}x{height} {data_size}
+        {base64_png}
+        ; thumbnail end
+    """
+    b64 = base64.b64encode(thumb_data).decode("ascii")
+    # Read existing content
+    with open(gcode_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    # Remove any existing thumbnail block
+    content = re.sub(
+        r"(?m)^; thumbnail begin \d+x\d+ \d+\n.*?\n; thumbnail end\n?",
+        "",
+        content,
+    )
+
+    # Insert before footer marker (or append if no footer)
+    b64_len = len(b64)
+    thumb_block = (
+        f"; thumbnail begin {THUMB_SIZE}x{THUMB_SIZE} {b64_len}\n"
+        f"{b64}\n"
+        f"; thumbnail end\n"
+    )
+
+    if FOOTER_MARKER in content:
+        content = content.replace(FOOTER_MARKER, f"{thumb_block}{FOOTER_MARKER}")
+    else:
+        content = content.rstrip("\n") + f"\n\n{thumb_block}"
+
+    with open(gcode_path, "w", encoding="utf-8") as f:
+        f.write(content)
+
+
 def extract_operations(head: str) -> List[Dict[str, str]]:
     ops: List[Dict[str, str]] = []
     for m in re.finditer(r"\(([^)]+)\)", head):
@@ -248,6 +384,9 @@ def build_metadata(gcode_path: str, cam: Optional[Dict[str, str]]) -> Dict[str, 
     envelope = extract_envelope(gcode_path)
     if envelope:
         meta["work_envelope"] = envelope
+    stock = extract_stock_from_ranges(head)
+    if stock:
+        meta["stock"] = stock
     if cam:
         tools = extract_tools(head, cam.get("cam_tool_slug", ""))
         if tools:
@@ -289,9 +428,6 @@ def process(gcode_path: str, force: bool = False) -> int:
     if is_already_processed(gcode_path) and not force:
         log.info("already processed: %s", gcode_path)
         return 0
-    if is_too_young(gcode_path) and not force:
-        log.info("file too young, skipping: %s", gcode_path)
-        return 0
     head, tail = read_head_and_tail(gcode_path)
     cam = detect_cam(head, tail)
     if cam is None:
@@ -300,6 +436,24 @@ def process(gcode_path: str, force: bool = False) -> int:
     meta = build_metadata(gcode_path, cam)
     write_sidecar(gcode_path, meta)
     append_footer(gcode_path)
+
+    # Generate and embed toolpath thumbnail
+    try:
+        envelope = meta.get("work_envelope")
+        toolpath = collect_toolpath(gcode_path)
+        if toolpath:
+            thumb_data = render_toolpath_thumbnail(toolpath, envelope)
+            if thumb_data:
+                embed_thumbnail(gcode_path, thumb_data)
+                log.info(
+                    "embedded %dx%d thumbnail in %s",
+                    THUMB_SIZE,
+                    THUMB_SIZE,
+                    os.path.basename(gcode_path),
+                )
+    except Exception:
+        log.warning("thumbnail generation failed", exc_info=True)
+
     log.info("wrote %s (cam_tool=%s)", sidecar_path_for(gcode_path), cam.get("cam_tool"))
     return 0
 

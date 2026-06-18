@@ -1,5 +1,17 @@
 import { escapePath } from '@/plugins/helpers'
 
+export interface CncMetadataStockAxis {
+    min?: number
+    max?: number
+    size?: number
+}
+
+export interface CncMetadataStock {
+    x?: CncMetadataStockAxis
+    y?: CncMetadataStockAxis
+    z?: CncMetadataStockAxis
+}
+
 export interface CncMetadataWorkEnvelope {
     x_min?: number
     x_max?: number
@@ -34,6 +46,7 @@ export interface CncMetadata {
     document?: string
     setup?: string
     work_envelope?: CncMetadataWorkEnvelope
+    stock?: CncMetadataStock
     tools?: CncMetadataTool[]
     spindle_rpm?: number
     feeds_mm_per_min?: CncMetadataFeeds
@@ -49,6 +62,7 @@ export interface CncMetadataCardField {
 export interface CncMetadataViewModel {
     camTool: string
     workEnvelope: string
+    stock: string
     tool: string
     spindle: string
     feeds: string
@@ -68,6 +82,11 @@ function formatRange(axis: 'X' | 'Y' | 'Z', minValue?: number, maxValue?: number
     const minText = minValue === undefined ? '--' : formatNumber(minValue)
     const maxText = maxValue === undefined ? '--' : formatNumber(maxValue)
     return `${axis} ${minText} → ${maxText}`
+}
+
+function formatStockSize(axis: 'X' | 'Y' | 'Z', stockAxis?: CncMetadataStockAxis): string {
+    if (!stockAxis || stockAxis.size === undefined) return `${axis} --`
+    return `${axis} ${formatNumber(stockAxis.size)} mm`
 }
 
 function formatTool(tool?: CncMetadataTool): string {
@@ -97,6 +116,8 @@ export function buildCncMetadataViewModel(metadata: CncMetadata | null | undefin
     const tool = metadata.tools?.[0]
     const envelope = metadata.work_envelope
 
+    const stockData = metadata.stock
+
     return {
         camTool: metadata.cam_tool ?? '--',
         workEnvelope: envelope
@@ -104,6 +125,13 @@ export function buildCncMetadataViewModel(metadata: CncMetadata | null | undefin
                   formatRange('X', envelope.x_min, envelope.x_max),
                   formatRange('Y', envelope.y_min, envelope.y_max),
                   formatRange('Z', envelope.z_min, envelope.z_max),
+              ].join(' · ')
+            : '--',
+        stock: stockData
+            ? [
+                  formatStockSize('X', stockData.x),
+                  formatStockSize('Y', stockData.y),
+                  formatStockSize('Z', stockData.z),
               ].join(' · ')
             : '--',
         tool: formatTool(tool),
@@ -123,6 +151,7 @@ export function buildCncMetadataViewModel(metadata: CncMetadata | null | undefin
                 : `${formatNumber(metadata.feeds_mm_per_min.rapid)} mm/min`,
         fields: [
             { label: 'Work Envelope', value: envelope ? formatRange('X', envelope.x_min, envelope.x_max) : '--' },
+            { label: 'Stock', value: stockData ? formatStockSize('X', stockData.x) : '--' },
             { label: 'Tool', value: formatTool(tool) },
             {
                 label: 'Spindle',
@@ -134,7 +163,9 @@ export function buildCncMetadataViewModel(metadata: CncMetadata | null | undefin
 }
 
 export async function loadCncMetadata(apiUrl: string, filename: string): Promise<CncMetadata | null> {
-    const url = `${apiUrl}/server/files/gcodes/${escapePath(filename)}.cnc-meta.json`
+    // Add cache-busting param to prevent stale metadata from being cached
+    const cacheBuster = `_t=${Date.now()}`
+    const url = `${apiUrl}/server/files/gcodes/${escapePath(filename)}.cnc-meta.json?${cacheBuster}`
 
     try {
         const response = await fetch(url)

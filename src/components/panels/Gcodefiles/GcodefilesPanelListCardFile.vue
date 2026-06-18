@@ -45,27 +45,6 @@
             </div>
         </div>
 
-        <v-divider class="gcode-card__divider" />
-
-        <div class="gcode-card__stats">
-            <div class="gcode-card__stat">
-                <div class="gcode-card__stat-label">{{ $t('Files.PrintTime') }}</div>
-                <div class="gcode-card__stat-value">{{ secondsOrDash(item.estimated_time) }}</div>
-            </div>
-            <div class="gcode-card__stat">
-                <div class="gcode-card__stat-label">{{ $t('Files.LastPrintDuration') }}</div>
-                <div class="gcode-card__stat-value">{{ secondsOrDash(item.last_print_duration) }}</div>
-            </div>
-            <div class="gcode-card__stat">
-                <div class="gcode-card__stat-label">{{ $t('Files.LastTotalDuration') }}</div>
-                <div class="gcode-card__stat-value">{{ secondsOrDash(item.last_total_duration) }}</div>
-            </div>
-            <div class="gcode-card__stat">
-                <div class="gcode-card__stat-label">{{ $t('Files.LastStartTime') }}</div>
-                <div class="gcode-card__stat-value">{{ dateOrDash(item.last_start_time) }}</div>
-            </div>
-        </div>
-
         <template v-if="cncMetadataViewModel">
             <div class="gcode-card__stats gcode-card__stats--cnc">
                 <div class="gcode-card__stat">
@@ -91,6 +70,10 @@
                 <div class="gcode-card__stat">
                     <div class="gcode-card__stat-label">Rapid</div>
                     <div class="gcode-card__stat-value">{{ cncMetadataViewModel.rapidFeed }}</div>
+                </div>
+                <div class="gcode-card__stat">
+                    <div class="gcode-card__stat-label">Stock</div>
+                    <div class="gcode-card__stat-value gcode-card__stat-value--stock">{{ cncMetadataViewModel.stock }}</div>
                 </div>
             </div>
         </template>
@@ -215,7 +198,6 @@ import {
     convertPrintStatusIconColor,
     escapePath,
     formatFilesize,
-    formatPrintTime,
 } from '@/plugins/helpers'
 import { buildCncMetadataViewModel, loadCncMetadata, type CncMetadataViewModel } from '@/store/files/cncMetadata'
 import GcodefilesRenameFileDialog from '@/components/dialogs/GcodefilesRenameFileDialog.vue'
@@ -328,6 +310,7 @@ function scanMeta() {
     store.dispatch('files/scanMetadata', {
         filename: 'gcodes' + currentPath.value + '/' + props.item.filename,
     })
+    setTimeout(() => { void refreshCncMetadata() }, 500)
 }
 
 function downloadFile() {
@@ -513,6 +496,12 @@ onBeforeUnmount(() => {
     font-family: '0xProto Nerd Font Mono', monospace;
     font-size: 13px;
     color: rgba(var(--v-theme-on-surface), 0.85);
+}
+
+.gcode-card__stat-value--stock {
+    font-size: 11px;
+    white-space: normal;
+    word-break: break-all;
 }
 
 .gcode-card__stats--cnc {
