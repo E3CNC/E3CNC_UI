@@ -221,17 +221,21 @@ function save() {
     closeDialog()
 }
 
-watch(showDialog, (newVal: boolean) => {
-    if (!newVal || !props.item) return
+watch(
+    showDialog,
+    (newVal: boolean) => {
+        if (!newVal || !props.item) return
 
-    name.value = props.item.name
-    note.value = props.item.note
-    reminder.value = props.item.reminder?.type ?? null
-    reminderFilament.value = props.item.reminder?.filament.bool ?? false
-    reminderFilamentValue.value = props.item.reminder?.filament.value ?? 0
-    reminderPrinttime.value = props.item.reminder?.printtime.bool ?? false
-    reminderPrinttimeValue.value = props.item.reminder?.printtime.value ?? 0
-    reminderDate.value = props.item.reminder?.date.bool ?? false
-    reminderDateValue.value = props.item.reminder?.date.value ?? 0
-})
+        name.value = props.item.name
+        note.value = props.item.note
+        reminder.value = props.item.reminder?.type ?? null
+        reminderFilament.value = props.item.reminder?.filament.bool ?? false
+        reminderFilamentValue.value = props.item.reminder?.filament.value ?? 0
+        reminderPrinttime.value = props.item.reminder?.printtime.bool ?? false
+        reminderPrinttimeValue.value = props.item.reminder?.printtime.value ?? 0
+        reminderDate.value = props.item.reminder?.date.bool ?? false
+        reminderDateValue.value = props.item.reminder?.date.value ?? 0
+    },
+    { immediate: true }
+)
 </script>
