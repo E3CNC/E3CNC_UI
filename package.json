@@ -1,12 +1,21 @@
 {
-    "name": "mainsail",
-    "version": "2.17.0",
+    "name": "mainsail-cnc",
+    "version": "0.2.0",
     "private": true,
     "type": "module",
-    "description": "a klipper web interface for CNC machines",
+    "description": "A web interface for Klipper-based CNC machines",
     "author": {
-        "name": "Stefan Dej"
+        "name": "Isaac Eliape"
     },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/isaaceliape/mainsail-cnc.git"
+    },
+    "bugs": {
+        "url": "https://github.com/isaaceliape/mainsail-cnc/issues"
+    },
+    "homepage": "https://github.com/isaaceliape/mainsail-cnc",
+    "license": "GPL-3.0",
     "scripts": {
         "serve": "vite serve",
         "dev": "tmux has-session -t mainsail-cnc 2>/dev/null || tmux new-session -d -s mainsail-cnc 'vite'",
