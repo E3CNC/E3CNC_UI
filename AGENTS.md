@@ -113,7 +113,7 @@ a9144473 spec: add Ansible migration plan
 
 - **Purpose**: Interactive CLI agent specializing in software engineering tasks for this project.
 - **Current Role**: Frontend maintenance, docs sync, Ansible deployment for the Mainsail fork (Vue 3.5, Vuetify 3)
-- **Access**: shell commands, file system, Chrome DevTools, SSH to the CNC host (`ssh <user>@<cnc-host-ip>`)
+- **Access**: shell commands, file system, Chrome DevTools, SSH to the CNC host using `ssh cnc` (configured in `~/.ssh/config`). Always access the CNC host within a `tmux` session — use `tmux new-session -s cnc 'ssh cnc'` or `tmux attach -t cnc` if one already exists.
 - **Package Manager**: Bun (not npm). Use `bun install`, `bun run`, `bunx`.
 - **Dev Server**: Run within `tmux`; check for existing sessions first. HMR is active.
 - **Ansible**: Playbooks at `ansible/playbooks/`. Run `ansible-playbook ansible/playbooks/install.yml` for full install.
@@ -123,6 +123,7 @@ a9144473 spec: add Ansible migration plan
 
 - **Ask before pushing**: Never push to remote without asking the user first.
 - **Build verification**: Always run `bun run build` after changes. The build must pass before committing.
+- **Playwright MCP**: Always use a **non-headless (headed)** browser instance when using Playwright MCP for browser automation. This ensures you can visually observe interactions in real-time and intervene when needed.
 - **Store layer**: Store migration is complete — all Vue 2 patterns (`Vue.set`, `Vue.$socket`, `Vue.$toast`, `import Vue`) removed.
 - **`@vue/compat`**: Fully removed — app runs on pure Vue 3.5 + Vuetify 3.
 - **Runtime fixes applied**: `i18n.global.t`, `useDisplay()`, `boolMenu`, removed `const mdiXxx = mdiXxx` TDZ bugs across 100+ files.
