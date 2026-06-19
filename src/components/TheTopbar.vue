@@ -177,7 +177,8 @@ const showSaveConfigButton = computed(() => {
 
 const printerName = computed((): string => {
     if (store.state.gui.general.printername.length) return store.state.gui.general.printername
-    return store.state.printer.hostname
+    if (store.state.printer.hostname) return store.state.printer.hostname
+    return 'E3CNC'
 })
 
 const machinePosition = computed(() => {
