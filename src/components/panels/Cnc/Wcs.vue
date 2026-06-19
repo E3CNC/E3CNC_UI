@@ -207,14 +207,23 @@
                         </template>
 
                         <!-- Tool position dot -->
-                        <g v-if="toolVisible">
+                        <g v-if="toolVisible" class="tool-dot-group">
                             <circle
-                                :cx="toSvgX(toolX)"
-                                :cy="toSvgY(toolY)"
-                                r="4"
+                                :cx="toSvgX(displayToolX)"
+                                :cy="toSvgY(displayToolY)"
+                                r="6"
                                 fill="rgb(var(--v-theme-primary))"
                                 stroke="rgb(var(--v-theme-on-surface))"
-                                stroke-width="1.5" />
+                                stroke-width="2" />
+                            <circle
+                                :cx="toSvgX(displayToolX)"
+                                :cy="toSvgY(displayToolY)"
+                                r="10"
+                                fill="none"
+                                stroke="rgb(var(--v-theme-primary))"
+                                stroke-width="1"
+                                opacity="0.4"
+                                class="tool-dot-pulse" />
                         </g>
 
                         <!-- Axis labels -->
@@ -319,7 +328,7 @@
                             <span class="offset-preview-legend__swatch offset-preview-legend__swatch--tool" />
                             <span class="offset-preview-legend__label">Tool</span>
                             <span class="offset-preview-legend__coords">
-                                ({{ toolX.toFixed(1) }}, {{ toolY.toFixed(1) }})
+                                ({{ displayToolX.toFixed(1) }}, {{ displayToolY.toFixed(1) }})
                             </span>
                         </div>
                     </div>
@@ -565,11 +574,24 @@
         <!-- Home confirmation dialog -->
         <v-dialog v-model="homeConfirmDialogOpen" persistent max-width="400" @keydown="onHomeDialogKeydown">
             <v-card>
-                <v-card-title class="text-subtitle-1">Machine Not Homed</v-card-title>
+                <v-card-title class="text-subtitle-1">
+                    <v-icon start>{{ mdiAlert }}</v-icon>
+                    Machine Not Homed
+                </v-card-title>
                 <v-card-text>
-                    The machine must be homed before it can move to the selected position.
-                    <br /><br />
-                    Press <kbd>Enter</kbd> to home the machine first, or <kbd>Esc</kbd> to cancel.
+                    <p class="mb-4">
+                        The machine must be homed before it can move to the selected position.
+                    </p>
+                    <div class="d-flex align-center justify-center ga-4 py-2">
+                        <v-chip size="small" color="primary" variant="flat" class="text-uppercase font-weight-bold">
+                            Enter
+                        </v-chip>
+                        <span class="text-body-2 text-medium-emphasis">to home then move</span>
+                        <v-chip size="small" color="primary" variant="outlined" class="text-uppercase font-weight-bold">
+                            Esc
+                        </v-chip>
+                        <span class="text-body-2 text-medium-emphasis">to cancel</span>
+                    </div>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer />
@@ -599,6 +621,7 @@ import {
     mdiTarget,
     mdiAxisZArrow,
     mdiPencilPlusOutline,
+    mdiAlert,
     mdiRestart,
 } from '@mdi/js'
 import ConfirmationDialog from '@/components/dialogs/ConfirmationDialog.vue'
@@ -829,6 +852,9 @@ const toolVisible = computed(() => {
     return homed.includes('x') && homed.includes('y')
 })
 
+const displayToolX = computed(() => (animFrameId !== null ? animatedToolX.value : toolX.value))
+const displayToolY = computed(() => (animFrameId !== null ? animatedToolY.value : toolY.value))
+
 const gridLinesX = computed(() => {
     const lines: number[] = []
     const step = gridStep.value
@@ -1027,9 +1053,48 @@ function onSvgClick() {
     executeMove(info.x, info.y)
 }
 
+const animatedToolX = ref(0)
+const animatedToolY = ref(0)
+let animFrameId: number | null = null
+
+function animateToolTo(targetX: number, targetY: number, durationMs: number) {
+    if (animFrameId !== null) cancelAnimationFrame(animFrameId)
+
+    const startX = toolX.value
+    const startY = toolY.value
+    const startTime = performance.now()
+
+    function step(now: number) {
+        const elapsed = now - startTime
+        const t = Math.min(elapsed / durationMs, 1)
+        // Ease-out cubic
+        const ease = 1 - Math.pow(1 - t, 3)
+        animatedToolX.value = startX + (targetX - startX) * ease
+        animatedToolY.value = startY + (targetY - startY) * ease
+
+        if (t < 1) {
+            animFrameId = requestAnimationFrame(step)
+        } else {
+            animFrameId = null
+            animatedToolX.value = targetX
+            animatedToolY.value = targetY
+        }
+    }
+
+    animFrameId = requestAnimationFrame(step)
+}
+
 function executeMove(x: number, y: number) {
     const gcode = `G53\nG1 X${x.toFixed(4)} Y${y.toFixed(4)} F3000`
     getSocket().emit('printer.gcode.script', { script: gcode })
+
+    // Animate the dot along the expected path
+    const dx = x - toolX.value
+    const dy = y - toolY.value
+    const distance = Math.sqrt(dx * dx + dy * dy)
+    // F3000 = 3000 mm/min = 50 mm/s
+    const durationMs = Math.max(200, (distance / 50) * 1000)
+    animateToolTo(x, y, durationMs)
 }
 
 function confirmHome() {
@@ -1378,8 +1443,8 @@ onMounted(() => {
 
 .offset-preview-tooltip {
     position: fixed;
-    background: rgba(var(--v-theme-on-surface), 0.85);
-    color: rgba(var(--v-theme-on-surface), 0.9);
+    background: #000;
+    color: #fff;
     font-family: '0xProto Nerd Font Mono', monospace;
     font-size: 10px;
     padding: 2px 6px;
@@ -1387,5 +1452,19 @@ onMounted(() => {
     pointer-events: none;
     white-space: nowrap;
     z-index: 10000;
+}
+
+.tool-dot-pulse {
+    animation: tool-pulse 2s ease-in-out infinite;
+}
+
+@keyframes tool-pulse {
+    0%,
+    100% {
+        opacity: 0.35;
+    }
+    50% {
+        opacity: 0.1;
+    }
 }
 </style>

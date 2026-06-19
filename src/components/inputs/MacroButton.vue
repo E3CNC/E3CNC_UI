@@ -24,6 +24,7 @@
                         :disabled="disabled"
                         :color="color"
                         v-bind="menuProps"
+                        :class="{ 'dialog-open': paramsDialog }"
                         class="minwidth-0 px-1 btnMacroMenu"
                         size="small">
                         <v-icon>{{ mdiMenuDown }}</v-icon>
@@ -60,6 +61,7 @@
                 <v-btn
                     :disabled="disabled"
                     :color="color"
+                    :class="{ 'dialog-open': paramsDialog }"
                     class="minwidth-0 px-1 btnMacroMenu"
                     size="small"
                     @click="paramsDialog = true">
@@ -216,6 +218,13 @@ onMounted(() => {
 .btnMacroMenu {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+    border-left: 1px solid black;
+    opacity: 0.7;
+}
+
+.btnMacroMenu.dialog-open,
+.btnMacroMenu:hover {
+    opacity: 1;
 }
 
 .macroWithParameters {

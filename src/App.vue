@@ -19,11 +19,24 @@
         </template>
         <the-select-printer-dialog v-else-if="instancesDB !== 'moonraker'" />
         <the-connecting-dialog v-else />
+        <!-- Scroll to top button -->
+        <v-fade-transition>
+            <v-btn
+                v-if="showScrollTop"
+                icon
+                color="primary"
+                class="scroll-to-top-btn"
+                elevation="4"
+                @click="scrollToTop"
+                aria-label="Scroll to top">
+                <v-icon>{{ mdiChevronUp }}</v-icon>
+            </v-btn>
+        </v-fade-transition>
     </v-app>
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted, nextTick } from 'vue'
+import { computed, ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -45,6 +58,7 @@ import TheUploadSnackbar from '@/components/TheUploadSnackbar.vue'
 import TheManualProbeDialog from '@/components/dialogs/TheManualProbeDialog.vue'
 import { setAndLoadLocale } from './plugins/i18n'
 import TheMacroPrompt from '@/components/dialogs/TheMacroPrompt.vue'
+import { mdiChevronUp } from '@mdi/js'
 import type { AppRoute } from '@/routes'
 
 const store = useStore()
@@ -125,6 +139,30 @@ const containerClasses = computed(() => {
 })
 
 const progressAsFavicon = computed(() => store.state.gui.uiSettings.progressAsFavicon)
+
+const showScrollTop = ref(false)
+let scrollTimer: ReturnType<typeof setTimeout> | null = null
+
+function onScroll() {
+    if (scrollTimer) return
+    scrollTimer = setTimeout(() => {
+        showScrollTop.value = window.scrollY > 300
+        scrollTimer = null
+    }, 100)
+}
+
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+onMounted(() => {
+    window.addEventListener('scroll', onScroll, { passive: true })
+})
+
+onBeforeUnmount(() => {
+    window.removeEventListener('scroll', onScroll)
+    if (scrollTimer) clearTimeout(scrollTimer)
+})
 
 watch(
     title,
@@ -319,6 +357,13 @@ onMounted((): void => {
 @import './assets/styles/sidebar.css';
 @import './assets/styles/utils.css';
 @import './assets/styles/updateManager.css';
+
+.scroll-to-top-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+}
 
 :root {
     --app-height: 100%;
