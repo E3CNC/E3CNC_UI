@@ -123,6 +123,7 @@ a9144473 spec: add Ansible migration plan
 ## Operational Guidelines
 
 - **Ask before pushing**: Never push to remote without asking the user first.
+- **Version bump**: Update the version number in `package.json` before each commit. Follow semver — bump the patch version for bug fixes, minor version for features. The version is used by the nightly release asset name and the update manager.
 - **Build verification**: Always run `bun run build` after changes. The build must pass before committing.
 - **Browser validation**: Always validate changes using the headed browser before committing. Use `playwright-cli` to navigate the app, interact with changed components, and verify the expected behavior. Check the **browser console** for any errors or warnings introduced by your changes.
 - **Playwright MCP**: Always use a **non-headless (headed)** browser instance when using Playwright MCP for browser automation. This ensures you can visually observe interactions in real-time and intervene when needed.
