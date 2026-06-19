@@ -1,68 +1,9 @@
 ---
-# Build frontend — use bun on 64-bit, npm on 32-bit ARM
-- name: Determine architecture
-  ansible.builtin.command: uname -m
-  register: arch_result
-  changed_when: false
-  when: not ansible_check_mode
-
-- name: Set package manager facts
-  ansible.builtin.set_fact:
-    pkg_mgr: "{{ 'npm' if arch_result.stdout == 'armv7l' else 'bun' }}"
-
-- name: Check that package manager is available
-  ansible.builtin.command: 'which {{ pkg_mgr }}'
-  register: pkg_check
-  changed_when: false
-  failed_when: pkg_check.rc != 0
-  when: not ansible_check_mode
-
-- name: Install frontend dependencies
+# Deploy frontend — download pre-built nightly release, skip local build on-device
+- name: Deploy frontend via download_frontend script
   ansible.builtin.command:
-    cmd: "{{ 'npm install --legacy-peer-deps' if pkg_mgr == 'npm' else 'bun install --frozen-lockfile' }}"
+    cmd: '{{ repo.dest }}/scripts/download_frontend.sh {{ frontend.web_root }}'
     chdir: '{{ repo.dest }}'
+  register: frontend_deploy
+  changed_when: '"Frontend updated" in frontend_deploy.stdout or "built locally" in frontend_deploy.stdout'
   when: not ansible_check_mode
-
-- name: Build frontend
-  ansible.builtin.command:
-    cmd: "{{ 'npm run build' if pkg_mgr == 'npm' else 'bun run build' }}"
-    chdir: '{{ repo.dest }}'
-  when: not ansible_check_mode
-
-- name: Ensure web root directory exists
-  ansible.builtin.file:
-    path: '{{ frontend.web_root }}'
-    state: directory
-    mode: '0755'
-
-- name: Deploy built frontend to web root
-  ansible.builtin.copy:
-    src: '{{ repo.dest }}/dist/'
-    dest: '{{ frontend.web_root }}/'
-    remote_src: true
-
-- name: Get git commit hash for version stamp
-  ansible.builtin.command:
-    cmd: git rev-parse --short HEAD
-    chdir: '{{ repo.dest }}'
-  register: git_commit
-  changed_when: false
-  when: not ansible_check_mode
-
-- name: Write version.json
-  ansible.builtin.copy:
-    dest: '{{ frontend.web_root }}/version.json'
-    content: |
-      {
-        "buildTime": "{{ ansible_date_time.iso8601 }}",
-        "commit": "{{ git_commit.stdout | default('unknown') }}"
-      }
-    mode: '0644'
-
-- name: Reload nginx
-  ansible.builtin.systemd:
-    name: nginx
-    state: reloaded
-  become: true
-  tags:
-    - restart-services

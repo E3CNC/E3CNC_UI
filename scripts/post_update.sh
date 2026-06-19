@@ -18,6 +18,9 @@
 
 set -euo pipefail
 
+# Ensure local install paths are on PATH (bun, ansible, etc.)
+export PATH="$HOME/.local/bin:$HOME/.bun/bin:/usr/local/bin:/usr/bin:/bin"
+
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "=== mainsail-cnc post-update ==="
@@ -25,10 +28,10 @@ echo "  Repo: $REPO_ROOT"
 echo "  Delegating to Ansible redeploy playbook..."
 echo ""
 
-cd "$REPO_ROOT"
+cd "$REPO_ROOT/ansible"
 ansible-playbook \
-  -i ansible/inventory/local.yml \
-  ansible/playbooks/redeploy.yml \
+  -i inventory/local.yml \
+  playbooks/redeploy.yml \
   --diff
 
 echo ""
