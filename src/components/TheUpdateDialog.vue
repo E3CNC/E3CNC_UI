@@ -1,5 +1,5 @@
 <template>
-    <v-dialog :value="application !== ''" persistent max-width="800" class="mx-0">
+    <v-dialog :model-value="application !== ''" persistent max-width="800" class="mx-0">
         <v-card :loading="!complete">
             <template #progress>
                 <v-progress-linear color="primary" indeterminate></v-progress-linear>
