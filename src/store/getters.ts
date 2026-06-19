@@ -10,7 +10,7 @@ export const getters: GetterTree<RootState, RootState> = {
     },
 
     getTitle: (state, getters) => {
-        if (!state.socket?.isConnected) return 'Mainsail'
+        if (!state.socket?.isConnected) return 'E3CNC'
         if (state.server?.klippy_state !== 'ready') return i18n.global.t('App.Titles.Error')
 
         // get printer_state
@@ -63,7 +63,7 @@ export const getters: GetterTree<RootState, RootState> = {
             return output
         }
 
-        return state.gui?.general.printername ?? state.printer?.hostname ?? 'Mainsail'
+        return state.gui?.general.printername ?? state.printer?.hostname ?? 'E3CNC'
     },
 
     getDependencies: (state) => {
