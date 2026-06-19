@@ -8,12 +8,13 @@
 // Inspired by this repo: https://github.com/surmon-china/vue-codemirror
 
 import { ref, onMounted, onBeforeUnmount, watch, nextTick, computed } from 'vue'
+
 import { useStore } from 'vuex'
 import { useBase } from '@/composables/useBase'
 import { useTheme } from '@/composables/useTheme'
 import { basicSetup } from 'codemirror'
-import { EditorView, keymap } from '@codemirror/view'
-import { EditorState } from '@codemirror/state'
+import { EditorView, keymap, WidgetType, Decoration, DecorationSet } from '@codemirror/view'
+import { EditorState, StateEffect, StateField } from '@codemirror/state'
 import { vscodeDark, vscodeLight } from '@uiw/codemirror-theme-vscode'
 import { StreamLanguage } from '@codemirror/language'
 import { klipper_config } from '@/plugins/StreamParserKlipperConfig'
@@ -29,6 +30,7 @@ const props = defineProps<{
     modelValue?: string
     name?: string
     fileExtension?: string
+    validationErrors?: { line: number; severity: 'error' | 'warning' }[]
 }>()
 
 const emit = defineEmits<{
@@ -89,6 +91,8 @@ function setCmValue(content: string) {
 
 const cmExtensions = computed(() => {
     const extensions = [
+        annotationField,
+
         EditorView.theme({}, { dark: themeMode.value === 'dark' }),
         basicSetup,
         vscodeTheme.value,
@@ -111,7 +115,10 @@ const cmExtensions = computed(() => {
     ]
 
     const ext = props.fileExtension ?? ''
-    if (['cfg', 'conf'].includes(ext)) extensions.push(StreamLanguage.define(klipper_config))
+    if (['cfg', 'conf'].includes(ext)) {
+        extensions.push(StreamLanguage.define(klipper_config))
+
+    }
     else if (['gcode'].includes(ext)) extensions.push(StreamLanguage.define(gcode))
     else if (['json'].includes(ext)) extensions.push(json())
     else if (['css', 'scss', 'sass'].includes(ext)) extensions.push(css())
@@ -127,7 +134,85 @@ const tabSize = computed(() => store.state.gui.editor?.tabSize || 2)
 
 const vscodeTheme = computed(() => (themeMode.value === 'dark' ? vscodeDark : vscodeLight))
 
-defineExpose({ gotoLine })
+class AnnotationWidget extends WidgetType {
+    severity: 'error' | 'warning'
+    constructor(severity: 'error' | 'warning') {
+        super()
+        this.severity = severity
+    }
+    toDOM() {
+        const span = document.createElement('span')
+        span.className = 'cm-annotation-widget cm-annotation-widget-' + this.severity
+        span.textContent = '\u26A0'
+        span.title = this.severity === 'error' ? 'Error' : 'Warning'
+        return span
+    }
+}
+
+const annotationEffect = StateEffect.define<{ line: number; severity: 'error' | 'warning' }[]>()
+
+const annotationField = StateField.define<DecorationSet>({
+    create() {
+        return Decoration.none
+    },
+    update(value, tr) {
+        for (const e of tr.effects) {
+            if (e.is(annotationEffect)) {
+                const sorted = [...e.value].sort((a, b) => a.line - b.line)
+                const decorations: Decoration[] = []
+                for (const ann of sorted) {
+                    if (ann.line < 1 || ann.line > tr.state.doc.lines) continue
+                    const line = tr.state.doc.line(ann.line)
+                    const isError = ann.severity === 'error'
+                    // Widget icon at the start of the line
+                    decorations.push(
+                        Decoration.widget({
+                            widget: new AnnotationWidget(ann.severity),
+                            side: -1,
+                        }).range(line.from)
+                    )
+                    // Wavy underline across the line (must be sorted by from to avoid Decoration.set errors)
+                    decorations.push(
+                        Decoration.mark({
+                            class: isError ? 'cm-annotation-error' : 'cm-annotation-warning',
+                        }).range(line.from, line.to)
+                    )
+                }
+                return Decoration.set(decorations, true)
+            }
+        }
+        return value.map(tr.changes)
+    },
+    provide: (field) => EditorView.decorations.from(field),
+})
+
+function setAnnotations(errors: { line: number; severity: 'error' | 'warning' }[]) {
+    if (!cminstance) return
+    cminstance.dispatch({
+        effects: annotationEffect.of(errors),
+    })
+}
+
+function clearAnnotations() {
+    if (!cminstance) return
+    cminstance.dispatch({
+        effects: annotationEffect.of([]),
+    })
+}
+
+watch(
+    () => props.validationErrors,
+    (errors) => {
+        if (errors && errors.length > 0) {
+            setAnnotations(errors)
+        } else {
+            clearAnnotations()
+        }
+    },
+    { deep: true }
+)
+
+defineExpose({ gotoLine, setAnnotations, clearAnnotations })
 
 function gotoLine(line: number) {
     const l = cminstance?.state?.doc.line(line)
@@ -139,3 +224,35 @@ function gotoLine(line: number) {
     })
 }
 </script>
+
+<style>
+.cm-annotation-error {
+    background: rgba(255, 0, 0, 0.1) !important;
+    text-decoration: wavy underline #f44336 2px !important;
+    text-underline-offset: 2px;
+}
+
+.cm-annotation-warning {
+    background: rgba(255, 152, 0, 0.08) !important;
+    text-decoration: wavy underline #ff9800 2px !important;
+    text-underline-offset: 2px;
+}
+
+.cm-annotation-widget {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    font-size: 13px;
+    cursor: default;
+    user-select: none;
+}
+
+.cm-annotation-widget-error {
+    color: #f44336;
+}
+
+.cm-annotation-widget-warning {
+    color: #ff9800;
+}
+</style>

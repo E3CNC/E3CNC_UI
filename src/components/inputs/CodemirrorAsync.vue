@@ -1,9 +1,13 @@
 <template>
-    <component :is="CodemirrorComp" v-bind="$attrs" />
+    <component :is="CodemirrorComp" :validation-errors="validationErrors" v-bind="$attrs" />
 </template>
 
 <script setup lang="ts">
 import { shallowRef, onMounted } from 'vue'
+
+const props = defineProps<{
+    validationErrors?: { line: number; severity: 'error' | 'warning' }[]
+}>()
 
 const CodemirrorComp = shallowRef<unknown>(null)
 

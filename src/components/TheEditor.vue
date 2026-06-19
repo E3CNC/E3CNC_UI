@@ -31,6 +31,20 @@
                         <v-icon size="small" class="mr-1">{{ mdiHelp }}</v-icon>
                         {{ $t('Editor.ConfigReference') }}
                     </v-btn>
+                    <span v-if="showAnnotationFilter" class="text-caption text-medium-emphasis mr-1">Show:</span>
+                    <v-select
+                        v-if="showAnnotationFilter"
+                        v-model="annotationFilter"
+                        :items="[
+                            { title: 'All', value: 'all' },
+                            { title: 'Errors', value: 'errors' },
+                            { title: 'Warnings', value: 'warnings' },
+                        ]"
+                        density="compact"
+                        variant="outlined"
+                        hide-details
+                        style="min-width: 90px; max-width: 120px"
+                        class="mr-2 annotation-filter-select" />
                     <v-btn
                         v-if="existsFileStructure"
                         variant="text"
@@ -64,6 +78,7 @@
                         v-model="sourcecode"
                         :name="filename"
                         :file-extension="fileExtension"
+                        :validation-errors="visibleErrors"
                         class="codemirror"
                         :class="{ withSidebar: existsFileStructure && fileStructureSidebar }"
                         @line-change="lineChanges" />
@@ -163,12 +178,55 @@
                 </v-card-actions>
             </panel>
         </v-dialog>
+        <!-- Config validation error dialog -->
+        <v-dialog v-model="dialogValidationErrors" persistent max-width="600">
+            <panel
+                card-class="editor-validation-dialog"
+                :icon="mdiAlertCircle"
+                title="Configuration Errors"
+                :margin-bottom="false">
+                <template #buttons>
+                    <v-btn :icon="mdiCloseThick" rounded="0" @click="closeValidationDialog" />
+                </template>
+                <v-card-text class="pt-3">
+                    <v-row>
+                        <v-col>
+                            <v-list density="compact" class="validation-error-list" lines="two">
+                                <v-list-item
+                                    v-for="(err, idx) in visibleErrors"
+                                    :key="idx"
+                                    :prepend-icon="err.severity === 'error' ? mdiCloseCircle : mdiAlert"
+                                    class="validation-error-item">
+                                    <v-list-item-title>
+                                        <span :class="err.severity === 'error' ? 'text-error' : 'text-warning'">
+                                            {{ err.severity === 'error' ? 'Error' : 'Warning' }} (line {{ err.line }}):
+                                        </span>
+                                    </v-list-item-title>
+                                    <v-list-item-subtitle class="text-wrap">
+                                        {{ err.message }}
+                                    </v-list-item-subtitle>
+                                </v-list-item>
+                            </v-list>
+                            <p v-if="visibleErrors.length > 0" class="body-1 mt-3 mb-0">
+                                Fix the errors above and try saving again.
+                            </p>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer />
+                    <v-btn variant="text" color="primary" @click="closeValidationDialog">
+                        {{ $t('Buttons.Close') }}
+                    </v-btn>
+                </v-card-actions>
+            </panel>
+        </v-dialog>
         <devices-dialog v-model="dialogDevices" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -176,8 +234,12 @@ import { useBase } from '@/composables/useBase'
 import { capitalize, formatFilesize, windowBeforeUnloadFunction } from '@/plugins/helpers'
 import { klipperRepos } from '@/store/variables'
 import CodemirrorAsync from '@/components/inputs/CodemirrorAsync.vue'
+import { validateCfg, type CfgValidationError } from '@/utils/cfgValidator'
 import {
+    mdiAlert,
+    mdiAlertCircle,
     mdiClose,
+    mdiCloseCircle,
     mdiCloseThick,
     mdiContentSave,
     mdiFileDocumentOutline,
@@ -244,6 +306,16 @@ onMounted(async () => {
 })
 
 const dialogConfirmChange = ref(false)
+const dialogValidationErrors = ref(false)
+const validationErrors = ref<CfgValidationError[]>([])
+const annotationFilter = ref<'all' | 'errors' | 'warnings'>('all')
+
+const showAnnotationFilter = computed(() => filename.value.endsWith('.cfg'))
+
+const visibleErrors = computed(() => {
+    if (annotationFilter.value === 'all') return validationErrors.value
+    return validationErrors.value.filter((e) => e.severity === annotationFilter.value.slice(0, -1))
+})
 const dialogDevices = ref(false)
 const treeviewItemKeyProp = 'line' as const
 const structureActive = ref<number[]>([])
@@ -267,6 +339,22 @@ const sourcecode = computed({
     get: () => store.state.editor.sourcecode ?? '',
     set: (newVal) => store.dispatch('editor/updateSourcecode', newVal),
 })
+
+// Run validation when .cfg file content loads
+watch(
+    sourcecode,
+    async (val) => {
+        if (!val || !filename.value.endsWith('.cfg')) return
+        await nextTick()
+        const errors = await validateCfg(val, filename.value)
+        if (errors.length > 0) {
+            errors.sort((a, b) => a.line - b.line)
+            validationErrors.value = errors
+        }
+    },
+    { once: true }
+)
+
 const loaderBool = computed(() => store.state.editor.loaderBool ?? false)
 const loaderProgress = computed(() => store.state.editor.loaderProgress ?? {})
 const snackbarHeadline = computed(() => {
@@ -375,8 +463,27 @@ function promptUnsavedChanges() {
     else dialogConfirmChange.value = true
 }
 
-function save(restartServiceName: string | null = null) {
+function closeValidationDialog() {
+    dialogValidationErrors.value = false
+    validationErrors.value = []
+}
+
+async function save(restartServiceName: string | null = null) {
     dialogConfirmChange.value = false
+
+    // Run config validation before saving .cfg files
+    const isCfgFile = filename.value.endsWith('.cfg')
+    if (isCfgFile) {
+        const errors = await validateCfg(sourcecode.value, filename.value)
+        if (errors.length > 0) {
+            // Sort: errors first (by line), then warnings (by line)
+            errors.sort((a, b) => a.line - b.line)
+            validationErrors.value = errors
+            dialogValidationErrors.value = true
+            return
+        }
+    }
+
     store.dispatch('editor/saveFile', {
         content: sourcecode.value,
         restartServiceName: restartServiceName,
@@ -499,5 +606,14 @@ watch(changed, (newVal: boolean) => {
 
 :deep(.editor-dialog .v-toolbar__content) {
     padding-right: 8px;
+}
+
+.validation-error-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.annotation-filter-select {
+    margin-right: 8px;
 }
 </style>
