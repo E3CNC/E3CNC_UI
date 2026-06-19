@@ -1,7 +1,7 @@
 import { KlipperRepos, Theme } from '@/store/types'
 
 export const defaultMode = 'dark'
-export const defaultTheme = 'mainsail'
+export const defaultTheme = 'e3cnc'
 export const defaultLogoColor = '#D41216'
 export const defaultPrimaryColor = '#2196f3'
 export const defaultBigThumbnailBackground = '#1e1e1e'
@@ -184,6 +184,13 @@ export const excludeKeys = [
  * List of all Themes
  */
 export const themes: Theme[] = [
+    {
+        name: 'e3cnc',
+        displayName: 'E3CNC',
+        colorLogo: '#00FF00',
+        colorPrimary: '#00FF00',
+        logo: { show: true, light: false },
+    },
     { name: 'mainsail', displayName: 'Mainsail', colorLogo: defaultLogoColor },
     {
         name: 'klipper',

@@ -10,7 +10,7 @@ import type {
 import { GuiPresetsStatePreset } from '@/store/gui/presets/types'
 import { RootState } from '@/store/types'
 import { getDefaultState } from './index'
-import { excludeKeys, themeDir } from '@/store/variables'
+import { defaultLogoColor, defaultPrimaryColor, excludeKeys, themeDir, themes } from '@/store/variables'
 import { deletePath, isRecord } from '@/plugins/helpers'
 
 export const actions: ActionTree<GuiState, RootState> = {
@@ -182,9 +182,21 @@ export const actions: ActionTree<GuiState, RootState> = {
         dispatch('init')
     },
 
-    saveSetting({ commit }, payload) {
+    saveSetting({ commit, state }, payload) {
         commit('saveSetting', payload)
         if (excludeKeys.includes(payload.name)) return
+
+        if (payload.name === 'uiSettings.theme') {
+            const theme = themes.find((t) => t.name === payload.value)
+            if (theme) {
+                if (theme.colorLogo) {
+                    commit('saveSetting', { name: 'uiSettings.logo', value: theme.colorLogo })
+                }
+                if (theme.colorPrimary) {
+                    commit('saveSetting', { name: 'uiSettings.primary', value: theme.colorPrimary })
+                }
+            }
+        }
 
         getSocket().emit('server.database.post_item', {
             namespace: 'mainsail',
