@@ -1,17 +1,7 @@
 ---
-# Build frontend — use bun on 64-bit, npm on 32-bit ARM
-- name: Determine architecture
-  ansible.builtin.command: uname -m
-  register: arch_result
-  changed_when: false
-  when: not ansible_check_mode
-
-- name: Set package manager facts
-  ansible.builtin.set_fact:
-    pkg_mgr: "{{ 'npm' if arch_result.stdout == 'armv7l' else 'bun' }}"
-
-- name: Check that package manager is available
-  ansible.builtin.command: 'which {{ pkg_mgr }}'
+# Build frontend — always use npm (available on all targets)
+- name: Check that npm is available
+  ansible.builtin.command: 'which npm'
   register: pkg_check
   changed_when: false
   failed_when: pkg_check.rc != 0
@@ -19,14 +9,18 @@
 
 - name: Install frontend dependencies
   ansible.builtin.command:
-    cmd: "{{ 'npm install --legacy-peer-deps' if pkg_mgr == 'npm' else 'bun install --frozen-lockfile' }}"
+    cmd: npm install --legacy-peer-deps
     chdir: '{{ repo.dest }}'
+  environment:
+    PATH: '{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.HOME }}/.bun/bin:/usr/local/bin:/usr/bin:/bin'
   when: not ansible_check_mode
 
 - name: Build frontend
   ansible.builtin.command:
-    cmd: "{{ 'npm run build' if pkg_mgr == 'npm' else 'bun run build' }}"
+    cmd: npm run build
     chdir: '{{ repo.dest }}'
+  environment:
+    PATH: '{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.HOME }}/.bun/bin:/usr/local/bin:/usr/bin:/bin'
   when: not ansible_check_mode
 
 - name: Ensure web root directory exists

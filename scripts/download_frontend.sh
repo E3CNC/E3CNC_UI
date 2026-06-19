@@ -7,6 +7,9 @@
 
 set -euo pipefail
 
+# Ensure local install paths are on PATH
+export PATH="$HOME/.local/bin:$HOME/.bun/bin:/usr/local/bin:/usr/bin:/bin"
+
 WEB_ROOT="${1:-$HOME/mainsail}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OWNER="isaaceliape"

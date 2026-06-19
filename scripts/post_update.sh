@@ -18,6 +18,9 @@
 
 set -euo pipefail
 
+# Ensure local install paths are on PATH (bun, ansible, etc.)
+export PATH="$HOME/.local/bin:$HOME/.bun/bin:/usr/local/bin:/usr/bin:/bin"
+
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "=== mainsail-cnc post-update ==="
