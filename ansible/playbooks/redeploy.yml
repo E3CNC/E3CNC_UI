@@ -47,3 +47,45 @@
       failed_when: false
       tags:
         - restart-services
+
+    - name: Set E3CNC as default theme in moonraker database
+      ansible.builtin.uri:
+        url: 'http://127.0.0.1:7125/server/database/item?namespace=mainsail&key=uiSettings.theme'
+        method: POST
+        body_format: json
+        body:
+          value: 'e3cnc'
+      register: theme_result
+      retries: 3
+      delay: 2
+      until: theme_result.status == 200
+      tags:
+        - theme
+
+    - name: Set E3CNC logo color in moonraker database
+      ansible.builtin.uri:
+        url: 'http://127.0.0.1:7125/server/database/item?namespace=mainsail&key=uiSettings.logo'
+        method: POST
+        body_format: json
+        body:
+          value: '#00FF00'
+      register: logo_result
+      retries: 3
+      delay: 1
+      until: logo_result.status == 200
+      tags:
+        - theme
+
+    - name: Set E3CNC primary color in moonraker database
+      ansible.builtin.uri:
+        url: 'http://127.0.0.1:7125/server/database/item?namespace=mainsail&key=uiSettings.primary'
+        method: POST
+        body_format: json
+        body:
+          value: '#00FF00'
+      register: primary_result
+      retries: 3
+      delay: 1
+      until: primary_result.status == 200
+      tags:
+        - theme
