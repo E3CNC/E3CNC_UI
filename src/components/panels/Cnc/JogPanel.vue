@@ -148,7 +148,7 @@
                         :disabled="['printing'].includes(printer_state) || !zHomed"
                         @click="jog('Z', currentStep)">
                         <v-icon>{{ mdiChevronUp }}</v-icon>
-                        <span class="ml-2">+{{ currentStep }}</span>
+                        <span class="ml-2">{{ formatStep(currentStep) }} up</span>
                     </v-btn>
                     <v-btn
                         class="jog-panel__jog-btn d-block w-100"
@@ -156,7 +156,7 @@
                         :disabled="['printing'].includes(printer_state) || !zHomed"
                         @click="jog('Z', -currentStep)">
                         <v-icon>{{ mdiChevronDown }}</v-icon>
-                        <span class="ml-2">-{{ currentStep }}</span>
+                        <span class="ml-2">{{ formatStep(currentStep) }} down</span>
                     </v-btn>
                 </v-col>
             </v-row>

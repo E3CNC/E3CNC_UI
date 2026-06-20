@@ -71,7 +71,7 @@
                                         @click="loadCurrentFile">
                                         {{ $t('GCodeViewer.LoadCurrentFile') }}
                                     </v-btn>
-                                    <v-btn @click="chooseFile">{{ $t('GCodeViewer.LoadLocal') }}</v-btn>
+                                    <v-btn color="primary" @click="chooseFile">upload gcode</v-btn>
                                 </template>
                                 <template v-else>
                                     <v-btn v-if="showTrackingButton" class="mr-3" @click="tracking = !tracking">
@@ -261,7 +261,7 @@ import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useStore } from 'vuex'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { useDisplay } from 'vuetify'
+import { useDisplay, useTheme } from 'vuetify'
 import { useBase } from '@/composables/useBase'
 import { useCncOffsets, offsetNames } from '@/composables/useCncOffsets'
 import GCodeViewer from '@sindarius/gcodeviewer'
@@ -271,6 +271,11 @@ import { escapePath, formatFilesize } from '@/plugins/helpers'
 import Panel from '@/components/ui/Panel.vue'
 import CodeStream from '@/components/gcodeviewer/CodeStream.vue'
 import debounce from 'lodash.debounce'
+import { Color3 } from '@babylonjs/core/Maths/math.color'
+import { Vector3 } from '@babylonjs/core/Maths/math.vector'
+import { CreateLineSystem } from '@babylonjs/core/Meshes/Builders/linesBuilder'
+import { CreateCylinder } from '@babylonjs/core/Meshes/Builders/cylinderBuilder'
+import { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial'
 import type { GCodeViewerInstance } from '@/store/gcodeviewer/types'
 import {
     mdiCameraRetake,
@@ -305,11 +310,21 @@ interface ViewerObjectMetadata {
     name?: string
 }
 
+interface StockBoxBounds {
+    xMin: number
+    xMax: number
+    yMin: number
+    yMax: number
+    zMin: number
+    zMax: number
+}
+
 const store = useStore()
 const route = useRoute()
 const { t } = useI18n()
 const display = useDisplay()
-const { apiUrl, printerIsPrinting } = useBase()
+const theme = useTheme()
+const { apiUrl, printerIsPrinting, klipperReadyForGui, socketIsConnected } = useBase()
 const { activeWcs, wcsOffsets, refreshWcs } = useCncOffsets()
 
 defineProps<{
@@ -320,6 +335,7 @@ const viewerCanvasContainer = ref<HTMLElement | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 
 let viewer: GCodeViewerInstance | null = null
+let stockBoxMesh: any | null = null
 
 const isBusy = ref(false)
 const loading = ref(false)
@@ -357,6 +373,9 @@ const downloadSnackbar = ref<DownloadSnackbar>({
 const fileData = ref('')
 const previewWcs = ref('G54')
 const appliedPreviewOffset = ref({ X: 0, Y: 0, Z: 0 })
+const stockBoxBounds = ref<StockBoxBounds | null>(null)
+const initialCameraAdjusted = ref(false)
+const primaryViewerColor = computed(() => normalizeThemeColor(theme.current.value.colors.primary ?? '#4caf50'))
 
 const resizeObserver = ref<ResizeObserver | null>(null)
 
@@ -369,6 +388,7 @@ onMounted(async () => {
     } catch (error) {
         window.console.error(error)
     }
+    await waitForMachineStateReady()
     await init()
 
     if (loadedFile.value !== null && viewer) scrubFileSize.value = viewer.fileSize
@@ -495,9 +515,11 @@ async function viewerInit(element: HTMLCanvasElement) {
     viewer.gcodeProcessor.useSpecularColor(specularLighting.value)
     viewer.gcodeProcessor.setLiveTracking(false)
     viewer.gcodeProcessor.g1AsExtrusion = true
+    viewer.gcodeProcessor.setColorMode(0)
+    viewer.setProgressColor(primaryViewerColor.value)
     viewer.buildObjects.objectCallback = objectCallback
 
-    loadToolColors(extruderColors.value)
+    applyPrimaryToolColor()
 
     if (viewer.lastLoadFailed()) {
         renderQuality.value = renderQualities.value[0]
@@ -527,6 +549,8 @@ function clearLoadedFile() {
 
     scrubPlaying.value = false
     scrubFileSize.value = 0
+    disposeStockBox()
+    stockBoxBounds.value = null
     viewer.clearScene(true)
     loadedFile.value = null
     tracking.value = false
@@ -544,10 +568,14 @@ function finishLoad() {
     if (viewer === null) return
 
     viewer.setCursorVisiblity(showCursor.value)
+    replaceToolCursorWithCylinder()
 
     refreshPrintingObjects()
     scrubFileSize.value = viewer.fileSize
+    stockBoxBounds.value = parseStockBoxBounds(fileData.value)
+    renderStockBox()
     applyPreviewOffset(true)
+    zoomOutInitialCamera()
 
     viewer.gcodeProcessor.updateFilePosition(viewer.fileSize)
 }
@@ -670,6 +698,17 @@ function resetCamera() {
     viewer?.resetCamera()
 }
 
+function zoomOutInitialCamera() {
+    if (!viewer || initialCameraAdjusted.value) return
+
+    const activeCamera = (viewer as any)?.scene?.activeCamera
+    if (!activeCamera || typeof activeCamera.radius !== 'number') return
+
+    activeCamera.radius *= 1.2
+    viewer.forceRender()
+    initialCameraAdjusted.value = true
+}
+
 const previewWcsItems = computed(() =>
     offsetNames.map((name) => {
         const offset = wcsOffsets.value[name] ?? { X: 0, Y: 0, Z: 0 }
@@ -679,6 +718,102 @@ const previewWcsItems = computed(() =>
         }
     })
 )
+
+function normalizeThemeColor(color: string): string {
+    if (color.startsWith('#')) return color
+    if (/^[0-9a-f]{6}$/i.test(color)) return `#${color}`
+    return '#4caf50'
+}
+
+function toColor3(color: string): Color3 {
+    return Color3.FromHexString(normalizeThemeColor(color))
+}
+
+function disposeStockBox() {
+    stockBoxMesh?.dispose(false, true)
+    stockBoxMesh = null
+}
+
+function parseStockBoxBounds(text: string): StockBoxBounds | null {
+    if (!text) return null
+
+    const lines = text.split(/\r?\n/)
+    const bounds: Partial<StockBoxBounds> = {}
+    let inStockBox = false
+
+    for (const line of lines) {
+        if (/^\s*;\s*Stock Box\s*:/i.test(line)) {
+            inStockBox = true
+            continue
+        }
+
+        if (!inStockBox) continue
+
+        const match = line.match(/^\s*;\s*([XYZ])\s*:\s*Min\s*=\s*(-?\d+(?:\.\d+)?)\s+Max\s*=\s*(-?\d+(?:\.\d+)?)/i)
+        if (match) {
+            const [, axis, minText, maxText] = match
+            const min = Number(minText)
+            const max = Number(maxText)
+            if (axis.toUpperCase() === 'X') {
+                bounds.xMin = min
+                bounds.xMax = max
+            } else if (axis.toUpperCase() === 'Y') {
+                bounds.yMin = min
+                bounds.yMax = max
+            } else if (axis.toUpperCase() === 'Z') {
+                bounds.zMin = min
+                bounds.zMax = max
+            }
+            continue
+        }
+
+        if (/^\s*;\s*[A-Z]\s*:/i.test(line) || /^\s*;\s*Ranges Table\s*:/i.test(line) || /^\s*[^;]/.test(line)) {
+            break
+        }
+    }
+
+    if (
+        bounds.xMin === undefined ||
+        bounds.xMax === undefined ||
+        bounds.yMin === undefined ||
+        bounds.yMax === undefined ||
+        bounds.zMin === undefined ||
+        bounds.zMax === undefined
+    ) {
+        return null
+    }
+
+    return bounds as StockBoxBounds
+}
+
+function renderStockBox() {
+    disposeStockBox()
+    if (!viewer?.scene || !stockBoxBounds.value) return
+
+    const { xMin, xMax, yMin, yMax, zMin, zMax } = stockBoxBounds.value
+    const point = (x: number, y: number, z: number) => new Vector3(x, z, y)
+
+    const lines = [
+        [point(xMin, yMin, zMin), point(xMax, yMin, zMin)],
+        [point(xMax, yMin, zMin), point(xMax, yMax, zMin)],
+        [point(xMax, yMax, zMin), point(xMin, yMax, zMin)],
+        [point(xMin, yMax, zMin), point(xMin, yMin, zMin)],
+        [point(xMin, yMin, zMax), point(xMax, yMin, zMax)],
+        [point(xMax, yMin, zMax), point(xMax, yMax, zMax)],
+        [point(xMax, yMax, zMax), point(xMin, yMax, zMax)],
+        [point(xMin, yMax, zMax), point(xMin, yMin, zMax)],
+        [point(xMin, yMin, zMin), point(xMin, yMin, zMax)],
+        [point(xMax, yMin, zMin), point(xMax, yMin, zMax)],
+        [point(xMax, yMax, zMin), point(xMax, yMax, zMax)],
+        [point(xMin, yMax, zMin), point(xMin, yMax, zMax)],
+    ]
+
+    stockBoxMesh = CreateLineSystem('StockBox', { lines }, viewer.scene)
+    stockBoxMesh.color = toColor3(primaryViewerColor.value)
+    stockBoxMesh.renderingGroupId = 2
+    stockBoxMesh.isPickable = false
+    viewer.forceRender()
+}
 
 function applyPreviewOffset(force = false) {
     if (viewer === null || loadedFile.value === null) return
@@ -691,13 +826,25 @@ function applyPreviewOffset(force = false) {
     if (!force && deltaX === 0 && deltaY === 0 && deltaZ === 0) return
 
     viewer.scene?.meshes?.forEach((mesh: any) => {
-        if (mesh?.renderingGroupId !== 2 || mesh?.name === 'JRNozzle') return
+        if (
+            mesh?.renderingGroupId !== 2 ||
+            mesh?.name === 'JRNozzle' ||
+            mesh?.name === 'SimpleToolCursorCylinder'
+        )
+            return
         if (!mesh?.position) return
 
         mesh.position.x += deltaX
         mesh.position.y += deltaZ
         mesh.position.z += deltaY
     })
+
+    const axesMesh = (viewer as any)?.axes?.axesMesh
+    if (axesMesh?.position) {
+        axesMesh.position.x += deltaX
+        axesMesh.position.y += deltaZ
+        axesMesh.position.z += deltaY
+    }
 
     if (!tracking.value) {
         const toolCursor = (viewer as any)?.toolCursor
@@ -706,10 +853,100 @@ function applyPreviewOffset(force = false) {
             toolCursor.position.y += deltaZ
             toolCursor.position.z += deltaY
         }
+        syncToolCursorCylinder(false)
     }
 
     appliedPreviewOffset.value = { ...nextOffset }
     viewer.forceRender()
+}
+
+function getPreviewAdjustedPosition(position: number[]) {
+    return [
+        position[0] + appliedPreviewOffset.value.X,
+        position[1] + appliedPreviewOffset.value.Y,
+        position[2] + appliedPreviewOffset.value.Z,
+        position[3] ?? 0,
+    ]
+}
+
+function applyPrimaryToolColor() {
+    if (!viewer) return
+
+    viewer.gcodeProcessor.resetTools()
+    viewer.gcodeProcessor.addTool(primaryViewerColor.value, nozzle_diameter.value)
+    viewer.gcodeProcessor.setColorMode(0)
+}
+
+function syncToolCursorCylinder(forceRender = true) {
+    if (!viewer) return
+
+    const viewerAny = viewer as any
+    const toolCursor = viewerAny?.toolCursor
+    const cylinder = viewerAny?.toolCursorMesh
+
+    if (!toolCursor?.getAbsolutePosition || cylinder?.name !== 'SimpleToolCursorCylinder') return
+
+    const position = toolCursor.getAbsolutePosition()
+    cylinder.setAbsolutePosition(new Vector3(position.x, position.y + 2, position.z))
+
+    if (forceRender) viewer.forceRender()
+}
+
+function replaceToolCursorWithCylinder(attempt = 0) {
+    if (!viewer?.scene) return
+
+    const viewerAny = viewer as any
+    const toolCursor = viewerAny?.toolCursor
+    const existingMesh = viewerAny?.toolCursorMesh
+    const childMeshes = typeof toolCursor?.getChildMeshes === 'function' ? toolCursor.getChildMeshes() : []
+
+    if ((!toolCursor || (!existingMesh && childMeshes.length === 0)) && attempt < 10) {
+        window.setTimeout(() => replaceToolCursorWithCylinder(attempt + 1), 100)
+        return
+    }
+
+    if (!toolCursor) return
+    if (existingMesh?.name === 'SimpleToolCursorCylinder') {
+        syncToolCursorCylinder()
+        return
+    }
+
+    const wasVisible = existingMesh?.isVisible ?? showCursor.value
+    childMeshes.forEach((mesh: any) => mesh?.dispose?.(false, true))
+
+    const cylinder = CreateCylinder(
+        'SimpleToolCursorCylinder',
+        { height: 4, diameter: 1.5, tessellation: 24 },
+        viewer.scene
+    )
+    const material = new StandardMaterial('SimpleToolCursorCylinderMaterial', viewer.scene)
+    material.diffuseColor = toColor3(primaryViewerColor.value)
+    material.specularColor = new Color3(0, 0, 0)
+    cylinder.material = material
+    cylinder.renderingGroupId = 2
+    cylinder.isPickable = false
+    cylinder.isVisible = wasVisible
+
+    viewerAny.toolCursorMesh = cylinder
+    syncToolCursorCylinder()
+}
+
+function reapplyPreviewOffsetToToolCursor() {
+    if (!viewer) return
+
+    const toolCursor = (viewer as any)?.toolCursor
+    if (!toolCursor?.position) return
+
+    const { X, Y, Z } = appliedPreviewOffset.value
+    if (X === 0 && Y === 0 && Z === 0) {
+        syncToolCursorCylinder()
+        return
+    }
+
+    toolCursor.position.x += X
+    toolCursor.position.y += Z
+    toolCursor.position.z += Y
+    syncToolCursorCylinder()
 }
 
 function setReloadRequiredFlag() {
@@ -732,13 +969,15 @@ watch(previewWcs, () => {
 watch(currentPosition, (newVal: number[]) => {
     if (!viewer || !tracking.value || scrubPlaying.value) return
 
+    const adjustedPosition = getPreviewAdjustedPosition(newVal)
     const position = [
-        { axes: 'X', position: newVal[0] },
-        { axes: 'Y', position: newVal[1] },
-        { axes: 'Z', position: newVal[2] },
+        { axes: 'X', position: adjustedPosition[0] },
+        { axes: 'Y', position: adjustedPosition[1] },
+        { axes: 'Z', position: adjustedPosition[2] },
     ]
 
     viewer.updateToolPosition(position)
+    syncToolCursorCylinder(false)
 })
 
 watch(filePosition, (newVal: number) => {
@@ -781,6 +1020,7 @@ const showCursor = computed({
 
 watch(showCursor, (newVal: boolean) => {
     viewer?.setCursorVisiblity(newVal)
+    if (newVal) replaceToolCursorWithCylinder()
 })
 
 const showTravelMoves = computed({
@@ -901,40 +1141,13 @@ watch(specularLighting, async (newVal: boolean) => {
     viewer.gcodeProcessor.useSpecularColor(newVal)
 })
 
-const extruderColors = computed(() => store.state.gui.gcodeViewer?.extruderColors ?? false)
-
-function loadToolColors(colors: string[]) {
-    if (!viewer || colors.length === 0) return
-
-    viewer?.gcodeProcessor.resetTools()
-    colors.forEach((color: string) => {
-        viewer?.gcodeProcessor.addTool(color, nozzle_diameter.value)
-    })
-    setReloadRequiredFlag()
-}
-
-watch(extruderColors, (newVal: string[]) => {
-    if (viewer && newVal && newVal.length) {
-        loadToolColors(newVal)
-        setReloadRequiredFlag()
-    }
-})
-
-const colorModes = [
-    { text: 'Extruder', value: 0 },
-    { text: 'Feed Rate', value: 1 },
-    { text: 'Feature', value: 2 },
-]
+const colorModes = [{ text: 'Primary', value: 0 }]
 
 const colorMode = computed({
-    get: () => store.state.gui.gcodeViewer?.colorMode ?? 2,
-    set: (newVal: number) => {
-        store.dispatch('gui/saveSetting', { name: 'gcodeViewer.colorMode', value: newVal })
-
-        if (viewer && viewer.gcodeProcessor.colorMode !== newVal) {
-            viewer.gcodeProcessor.setColorMode(newVal)
-            reloadViewer()
-        }
+    get: () => 0,
+    set: () => {
+        if (!viewer) return
+        viewer.gcodeProcessor.setColorMode(0)
     },
 })
 
@@ -1010,6 +1223,39 @@ const bedMinSize = computed(
     () => store.state.printer.toolhead?.axis_minimum ?? store.state.gui?.gcodeViewer?.klipperCache?.axis_minimum ?? null
 )
 
+const machineStateReady = computed(() => {
+    const min = store.state.printer.toolhead?.axis_minimum
+    const max = store.state.printer.toolhead?.axis_maximum
+    return (
+        klipperReadyForGui.value &&
+        Array.isArray(min) &&
+        min.length >= 3 &&
+        Array.isArray(max) &&
+        max.length >= 3
+    )
+})
+
+async function waitForMachineStateReady() {
+    if (!socketIsConnected.value || machineStateReady.value) return
+
+    await new Promise<void>((resolve) => {
+        const stop = watch(
+            machineStateReady,
+            (ready) => {
+                if (!ready) return
+                stop()
+                resolve()
+            },
+            { immediate: true }
+        )
+
+        window.setTimeout(() => {
+            stop()
+            resolve()
+        }, 5000)
+    })
+}
+
 watch(
     kinematics,
     (newVal: string) => {
@@ -1044,10 +1290,25 @@ watch(
     { deep: true, immediate: true }
 )
 
-const progressColor = computed(() => store.state.gui.gcodeViewer?.progressColor ?? '#FFFFFF')
+watch(primaryViewerColor, async (newVal: string) => {
+    if (!viewer) return
 
-watch(progressColor, (newVal: string) => {
-    viewer?.setProgressColor(newVal)
+    viewer.setProgressColor(newVal)
+    if (stockBoxMesh) stockBoxMesh.color = toColor3(newVal)
+
+    const toolCursorMesh = (viewer as any)?.toolCursorMesh
+    const toolCursorMaterial = toolCursorMesh?.material as StandardMaterial | undefined
+    if (toolCursorMesh?.name === 'SimpleToolCursorCylinder' && toolCursorMaterial) {
+        toolCursorMaterial.diffuseColor = toColor3(newVal)
+    }
+
+    applyPrimaryToolColor()
+
+    if (loadedFile.value) {
+        await reloadViewer()
+    } else {
+        viewer.forceRender()
+    }
 })
 
 watch(scrubPlaying, (to: boolean): void => {
@@ -1078,6 +1339,7 @@ watch(scrubPlaying, (to: boolean): void => {
         scrubPosition.value += 100 * scrubSpeed.value
         viewer?.gcodeProcessor.updateFilePosition(scrubPosition.value)
         viewer?.simulateToolPosition()
+        reapplyPreviewOffsetToToolCursor()
         if (tracking.value || scrubPosition.value >= scrubFileSize.value) {
             scrubPlaying.value = false
         }
@@ -1091,6 +1353,7 @@ const updateScrubPosition = debounce((to: number): void => {
 
     viewer.gcodeProcessor.updateFilePosition(to)
     viewer.simulateToolPosition()
+    reapplyPreviewOffsetToToolCursor()
 }, 200)
 
 watch(scrubPosition, (to: number) => {
