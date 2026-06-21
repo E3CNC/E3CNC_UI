@@ -25,3 +25,10 @@
     dest: '{{ printer_data.E3CNC_dir }}/theme.json'
     mode: '0644'
     remote_src: true
+
+- name: Deploy cnc_base.cfg
+  ansible.builtin.copy:
+    src: '{{ repo.dest }}/E3CNC/macros/cnc_base.cfg'
+    dest: '{{ printer_data.E3CNC_dir }}/macros/cnc_base.cfg'
+    mode: '0644'
+    remote_src: true
