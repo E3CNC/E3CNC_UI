@@ -491,6 +491,18 @@ onMounted(() => {
             }
         }
 
+        // Auto-connect if exactly one printer is configured
+        if (printers.value.length === 1) {
+            const printer = printers.value[0]
+            if (printer.socket?.isConnected ?? false) {
+                window.console.log('[auto-connect] already connected to', printer.hostname)
+                return
+            }
+            window.console.log('[auto-connect] single printer found, connecting to', printer.hostname)
+            connect(printer)
+            return
+        }
+
         if (!('printer' in route.query)) return
 
         const printerQuery = route.query.printer
