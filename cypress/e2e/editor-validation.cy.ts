@@ -48,7 +48,19 @@ kinematics cartesian
     expectIssueCount: 5,
 }
 
-function installEditorBackend(filePath: string, content: string) {
+const testPrinter = {
+    hostname: 'localhost',
+    port: 4173,
+    name: 'Test Printer',
+    path: '/',
+}
+
+function setupEditorTest(filePath: string, content: string) {
+    // Set up localStorage so auto-connect kicks in and bypasses the printer dialog
+    cy.then(() => {
+        window.localStorage.setItem('printers', JSON.stringify([testPrinter]))
+    })
+
     cy.intercept('GET', '**/config.json', {
         statusCode: 200,
         body: {
@@ -74,7 +86,7 @@ function installEditorBackend(filePath: string, content: string) {
 }
 
 function visitEditor(filePath: string, content: string) {
-    installEditorBackend(filePath, content)
+    setupEditorTest(filePath, content)
     cy.visit(`/config?editorFile=${filePath}`)
     cy.wait('@configJson')
     cy.wait('@openFile')

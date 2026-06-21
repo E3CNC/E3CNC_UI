@@ -28,7 +28,7 @@
         "i18n-extract": "vue-i18n-extract --vueFiles './src/**/{*.?(js|ts|vue),.i18nignore}' --languageFiles './src/locales/*.json'",
         "preview": "vite preview",
         "start": "vite build && vite preview",
-        "test": "start-server-and-test preview http://127.0.0.1:4173/ 'cypress run'",
+        "test": "start-server-and-test preview http://127.0.0.1:4173/ 'cypress run --headed'",
         "test:ui": "cypress open",
         "typecheck": "vue-tsc --noEmit",
         "test:unit": "NODE_OPTIONS=\"${NODE_OPTIONS:---max-old-space-size=4096}\" vitest run",
