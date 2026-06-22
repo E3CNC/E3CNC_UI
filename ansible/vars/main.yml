@@ -1,7 +1,7 @@
 ---
 repo:
-  url: https://github.com/isaaceliape/mainsail-cnc.git
-  dest: '{{ ansible_env.HOME }}/mainsail-cnc'
+  url: https://github.com/E3CNC/E3CNC_UI.git
+  dest: '{{ ansible_env.HOME }}/E3CNC_UI'
   branch: main
 
 frontend:

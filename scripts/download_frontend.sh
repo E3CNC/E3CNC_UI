@@ -12,8 +12,8 @@ export PATH="$HOME/.local/bin:$HOME/.bun/bin:/usr/local/bin:/usr/bin:/bin"
 
 WEB_ROOT="${1:-$HOME/mainsail}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-OWNER="isaaceliape"
-REPO="mainsail-cnc"
+OWNER="E3CNC"
+REPO="E3CNC_UI"
 
 echo "=== Downloading pre-built frontend ==="
 
@@ -27,7 +27,7 @@ if [[ -n "$TAG_VER" ]]; then
 else
     RELEASE_VER="v$(node -p "require('$REPO_ROOT/package.json').version")"
 fi
-ASSET_NAME="mainsail-cnc-${RELEASE_VER}.zip"
+ASSET_NAME="E3CNC_UI-${RELEASE_VER}.zip"
 ZIP_FILE="$TMP_DIR/$ASSET_NAME"
 
 echo "    target release asset: $ASSET_NAME"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Post-update hook for Moonraker's update_manager.
-# Runs after `git pull` on the mainsail-cnc monorepo.
+# Runs after `git pull` on the E3CNC_UI monorepo.
 #
 # Delegates to the Ansible redeploy playbook, which handles:
 #   - Frontend rebuild + deploy
@@ -13,8 +13,8 @@
 #   ./scripts/post_update.sh
 #
 # Add to moonraker.conf:
-#   [update_manager mainsail-cnc]
-#   post_update_script: ~/mainsail-cnc/scripts/post_update.sh
+#   [update_manager E3CNC_UI]
+#   post_update_script: ~/E3CNC_UI/scripts/post_update.sh
 
 set -euo pipefail
 
@@ -23,7 +23,7 @@ export PATH="$HOME/.local/bin:$HOME/.bun/bin:/usr/local/bin:/usr/bin:/bin"
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-echo "=== mainsail-cnc post-update ==="
+echo "=== E3CNC_UI post-update ==="
 echo "  Repo: $REPO_ROOT"
 echo "  Delegating to Ansible redeploy playbook..."
 echo ""

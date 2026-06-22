@@ -22,14 +22,14 @@
     value: '30.0'
     value_delimiter: ': '
 
-- name: Ensure [update_manager mainsail-cnc] section in moonraker.conf
+- name: Ensure [update_manager E3CNC_UI] section in moonraker.conf
   ansible.builtin.blockinfile:
     path: '{{ moonraker_conf }}'
-    marker: '# {mark} ANSIBLE MANAGED BLOCK - update_manager mainsail-cnc'
+    marker: '# {mark} ANSIBLE MANAGED BLOCK - update_manager E3CNC_UI'
     insertafter: EOF
     create: true
     block: |-
-      [update_manager mainsail-cnc]
+      [update_manager E3CNC_UI]
       type: git_repo
       channel: dev
       path: {{ repo.dest }}
@@ -39,6 +39,6 @@
       is_system_service: False
       post_update_script: {{ repo.dest }}/scripts/post_update.sh
       info_tags:
-          desc=Mainsail CNC
+          desc=E3CNC UI
       managed_services: klipper moonraker
       refresh_interval: 24

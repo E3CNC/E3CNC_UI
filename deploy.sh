@@ -1,5 +1,5 @@
 #!/bin/bash
-# Deploy mainsail-cnc fork to the web server directory.
+# Deploy E3CNC_UI fork to the web server directory.
 # Delegates to the Ansible deploy playbook.
 #
 # Usage: ./deploy.sh [--live]
@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-MAINSAIL_CNC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
+E3CNC_UI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)"
 DEPLOY_DIR="${MAINSAIL_DEPLOY_DIR:-$HOME/mainsail}"
 
 MODE="dry-run"
@@ -15,15 +15,15 @@ if [ "${1:-}" = "--live" ]; then
   MODE="live"
 fi
 
-echo "=== mainsail-cnc deploy ==="
-echo "  Source:  $MAINSAIL_CNC_DIR"
+echo "=== E3CNC_UI deploy ==="
+echo "  Source:  $E3CNC_UI_DIR"
 echo "  Target:  $DEPLOY_DIR"
 echo "  Mode:    $MODE"
 echo ""
 
 if [ "$MODE" = "dry-run" ]; then
   echo "[dry-run] Would run Ansible frontend deploy playbook:"
-  echo "  cd $MAINSAIL_CNC_DIR && ansible-playbook \\"
+  echo "  cd $E3CNC_UI_DIR && ansible-playbook \\"
   echo "    -i ansible/inventory/local.yml \\"
   echo "    ansible/playbooks/deploy.yml \\"
   echo "    --diff --check"
@@ -32,11 +32,11 @@ if [ "$MODE" = "dry-run" ]; then
   exit 0
 fi
 
-cd "$MAINSAIL_CNC_DIR"
+cd "$E3CNC_UI_DIR"
 ansible-playbook \
   -i ansible/inventory/local.yml \
   ansible/playbooks/deploy.yml \
   --diff
 
 echo ""
-echo "deployed mainsail-cnc"
+echo "deployed E3CNC_UI"

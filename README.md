@@ -1,13 +1,13 @@
-# Mainsail-cnc
+# E3CNC UI
 
-[![Release](https://img.shields.io/github/v/release/isaaceliape/mainsail-cnc?style=flat&label=Release&color=00FF00)](https://github.com/isaaceliape/mainsail-cnc/releases)
-[![Build Frontend](https://github.com/isaaceliape/mainsail-cnc/actions/workflows/build-frontend.yml/badge.svg?branch=main)](https://github.com/isaaceliape/mainsail-cnc/actions/workflows/build-frontend.yml)
-[![License](https://img.shields.io/github/license/isaaceliape/mainsail-cnc?style=flat&label=License&color=00FF00)](https://github.com/isaaceliape/mainsail-cnc/blob/main/LICENSE)
+[![Release](https://img.shields.io/github/v/release/E3CNC/E3CNC_UI?style=flat&label=Release&color=00FF00)](https://github.com/E3CNC/E3CNC_UI/releases)
+[![Build Frontend](https://github.com/E3CNC/E3CNC_UI/actions/workflows/build-frontend.yml/badge.svg?branch=main)](https://github.com/E3CNC/E3CNC_UI/actions/workflows/build-frontend.yml)
+[![License](https://img.shields.io/github/license/E3CNC/E3CNC_UI?style=flat&label=License&color=00FF00)](https://github.com/E3CNC/E3CNC_UI/blob/main/LICENSE)
 
 A modern, responsive CNC controller interface for Klipper-based machines — forked from [Mainsail](https://github.com/mainsail-crew/mainsail) and retargeted from 3D printing to CNC machine control. Built with **Vue 3.5** and **Vuetify 3**.
 
 ```bash
-git clone https://github.com/isaaceliape/mainsail-cnc.git ~/mainsail-cnc && cd ~/mainsail-cnc
+git clone https://github.com/E3CNC/E3CNC_UI.git ~/E3CNC_UI && cd ~/E3CNC_UI
 ansible-playbook ansible/playbooks/install.yml   # idempotent full install
 ```
 
@@ -46,14 +46,14 @@ ansible-playbook ansible/playbooks/install.yml   # idempotent full install
 
 ## Documentation
 
-Full docs on the [wiki](https://github.com/isaaceliape/mainsail-cnc/wiki):
+Full docs on the [wiki](https://github.com/E3CNC/E3CNC_UI/wiki):
 
-- [Installation](https://github.com/isaaceliape/mainsail-cnc/wiki/Installation)
-- [Architecture](https://github.com/isaaceliape/mainsail-cnc/wiki/Architecture)
-- [API Reference](https://github.com/isaaceliape/mainsail-cnc/wiki/API)
-- [Features](https://github.com/isaaceliape/mainsail-cnc/wiki/Features)
-- [Changelog](https://github.com/isaaceliape/mainsail-cnc/wiki/Changelog)
-- [Contributing](https://github.com/isaaceliape/mainsail-cnc/wiki/Contributing)
+- [Installation](https://github.com/E3CNC/E3CNC_UI/wiki/Installation)
+- [Architecture](https://github.com/E3CNC/E3CNC_UI/wiki/Architecture)
+- [API Reference](https://github.com/E3CNC/E3CNC_UI/wiki/API)
+- [Features](https://github.com/E3CNC/E3CNC_UI/wiki/Features)
+- [Changelog](https://github.com/E3CNC/E3CNC_UI/wiki/Changelog)
+- [Contributing](https://github.com/E3CNC/E3CNC_UI/wiki/Contributing)
 
 ## Repository Structure
 

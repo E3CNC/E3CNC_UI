@@ -4,7 +4,7 @@ A Moonraker component for CNC-specific state and workflows.
 
 ## Scope
 
-Klipper already exposes the read-only machine state used by the Mainsail CNC
+Klipper already exposes the read-only machine state used by the E3CNC UI
 panels (`toolhead`, `gcode_move`, `print_stats`, `configfile`), and the
 frontend reads it directly from Mainsail's existing Vuex store subscription.
 The agent does **not** re-expose that data.
@@ -87,7 +87,7 @@ moonraker-cnc-mcp
 **Recommended — Ansible playbook (idempotent, supports `--check`):**
 
 ```sh
-cd ~/mainsail-cnc
+cd ~/E3CNC_UI
 ansible-playbook ansible/playbooks/install.yml
 ```
 
@@ -104,12 +104,12 @@ and restart Moonraker.
 ## Updates via the Mainsail update manager
 
 The Ansible install playbook and the bash install script both wire the
-project into Moonraker's update manager by default, so mainsail-cnc shows
+project into Moonraker's update manager by default, so E3CNC_UI shows
 up in Mainsail's **Machine → Update Manager** panel alongside Klipper,
 Moonraker, and stock Mainsail.
 
 The entry is `type: git_repo` pointing at the monorepo clone on the
-printer (`~/mainsail-cnc` by default). The install creates that
+printer (`~/E3CNC_UI` by default). The install creates that
 clone on first run (and pulls on subsequent runs) so
 it's a real git checkout of the project — no synthetic subpath, no
 "ahead 1, behind N" weirdness.
@@ -130,7 +130,7 @@ frontend, agent, and plugins are all updated automatically.
 ## Updates via the Ansible playbook
 
 ```sh
-cd ~/mainsail-cnc
+cd ~/E3CNC_UI
 git pull
 ansible-playbook ansible/playbooks/install.yml
 ```
@@ -143,7 +143,7 @@ If `post_update_script` is not configured, re-run the install after
 a git pull:
 
 ```sh
-cd ~/mainsail-cnc
+cd ~/E3CNC_UI
 ./scripts/install_to_moonraker.sh
 ```
 

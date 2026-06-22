@@ -27,8 +27,8 @@ const PWAConfig: Partial<VitePWAOptions> = {
     registerType: 'autoUpdate',
     includeAssets: ['fonts/**/*.woff2', 'img/**/*.svg', 'img/**/*.png'],
     manifest: {
-        name: 'Mainsail-CNC',
-        short_name: 'Mainsail-CNC',
+        name: 'E3CNC UI',
+        short_name: 'E3CNC UI',
         description: 'Web interface for Klipper-based CNC machines',
         theme_color: '#D51F26',
         display: 'standalone',

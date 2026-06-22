@@ -1,5 +1,5 @@
 /**
- * Global test setup for Mainsail CNC
+ * Global test setup for E3CNC UI
  *
  * This file is loaded before each test file and sets up:
  * - Global mocks for browser APIs (WebSocket, localStorage, etc.)

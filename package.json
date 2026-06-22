@@ -1,6 +1,6 @@
 {
-  "name": "mainsail-cnc",
-  "version": "0.7.0",
+  "name": "E3CNC_UI",
+  "version": "0.7.1",
   "private": true,
   "type": "module",
   "description": "A web interface for Klipper-based CNC machines",
@@ -9,16 +9,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/isaaceliape/mainsail-cnc.git"
+    "url": "git+https://github.com/E3CNC/E3CNC_UI.git"
   },
   "bugs": {
-    "url": "https://github.com/isaaceliape/mainsail-cnc/issues"
+    "url": "https://github.com/E3CNC/E3CNC_UI/issues"
   },
-  "homepage": "https://github.com/isaaceliape/mainsail-cnc",
+  "homepage": "https://github.com/E3CNC/E3CNC_UI",
   "license": "GPL-3.0",
   "scripts": {
     "serve": "vite serve",
-    "dev": "tmux has-session -t mainsail-cnc 2>/dev/null || tmux new-session -d -s mainsail-cnc 'vite'",
+    "dev": "tmux has-session -t E3CNC_UI 2>/dev/null || tmux new-session -d -s E3CNC_UI 'vite'",
     "build": "vite build",
     "format": "bun run format:base -- --write",
     "format:base": "prettier .",

@@ -14,7 +14,7 @@ DEFAULT_API_KEY = os.environ.get("MOONRAKER_API_KEY")
 mcp = FastMCP(
     name="moonraker-cnc",
     instructions=(
-        "Moonraker / Klipper MCP server for Mainsail CNC. Use these tools to "
+        "Moonraker / Klipper MCP server for E3CNC UI. Use these tools to "
         "inspect printer state, query Klipper objects, send G-code, and read "
         "Moonraker server/system metadata."
     ),

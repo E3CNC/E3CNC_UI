@@ -62,7 +62,7 @@ jobs:
       - name: Create dist archive
         run: |
           cp ./remote/* ./dist/ 2>/dev/null || true
-          cd dist && zip -r ../mainsail-cnc-${{ steps.version.outputs.VERSION }}.zip . && cd ..
+          cd dist && zip -r ../E3CNC_UI-${{ steps.version.outputs.VERSION }}.zip . && cd ..
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v5
@@ -91,7 +91,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION='${{ steps.version.outputs.VERSION }}'
-          ASSET="mainsail-cnc-${VERSION}.zip"
+          ASSET="E3CNC_UI-${VERSION}.zip"
 
           if gh release view "$VERSION" >/dev/null 2>&1; then
             echo "Updating existing release: $VERSION"
