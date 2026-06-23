@@ -311,6 +311,15 @@
                         </p>
                     </div>
                     <div class="feature">
+                        <div class="icon"><i class="fa-solid fa-font"></i></div>
+                        <h3>Ndot57 Theme</h3>
+                        <p>
+                            Dedicated theme with Ndot 57 Aligned display font, custom letter-spacing, and cyan
+                            accent colours. Font-family and letter-spacing inherit from root via CSS custom
+                            properties — all Vuetify typography classes respect the active theme.
+                        </p>
+                    </div>
+                    <div class="feature">
                         <div class="icon"><i class="fa-solid fa-crosshairs"></i></div>
                         <h3>Interactive WCS Preview</h3>
                         <p>
@@ -380,6 +389,43 @@
             <section>
                 <h2>Recent Changes</h2>
                 <div class="changelog-list">
+                    <div class="entry">
+                        <span class="tag tag-feat">feat</span>
+                        <span class="desc">
+                            <strong>Ndot57 theme</strong>
+                            — New theme with Ndot 57 Aligned display font, configurable letter-spacing, and
+                            cyan accent colours. Theme interface extended with <code>fontFamily</code> and
+                            <code>letterSpacing</code> properties.
+                        </span>
+                    </div>
+                    <div class="entry">
+                        <span class="tag tag-feat">feat</span>
+                        <span class="desc">
+                            <strong>Font inheritance system</strong>
+                            — All font-family and letter-spacing declarations removed from individual components.
+                            Everything inherits from root via <code>--font-family</code> and
+                            <code>--letter-spacing</code> CSS custom properties, controlled by the active theme.
+                            Vuetify typography classes (<code>.text-caption</code>, <code>.v-card-title</code>, etc.)
+                            also respect theme fonts.
+                        </span>
+                    </div>
+                    <div class="entry">
+                        <span class="tag tag-chore">chore</span>
+                        <span class="desc">
+                            <strong>Rem units</strong>
+                            — All <code>font-size</code> values converted from px and em to rem across 25+ components
+                            for consistent scaling with root font size.
+                        </span>
+                    </div>
+                    <div class="entry">
+                        <span class="tag tag-fix">fix</span>
+                        <span class="desc">
+                            <strong>DRO formatting</strong>
+                            — Axis values now display 2 decimal places with trailing zeros stripped
+                            (e.g. <code>1.00</code> → <code>1</code>, <code>1.50</code> → <code>1.5</code>).
+                            Consistent between topbar DRO and dashboard DRO panel.
+                        </span>
+                    </div>
                     <div class="entry">
                         <span class="tag tag-feat">feat</span>
                         <span class="desc">
