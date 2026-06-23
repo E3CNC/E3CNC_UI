@@ -93,7 +93,12 @@ ls -1d "${HOME}/printer_data/config/e3cnc-backup-"* 2>/dev/null | sort -r | tail
     echo "  Pruned old backup: $(basename "$old")"
 done
 
-ok "Backup saved to $(basename "$BACKUP_DIR")"
+echo ""
+echo "  >>>  BACKUP SAVED  >>>"
+echo "  >>>  $BACKUP_DIR"
+echo ""
+echo "  >>>  To restore: cp -a $BACKUP_DIR/frontend/* ~/mainsail/"
+echo ""
 
 # ------------------------------------------------------------------
 step 4 "Deploying frontend, agent, and plugins…"
