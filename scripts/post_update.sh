@@ -24,26 +24,41 @@ export PATH="$HOME/.local/bin:$HOME/.bun/bin:/usr/local/bin:/usr/bin:/bin"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # ------------------------------------------------------------------
-# 1. Backup existing frontend
+# 1. Backup user configs and frontend
 # ------------------------------------------------------------------
-WEB_ROOT="${HOME}/mainsail"
-BACKUP_DIR="${HOME}/printer_data/config/mainsail-backup"
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+BACKUP_DIR="${HOME}/printer_data/config/e3cnc-backup-${TIMESTAMP}"
+mkdir -p "$BACKUP_DIR"
 
-if [[ -d "$WEB_ROOT" ]] && [[ -n "$(ls -A "$WEB_ROOT" 2>/dev/null)" ]]; then
-    TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-    BACKUP_PATH="${BACKUP_DIR}-${TIMESTAMP}"
-    mkdir -p "$BACKUP_PATH"
-    cp -a "$WEB_ROOT/." "$BACKUP_PATH/"
-    echo "  Backed up $WEB_ROOT → $BACKUP_PATH"
-
-    # Remove old backups, keep the 3 most recent
-    ls -1d "${BACKUP_DIR}-"* 2>/dev/null | sort -r | tail -n +4 | while read -r old; do
-        rm -rf "$old"
-        echo "  Pruned old backup: $old"
-    done
-else
-    echo "  No existing frontend found — skipping backup"
+# 1a. Frontend files
+echo "  Backing up frontend…"
+if [[ -d "${HOME}/mainsail" ]] && [[ -n "$(ls -A "${HOME}/mainsail" 2>/dev/null)" ]]; then
+    mkdir -p "$BACKUP_DIR/frontend"
+    cp -a "${HOME}/mainsail/." "$BACKUP_DIR/frontend/"
 fi
+
+# 1b. Printer config directory
+echo "  Backing up printer config…"
+if [[ -d "${HOME}/printer_data/config" ]]; then
+    mkdir -p "$BACKUP_DIR/config"
+
+    # Copy all config files except old backups and the moonraker database
+    rsync -a --exclude='moonraker.db' --exclude='e3cnc-backup-*' "${HOME}/printer_data/config/" "$BACKUP_DIR/config/"
+fi
+
+# 1c. WCS offsets (if present)
+if [[ -f "${HOME}/wcs_offsets.json" ]]; then
+    echo "  Backing up WCS offsets…"
+    cp -a "${HOME}/wcs_offsets.json" "$BACKUP_DIR/"
+fi
+
+echo "  Backup saved to $BACKUP_DIR"
+
+# Remove old backups, keep the 3 most recent
+ls -1d "${HOME}/printer_data/config/e3cnc-backup-"* 2>/dev/null | sort -r | tail -n +4 | while read -r old; do
+    rm -rf "$old"
+    echo "  Pruned old backup: $old"
+done
 
 echo ""
 echo "=== E3CNC_UI post-update ==="
