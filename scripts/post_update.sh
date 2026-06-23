@@ -24,8 +24,35 @@ export PATH="$HOME/.local/bin:$HOME/.bun/bin:/usr/local/bin:/usr/bin:/bin"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # ------------------------------------------------------------------
-# 0. Bootstrap Ansible (in case the user added the update manager
-#    block manually without running the Ansible install playbook first)
+# 0. Check all required dependencies
+# ------------------------------------------------------------------
+MISSING=""
+for cmd in git python3 curl unzip rsync; do
+    if ! command -v "$cmd" &>/dev/null; then
+        MISSING="$MISSING $cmd"
+    fi
+done
+
+if ! command -v pip3 &>/dev/null && ! command -v pip &>/dev/null; then
+    MISSING="$MISSING pip3"
+fi
+
+if [[ -n "$MISSING" ]]; then
+    echo "  Missing required dependencies:"
+    for m in $MISSING; do
+        echo "    - $m"
+    done
+    echo ""
+    echo "  Install them with:"
+    echo "    sudo apt update && sudo apt install -y python3-pip git curl unzip rsync"
+    exit 1
+fi
+
+echo "  All dependencies found ✓"
+
+# ------------------------------------------------------------------
+# 0b. Bootstrap Ansible (in case the user added the update manager
+#     block manually without running the Ansible install playbook first)
 # ------------------------------------------------------------------
 if ! command -v ansible-playbook &>/dev/null; then
     echo "  Ansible not found — installing…"
