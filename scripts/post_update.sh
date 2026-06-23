@@ -29,6 +29,15 @@ fail() { echo "[E3CNC] ✗ $1"; exit 1; }
 
 TOTAL_STEPS=5
 
+echo "[E3CNC] Starting E3CNC_UI update…"
+echo ""
+echo "[E3CNC]   [ ] 1/5  Checking dependencies"
+echo "[E3CNC]   [ ] 2/5  Checking Ansible"
+echo "[E3CNC]   [ ] 3/5  Creating backup"
+echo "[E3CNC]   [ ] 4/5  Deploying frontend, agent, and plugins"
+echo "[E3CNC]   [ ] 5/5  Finalizing"
+echo ""
+
 step 1 "Checking dependencies…"
 
 MISSING=""
