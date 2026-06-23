@@ -42,8 +42,8 @@ echo "  Backing up printer config…"
 if [[ -d "${HOME}/printer_data/config" ]]; then
     mkdir -p "$BACKUP_DIR/config"
 
-    # Copy all config files except old backups and the moonraker database
-    rsync -a --exclude='moonraker.db' --exclude='e3cnc-backup-*' "${HOME}/printer_data/config/" "$BACKUP_DIR/config/"
+    # Copy all config files except old backups
+    rsync -a --exclude='e3cnc-backup-*' "${HOME}/printer_data/config/" "$BACKUP_DIR/config/"
 fi
 
 # 1c. WCS offsets (if present)
