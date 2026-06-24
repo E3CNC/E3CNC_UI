@@ -5,7 +5,7 @@ import json
 
 import httpx
 
-from moonraker_cnc_agent import mcp_server
+from moonraker_mcp import mcp_server
 
 
 def test_request_unwraps_result_and_sets_api_key_header():

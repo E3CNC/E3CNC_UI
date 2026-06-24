@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "moonraker-mcp"
+version = "0.1.0"
+description = "Moonraker MCP server for E3CNC UI — exposes printer state, G-code, history, and system info as MCP tools"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    { name = "E3CNC", email = "e3cnc@users.noreply.github.com" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Manufacturing",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific Engineering",
+]
+dependencies = [
+    "httpx>=0.27",
+    "mcp>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/E3CNC/E3CNC_UI"
+Repository = "https://github.com/E3CNC/E3CNC_UI"
+"Issues" = "https://github.com/E3CNC/E3CNC_UI/issues"
+
+[project.scripts]
+moonraker-mcp = "moonraker_mcp.mcp_server:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

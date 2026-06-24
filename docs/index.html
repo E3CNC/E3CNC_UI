@@ -708,19 +708,19 @@
                 <pre class="install-config"><code>[update_manager E3CNC_UI]
 type: git_repo
 channel: dev
-path: /home/biqu/mainsail-cnc
+path: ~/E3CNC_UI
 origin: https://github.com/E3CNC/E3CNC_UI.git
 primary_branch: main
 enable_node_updates: False
 is_system_service: False
-post_update_script: /home/biqu/mainsail-cnc/scripts/post_update.sh
+post_update_script: ~/E3CNC_UI/scripts/post_update.sh
 info_tags:
     desc=E3CNC UI
 managed_services: klipper moonraker
 refresh_interval: 24</code></pre>
 
                 <p class="install-note">
-                    Replace <code>/home/biqu/</code> with your home directory. The script
+                    Replace <code>~/E3CNC_UI</code> with an absolute path if needed (e.g. <code>/home/pi/E3CNC_UI</code>). The script
                     auto-installs Ansible, creates a backup before every update, and preserves
                     the 3 most recent backups. See the
                     <a href="https://github.com/E3CNC/E3CNC_UI/wiki/Installation-Update-Manager">wiki</a>

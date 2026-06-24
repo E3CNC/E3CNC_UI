@@ -68,7 +68,7 @@ Full docs on the [wiki](https://github.com/E3CNC/E3CNC_UI/wiki):
 | `src/` | Mainsail frontend (Vue 3.5, Vuetify 3, TypeScript) |
 | `E3CNC/macros/` | Klipper CNC macros (homing override, PAUSE/RESUME, WCS) |
 | `E3CNC/extras/` | Klipper WCS plugin (`work_coordinate_systems.py`) |
-| `E3CNC/moonraker-cnc-agent/` | Moonraker CNC component |
+| `E3CNC/moonraker-mcp/` | Moonraker MCP (MCP server + CNC agent component) |
 | `E3CNC/post_processors/` | Fusion 360 CAM post processors |
 | `ansible/` | Ansible playbooks for install/deploy/uninstall |
 | `scripts/` | Utility scripts (install, deploy, download frontend) |

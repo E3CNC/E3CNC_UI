@@ -1,0 +1,82 @@
+name: Publish moonraker-mcp to PyPI
+
+on:
+  push:
+    tags:
+      - 'moonraker-mcp-v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g. 0.1.0)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-publish:
+    name: Build and publish to PyPI
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # required for trusted publishing
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Resolve version (tag-triggered)
+        if: github.event_name == 'push'
+        id: version_tag
+        shell: bash
+        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#moonraker-mcp-v}"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Publishing moonraker-mcp v$VERSION"
+
+      - name: Resolve version (manual trigger)
+        if: github.event_name == 'workflow_dispatch'
+        id: version_manual
+        shell: bash
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Publishing moonraker-mcp v$VERSION"
+
+      - name: Update version in pyproject.toml
+        shell: bash
+        run: |
+          VERSION="${{ steps.version_tag.outputs.VERSION || steps.version_manual.outputs.VERSION }}"
+          cd E3CNC/moonraker-mcp
+          sed -i "s/^version = \".*\"/version = \"$VERSION\"/" pyproject.toml
+          echo "Set version to $VERSION"
+
+      - name: Build package
+        run: |
+          cd E3CNC/moonraker-mcp
+          python -m build
+
+      - name: Verify package
+        run: |
+          cd E3CNC/moonraker-mcp
+          python -m twine check dist/*
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: E3CNC/moonraker-mcp/dist/
+          verbose: true

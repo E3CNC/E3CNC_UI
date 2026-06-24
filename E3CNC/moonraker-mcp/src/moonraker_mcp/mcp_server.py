@@ -12,7 +12,7 @@ DEFAULT_TIMEOUT = float(os.environ.get("MOONRAKER_TIMEOUT", "15"))
 DEFAULT_API_KEY = os.environ.get("MOONRAKER_API_KEY")
 
 mcp = FastMCP(
-    name="moonraker-cnc",
+    name="moonraker-mcp",
     instructions=(
         "Moonraker / Klipper MCP server for E3CNC UI. Use these tools to "
         "inspect printer state, query Klipper objects, send G-code, and read "

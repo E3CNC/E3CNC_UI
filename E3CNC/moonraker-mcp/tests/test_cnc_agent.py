@@ -9,7 +9,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.abspath(os.path.join(HERE, "..", "src"))
 sys.path.insert(0, SRC)
 
-from moonraker_cnc_agent.cnc_agent import CncAgent
+from moonraker_mcp.cnc_agent import CncAgent
 
 
 def resolve(value):
