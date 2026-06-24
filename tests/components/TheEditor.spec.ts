@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount, flushPromises } from '@vue/test-utils'
+import { mount } from '@vue/test-utils'
 import { createStore } from 'vuex'
 import TheEditor from '@/components/TheEditor.vue'
 import { getDefaultState as getDefaultEditorState } from '@/store/editor'
@@ -31,6 +31,24 @@ const mockIsMobile = vi.hoisted(() => {
 
 vi.mock('vue-i18n', () => ({
     useI18n: () => ({ t: (key: string) => key }),
+    createI18n: () => ({
+        global: {
+            setLocaleMessage: vi.fn(),
+            locale: { value: 'en' },
+            t: (key: string) => key,
+        },
+    }),
+}))
+
+vi.mock('@/plugins/i18n', () => ({
+    default: {
+        global: {
+            setLocaleMessage: vi.fn(),
+            locale: { value: 'en' },
+            t: (key: string) => key,
+        },
+    },
+    setAndLoadLocale: vi.fn(),
 }))
 
 vi.mock('vue-router', () => ({
@@ -79,22 +97,21 @@ vi.mock('@mdi/js', () => ({
 vi.mock('vuetify/components', () => ({
     VDialog: {
         name: 'VDialog',
-        props: ['modelValue', 'persistent', 'fullscreen', 'width', 'scrollable'],
-        template: '<div class="v-dialog" :style="{ display: modelValue ? \'block\' : \'none\' }"><slot /></div>',
+        props: ['modelValue'],
+        template: '<div class="v-dialog" v-if="modelValue"><slot /></div>',
     },
     VBtn: {
         name: 'VBtn',
-        props: ['icon', 'variant', 'rounded', 'color', 'href', 'target'],
-        template: '<button class="v-btn" @click="typeof $attrs?.onClick === \'function\' && $attrs.onClick($event); typeof $attrs?.onclick === \'function\' && $attrs.onclick($event)"><slot /><i v-if="icon" class="v-btn-icon">{{ icon }}</i></button>',
+        props: ['icon'],
+        template: '<button class="v-btn"><slot /></button>',
     },
     VIcon: {
         name: 'VIcon',
         props: ['icon', 'size'],
-        template: '<i class="v-icon"><slot />{{ icon }}</i>',
+        template: '<i class="v-icon">{{ icon }}</i>',
     },
     VCardText: {
         name: 'VCardText',
-        props: ['class'],
         template: '<div class="v-card-text"><slot /></div>',
     },
     VCardActions: {
@@ -107,22 +124,21 @@ vi.mock('vuetify/components', () => ({
     },
     VSelect: {
         name: 'VSelect',
-        props: ['modelValue', 'items', 'density', 'variant', 'hideDetails', 'style'],
-        template: '<select class="v-select" :value="modelValue"><option v-for="item in items" :key="item.value" :value="item.value">{{ item.title }}</option></select>',
+        props: ['modelValue', 'items'],
+        template: '<div class="v-select" />',
     },
     VTreeview: {
         name: 'VTreeview',
-        props: ['activatable', 'density', 'active', 'open', 'itemKey', 'items', 'class'],
-        template: '<div class="v-treeview"><slot name="title" :item="{}" /><slot name="append" :item="{}" /></div>',
+        props: ['items', 'active', 'open'],
+        template: '<div class="v-treeview"><slot name="title" :item="{ name: \'test\', line: 1, type: \'section\' }" /><slot name="append" :item="{ name: \'test\', type: \'section\' }" /></div>',
     },
     VSnackbar: {
         name: 'VSnackbar',
-        props: ['modelValue', 'timeout', 'location'],
-        template: '<div class="v-snackbar" v-if="modelValue"><slot /><slot name="actions" :props=\'{}\' /></div>',
+        props: ['modelValue'],
+        template: '<div class="v-snackbar" v-if="modelValue"><slot /><slot name="actions" /></div>',
     },
     VProgressLinear: {
         name: 'VProgressLinear',
-        props: ['modelValue', 'indeterminate', 'class'],
         template: '<div class="v-progress-linear" />',
     },
     VRow: {
@@ -131,7 +147,6 @@ vi.mock('vuetify/components', () => ({
     },
     VCol: {
         name: 'VCol',
-        props: ['class'],
         template: '<div class="v-col"><slot /></div>',
     },
     VCard: {
@@ -150,15 +165,15 @@ vi.mock('@/components/ui/Panel.vue', () => ({
             height: [String, Number],
             marginBottom: Boolean,
         },
-        template: '<div class="panel" :class="cardClass" :style="{ height }"><slot name="buttons" /><slot /><span class="panel-title">{{ typeof title === \'string\' ? title : \'\' }}</span></div>',
+        template: '<div class="panel"><slot name="buttons" /><slot /><span class="panel-title">{{ title }}</span></div>',
     },
 }))
 
 vi.mock('@/components/inputs/CodemirrorAsync.vue', () => ({
     default: {
         name: 'CodemirrorAsync',
-        props: ['modelValue', 'name', 'fileExtension', 'validationErrors', 'class'],
-        template: '<div class="codemirror-async-stub" :class="class">CodeMirror Stub</div>',
+        props: ['modelValue', 'name', 'fileExtension', 'validationErrors'],
+        template: '<div class="codemirror-async-stub">CodeMirror Stub</div>',
         emits: ['line-change'],
     },
 }))
@@ -240,6 +255,7 @@ describe('TheEditor.vue', () => {
         const wrapper = mount(TheEditor, {
             global: {
                 plugins: [store],
+                mocks: { $t: (key: string) => key },
             },
         })
         expect(wrapper.exists()).toBe(true)
@@ -249,6 +265,7 @@ describe('TheEditor.vue', () => {
         const wrapper = mount(TheEditor, {
             global: {
                 plugins: [store],
+                mocks: { $t: (key: string) => key },
             },
         })
         expect(wrapper.find('.v-dialog').exists()).toBe(false)
@@ -263,6 +280,7 @@ describe('TheEditor.vue', () => {
         const wrapper = mount(TheEditor, {
             global: {
                 plugins: [store],
+                mocks: { $t: (key: string) => key },
             },
         })
 
@@ -278,6 +296,7 @@ describe('TheEditor.vue', () => {
         const wrapper = mount(TheEditor, {
             global: {
                 plugins: [store],
+                mocks: { $t: (key: string) => key },
             },
         })
 
@@ -294,6 +313,7 @@ describe('TheEditor.vue', () => {
         const wrapper = mount(TheEditor, {
             global: {
                 plugins: [store],
+                mocks: { $t: (key: string) => key },
             },
         })
 
@@ -308,6 +328,7 @@ describe('TheEditor.vue', () => {
         const wrapper = mount(TheEditor, {
             global: {
                 plugins: [store],
+                mocks: { $t: (key: string) => key },
             },
         })
 
@@ -323,6 +344,7 @@ describe('TheEditor.vue', () => {
         const wrapper = mount(TheEditor, {
             global: {
                 plugins: [store],
+                mocks: { $t: (key: string) => key },
             },
         })
 
@@ -339,6 +361,7 @@ describe('TheEditor.vue', () => {
         const wrapper = mount(TheEditor, {
             global: {
                 plugins: [store],
+                mocks: { $t: (key: string) => key },
             },
         })
 
@@ -392,6 +415,7 @@ describe('TheEditor.vue', () => {
         mount(TheEditor, {
             global: {
                 plugins: [store],
+                mocks: { $t: (key: string) => key },
             },
         })
 
@@ -414,6 +438,7 @@ describe('TheEditor.vue', () => {
         const wrapper = mount(TheEditor, {
             global: {
                 plugins: [store],
+                mocks: { $t: (key: string) => key },
             },
         })
 
@@ -430,6 +455,7 @@ describe('TheEditor.vue', () => {
         const wrapper = mount(TheEditor, {
             global: {
                 plugins: [store],
+                mocks: { $t: (key: string) => key },
             },
         })
 
