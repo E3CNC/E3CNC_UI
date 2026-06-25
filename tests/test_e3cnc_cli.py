@@ -482,7 +482,7 @@ class TestInstance:
         base = tmp_path / "printer_data"
         base.mkdir()
         inst = Instance.from_printer_data(str(base))
-        assert inst.name == "printer"
+        assert inst.name == "cnc"
         assert inst.printer_data_dir == str(base)
         assert inst.config_dir == str(base / "config")
         assert inst.moonraker_conf == str(base / "config" / "moonraker.conf")
@@ -497,7 +497,7 @@ class TestInstance:
         base = tmp_path / "printer_data_2"
         base.mkdir()
         inst = Instance.from_printer_data(str(base))
-        assert inst.name == "printer_2"
+        assert inst.name == "cnc_2"
 
     def test_instance_web_root_naming(self, tmp_path):
         """Web root should include instance suffix for non-default instances."""
@@ -517,7 +517,7 @@ class TestInstance:
             mock_home.return_value = tmp_path
             instances = detect_instances()
             assert len(instances) == 1
-            assert instances[0].name == "printer"
+            assert instances[0].name == "cnc"
 
     def test_detect_instances_multiple(self, tmp_path):
         """detect_instances with multiple printer_data dirs."""
@@ -530,9 +530,9 @@ class TestInstance:
             mock_home.return_value = tmp_path
             instances = detect_instances()
             assert len(instances) == 3
-            assert instances[0].name == "printer"
-            assert instances[1].name == "printer_2"
-            assert instances[2].name == "printer_3"
+            assert instances[0].name == "cnc"
+            assert instances[1].name == "cnc_2"
+            assert instances[2].name == "cnc_3"
 
     def test_detect_instances_none(self, tmp_path):
         """detect_instances with no printer_data dirs."""
@@ -551,7 +551,7 @@ class TestInstance:
             mock_home.return_value = tmp_path
             instances = detect_instances()
             assert len(instances) == 1
-            assert instances[0].name == "printer_2"
+            assert instances[0].name == "cnc_2"
 
     def test_select_instance_single(self):
         """Single instance should be auto-selected without prompt."""
@@ -587,7 +587,7 @@ class TestInstance:
             # First call should detect
             inst1 = get_active_instance()
             assert inst1 is not None
-            assert inst1.name == "printer"
+            assert inst1.name == "cnc"
 
             # Second call should return cached (no re-scan)
             inst2 = get_active_instance()

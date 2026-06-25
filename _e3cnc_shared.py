@@ -102,10 +102,11 @@ def print_banner() -> None:
 class CmdResult:
     """Holds the result of running a command, so the TUI can display it."""
 
-    def __init__(self, success: bool, output: str, label: str = ""):
+    def __init__(self, success: bool, output: str, label: str = "", returncode: int = 0):
         self.success = success
         self.output = output
         self.label = label
+        self.returncode = returncode
 
 
 # ── Ansible helpers ─────────────────────────────────────────────────────────
@@ -312,13 +313,13 @@ class Instance:
     def from_printer_data(cls, base: str, web_root: str = "") -> "Instance":
         """Create an Instance from a printer_data directory path."""
         config = f"{base}/config"
-        name = Path(base).name.replace("printer_data", "printer")
-        if name == "printer":
-            name = "printer"
+        name = Path(base).name.replace("printer_data", "cnc")
+        if name == "cnc":
+            name = "cnc"
         if not web_root:
             web_root = f"{Path.home()}/mainsail"
-            if name != "printer":
-                web_root = f"{Path.home()}/mainsail-{name.replace('printer', '')}"
+            if name != "cnc":
+                web_root = f"{Path.home()}/mainsail-{name.replace('cnc', '')}"
         return cls(
             name=name,
             printer_data_dir=base,
@@ -781,7 +782,7 @@ def run_ansible_playbook(
     _o("")
     if rc == 0:
         _o(f"  ✓ {label} completed successfully")
-        return CmdResult(True, "\n".join(out), label)
+        return CmdResult(True, "\n".join(out), label, returncode=rc)
     else:
         _o(f"  ✗ {label} failed (exit code {rc})")
-        return CmdResult(False, "\n".join(out), label)
+        return CmdResult(False, "\n".join(out), label, returncode=rc)

@@ -13,6 +13,7 @@ See --help for full command list.
 import argparse
 import sys
 from pathlib import Path
+from typing import Optional
 
 # Import shared logic
 from _e3cnc_shared import (
@@ -24,8 +25,114 @@ from _e3cnc_shared import (
     _ensure_remote_inventory, LOCAL_INVENTORY,
     get_active_instance, detect_instances, Instance,
     instance_extra_vars, set_active_instance,
+    _ssh_run,
 )
 
+
+# ── Helpers ──────────────────────────────────────────────────────────────────
+
+_DESTRUCTIVE = ("install", "update", "uninstall")
+
+
+def _confirm_destructive(cmd: str, args: argparse.Namespace) -> bool:
+    """Ask for confirmation before destructive commands.
+    Skips if --yes, --check, or non-interactive."""
+    if cmd not in _DESTRUCTIVE:
+        return True
+    if args.yes or args.check:
+        return True
+    if not sys.stdin.isatty():
+        return True
+    label = {"install": "Install", "update": "Update", "uninstall": "Uninstall"}[cmd]
+    print()
+    try:
+        answer = input(f"  {Style.YELLOW}⚠ {label} is a destructive operation. Continue? [y/N] {Style.RESET}").strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return False
+    return answer == "y"
+
+
+def _validate_ssh(host: str) -> bool:
+    """Test SSH connection before running a remote command."""
+    info(f"Testing SSH connection to {host}...")
+    result = _ssh_run(host, "echo connected")
+    if result.returncode != 0:
+        print()
+        fail(f"Cannot connect to {host}. Check:")
+        fail(f"  • SSH key is configured: ssh-copy-id {host}")
+        fail(f"  • Host is reachable: ping {host.split('@')[-1].split(':')[0]}")
+        fail(f"  • SSH config is correct: ssh {host}")
+        sys.exit(1)
+    ok(f"Connected to {host}")
+    return True
+
+
+def _require_ansible() -> None:
+    """Check ansible-playbook is available, with a helpful error if not."""
+    import shutil
+    if not shutil.which("ansible-playbook"):
+        print()
+        fail("ansible-playbook is required but not installed.")
+        fail("Install it with: pip3 install ansible --user")
+        fail("Then add ~/.local/bin to your PATH, or run: export PATH=$HOME/.local/bin:$PATH")
+        sys.exit(1)
+
+
+def _get_instance(args: argparse.Namespace) -> Optional[Instance]:
+    """Resolve the active instance from --instance flag or auto-detect."""
+    if args.instance:
+        instances = detect_instances()
+        for inst in instances:
+            if inst.name == args.instance or inst.name.replace("cnc_", "") == args.instance:
+                set_active_instance(inst)
+                return inst
+        warn(f"Instance '{args.instance}' not found. Available: {[i.name for i in instances]}")
+        return None
+    return get_active_instance()
+
+
+def _run_ansible_cmd(
+    playbook: Path,
+    args: argparse.Namespace,
+    label: str,
+) -> None:
+    """Run an Ansible playbook with proper error handling and instance paths."""
+    _require_ansible()
+
+    if args.remote:
+        _validate_ssh(args.remote)
+
+    extra_vars = None
+    if not args.remote:
+        inst = _get_instance(args)
+        if inst:
+            extra_vars = instance_extra_vars(inst)
+            if inst.name != "cnc":
+                info(f"Using instance: {Style.BOLD}{inst.name}{Style.RESET}")
+
+    if not _confirm_destructive(args.command, args):
+        info("Cancelled")
+        return
+
+    header(f"{label}")
+    print(f"  {Style.DIM}{'─' * 50}{Style.RESET}")
+
+    result = run_ansible_playbook(
+        playbook, args.remote, args.check, args.verbose,
+        label, output_callback=lambda line: print(line, end=""),
+        extra_vars=extra_vars,
+    )
+
+    print(f"  {Style.DIM}{'─' * 50}{Style.RESET}")
+    if result.success:
+        ok(f"{label} completed")
+    else:
+        fail(f"{label} failed (exit code {result.returncode if hasattr(result, 'returncode') else '?'})")
+        sys.exit(1)
+
+
+# ── Command handlers ────────────────────────────────────────────────────────
 
 def cmd_check(args: argparse.Namespace) -> None:
     """Check dependencies and print results."""
@@ -38,52 +145,32 @@ def cmd_check(args: argparse.Namespace) -> None:
 
 def cmd_install(args: argparse.Namespace) -> None:
     """Full installation: agent, frontend, plugins, macros."""
-    header("Install E3CNC UI")
-    result = run_ansible_playbook(
-        INSTALL_PLAYBOOK, args.remote, args.check, args.verbose,
-        "Install", output_callback=lambda line: print(line, end=""),
-    )
-    if not result.success:
-        sys.exit(1)
+    _run_ansible_cmd(INSTALL_PLAYBOOK, args, "Install")
 
 
 def cmd_deploy(args: argparse.Namespace) -> None:
     """Deploy frontend only."""
-    header("Deploy Frontend")
-    result = run_ansible_playbook(
-        DEPLOY_PLAYBOOK, args.remote, args.check, args.verbose,
-        "Deploy", output_callback=lambda line: print(line, end=""),
-    )
-    if not result.success:
-        sys.exit(1)
+    _run_ansible_cmd(DEPLOY_PLAYBOOK, args, "Deploy")
 
 
 def cmd_update(args: argparse.Namespace) -> None:
     """Re-vendor agent, rebuild frontend, re-deploy plugins, restart."""
-    header("Update / Redeploy")
-    result = run_ansible_playbook(
-        REDEPLOY_PLAYBOOK, args.remote, args.check, args.verbose,
-        "Update", output_callback=lambda line: print(line, end=""),
-    )
-    if not result.success:
-        sys.exit(1)
+    _run_ansible_cmd(REDEPLOY_PLAYBOOK, args, "Update")
 
 
 def cmd_uninstall(args: argparse.Namespace) -> None:
     """Remove all E3CNC components."""
-    header("Uninstall E3CNC UI")
-    result = run_ansible_playbook(
-        UNINSTALL_PLAYBOOK, args.remote, args.check, args.verbose,
-        "Uninstall", output_callback=lambda line: print(line, end=""),
-    )
-    if not result.success:
-        sys.exit(1)
+    _run_ansible_cmd(UNINSTALL_PLAYBOOK, args, "Uninstall")
     info("The ~/E3CNC_UI repo checkout was NOT deleted.")
     info("To restore stock Mainsail, see: https://github.com/mainsail-crew/mainsail")
 
 
 def cmd_status(args: argparse.Namespace) -> None:
     """Check installation status."""
+    if not args.remote:
+        inst = _get_instance(args)
+        if inst and inst.name != "cnc":
+            info(f"Using instance: {Style.BOLD}{inst.name}{Style.RESET}")
     header("Installation Status")
     print(f"  {Style.DIM}Repository root: {HERE}{Style.RESET}")
     check_status(args.remote, output_callback=lambda line: print(line, end=""))
@@ -154,26 +241,37 @@ Examples:
     parser.add_argument("--verbose", "-v", action="store_true")
 
     shared_remote = argparse.ArgumentParser(add_help=False)
-    shared_remote.add_argument("--remote", metavar="HOST", default=None)
+    shared_remote.add_argument("--remote", metavar="HOST", default=None,
+                               help="Remote SSH target (e.g., pi@192.168.1.100)")
 
     shared_check = argparse.ArgumentParser(add_help=False)
-    shared_check.add_argument("--check", "-n", action="store_true")
+    shared_check.add_argument("--check", "-n", action="store_true",
+                              help="Dry-run mode (Ansible check mode)")
+
+    shared_yes = argparse.ArgumentParser(add_help=False)
+    shared_yes.add_argument("--yes", "-y", action="store_true",
+                            help="Skip confirmation prompts")
+
+    shared_instance = argparse.ArgumentParser(add_help=False)
+    shared_instance.add_argument("--instance", "-p", metavar="NAME", default=None,
+                                 help="CNC instance name (e.g., 'cnc_2' or just '2')")
 
     p = subparsers = parser.add_subparsers(dest="command", title="Commands")
 
-    p.add_parser("install", parents=[shared_remote, shared_check],
+    p.add_parser("install", parents=[shared_remote, shared_check, shared_yes, shared_instance],
                  help="Full installation: agent, frontend, plugins, macros")
-    p.add_parser("deploy", parents=[shared_remote, shared_check],
+    p.add_parser("deploy", parents=[shared_remote, shared_check, shared_instance],
                  help="Deploy frontend only (build + copy + reload nginx)")
-    p.add_parser("update", parents=[shared_remote, shared_check], aliases=["redeploy"],
+    p.add_parser("update", parents=[shared_remote, shared_check, shared_yes, shared_instance],
+                 aliases=["redeploy"],
                  help="Re-vendor agent, rebuild frontend, re-deploy plugins, restart")
-    p.add_parser("uninstall", parents=[shared_remote, shared_check],
+    p.add_parser("uninstall", parents=[shared_remote, shared_check, shared_yes, shared_instance],
                  help="Remove all E3CNC components")
-    p.add_parser("status", parents=[shared_remote],
+    p.add_parser("status", parents=[shared_remote, shared_instance],
                  help="Check installation status of all components")
     p.add_parser("check", help="Check dependencies")
 
-    bp = p.add_parser("backup", parents=[shared_remote],
+    bp = p.add_parser("backup", parents=[shared_remote, shared_instance],
                        help="Create a timestamped backup")
 
     rp = p.add_parser("restore", parents=[shared_remote],
@@ -181,10 +279,11 @@ Examples:
     rp.add_argument("backup_dir", help="Backup directory name or path")
     rp.add_argument("--yes", "-y", action="store_true")
 
-    p.add_parser("diagnose", parents=[shared_remote], aliases=["diag", "doctor"],
+    p.add_parser("diagnose", parents=[shared_remote, shared_instance],
+                 aliases=["diag", "doctor"],
                  help="Run comprehensive diagnostics")
 
-    lp = p.add_parser("logs", parents=[shared_remote],
+    lp = p.add_parser("logs", parents=[shared_remote, shared_instance],
                        help="Tail Moonraker and nginx logs")
     lp.add_argument("--lines", "-n", type=int, default=50)
 
@@ -248,6 +347,19 @@ def _interactive_menu() -> None:
     if cmd == "quit":
         sys.exit(0)
 
+    # Confirmation for destructive commands
+    if cmd in _DESTRUCTIVE:
+        print()
+        labels = {"install": "Install", "update": "Update", "uninstall": "Uninstall"}
+        try:
+            answer = input(f"  {Style.YELLOW}⚠ {labels[cmd]} is a destructive operation. Continue? [y/N] {Style.RESET}").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            sys.exit(0)
+        if answer != "y":
+            print(f"  {Style.DIM}Cancelled{Style.RESET}")
+            sys.exit(0)
+
     # Build fake args namespace
     class FakeArgs:
         pass
@@ -257,8 +369,14 @@ def _interactive_menu() -> None:
     fake_args.check = False
     fake_args.verbose = False
     fake_args.backup_dir = ""
-    fake_args.yes = False
+    fake_args.yes = True  # already confirmed above
     fake_args.lines = 50
+    fake_args.instance = None
+
+    # Instance detection
+    inst = get_active_instance()
+    if inst and inst.name != "cnc":
+        info(f"Using instance: {Style.BOLD}{inst.name}{Style.RESET}")
 
     dispatch = {
         "check": cmd_check,
@@ -287,16 +405,11 @@ def main() -> None:
 
     print_banner()
 
-    # Auto-detect instance if command uses instance paths
-    needs_instance = args.command in (
-        "install", "deploy", "update", "uninstall",
-        "status", "backup", "restore", "diagnose", "logs",
-    )
-    if needs_instance and not args.remote:
-        inst = get_active_instance()
-        if inst and inst.name != "printer":
-            info(f"Using instance: {Style.BOLD}{inst.name}{Style.RESET}")
-            info(f"  Config: {inst.config_dir}")
+    # Validate SSH for remote commands before dispatching
+    if getattr(args, "remote", None):
+        if args.command in ("install", "deploy", "update", "uninstall"):
+            _require_ansible()
+        _validate_ssh(args.remote)
 
     dispatch = {
         "check": cmd_check,

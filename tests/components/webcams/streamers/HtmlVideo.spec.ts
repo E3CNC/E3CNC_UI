@@ -120,4 +120,16 @@ describe('HtmlVideo.vue', () => {
         expect(wrapper.find('.webcamBackground').exists()).toBe(true)
         expect(wrapper.find('.webcamImage').exists()).toBe(true)
     })
+
+    it('calls onLoadedMetadata when video metadata loads', async () => {
+        const wrapper = mount(HtmlVideo, {
+            props: {
+                camSettings: createCamSettings(),
+            },
+        })
+
+        const video = wrapper.find('video')
+        await video.trigger('loadedmetadata')
+        expect(mockWebcamFunctions.updateAspectRatioFromVideo).toHaveBeenCalled()
+    })
 })
