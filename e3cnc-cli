@@ -225,7 +225,6 @@ def check_dependencies(output_callback=None) -> Tuple[bool, List[str]]:
     all_ok &= _check("python3", "Install Python 3: sudo apt install python3")
     all_ok &= _check("curl")
     all_ok &= _check("unzip")
-    all_ok &= _check("rsync")
 
     lines.append("")
     lines.append("  Ansible")
@@ -244,12 +243,6 @@ def check_dependencies(output_callback=None) -> Tuple[bool, List[str]]:
         else:
             _w("Ansible collection: community.general not found — install with: ansible-galaxy collection install community.general")
             all_ok = False
-
-    lines.append("")
-    lines.append("  Node.js / Frontend")
-    has_bun = _check("bun", "Install: curl -fsSL https://bun.sh/install | bash")
-    has_node = _check("node", "Install via nvm: nvm install 20")
-    all_ok &= has_bun or has_node
 
     lines.append("")
     lines.append("  Project structure")
@@ -983,24 +976,28 @@ def cmd_check(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
-def _ensure_bun() -> None:
-    """Install bun if not available."""
-    if shutil.which("bun"):
+
+
+
+def _ensure_system_packages() -> None:
+    """Install system packages needed for frontend download and Ansible."""
+    missing = []
+    for pkg in ["curl", "unzip"]:
+        if not shutil.which(pkg):
+            missing.append(pkg)
+    if not missing:
         return
-    info("Installing bun...")
+    info(f"Installing system packages: {' '.join(missing)}...")
+    subprocess.run(["sudo", "apt-get", "update"], capture_output=True)
     result = subprocess.run(
-        ["curl", "-fsSL", "https://bun.sh/install", "|", "bash"],
-        capture_output=True, text=True, shell=True,
+        ["sudo", "apt-get", "install", "-y"] + missing,
+        capture_output=True, text=True,
     )
-    if result.returncode != 0:
-        warn(f"bun auto-install failed: {result.stderr}")
-        warn("Install bun manually: curl -fsSL https://bun.sh/install | bash")
-        return
-    # Add bun to PATH
-    bun_path = Path.home() / ".bun" / "bin"
-    os.environ["PATH"] = f"{bun_path}:{os.environ.get('PATH', '')}"
-    if shutil.which("bun"):
-        ok("bun installed")
+    if result.returncode == 0:
+        ok(f"Installed: {' '.join(missing)}")
+    else:
+        warn(f"Failed to install: {' '.join(missing)}")
+        warn("Install manually: sudo apt install " + " ".join(missing))
 
 
 def _ensure_ansible_collections() -> None:
@@ -1030,8 +1027,8 @@ def cmd_install(args: argparse.Namespace) -> None:
     """Full installation: agent, frontend, plugins, macros."""
     header("Prerequisites")
     _require_ansible()
+    _ensure_system_packages()
     _ensure_ansible_collections()
-    _ensure_bun()
     _run_ansible_cmd(INSTALL_PLAYBOOK, args, "Install")
 
 

@@ -187,7 +187,6 @@ def check_dependencies(output_callback=None) -> Tuple[bool, List[str]]:
     all_ok &= _check("python3", "Install Python 3: sudo apt install python3")
     all_ok &= _check("curl")
     all_ok &= _check("unzip")
-    all_ok &= _check("rsync")
 
     lines.append("")
     lines.append("  Ansible")
@@ -205,12 +204,6 @@ def check_dependencies(output_callback=None) -> Tuple[bool, List[str]]:
             lines.append("  ✓ Ansible collection: community.general")
         else:
             _w("Ansible collection: community.general not found — install with: ansible-galaxy collection install community.general")
-
-    lines.append("")
-    lines.append("  Node.js / Frontend")
-    has_bun = _check("bun", "Install: curl -fsSL https://bun.sh/install | bash")
-    has_node = _check("node", "Install via nvm: nvm install 20")
-    all_ok &= has_bun or has_node
 
     lines.append("")
     lines.append("  Project structure")
