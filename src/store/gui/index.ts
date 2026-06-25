@@ -86,7 +86,6 @@ export const getDefaultState = (): GuiState => {
                 { name: 'spindle-coolant', visible: true },
                 { name: 'mdi', visible: true },
                 { name: 'miniconsole', visible: true },
-                { name: 'host-bash', visible: false },
             ],
             desktopLayout1: [
                 { name: 'webcam', visible: true },
@@ -103,7 +102,6 @@ export const getDefaultState = (): GuiState => {
                 { name: 'spindle-coolant', visible: true },
                 { name: 'mdi', visible: true },
                 { name: 'miniconsole', visible: true },
-                { name: 'host-bash', visible: true },
             ],
             widescreenLayout1: [
                 { name: 'cnc-status', visible: true },
@@ -122,7 +120,6 @@ export const getDefaultState = (): GuiState => {
                 { name: 'webcam', visible: true },
                 { name: 'mdi', visible: true },
                 { name: 'miniconsole', visible: true },
-                { name: 'host-bash', visible: false },
             ],
             floatingPanels: {},
         },

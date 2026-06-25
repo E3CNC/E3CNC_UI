@@ -115,7 +115,6 @@ import SpindleCoolantPanel from '@/components/panels/Cnc/SpindleCoolantPanel.vue
 import StatusPanel from '@/components/panels/StatusPanel.vue'
 import TemperaturePanel from '@/components/panels/TemperaturePanel.vue'
 import MdiPanel from '@/components/panels/Cnc/MdiPanel.vue'
-import HostBashPanel from '@/components/panels/Cnc/HostBashPanel.vue'
 import WebcamPanel from '@/components/panels/WebcamPanel.vue'
 
 const store = useStore()
@@ -143,7 +142,6 @@ const registeredPanels: Record<string, unknown> = {
     'offset-preview': Wcs,
     'spindle-coolant': SpindleCoolantPanel,
     mdi: MdiPanel,
-    'host-bash': HostBashPanel,
     klippystate: KlippyStatePanel,
     minsettings: MinSettingsPanel,
     status: StatusPanel,

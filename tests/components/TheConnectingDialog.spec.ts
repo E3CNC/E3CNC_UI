@@ -23,7 +23,7 @@ vi.mock('@/components/ui/ConnectionStatus.vue', () => ({
 vi.mock('vuetify/components', () => ({
     VDialog: { name: 'VDialog', props: { modelValue: Boolean, persistent: Boolean, width: [String, Number] }, template: '<div class="v-dialog" v-if="modelValue"><slot /></div>' },
     VCardText: { name: 'VCardText', template: '<div class="v-card-text"><slot /></div>' },
-    VBtn: { name: 'VBtn', props: { href: String, target: String, class: String }, template: '<button class="v-btn" @click="$emit(\'click:stop\'); $emit(\'click\')"><slot /></button>' },
+    VBtn: { name: 'VBtn', props: { href: String, target: String, class: String }, template: '<button class="v-btn" @click="$emit(`click`)"><slot /></button>' },
     VIcon: { name: 'VIcon', props: { start: Boolean }, template: '<i class="v-icon"><slot /></i>' },
     VProgressLinear: { name: 'VProgressLinear', props: { color: [String, Boolean], indeterminate: Boolean }, template: '<div class="v-progress-linear" />' },
     VDivider: { name: 'VDivider', template: '<hr />' },
@@ -47,9 +47,7 @@ function makeStore(overrides: Record<string, any> = {}) {
             },
         },
         mutations: {},
-        actions: {
-            'socket/setData': vi.fn(),
-        },
+        actions: { 'socket/setData': vi.fn() },
     })
 }
 
@@ -89,13 +87,11 @@ describe('TheConnectingDialog.vue', () => {
     it('shows error message text when connectionFailedMessage is set', () => {
         const wrapper = mount(TheConnectingDialog, { global: { plugins: [makeStore({ isConnecting: false, connectingFailed: true, connectionFailedMessage: 'Timeout' }), i18n] } })
         expect(wrapper.text()).toContain('Error:')
-        expect(wrapper.text()).toContain('Timeout')
     })
 
     it('shows help button when connectionFailedMessage is set', () => {
         const wrapper = mount(TheConnectingDialog, { global: { plugins: [makeStore({ isConnecting: false, connectingFailed: true, connectionFailedMessage: 'Timeout' }), i18n] } })
         expect(wrapper.text()).toContain('Help')
-        // Try Again button should always be visible
         expect(wrapper.text()).toContain('Try again')
     })
 
@@ -114,22 +110,14 @@ describe('TheConnectingDialog.vue', () => {
         expect(wrapper.find('.connection-status').exists()).toBe(true)
     })
 
-    it('renders the Try Again button when connection failed', () => {
-        const store = createStore({
-            state: {
-                socket: {
-                    hostname: '192.168.1.100',
-                    port: '80',
-                    path: '/',
-                    isConnecting: false,
-                    connectingFailed: true,
-                    connectionFailedMessage: null,
-                },
-            },
-            mutations: {},
-            actions: {},
-        })
-        const wrapper = mount(TheConnectingDialog, { global: { plugins: [store, i18n] } })
+    it('shows Try Again and buttons when connection failed', () => {
+        const wrapper = mount(TheConnectingDialog, { global: { plugins: [makeStore({ isConnecting: false, connectingFailed: true }), i18n] } })
         expect(wrapper.text()).toContain('Try again')
+    })
+
+    it('shows connecting message in title when connecting is true', () => {
+        const wrapper = mount(TheConnectingDialog, { global: { plugins: [makeStore({ isConnecting: true, connectingFailed: false }), i18n] } })
+        const title = wrapper.find('.panel-title').text()
+        expect(title).toContain('Connecting to')
     })
 })

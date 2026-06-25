@@ -90,14 +90,3 @@ export function getCncSettings(apiUrl: string) {
 export function updateCncSettings(apiUrl: string, settings: Record<string, unknown>) {
     return requestCnc(apiUrl, '/server/cnc/settings', settings)
 }
-
-export interface BashResult {
-    ok: boolean
-    exit_code: number
-    stdout: string
-    stderr: string
-}
-
-export function execBash(apiUrl: string, command: string, timeout = 30): Promise<BashResult | null> {
-    return requestCnc<BashResult>(apiUrl, '/server/cnc/bash', { command, timeout })
-}

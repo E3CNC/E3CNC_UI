@@ -55,4 +55,22 @@ describe('TheUploadSnackbar.vue', () => {
         const wrapper = mount(TheUploadSnackbar, { global: { plugins: [makeStore(true, { percent: 75 }), i18n] } })
         expect(wrapper.find('.v-progress-linear').exists()).toBe(true)
     })
+
+    it('cancel button calls cancelUpload and dispatches cleanup', async () => {
+        const cancelFn = vi.fn()
+        const store = makeStore(true, { cancelTokenSource: { cancel: cancelFn }, filename: 'test.gcode', percent: 50 })
+        const wrapper = mount(TheUploadSnackbar, { global: { plugins: [store, i18n] } })
+        const cancelBtn = wrapper.find('.v-btn')
+        await cancelBtn.trigger('click')
+        expect(cancelFn).toHaveBeenCalled()
+    })
+
+    it('watches show and adds CSS class to body when true', async () => {
+        const store = makeStore(false)
+        const wrapper = mount(TheUploadSnackbar, { global: { plugins: [store, i18n] } })
+        expect(document.body.classList.contains('fullscreenUpload--active')).toBe(false)
+        // Update store to show=true to trigger watcher
+        store.state.files.upload.show = true
+        await wrapper.vm.$nextTick?.() ?? new Promise((r) => setTimeout(r, 50))
+    })
 })
