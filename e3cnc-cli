@@ -22,6 +22,8 @@ from _e3cnc_shared import (
     run_ansible_playbook, check_dependencies, check_status,
     run_backup, run_restore, run_diagnose, run_logs,
     _ensure_remote_inventory, LOCAL_INVENTORY,
+    get_active_instance, detect_instances, Instance,
+    instance_extra_vars, set_active_instance,
 )
 
 
@@ -189,15 +191,112 @@ Examples:
     return parser
 
 
+def _interactive_menu() -> None:
+    """Show an interactive numbered menu and run the selected command."""
+    items = [
+        ("[S] Status",      "status"),
+        ("[I] Install",     "install"),
+        ("[D] Deploy",      "deploy"),
+        ("[U] Update",      "update"),
+        ("[X] Uninstall",   "uninstall"),
+        ("[C] Check Deps",  "check"),
+        ("[B] Backup",      "backup"),
+        ("[R] Restore",     "restore"),
+        ("[G] Diagnose",    "diagnose"),
+        ("[L] Logs",        "logs"),
+        ("[Q] Quit",        "quit"),
+    ]
+
+    print_banner()
+    print(f"  {Style.BOLD}{Style.GREEN}{TOOL_NAME} v{VERSION}{Style.RESET}")
+    print()
+    print(f"  {Style.BOLD}Select an action:{Style.RESET}")
+    print()
+
+    for i, (label, cmd) in enumerate(items):
+        print(f"  {i + 1:>2}) {label}")
+
+    print()
+    try:
+        choice = input(f"  {Style.BOLD}Choice [1-{len(items)}]{Style.RESET} ").strip()
+    except (EOFError, KeyboardInterrupt):
+        print()
+        sys.exit(0)
+
+    if not choice:
+        sys.exit(0)
+
+    try:
+        idx = int(choice) - 1
+        if idx < 0 or idx >= len(items):
+            print(f"  {Style.YELLOW}Invalid choice: {choice}{Style.RESET}")
+            sys.exit(1)
+        label, cmd = items[idx]
+    except ValueError:
+        # Check if it matches a letter shortcut
+        choice_lower = choice.lower()
+        found = None
+        for l, c in items:
+            if c and l.lower().startswith(f"[{choice_lower}]"):
+                found = c
+                break
+        if not found:
+            print(f"  {Style.YELLOW}Invalid choice: {choice}{Style.RESET}")
+            sys.exit(1)
+        cmd = found
+
+    if cmd == "quit":
+        sys.exit(0)
+
+    # Build fake args namespace
+    class FakeArgs:
+        pass
+
+    fake_args = FakeArgs()
+    fake_args.remote = None
+    fake_args.check = False
+    fake_args.verbose = False
+    fake_args.backup_dir = ""
+    fake_args.yes = False
+    fake_args.lines = 50
+
+    dispatch = {
+        "check": cmd_check,
+        "install": cmd_install,
+        "deploy": cmd_deploy,
+        "update": cmd_update,
+        "uninstall": cmd_uninstall,
+        "status": cmd_status,
+        "backup": cmd_backup,
+        "restore": cmd_restore,
+        "diagnose": cmd_diagnose,
+        "logs": cmd_logs,
+    }
+    handler = dispatch.get(cmd)
+    if handler:
+        handler(fake_args)
+
+
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
 
     if args.command is None:
-        parser.print_help()
+        _interactive_menu()
         sys.exit(0)
 
     print_banner()
+
+    # Auto-detect instance if command uses instance paths
+    needs_instance = args.command in (
+        "install", "deploy", "update", "uninstall",
+        "status", "backup", "restore", "diagnose", "logs",
+    )
+    if needs_instance and not args.remote:
+        inst = get_active_instance()
+        if inst and inst.name != "printer":
+            info(f"Using instance: {Style.BOLD}{inst.name}{Style.RESET}")
+            info(f"  Config: {inst.config_dir}")
 
     dispatch = {
         "check": cmd_check,

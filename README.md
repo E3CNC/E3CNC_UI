@@ -79,7 +79,10 @@ Full docs on the [wiki](https://github.com/E3CNC/E3CNC_UI/wiki):
 | `E3CNC/moonraker-mcp/` | Moonraker MCP (MCP server + CNC agent component) |
 | `E3CNC/post_processors/` | Fusion 360 CAM post processors |
 | `ansible/` | Ansible playbooks for install/deploy/uninstall |
+| `_e3cnc_shared.py` | Shared command logic for the e3cnc-cli tool |
+| `e3cnc-cli` | Unified CLI — full install, deploy, update, uninstall, status, backup, restore, diagnose, logs |
 | `scripts/` | Utility scripts (install, deploy, download frontend) |
+| `tests/test_e3cnc_cli.py` | Unit tests for the e3cnc-cli shared module (48 tests) |
 
 ## Contributors
 

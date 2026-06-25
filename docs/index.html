@@ -700,6 +700,27 @@
                 <h2>Quick Install</h2>
 
                 <p class="install-intro">
+                    <strong>Recommended:</strong> Use the <code>e3cnc-cli</code> tool for a unified
+                    interactive setup. It handles everything — agent vendoring, frontend build,
+                    plugin deployment, and service restarts — in a single command.
+                </p>
+
+                <pre class="install-config"><code>git clone https://github.com/E3CNC/E3CNC_UI.git ~/E3CNC_UI
+cd ~/E3CNC_UI
+./e3cnc-cli install</code></pre>
+
+                <p class="install-note">
+                    Run <code>./e3cnc-cli</code> with no arguments for an interactive menu.
+                    Tab completion available via
+                    <code>source ~/E3CNC_UI/scripts/e3cnc-completion.sh</code>.
+                    See the
+                    <a href="https://github.com/E3CNC/E3CNC_UI/wiki/Installation">wiki</a>
+                    for details and other install methods.
+                </p>
+
+                <h3 style="margin-top:2em">Alternate: Update Manager</h3>
+
+                <p class="install-intro">
                     Already have Klipper + Moonraker + Mainsail? Add this block to
                     <code>~/printer_data/config/moonraker.conf</code>, restart Klipper,
                     then click <strong>Update</strong> in <strong>Machine &rarr; Update Manager</strong>.

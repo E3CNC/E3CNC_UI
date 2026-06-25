@@ -14,11 +14,12 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from dataclasses import dataclass
 from typing import List, NoReturn, Optional, Tuple
 
 # ── Metadata ────────────────────────────────────────────────────────────────
 
-VERSION = "0.7.4"
+VERSION = "0.7.5"
 TOOL_NAME = "e3cnc-cli"
 
 # ── Paths (relative to this script's location) ─────────────────────────────
@@ -290,6 +291,128 @@ def check_status(remote_host: Optional[str] = None, output_callback=None) -> Tup
 BACKUP_EXCLUDES = ("node_modules", ".git", ".venv", "__pycache__", "*.pyc")
 
 
+# ── Multi-instance detection ────────────────────────────────────────────────
+
+@dataclass
+class Instance:
+    """Represents a detected Klipper/Moonraker instance."""
+    name: str
+    printer_data_dir: str
+    config_dir: str
+    moonraker_conf: str
+    moonraker_log: str
+    scripts_dir: str
+    macros_dir: str
+    E3CNC_dir: str
+    printer_cfg: str
+    web_root: str
+    is_running: bool = False
+
+    @classmethod
+    def from_printer_data(cls, base: str, web_root: str = "") -> "Instance":
+        """Create an Instance from a printer_data directory path."""
+        config = f"{base}/config"
+        name = Path(base).name.replace("printer_data", "printer")
+        if name == "printer":
+            name = "printer"
+        if not web_root:
+            web_root = f"{Path.home()}/mainsail"
+            if name != "printer":
+                web_root = f"{Path.home()}/mainsail-{name.replace('printer', '')}"
+        return cls(
+            name=name,
+            printer_data_dir=base,
+            config_dir=config,
+            moonraker_conf=f"{config}/moonraker.conf",
+            moonraker_log=f"{base}/logs/moonraker.log",
+            scripts_dir=f"{base}/scripts",
+            macros_dir=f"{config}/macros",
+            E3CNC_dir=f"{config}/E3CNC",
+            printer_cfg=f"{config}/printer.cfg",
+            web_root=web_root,
+            is_running=Path(f"{config}/moonraker.conf").exists(),
+        )
+
+
+_active_instance: Optional[Instance] = None
+
+
+def detect_instances() -> List[Instance]:
+    """Scan for Klipper/Moonraker instances on this machine."""
+    instances: List[Instance] = []
+    home = str(Path.home())
+
+    for candidate in sorted(Path(home).glob("printer_data*")):
+        if candidate.is_dir():
+            conf = candidate / "config" / "moonraker.conf"
+            if conf.exists():
+                instances.append(Instance.from_printer_data(str(candidate)))
+
+    return instances
+
+
+def select_instance(instances: List[Instance]) -> Optional[Instance]:
+    """Pick an instance interactively, or return the only one."""
+    if not instances:
+        return None
+    if len(instances) == 1:
+        return instances[0]
+
+    print()
+    print(f"  {Style.BOLD}Multiple Klipper/Moonraker instances detected:{Style.RESET}")
+    print()
+    for i, inst in enumerate(instances):
+        dot = "\x1b[32m●\x1b[0m" if inst.is_running else "\x1b[90m○\x1b[0m"
+        print(f"  {i + 1:>2}) {dot} {Style.BOLD}{inst.name}{Style.RESET}")
+        print(f"      Config: {inst.config_dir}")
+        print()
+
+    try:
+        choice = input(f"  {Style.BOLD}Choose instance [1-{len(instances)}]{Style.RESET} ").strip()
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return None
+
+    try:
+        idx = int(choice) - 1
+        if 0 <= idx < len(instances):
+            return instances[idx]
+    except ValueError:
+        pass
+
+    return instances[0]
+
+
+def get_active_instance() -> Optional[Instance]:
+    """Get the globally active instance, auto-detecting if needed."""
+    global _active_instance
+    if _active_instance is not None:
+        return _active_instance
+    instances = detect_instances()
+    _active_instance = select_instance(instances)
+    return _active_instance
+
+
+def set_active_instance(inst: Instance) -> None:
+    """Set the globally active instance."""
+    global _active_instance
+    _active_instance = inst
+
+
+def instance_extra_vars(inst: Instance) -> List[str]:
+    """Generate Ansible extra vars for a specific instance."""
+    return [
+        f"printer_data_dir={inst.printer_data_dir}",
+        f"printer_data__config_dir={inst.config_dir}",
+        f"printer_data__E3CNC_dir={inst.E3CNC_dir}",
+        f"printer_data__scripts_dir={inst.scripts_dir}",
+        f"printer_data__macros_dir={inst.macros_dir}",
+        f"printer_data__printer_cfg={inst.printer_cfg}",
+        f"moonraker_conf={inst.moonraker_conf}",
+        f"frontend__web_root={inst.web_root}",
+    ]
+
+
 def run_backup(remote_host: Optional[str] = None, output_callback=None) -> CmdResult:
     """Create a timestamped backup. Returns CmdResult."""
     out: List[str] = []
@@ -305,7 +428,7 @@ def run_backup(remote_host: Optional[str] = None, output_callback=None) -> CmdRe
     _o("Backing up frontend (mainsail)...")
     mainsail_dir = Path.home() / "mainsail"
     if mainsail_dir.is_dir():
-        shutil.copytree(mainsail_dir, backup_dir / "frontend", ignore=shutil.ignore_patterns(*BACKUP_EXCLUDES), symlinks=True)
+        subprocess.run(["cp", "-a", str(mainsail_dir), str(backup_dir / "frontend")], capture_output=True)
         _o(f"  ✓ Frontend backed up ({_dir_size(mainsail_dir)} MB)")
     else:
         _o("  ⚠ No frontend directory found")
@@ -313,7 +436,7 @@ def run_backup(remote_host: Optional[str] = None, output_callback=None) -> CmdRe
     _o("Backing up printer config...")
     config_dir = Path.home() / "printer_data" / "config"
     if config_dir.is_dir():
-        shutil.copytree(config_dir, backup_dir / "config", ignore=shutil.ignore_patterns(*BACKUP_EXCLUDES), symlinks=True)
+        subprocess.run(["cp", "-a", str(config_dir), str(backup_dir / "config")], capture_output=True)
         _o("  ✓ Printer config backed up")
     else:
         _o("  ⚠ No config directory found")
@@ -498,7 +621,18 @@ def run_diagnose(remote_host: Optional[str] = None, output_callback=None) -> Cmd
     _o(f"Running diagnostics on {label}...")
 
     checks = [
-        ("Moonraker API", "curl -sf http://127.0.0.1:7125/printer/info 2>/dev/null"),
+        ("Moonraker API", '''curl -sf http://127.0.0.1:7125/printer/info 2>/dev/null | python3 -c "
+import sys, json
+d = json.load(sys.stdin).get('result', {})
+print(d.get('state', 'unknown'))
+host = d.get('hostname', '?')
+ver = d.get('software_version', '?')
+cpu = d.get('cpu_info', '?')
+klipper = d.get('klipper_path', '?')
+print(f'Host: {host}')
+print(f'Version: {ver}')
+print(f'CPU: {cpu}')
+" 2>/dev/null'''),
         ("Klippy state", 'curl -sf http://127.0.0.1:7125/printer/info 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get(\'result\',{}).get(\'state\',\'unknown\'))" 2>/dev/null'),
         ("Agent loaded", "curl -sf http://127.0.0.1:7125/server/info 2>/dev/null | python3 -c \"import sys,json; d=json.load(sys.stdin); print('yes' if 'cnc_agent' in str(d.get('result',{})) else 'no')\" 2>/dev/null || echo 'no'"),
         ("Metadata loaded", "curl -sf http://127.0.0.1:7125/server/info 2>/dev/null | python3 -c \"import sys,json; d=json.load(sys.stdin); print('yes' if 'cnc_metadata' in str(d.get('result',{})) else 'no')\" 2>/dev/null || echo 'no'"),
@@ -508,10 +642,17 @@ def run_diagnose(remote_host: Optional[str] = None, output_callback=None) -> Cmd
     for label, cmd in checks:
         result = runner(cmd)
         status = result.stdout.strip() if result.returncode == 0 else "error"
-        if status and status not in ("error", "unreachable", "no"):
-            _o(f"  ✓ {label}: {status}")
-        else:
+        if not status or status in ("error", "unreachable", "no"):
             _o(f"  ⚠ {label}: {status}")
+            continue
+
+        lines = status.split("\n")
+        main_status = lines[0].strip()
+        _o(f"  ✓ {label}: {main_status}")
+        for extra in lines[1:]:
+            extra = extra.strip()
+            if extra:
+                _o(f"      {extra}")
 
     _o("")
     _o("  For detailed logs: e3cnc-cli logs" + (f" --remote {remote_host}" if remote_host else ""))

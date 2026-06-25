@@ -38,4 +38,7 @@ validation_screenshot*.png
 verbose-snapshot*.txt
 .playwright-cli/
 prd/
+# e3cnc-cli backup artifacts
+e3cnc-backup-*/
+
 public/img/themes/sidebarLogo-ndot57*.svg
