@@ -1,0 +1,36 @@
+# Changelog
+
+## v0.7.8 (2026-06-25)
+- Cleanup Vuetify 2 class leftovers across 20+ files
+- Replace Vue 2 `vue-load-image` package with local Vue 3 component
+- Fix TimelapseFilesPanel `sortBy` prop for Vuetify 3 data-table
+
+## v0.7.7 (2026-06-25)
+- Version compatibility check between `e3cnc-cli` and `_e3cnc_shared.py`
+- Various bug fixes: auto-connect, auto-detect, font restore, Ansible fixes
+
+## v0.7.6 (2026-06-25)
+- Fix `run_ansible_playbook` — added missing `extra_vars` parameter
+
+## v0.7.5 (2026-06-25)
+- Interactive menu: loop, switch instance, confirmation prompts
+- SSH validation, Ansible prerequisite check, `--instance` flag
+- Multi-instance docs
+
+## v0.7.3 (2026-06-24)
+- **Moonraker MCP server** — 13 MCP tools for AI agent integration
+- Package rename: `moonraker-cnc-agent` → `moonraker-mcp`
+- Ansible fixes: printer.cfg includes, recursive var, download_frontend.sh
+- Post-update script improvements, dry-run mode for backup restore
+
+## v0.7.2 (2026-06-22)
+- **Ndot57 theme** — new display font with configurable letter-spacing
+- Font inheritance system via CSS custom properties
+- Rem units across 25+ components
+- DRO formatting improvements
+
+## v0.7.1 (2026-06-22)
+- Rename project from `mainsail-cnc` to `E3CNC UI`
+
+## v0.7.0 (2026-06-22)
+- Initial release under E3CNC organization

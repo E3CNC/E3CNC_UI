@@ -77,14 +77,14 @@ jobs:
 
       - name: Write release notes
         run: |
+          VERSION='${{ steps.version.outputs.VERSION }}'
           echo "### Auto-built from commit ${{ github.sha }}" > release-notes.md
           echo "" >> release-notes.md
           echo "---" >> release-notes.md
-          echo "### Changelog" >> release-notes.md
+          echo "### What's Changed" >> release-notes.md
           echo "" >> release-notes.md
-          CURRENT='${{ steps.version.outputs.VERSION }}'
-          PREV=$(git tag --sort=-version:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | grep -Fxv "$CURRENT" | head -n1 || echo "")
-          python3 scripts/_gen_changelog.py "$PREV" >> release-notes.md
+          python3 scripts/_get_changelog_entry.py "$VERSION" >> release-notes.md 2>/dev/null \
+            || echo "  See the [CHANGELOG](https://github.com/E3CNC/E3CNC_UI/blob/main/CHANGELOG.md) for details." >> release-notes.md
 
       - name: Publish release
         env:
