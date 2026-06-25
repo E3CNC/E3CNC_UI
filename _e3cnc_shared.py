@@ -19,7 +19,7 @@ from typing import List, NoReturn, Optional, Tuple
 
 # ── Metadata ────────────────────────────────────────────────────────────────
 
-VERSION = "0.7.5"
+VERSION = "0.7.6"
 TOOL_NAME = "e3cnc-cli"
 
 # ── Paths (relative to this script's location) ─────────────────────────────
@@ -755,6 +755,7 @@ def run_ansible_playbook(
     verbose: bool,
     label: str,
     output_callback=None,
+    extra_vars: Optional[List[str]] = None,
 ) -> CmdResult:
     """Run one of the Ansible playbooks and return a CmdResult."""
     out: List[str] = []
@@ -772,11 +773,14 @@ def run_ansible_playbook(
     if check_mode:
         _o("  Mode: dry-run (--check)")
 
+    if extra_vars:
+        _o(f"  Instance: {'  '.join(extra_vars)}")
+
     _o("")
 
     rc = run_ansible(
         playbook, inventory, check=check_mode, verbose=verbose,
-        output_callback=output_callback,
+        extra_vars=extra_vars, output_callback=output_callback,
     )
 
     _o("")
