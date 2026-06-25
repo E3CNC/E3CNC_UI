@@ -234,7 +234,6 @@ def check_dependencies(output_callback=None) -> Tuple[bool, List[str]]:
             ["ansible-playbook", "--version"], capture_output=True, text=True
         ).stdout.splitlines()[0]
         lines.append(f"  → ansible-playbook version: {ansible_ver.strip()}")
-            all_ok = False
 
     lines.append("")
     lines.append("  Project structure")
