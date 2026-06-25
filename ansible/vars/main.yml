@@ -16,8 +16,9 @@ klipper:
 
 printer_data:
   config_dir: '{{ ansible_env.HOME }}/printer_data/config'
-  E3CNC_dir: '{{ printer_data.config_dir }}/E3CNC'
+  E3CNC_dir: '{{ ansible_env.HOME }}/printer_data/config/E3CNC'
   scripts_dir: '{{ ansible_env.HOME }}/printer_data/scripts'
   macros_dir: '{{ ansible_env.HOME }}/printer_data/config/macros'
+  printer_cfg: '{{ ansible_env.HOME }}/printer_data/config/printer.cfg'
 
-moonraker_conf: '{{ printer_data.config_dir }}/moonraker.conf'
+moonraker_conf: '{{ ansible_env.HOME }}/printer_data/config/moonraker.conf'

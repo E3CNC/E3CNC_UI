@@ -35,7 +35,12 @@ async function requestCnc<T>(apiUrl: string, path: string, body?: unknown): Prom
         return null
     }
 
-    return (await response.json()) as T
+    const json = await response.json()
+    // Moonraker wraps successful responses in a "result" envelope
+    if (json && typeof json === 'object' && 'result' in json) {
+        return json.result as T
+    }
+    return json as T
 }
 
 export function getCncState(apiUrl: string) {
@@ -84,4 +89,15 @@ export function getCncSettings(apiUrl: string) {
 
 export function updateCncSettings(apiUrl: string, settings: Record<string, unknown>) {
     return requestCnc(apiUrl, '/server/cnc/settings', settings)
+}
+
+export interface BashResult {
+    ok: boolean
+    exit_code: number
+    stdout: string
+    stderr: string
+}
+
+export function execBash(apiUrl: string, command: string, timeout = 30): Promise<BashResult | null> {
+    return requestCnc<BashResult>(apiUrl, '/server/cnc/bash', { command, timeout })
 }

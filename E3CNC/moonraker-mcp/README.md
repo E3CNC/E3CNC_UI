@@ -245,6 +245,15 @@ cd ~/E3CNC_UI
 
 ## Updating via Moonraker Update Manager
 
+> **Important:** Moonraker only *manages* an existing repo — it does not clone one from scratch. Before adding the `[update_manager E3CNC_UI]` section to `moonraker.conf`, you must clone the repo manually:
+>
+> ```sh
+> cd ~
+> git clone https://github.com/E3CNC/E3CNC_UI.git
+> cd E3CNC_UI
+> ./scripts/post_update.sh
+> ```
+
 The Ansible install and bash script both register an `[update_manager E3CNC_UI]` entry in `moonraker.conf`. After a git pull, the `post_update_script` automatically:
 
 1. Downloads the latest pre-built frontend (avoids running `vite build` on the printer)
@@ -252,4 +261,4 @@ The Ansible install and bash script both register an `[update_manager E3CNC_UI]`
 3. Re-deploys the metadata extractor, WCS plugin, and macros
 4. Restarts Moonraker
 
-Clicking **Update** in Mainsail's Machine → Update Manager panel is all you need.
+Once set up, clicking **Update** in Mainsail's Machine → Update Manager panel is all you need for future updates.

@@ -18,6 +18,17 @@ log()  { echo "[E3CNC] $*"; }
 ok()   { echo "[E3CNC] ✓ $*"; }
 fail() { echo "[E3CNC] ✗ $*"; exit 1; }
 
+# --- Parse flags ---
+DRY_RUN=false
+ARGS=()
+for arg in "$@"; do
+    case "$arg" in
+        --dry-run) DRY_RUN=true ;;
+        *) ARGS+=("$arg") ;;
+    esac
+done
+set -- "${ARGS[@]}"
+
 # --- Collect available backups ---
 mapfile -t BACKUPS < <(ls -1d "${BACKUP_DIR}/e3cnc-backup-"* 2>/dev/null | sort -r || true)
 
@@ -73,6 +84,26 @@ HAS_WCS=false
 [[ -d "$SELECTED/frontend" ]] && HAS_FRONTEND=true
 [[ -d "$SELECTED/config" ]] && HAS_CONFIG=true
 [[ -f "$SELECTED/wcs_offsets.json" ]] && HAS_WCS=true
+
+# --- Dry-run: just show what would happen ---
+if $DRY_RUN; then
+    echo "[DRY RUN] Would restore from: $(basename "$SELECTED")"
+    echo ""
+    if $HAS_FRONTEND; then
+        echo "  Would restore frontend to: $WEB_ROOT"
+        echo "    Source: $SELECTED/frontend/"
+    fi
+    if $HAS_CONFIG; then
+        echo "  Would restore printer config to: ${HOME}/printer_data/config/"
+        echo "    Source: $SELECTED/config/"
+    fi
+    if $HAS_WCS; then
+        echo "  Would restore WCS offsets from: $SELECTED/wcs_offsets.json"
+    fi
+    echo ""
+    ok "Dry-run complete — no changes made. Run without --dry-run to restore."
+    exit 0
+fi
 
 # --- Restore frontend ---
 if $HAS_FRONTEND; then

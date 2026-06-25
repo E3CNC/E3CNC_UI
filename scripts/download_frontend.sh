@@ -21,11 +21,15 @@ echo "=== Downloading pre-built frontend ==="
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
+# Resolve release version — try git tag first, then package.json
 TAG_VER=$(git -C "$REPO_ROOT" tag --points-at HEAD | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)
 if [[ -n "$TAG_VER" ]]; then
     RELEASE_VER="$TAG_VER"
-else
+elif command -v node &>/dev/null; then
     RELEASE_VER="v$(node -p "require('$REPO_ROOT/package.json').version")"
+else
+    # Fallback: grep version from package.json without node
+    RELEASE_VER="v$(grep -oP '"version"\s*:\s*"\K[^"]+' "$REPO_ROOT/package.json" || echo '0.0.0')"
 fi
 ASSET_NAME="E3CNC_UI-${RELEASE_VER}.zip"
 ZIP_FILE="$TMP_DIR/$ASSET_NAME"
@@ -33,7 +37,8 @@ ZIP_FILE="$TMP_DIR/$ASSET_NAME"
 echo "    target release asset: $ASSET_NAME"
 
 RELEASES_API_URL="https://api.github.com/repos/${OWNER}/${REPO}/releases?per_page=10"
-ZIP_URL=$(curl -sfL "$RELEASES_API_URL" | node -e "
+if command -v node &>/dev/null; then
+    ZIP_URL=$(curl -sfL "$RELEASES_API_URL" | node -e "
 let data = '';
 process.stdin.on('data', c => data += c);
 process.stdin.on('end', () => {
@@ -52,6 +57,10 @@ process.stdin.on('end', () => {
   }
 });
 ")
+else
+    echo "    WARNING: node not found — skipping nightly release lookup, will fall back to local build" >&2
+    ZIP_URL=""
+fi
 
 if [[ -n "$ZIP_URL" ]] && curl -sfL "$ZIP_URL" -o "$ZIP_FILE" && [[ -s "$ZIP_FILE" ]]; then
     echo "    downloaded nightly build ($(du -h "$ZIP_FILE" | cut -f1))"

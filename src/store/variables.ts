@@ -113,6 +113,7 @@ export const allDashboardPanels = [
     'jog',
     'wcs',
     'spindle-coolant',
+    'host-bash',
     'macros',
     'led-effects',
     'machine-settings',

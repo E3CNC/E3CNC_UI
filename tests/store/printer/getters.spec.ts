@@ -369,9 +369,7 @@ describe('printer getters', () => {
     })
 
     describe('getFans', () => {
-        // NOTE: Source code has `objects.foreach` (typo - should be `forEach`).
-        // This pre-existing bug means getFans always throws. Skipping tests until fixed.
-        it.skip('returns fans from printer objects sorted by controllable then name', () => {
+        it('returns fans from printer objects sorted by controllable then name', () => {
             state['fan_generic my_fan'] = { speed: 0.5 } as any
             state['temperature_fan chamber'] = { speed: 0.8 } as any
             state['fan'] = { speed: 1 } as any
@@ -387,7 +385,7 @@ describe('printer getters', () => {
             expect(result[2].controllable).toBe(false)
         })
 
-        it.skip('returns empty when no fan objects exist', () => {
+        it('returns empty when no fan objects exist', () => {
             const result = (getters as any).getFans(state, { getPrinterObjects: () => [] })
             expect(result).toEqual([])
         })

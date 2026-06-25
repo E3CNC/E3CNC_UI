@@ -35,6 +35,17 @@
       tags:
         - restart-services
 
+    - name: Verify Klippy reports ready
+      ansible.builtin.uri:
+        url: 'http://127.0.0.1:7125/printer/info'
+        method: GET
+      register: klippy_info
+      retries: 20
+      delay: 3
+      until: klippy_info.json is defined and klippy_info.json.result.state == 'ready'
+      tags:
+        - restart-services
+
     - name: Verify CncAgent loaded in moonraker logs
       ansible.builtin.shell:
         cmd: |

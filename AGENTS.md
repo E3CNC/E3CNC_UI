@@ -89,9 +89,10 @@ Plus fixes discovered during rollout:
 - **Nightly CI releases**: `.github/workflows/build-frontend.yml` builds on every
   push to `main` and publishes `E3CNC_UI-<version>.zip` (semver) as a `nightly-main-<YYYYMMDD>-<run_id>` GitHub release.
   Low-RAM devices (32-bit ARM) download the pre-built zip instead of running `vite build`.
-- **`post_update_script`**: Moonraker update manager now runs `scripts/post_update.sh`
+- **`post_update_script`**: Moonraker update manager runs `scripts/post_update.sh`
   after every `git pull`, which downloads the nightly release, re-vendors the agent,
-  re-deploys plugins, and restarts Moonraker automatically.
+  re-deploys plugins, and restarts Moonraker automatically. Repo must be cloned
+  manually first — Moonraker does not clone from scratch.
 - **Fixed missing dep**: `vue-load-image` was imported in `src/main.ts` but missing
   from `package.json` — was blocking all CI builds.
 
@@ -131,5 +132,5 @@ a9144473 spec: add Ansible migration plan
 - **`@vue/compat`**: Fully removed — app runs on pure Vue 3.5 + Vuetify 3.
 - **Runtime fixes applied**: `i18n.global.t`, `useDisplay()`, `boolMenu`, removed `const mdiXxx = mdiXxx` TDZ bugs across 100+ files.
 - **32-bit ARM builds**: Do NOT run `bun run build` on 32-bit ARM — it OOMs. Use `scripts/download_frontend.sh` or CI nightly releases instead.
-- **Moonraker update manager**: Has `post_update_script: ~/E3CNC_UI/scripts/post_update.sh` which auto-updates frontend + agent on git pull.
+- **Moonraker update manager**: Has `post_update_script: ~/E3CNC_UI/scripts/post_update.sh` which auto-updates frontend + agent on git pull. Repo must be cloned manually first (Moonraker does not clone from scratch).
 - **Ask before pushing**: Never push to remote without asking the user first.

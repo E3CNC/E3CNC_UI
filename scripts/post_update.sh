@@ -23,6 +23,17 @@ export PATH="$HOME/.local/bin:$HOME/.bun/bin:/usr/local/bin:/usr/bin:/bin"
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+# Guard: the repo must be cloned before this script can do anything useful.
+if [[ ! -d "$REPO_ROOT/.git" ]]; then
+    echo "[E3CNC] ERROR: This script must be run from inside a cloned E3CNC_UI repository." >&2
+    echo "[E3CNC]" >&2
+    echo "[E3CNC]   Clone the repo first:" >&2
+    echo "[E3CNC]     cd ~ && git clone https://github.com/E3CNC/E3CNC_UI.git" >&2
+    echo "[E3CNC]     cd E3CNC_UI && ./scripts/post_update.sh" >&2
+    echo "[E3CNC]" >&2
+    exit 1
+fi
+
 step() { echo "[E3CNC] [${1}/${TOTAL_STEPS}] $2"; }
 ok()   { echo "[E3CNC] ✓ $1"; }
 fail() { echo "[E3CNC] ✗ $1"; exit 1; }
@@ -41,7 +52,7 @@ echo ""
 step 1 "Checking dependencies…"
 
 MISSING=""
-for cmd in git python3 curl unzip rsync; do
+for cmd in git python3 curl unzip rsync node; do
     command -v "$cmd" &>/dev/null || MISSING="$MISSING $cmd"
 done
 command -v pip3 &>/dev/null || command -v pip &>/dev/null || MISSING="$MISSING pip3"

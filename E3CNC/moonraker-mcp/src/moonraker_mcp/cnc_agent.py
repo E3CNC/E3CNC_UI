@@ -97,6 +97,9 @@ class CncAgent:
                 "GET": self.handle_settings_get,
                 "POST": self.handle_settings_post,
             },
+            "/server/cnc/bash": {
+                "POST": self.handle_bash,
+            },
         }
 
         for path, handlers in endpoint_groups.items():
@@ -482,6 +485,60 @@ class CncAgent:
         payload = self._coerce_payload(request)
         self.update_settings(payload)
         return {"ok": True, "type": "settings", "settings": copy.deepcopy(self._state["settings"])}
+
+    async def handle_bash(self, request: Any = None):
+        import subprocess
+        payload = self._coerce_payload(request)
+        command = str(payload.get("command", "")).strip()
+        timeout = float(payload.get("timeout", 30.0))
+
+        if not command:
+            raise ValueError("bash: command must not be empty")
+
+        # Block dangerous one-liners that could modify the install or lock the host
+        low = command.lower()
+        if any(kw in low for kw in ["rm -rf /", ":(){ :|:& };:", "dd if=/dev/zero", "mkfs.", "chmod -r 0 /"]):
+            raise ValueError("bash: command rejected (potentially destructive pattern)")
+
+        self.logger.info("bash: executing command (timeout=%.1fs): %s", timeout, command[:500])
+
+        try:
+            result = subprocess.run(
+                command,
+                shell=True,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                executable="/bin/bash",
+            )
+            self.logger.info(
+                "bash: exit_code=%d stdout=%d chars stderr=%d chars",
+                result.returncode,
+                len(result.stdout),
+                len(result.stderr),
+            )
+            return {
+                "ok": True,
+                "exit_code": result.returncode,
+                "stdout": result.stdout,
+                "stderr": result.stderr,
+            }
+        except subprocess.TimeoutExpired:
+            self.logger.warning("bash: command timed out after %.1fs: %s", timeout, command[:200])
+            return {
+                "ok": False,
+                "exit_code": -1,
+                "stdout": "",
+                "stderr": f"Command timed out after {timeout}s",
+            }
+        except Exception as exc:
+            self.logger.error("bash: execution failed: %s", exc)
+            return {
+                "ok": False,
+                "exit_code": -1,
+                "stdout": "",
+                "stderr": str(exc),
+            }
 
 
 def load_component(config):
