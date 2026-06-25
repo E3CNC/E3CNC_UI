@@ -1,0 +1,52 @@
+# Dockerfile.fresh-install
+# Simulates a clean Linux machine to test e3cnc-cli install.
+#
+# Build:
+#   docker build -t e3cnc-test -f tests/Dockerfile.fresh-install .
+#
+# Run (interactive):
+#   docker run -it --rm e3cnc-test
+#
+# Run (auto-check deps):
+#   docker run --rm e3cnc-test bash -c 'cd ~/E3CNC_UI && ./e3cnc-cli check'
+#
+# Run (full install — will fail at Moonraker-dependent steps but proves
+#        ansible + bun auto-install works):
+#   docker run --rm e3cnc-test bash -c 'cd ~/E3CNC_UI && echo y | ./e3cnc-cli install'
+
+FROM ubuntu:24.04
+
+# Prevent tzdata interactive prompt
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
+# Install bare minimum — NO ansible, NO bun, NO nvm, NO pip
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    curl \
+    python3 \
+    sudo \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create a non-root user for testing (e3cnc-cli installs user-level tools)
+RUN useradd -m -s /bin/bash testbed && echo "testbed ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+USER testbed
+WORKDIR /home/testbed
+
+# Clone the repo
+RUN git clone https://github.com/E3CNC/E3CNC_UI.git /home/testbed/E3CNC_UI
+
+# Print summary
+RUN echo "=== Fresh install test environment ===" && \
+    echo "Python: $(python3 --version 2>&1)" && \
+    echo "Git:    $(git --version 2>&1)" && \
+    echo "Curl:   $(curl --version 2>&1 | head -1)" && \
+    echo "--- Missing (expected) ---" && \
+    (pip3 --version 2>&1 || echo "pip:     NOT INSTALLED") && \
+    (ansible-playbook --version 2>&1 | head -1 || echo "ansible: NOT INSTALLED") && \
+    (bun --version 2>&1 || echo "bun:     NOT INSTALLED") && \
+    echo "==========================="
+
+CMD ["bash"]

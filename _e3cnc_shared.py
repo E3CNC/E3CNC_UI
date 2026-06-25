@@ -19,7 +19,7 @@ from typing import List, NoReturn, Optional, Tuple
 
 # ── Metadata ────────────────────────────────────────────────────────────────
 
-VERSION = "0.7.7"
+VERSION = "0.7.8"
 TOOL_NAME = "e3cnc-cli"
 
 # ── Paths (relative to this script's location) ─────────────────────────────
@@ -205,7 +205,6 @@ def check_dependencies(output_callback=None) -> Tuple[bool, List[str]]:
             lines.append("  ✓ Ansible collection: community.general")
         else:
             _w("Ansible collection: community.general not found — install with: ansible-galaxy collection install community.general")
-            all_ok = False
 
     lines.append("")
     lines.append("  Node.js / Frontend")

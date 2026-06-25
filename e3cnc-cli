@@ -57,7 +57,7 @@ from typing import List, NoReturn, Optional, Tuple
 
 # ── Metadata ────────────────────────────────────────────────────────────────
 
-VERSION = "0.7.7"
+VERSION = "0.7.8"
 TOOL_NAME = "e3cnc-cli"
 
 # ── Paths (relative to this script's location) ─────────────────────────────
@@ -864,14 +864,38 @@ def _validate_ssh(host: str) -> bool:
 
 
 def _require_ansible() -> None:
-    """Check ansible-playbook is available, with a helpful error if not."""
-    import shutil
+    """Ensure ansible-playbook is available, auto-installing if needed."""
+    if shutil.which("ansible-playbook"):
+        return
+
+    print(f"  {Style.CYAN}→{Style.RESET} Installing Ansible...")
+    # Ensure pip is available
+    if not shutil.which("pip3") and not shutil.which("pip"):
+        info("Installing pip...")
+        subprocess.run(
+            [sys.executable, "-m", "ensurepip", "--upgrade"],
+            capture_output=True, text=True,
+        )
+        pip_cmd = "pip3" if shutil.which("pip3") else "pip"
+        if not shutil.which(pip_cmd):
+            fail("Could not install pip. Try: sudo apt install python3-pip")
+
+    pip_cmd = "pip3" if shutil.which("pip3") else "pip"
+    result = subprocess.run(
+        [pip_cmd, "install", "--user", "ansible"],
+        capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        fail(f"Ansible installation failed: {result.stderr}")
+
+    # Add ~/.local/bin to PATH for this session
+    local_bin = Path.home() / ".local" / "bin"
+    os.environ["PATH"] = f"{local_bin}:{os.environ.get('PATH', '')}"
+
     if not shutil.which("ansible-playbook"):
-        print()
-        fail("ansible-playbook is required but not installed.")
-        fail("Install it with: pip3 install ansible --user")
-        fail("Then add ~/.local/bin to your PATH, or run: export PATH=$HOME/.local/bin:$PATH")
-        sys.exit(1)
+        fail(f"Ansible installed but not found in PATH. Add {local_bin} to your PATH and re-run.")
+
+    ok("Ansible installed")
 
 
 def _get_instance(args: argparse.Namespace) -> Optional[Instance]:
@@ -938,8 +962,55 @@ def cmd_check(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
+def _ensure_bun() -> None:
+    """Install bun if not available."""
+    if shutil.which("bun"):
+        return
+    info("Installing bun...")
+    result = subprocess.run(
+        ["curl", "-fsSL", "https://bun.sh/install", "|", "bash"],
+        capture_output=True, text=True, shell=True,
+    )
+    if result.returncode != 0:
+        warn(f"bun auto-install failed: {result.stderr}")
+        warn("Install bun manually: curl -fsSL https://bun.sh/install | bash")
+        return
+    # Add bun to PATH
+    bun_path = Path.home() / ".bun" / "bin"
+    os.environ["PATH"] = f"{bun_path}:{os.environ.get('PATH', '')}"
+    if shutil.which("bun"):
+        ok("bun installed")
+
+
+def _ensure_ansible_collections() -> None:
+    """Install required Ansible collections."""
+    result = subprocess.run(
+        [sys.executable, "-c", "import ansible_collections.community.general"],
+        capture_output=True, text=True,
+    )
+    if result.returncode == 0:
+        return
+    info("Installing Ansible collection: community.general...")
+    subprocess.run(
+        ["ansible-galaxy", "collection", "install", "community.general"],
+        cwd=ANSIBLE_DIR, capture_output=True, text=True,
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", "import ansible_collections.community.general"],
+        capture_output=True, text=True,
+    )
+    if result.returncode == 0:
+        ok("Ansible collection: community.general installed")
+    else:
+        warn("Failed to install community.general — install manually: ansible-galaxy collection install community.general")
+
+
 def cmd_install(args: argparse.Namespace) -> None:
     """Full installation: agent, frontend, plugins, macros."""
+    header("Prerequisites")
+    _require_ansible()
+    _ensure_ansible_collections()
+    _ensure_bun()
     _run_ansible_cmd(INSTALL_PLAYBOOK, args, "Install")
 
 

@@ -4,6 +4,9 @@
 - Cleanup Vuetify 2 class leftovers across 20+ files
 - Replace Vue 2 `vue-load-image` package with local Vue 3 component
 - Fix TimelapseFilesPanel `sortBy` prop for Vuetify 3 data-table
+- Fix Ansible `stdout_callback` for community.general v12+ compatibility
+- Auto-install missing dependencies (pip, ansible, bun, community.general) during install
+- Add Docker test container for fresh-install verification
 
 ## v0.7.7 (2026-06-25)
 - Version compatibility check between `e3cnc-cli` and `_e3cnc_shared.py`
