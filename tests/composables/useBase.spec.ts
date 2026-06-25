@@ -242,6 +242,21 @@ describe('useBase', () => {
             expect(result).toBeTruthy()
         })
 
+        it('formats date with yy short year format', () => {
+            const base = mountComposable()
+            const date = new Date('2026-06-13T12:00:00Z')
+            const result = base.formatDate(date, 'yy-mm-dd')
+            expect(result).toBe('26-06-13')
+        })
+
+        it('formats date with custom format containing literal text', () => {
+            const base = mountComposable()
+            const date = new Date('2026-06-13T12:00:00Z')
+            const result = base.formatDate(date, 'yyyy-mm-dd at HH:MM')
+            expect(result).toContain('2026')
+            expect(result).toContain('at')
+        })
+
         it('returns NaN-NaN-NaN for invalid date with custom format', () => {
             const base = mountComposable()
             const result = base.formatDate('invalid')

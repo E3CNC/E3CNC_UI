@@ -51,4 +51,19 @@ describe('useServices', () => {
         expect(services.klipperInstance.value).toBe('klippy')
         expect(services.moonrakerInstance.value).toBe('moon')
     })
+
+    it('handles default values when state is missing', () => {
+        store = createStore({
+            state: {
+                gui: { uiSettings: {} },
+                server: { system_info: null },
+            },
+            getters: {},
+        })
+        const services = mountComposable()
+        expect(services.hideOtherInstances.value).toBe(false)
+        expect(services.instance_ids.value).toEqual({})
+        expect(services.klipperInstance.value).toBe('')
+        expect(services.moonrakerInstance.value).toBe('')
+    })
 })

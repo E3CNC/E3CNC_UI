@@ -115,6 +115,14 @@ E3cncTui {
 #button-grid Button {
     width: 1fr;
     height: 3;
+    background: #2f2f2f;
+    color: #dddddd;
+}
+
+#button-grid Button:focus {
+    background: #00FF00;
+    color: #000000;
+    text-style: bold;
 }
 
 
@@ -169,12 +177,22 @@ E3cncTui {
 class E3cncTui(App):
     """E3CNC UI management TUI."""
 
+    BUTTON_ROWS = [
+        ["btn-status", "btn-install", "btn-deploy", "btn-update"],
+        ["btn-uninstall", "btn-check", "btn-backup", "btn-restore"],
+        ["btn-diagnose", "btn-logs", "btn-exit"],
+    ]
+
     TITLE = "E3CNC UI Manager"
     CSS = CSS
     BINDINGS = [
         ("ctrl+c", "quit", "Quit"),
         ("escape", "focus_button_grid", "Buttons"),
         ("f5", "refresh_status", "Refresh Status"),
+        ("up", "move_up", "Up"),
+        ("down", "move_down", "Down"),
+        ("left", "move_left", "Left"),
+        ("right", "move_right", "Right"),
     ]
 
     status_text = reactive("Ready")
@@ -192,16 +210,17 @@ class E3cncTui(App):
         with Container(id="main-area"):
             # Button grid
             with Horizontal(id="button-grid"):
-                yield Button("🏠 Status", id="btn-status", variant="primary")
-                yield Button("📦 Install", id="btn-install", variant="primary")
-                yield Button("🚀 Deploy", id="btn-deploy", variant="primary")
-                yield Button("🔄 Update", id="btn-update", variant="primary")
-                yield Button("🗑 Uninstall", id="btn-uninstall", variant="error")
-                yield Button("🔍 Check Deps", id="btn-check", variant="default")
-                yield Button("💾 Backup", id="btn-backup", variant="default")
-                yield Button("📂 Restore", id="btn-restore", variant="default")
-                yield Button("🔬 Diagnose", id="btn-diagnose", variant="default")
-                yield Button("📋 Logs", id="btn-logs", variant="default")
+                yield Button("[S] Status", id="btn-status", variant="primary")
+                yield Button("[I] Install", id="btn-install", variant="primary")
+                yield Button("[D] Deploy", id="btn-deploy", variant="primary")
+                yield Button("[U] Update", id="btn-update", variant="primary")
+                yield Button("[X] Uninstall", id="btn-uninstall", variant="error")
+                yield Button("[C] Check Deps", id="btn-check", variant="default")
+                yield Button("[B] Backup", id="btn-backup", variant="default")
+                yield Button("[R] Restore", id="btn-restore", variant="default")
+                yield Button("[G] Diagnose", id="btn-diagnose", variant="default")
+                yield Button("[L] Logs", id="btn-logs", variant="default")
+                yield Button("[Q] Exit", id="btn-exit", variant="error")
 
             # Output panel
             with Container(id="output-panel"):
@@ -216,8 +235,10 @@ class E3cncTui(App):
         self._update_status("Ready — press a button to start", "status-idle")
         self.query_one("#command-output", RichLog).write(
             "[dim]Welcome to E3CNC UI Manager[/]\n"
-            "[dim]Select a command from the buttons above.[/]\n"
+            "[dim]Use arrow keys to navigate buttons.[/]\n"
+            "[dim]Press Enter to run the focused action.[/]\n"
         )
+        self.action_focus_button_grid()
 
     # ── Helpers ─────────────────────────────────────────────────────────────
 
@@ -251,15 +272,58 @@ class E3cncTui(App):
 
     def _disable_buttons(self, disabled: bool = True) -> None:
         """Enable/disable all command buttons."""
-        for btn_id in [
-            "btn-status", "btn-install", "btn-deploy", "btn-update",
-            "btn-uninstall", "btn-check", "btn-backup", "btn-restore",
-            "btn-diagnose", "btn-logs",
-        ]:
-            try:
-                self.query_one(f"#{btn_id}", Button).disabled = disabled
-            except NoMatches:
-                pass
+        for row in self.BUTTON_ROWS:
+            for btn_id in row:
+                try:
+                    self.query_one(f"#{btn_id}", Button).disabled = disabled
+                except NoMatches:
+                    pass
+
+    def _focused_button_id(self) -> Optional[str]:
+        focused = self.focused
+        if isinstance(focused, Button):
+            return focused.id
+        return None
+
+    def _focus_button(self, button_id: str) -> None:
+        try:
+            self.query_one(f"#{button_id}", Button).focus()
+        except NoMatches:
+            pass
+
+    def _find_button_position(self, button_id: str) -> Optional[tuple[int, int]]:
+        for row_index, row in enumerate(self.BUTTON_ROWS):
+            for col_index, current_id in enumerate(row):
+                if current_id == button_id:
+                    return row_index, col_index
+        return None
+
+    def _move_focus(self, row_delta: int = 0, col_delta: int = 0) -> None:
+        if self.running:
+            return
+
+        button_id = self._focused_button_id()
+        if button_id is None:
+            self.action_focus_button_grid()
+            return
+
+        pos = self._find_button_position(button_id)
+        if pos is None:
+            self.action_focus_button_grid()
+            return
+
+        row_index, col_index = pos
+        target_row_index = max(0, min(len(self.BUTTON_ROWS) - 1, row_index + row_delta))
+
+        if row_delta != 0:
+            target_row = self.BUTTON_ROWS[target_row_index]
+            target_col_index = max(0, min(len(target_row) - 1, col_index))
+        else:
+            target_row = self.BUTTON_ROWS[row_index]
+            target_row_index = row_index
+            target_col_index = max(0, min(len(target_row) - 1, col_index + col_delta))
+
+        self._focus_button(self.BUTTON_ROWS[target_row_index][target_col_index])
 
     # ── Action: Refresh Status ──────────────────────────────────────────────
 
@@ -420,9 +484,12 @@ class E3cncTui(App):
             "btn-restore": "restore",
             "btn-diagnose": "diagnose",
             "btn-logs": "logs",
+            "btn-exit": "exit",
         }
         command = command_map.get(btn_id)
-        if command:
+        if command == "exit":
+            self.exit()
+        elif command:
             label_map = {
                 "status": "Status Check", "install": "Install",
                 "deploy": "Deploy", "update": "Update",
@@ -434,10 +501,19 @@ class E3cncTui(App):
 
     def action_focus_button_grid(self) -> None:
         """Focus the first button (bound to Escape)."""
-        try:
-            self.query_one("#btn-status", Button).focus()
-        except NoMatches:
-            pass
+        self._focus_button("btn-status")
+
+    def action_move_up(self) -> None:
+        self._move_focus(row_delta=-1)
+
+    def action_move_down(self) -> None:
+        self._move_focus(row_delta=1)
+
+    def action_move_left(self) -> None:
+        self._move_focus(col_delta=-1)
+
+    def action_move_right(self) -> None:
+        self._move_focus(col_delta=1)
 
     def watch_status_text(self, text: str) -> None:
         """Reactively update the status bar."""

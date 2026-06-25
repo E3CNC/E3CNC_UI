@@ -138,4 +138,35 @@ describe('useControl', () => {
             script: '_CLIENT_LINEAR_MOVE X=10 Y=5 F=15000',
         })
     })
+
+    it('handles z_tilt_ng variant in colorZTilt', () => {
+        store.state.printer = {
+            gcode_move: { absolute_coordinates: true },
+            z_tilt_ng: { applied: false },
+            toolhead: { homed_axes: '' },
+            gcode: { commands: {} },
+        }
+        const control = mountComposable()
+        expect(control.colorZTilt.value).toBe('warning')
+    })
+
+    it('falls back to gcode_macro parsing when gcode.commands is null', () => {
+        store.state.printer = {
+            gcode_move: { absolute_coordinates: true },
+            quad_gantry_level: { applied: true },
+            z_tilt: { applied: true },
+            toolhead: { homed_axes: '' },
+            'gcode_macro T1': {},
+            'gcode_macro T2': {},
+        }
+        const control = mountComposable()
+        expect(control.toolchangeMacros.value).toEqual(['T1', 'T2'])
+    })
+
+    it('actionButton falls back to default when ztilt selected but not available', () => {
+        store.state.gui.control.actionButton = 'ztilt'
+        qglExists = false
+        const control = mountComposable()
+        expect(control.actionButton.value).toBe('homeAll')
+    })
 })
