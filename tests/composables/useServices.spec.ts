@@ -7,28 +7,15 @@ import { useServices } from '@/composables/useServices'
 describe('useServices', () => {
     let store: any
 
-    beforeEach(() => {
+    function mountComposable(stateOverrides: Record<string, any> = {}) {
         store = createStore({
             state: {
-                gui: {
-                    uiSettings: {
-                        hideOtherInstances: true,
-                    },
-                },
-                server: {
-                    system_info: {
-                        instance_ids: {
-                            klipper: 'klippy',
-                            moonraker: 'moon',
-                        },
-                    },
-                },
+                gui: { uiSettings: {} },
+                server: {},
+                ...stateOverrides,
             },
-            getters: {},
         })
-    })
 
-    function mountComposable() {
         let result: any
         const TestComponent = defineComponent({
             setup() {
@@ -45,24 +32,30 @@ describe('useServices', () => {
     }
 
     it('exposes service flags and instance ids', () => {
-        const services = mountComposable()
+        const services = mountComposable({
+            gui: { uiSettings: { hideOtherInstances: true } },
+            server: { system_info: { instance_ids: { klipper: 'klippy', moonraker: 'moon' } } },
+        })
         expect(services.hideOtherInstances.value).toBe(true)
         expect(services.instance_ids.value).toEqual({ klipper: 'klippy', moonraker: 'moon' })
         expect(services.klipperInstance.value).toBe('klippy')
         expect(services.moonrakerInstance.value).toBe('moon')
     })
 
-    it('handles default values when state is missing', () => {
-        store = createStore({
-            state: {
-                gui: { uiSettings: {} },
-                server: { system_info: null },
-            },
-            getters: {},
-        })
+    it('defaults hideOtherInstances to false', () => {
         const services = mountComposable()
         expect(services.hideOtherInstances.value).toBe(false)
+    })
+
+    it('defaults instance_ids to empty object', () => {
+        const services = mountComposable()
         expect(services.instance_ids.value).toEqual({})
+    })
+
+    it('defaults klipper and moonraker instance to empty string', () => {
+        const services = mountComposable({
+            server: { system_info: { instance_ids: {} } },
+        })
         expect(services.klipperInstance.value).toBe('')
         expect(services.moonrakerInstance.value).toBe('')
     })
