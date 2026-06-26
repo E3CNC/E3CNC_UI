@@ -224,11 +224,34 @@ async function e3cncUpdate() {
     try {
         const response = await fetch(apiUrl.value + '/machine/e3cnc/update', { method: 'POST' })
         const data = await response.json()
-        if (data?.result?.ok) {
-            await e3cncFetchInfo()
-            $toast.success('E3CNC stack updated successfully')
+        if (data?.result?.status === 'started') {
+            // Poll for completion — check releases endpoint every 5s
+            $toast.success('Update started')
+            for (let i = 0; i < 24; i++) {  // 2 minutes max
+                await new Promise(r => setTimeout(r, 5000))
+                try {
+                    const info = await fetch(apiUrl.value + '/machine/e3cnc/info')
+                    const infoData = await info.json()
+                    if (infoData?.result?.ok) {
+                        // Update completed — refresh instance info
+                        if (infoData.result.instances?.length) {
+                            const running = infoData.result.instances.find((i: any) => i.running)
+                            const matched = running ?? infoData.result.instances[0]
+                            matched.current_version = infoData.result.current_version
+                            instanceInfo.value = matched
+                        }
+                        $toast.success('E3CNC stack updated')
+                        e3cncUpdating.value = false
+                        showMenu.value = false
+                        return
+                    }
+                } catch {
+                    // Moonraker may restart during update — retry
+                }
+            }
+            $toast.error('Update timed out — check ~/printer_data/logs/moonraker.log')
         } else {
-            $toast.error('Update failed — check ~/printer_data/logs/moonraker.log')
+            $toast.error('Update failed to start')
         }
     } catch {
         $toast.error('Update request failed')

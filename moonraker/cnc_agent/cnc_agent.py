@@ -204,10 +204,11 @@ class CncAgent:
         return result
 
     async def handle_e3cnc_update(self, request: Any = None) -> Dict[str, Any]:
-        """POST /machine/e3cnc/update — trigger full stack update."""
+        """POST /machine/e3cnc/update — trigger full stack update (background task)."""
         self.logger.info("E3CNC update triggered via API")
-        result = await self._run_e3cnc_cli(["update", "--yes"])
-        return result
+        # Fire the CLI in the background so the HTTP request returns immediately
+        asyncio.ensure_future(self._run_e3cnc_cli(["update", "--yes"]))
+        return {"ok": True, "status": "started", "message": "Update started in background"}
 
     async def handle_e3cnc_rollback(self, request: Any = None) -> Dict[str, Any]:
         """POST /machine/e3cnc/rollback — roll back to previous release."""
