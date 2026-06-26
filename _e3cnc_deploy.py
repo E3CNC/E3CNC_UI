@@ -776,3 +776,323 @@ def format_release_list(releases: List[Release]) -> str:
     except OSError:
         pass
     return "\n".join(lines)
+
+
+# ── Runtime file sync ───────────────────────────────────────────────────────
+
+def sync_runtime_files(inst: Optional[Instance] = None, dry_run: bool = False) -> bool:
+    """Sync runtime files from ~/e3cnc/current/ to live system paths.
+
+    Deploys: Moonraker components, Klipper extras, macros, scripts, frontend.
+    Returns True if all syncs succeeded.
+    """
+    current = get_current_release()
+    if not current:
+        warn("No active release — cannot sync runtime files")
+        return False
+
+    active_inst = inst or get_active_instance()
+    if not active_inst:
+        warn("No instance detected — cannot sync runtime files")
+        return False
+
+    release_root = current.path
+    all_ok = True
+
+    # 1. Moonraker components (cnc_agent, cnc_metadata)
+    components = ["cnc_agent", "cnc_metadata"]
+    for comp in components:
+        src = release_root / "moonraker" / comp
+        dest = Path(active_inst.moonraker_dir) / "moonraker" / "components" / comp
+        if src.is_dir():
+            dest.mkdir(parents=True, exist_ok=True)
+            for f in src.iterdir():
+                if f.is_file():
+                    if dry_run:
+                        info(f"Would copy {f} -> {dest / f.name}")
+                    else:
+                        shutil.copy2(f, dest / f.name)
+            info(f"Synced Moonraker component: {comp}")
+        else:
+            warn(f"Moonraker component source not found: {src}")
+            all_ok = False
+
+    # 2. MCP server
+    mcp_src = release_root / "moonraker" / "mcp"
+    mcp_dest = Path(active_inst.moonraker_dir) / "moonraker" / "components" / "mcp"
+    if mcp_src.is_dir():
+        mcp_dest.mkdir(parents=True, exist_ok=True)
+        for f in mcp_src.iterdir():
+            if f.is_file() and f.suffix == ".py":
+                if dry_run:
+                    info(f"Would copy {f} -> {mcp_dest / f.name}")
+                else:
+                    shutil.copy2(f, mcp_dest / f.name)
+        info("Synced MCP server")
+
+    # 3. Klipper extras
+    extras_src = release_root / "klipper" / "extras"
+    extras_dest = Path(active_inst.klipper_dir) / "klippy" / "extras"
+    if extras_src.is_dir():
+        extras_dest.mkdir(parents=True, exist_ok=True)
+        for f in extras_src.iterdir():
+            if f.is_file():
+                if dry_run:
+                    info(f"Would copy {f} -> {extras_dest / f.name}")
+                else:
+                    shutil.copy2(f, extras_dest / f.name)
+        info("Synced Klipper extras")
+    else:
+        warn(f"Klipper extras source not found: {extras_src}")
+        all_ok = False
+
+    # 4. Macros
+    macros_src = release_root / "config" / "macros"
+    macros_dest = Path(active_inst.E3CNC_dir) / "macros"
+    if macros_src.is_dir():
+        macros_dest.mkdir(parents=True, exist_ok=True)
+        for f in macros_src.iterdir():
+            if f.is_file():
+                if dry_run:
+                    info(f"Would copy {f} -> {macros_dest / f.name}")
+                else:
+                    shutil.copy2(f, macros_dest / f.name)
+        info("Synced macros")
+
+    # 5. Metadata extractor script
+    script_src = release_root / "scripts" / "cnc_metadata_extractor.py"
+    if script_src.is_file():
+        script_dest = Path(active_inst.scripts_dir) / "cnc_metadata_extractor.py"
+        if dry_run:
+            info(f"Would copy {script_src} -> {script_dest}")
+        else:
+            shutil.copy2(script_src, script_dest)
+            script_dest.chmod(0o755)
+        info("Synced metadata extractor")
+
+    # 6. Frontend (sync to web root)
+    fe_src = release_root / "frontend"
+    fe_dest = Path(active_inst.web_root)
+    if fe_src.is_dir():
+        fe_dest.mkdir(parents=True, exist_ok=True)
+        if dry_run:
+            info(f"Would sync frontend {fe_src} -> {fe_dest}")
+        else:
+            # rsync-style: copy all files, overwrite existing
+            for f in fe_src.rglob("*"):
+                if f.is_file():
+                    rel = f.relative_to(fe_src)
+                    target = fe_dest / rel
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(f, target)
+        info("Synced frontend")
+
+    if all_ok:
+        ok("Runtime files synced")
+    else:
+        warn("Some runtime files could not be synced")
+    return all_ok
+
+
+# ── Systemd management ───────────────────────────────────────────────────────
+
+def update_systemd_paths(inst: Optional[Instance] = None, dry_run: bool = False) -> bool:
+    """Update systemd drop-ins to point to the current release."""
+    current = get_current_release()
+    if not current:
+        warn("No active release — cannot update systemd paths")
+        return False
+
+    active_inst = inst or get_active_instance()
+    if not active_inst:
+        warn("No instance detected")
+        return False
+
+    current_path = str(current.path)
+    all_ok = True
+
+    # Create systemd drop-in directory
+    services = {
+        active_inst.moonraker_service: {
+            "WorkingDirectory": current_path / "moonraker",
+        },
+    }
+    # Only update Klipper if extras are present in the release
+    klipper_extras = current.path / "klipper" / "extras"
+    if klipper_extras.is_dir():
+        services[active_inst.klipper_service] = {}
+
+    for service_name, overrides in services.items():
+        dropin_dir = Path("/etc/systemd/system") / f"{service_name}.service.d"
+        dropin_path = dropin_dir / "e3cnc-override.conf"
+
+        if not shutil.which("systemctl"):
+            info(f"systemctl not available — skipping systemd update for {service_name}")
+            continue
+
+        if dry_run:
+            info(f"Would create systemd drop-in: {dropin_path}")
+            continue
+
+        try:
+            dropin_dir.mkdir(parents=True, exist_ok=True)
+            lines = ["[Service]"]
+            for key, val in overrides.items():
+                lines.append(f"{key}={val}")
+            dropin_path.write_text("\n".join(lines) + "\n")
+            info(f"Updated systemd drop-in: {service_name}")
+        except PermissionError:
+            warn(f"Permission denied: {dropin_path} — try running with sudo")
+            all_ok = False
+        except OSError as e:
+            warn(f"Failed to update systemd for {service_name}: {e}")
+            all_ok = False
+
+    return all_ok
+
+
+def restart_services(inst: Optional[Instance] = None, dry_run: bool = False) -> bool:
+    """Restart services in the correct order: Moonraker first, then Klipper."""
+    active_inst = inst or get_active_instance()
+    if not active_inst:
+        warn("No instance detected — cannot restart services")
+        return False
+
+    if not shutil.which("systemctl"):
+        warn("systemctl not available — cannot restart services")
+        return False
+
+    order = [active_inst.moonraker_service, active_inst.klipper_service]
+    all_ok = True
+
+    for svc in order:
+        if dry_run:
+            info(f"Would restart {svc}")
+            continue
+        info(f"Restarting {svc}...")
+        try:
+            result = subprocess.run(
+                ["sudo", "systemctl", "restart", svc],
+                capture_output=True, text=True, timeout=30,
+            )
+            if result.returncode == 0:
+                ok(f"{svc} restarted")
+                time.sleep(2)  # Brief cooldown between services
+            else:
+                warn(f"{svc} restart failed: {result.stderr.strip()}")
+                all_ok = False
+        except (subprocess.CalledProcessError, OSError, ValueError) as e:
+            warn(f"Failed to restart {svc}: {e}")
+            all_ok = False
+
+    return all_ok
+
+
+# ── Pip dependency installation ─────────────────────────────────────────────
+
+def install_pip_deps(release_dir: Optional[Path] = None, dry_run: bool = False) -> bool:
+    """Install pip dependencies from vendored wheels in the release."""
+    rdir = release_dir or (get_current_release().path if get_current_release() else None)
+    if not rdir:
+        warn("No release to install pip deps from")
+        return False
+
+    wheels_dir = rdir / "moonraker" / "wheels"
+    req_file = rdir / "moonraker" / "requirements.txt"
+
+    if not req_file.exists():
+        info("No requirements.txt found — skipping pip install")
+        return True
+
+    if dry_run:
+        info(f"Would pip install from {req_file}")
+        return True
+
+    cmd = [sys.executable, "-m", "pip", "install"]
+    if wheels_dir.is_dir():
+        cmd.extend(["--no-index", "--find-links", str(wheels_dir)])
+    cmd.extend(["-r", str(req_file)])
+
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        if result.returncode == 0:
+            ok("Pip dependencies installed")
+            return True
+        else:
+            warn(f"Pip install failed: {result.stderr.strip()}")
+            return False
+    except (subprocess.CalledProcessError, OSError, ValueError) as e:
+        warn(f"Pip install error: {e}")
+        return False
+
+
+# ── Config/schema migrations ────────────────────────────────────────────────
+
+def run_migrations(release_dir: Optional[Path] = None, direction: str = "up", dry_run: bool = False) -> bool:
+    """Run config/schema migrations from the release's migrations/ directory.
+
+    Args:
+        release_dir: Path to the release directory (default: current release)
+        direction: 'up' for forward migrations, 'down' for reverse
+        dry_run: If True, only log what would be done
+
+    Returns True if all migrations succeeded.
+    """
+    rdir = release_dir or (get_current_release().path if get_current_release() else None)
+    if not rdir:
+        warn("No release to run migrations from")
+        return False
+
+    migrations_dir = rdir / "migrations"
+    if not migrations_dir.is_dir():
+        info("No migrations directory — skipping")
+        return True
+
+    journal = Journal.load()
+    current_schema = journal.config_schema
+
+    # Find migration scripts
+    migration_files = sorted(migrations_dir.glob("[0-9]*.py"))
+    if not migration_files:
+        info("No migration scripts found")
+        return True
+
+    all_ok = True
+    for mf in migration_files:
+        try:
+            # Parse schema version from filename
+            name_match = re.match(r"(\d+)_", mf.name)
+            if not name_match:
+                continue
+            schema_version = int(name_match.group(1))
+
+            if direction == "up" and schema_version <= current_schema:
+                continue  # Already applied
+            if direction == "down" and schema_version > current_schema:
+                continue  # Not applicable when going down
+
+            if dry_run:
+                info(f"Would run migration {direction}: {mf.name}")
+                continue
+
+            # Execute migration script
+            result = subprocess.run(
+                [sys.executable, str(mf), direction],
+                capture_output=True, text=True, timeout=30,
+            )
+            if result.returncode == 0:
+                ok(f"Migration {mf.name} ({direction})")
+                if direction == "up":
+                    journal.config_schema_previous = current_schema
+                    journal.config_schema = schema_version
+                else:
+                    journal.config_schema = journal.config_schema_previous
+                journal.save()
+            else:
+                warn(f"Migration {mf.name} failed: {result.stderr.strip()}")
+                all_ok = False
+        except (OSError, ValueError, subprocess.CalledProcessError) as e:
+            warn(f"Migration error {mf.name}: {e}")
+            all_ok = False
+
+    return all_ok
