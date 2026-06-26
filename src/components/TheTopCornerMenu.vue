@@ -228,7 +228,7 @@ async function e3cncUpdate() {
             await e3cncFetchInfo()
             $toast.success('E3CNC stack updated successfully')
         } else {
-            $toast.error('Update failed' + (data?.result?.output ? ': see logs' : ''))
+            $toast.error('Update failed — check ~/printer_data/logs/moonraker.log')
         }
     } catch {
         $toast.error('Update request failed')
