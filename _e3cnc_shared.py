@@ -96,7 +96,11 @@ BANNER_RAW = r"""
 
 def print_banner() -> None:
     """Print the E3CNC logo banner in green."""
-    print(Style.GREEN + BANNER_RAW + Style.RESET)
+    try:
+        print(Style.GREEN + BANNER_RAW + Style.RESET)
+    except UnicodeEncodeError:
+        # Terminal doesn't support the banner characters (e.g. latin-1 encoding)
+        print(f"{Style.GREEN}E3CNC{Style.RESET}")
 
 
 # ── Data classes for TUI results ────────────────────────────────────────────
