@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Optional
 
 # Hardcoded CLI version for compatibility check
-_CLI_VERSION = "0.8.0"
+_CLI_VERSION = "0.8.1"
 
 # Import shared logic
 from _e3cnc_shared import (
@@ -76,7 +76,7 @@ from typing import List, NoReturn, Optional, Tuple
 
 # ── Metadata ────────────────────────────────────────────────────────────────
 
-VERSION = "0.8.0"
+VERSION = "0.8.1"  # fallback if _e3cnc_shared import fails
 TOOL_NAME = "e3cnc-cli"
 
 # ── Paths (relative to this script's location) ─────────────────────────────
