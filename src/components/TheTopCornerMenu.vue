@@ -181,7 +181,7 @@ interface instanceInfo {
 
 const store = useStore()
 const { t } = useI18n()
-const { klipperState, printer_state, printerIsPrinting } = useBase()
+const { klipperState, printer_state, printerIsPrinting, apiUrl } = useBase()
 const { hideOtherInstances, klipperInstance, moonrakerInstance } = useServices()
 const socket = useSocket()
 
@@ -190,8 +190,7 @@ const instanceInfo = ref<instanceInfo | null>(null)
 const e3cncUpdating = ref(false)
 
 async function e3cncFetchInfo() {
-    const base = useBase()
-    const url = base.apiUrl.value + '/machine/e3cnc/info'
+    const url = apiUrl.value + '/machine/e3cnc/info'
     try {
         const response = await fetch(url)
         const data = await response.json()
@@ -207,10 +206,9 @@ async function e3cncFetchInfo() {
 }
 
 async function e3cncUpdate() {
-    const base = useBase()
     e3cncUpdating.value = true
     try {
-        const response = await fetch(base.apiUrl.value + '/machine/e3cnc/update', { method: 'POST' })
+        const response = await fetch(apiUrl.value + '/machine/e3cnc/update', { method: 'POST' })
         const data = await response.json()
         if (data?.result?.ok) {
             await e3cncFetchInfo()
@@ -223,9 +221,8 @@ async function e3cncUpdate() {
 }
 
 async function e3cncRollback() {
-    const base = useBase()
     try {
-        await fetch(base.apiUrl.value + '/machine/e3cnc/rollback', { method: 'POST' })
+        await fetch(apiUrl.value + '/machine/e3cnc/rollback', { method: 'POST' })
         await e3cncFetchInfo()
     } catch {
         // Ignore
@@ -234,8 +231,7 @@ async function e3cncRollback() {
 }
 
 onMounted(async () => {
-    const base = useBase()
-    const url = base.apiUrl.value + '/machine/e3cnc/info'
+    const url = apiUrl.value + '/machine/e3cnc/info'
     try {
         const response = await fetch(url)
         const data = await response.json()
