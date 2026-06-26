@@ -726,7 +726,7 @@ cd ~/E3CNC
                     that loops after each command. Use <code>[W]</code> to switch between
                     multiple Klipper/Moonraker instances on the same machine.
                     Tab completion available via
-                    <code>source ~/E3CNC/scripts/e3cnc-completion.sh</code>.
+                    <code>source ~/E3CNC/build-scripts/e3cnc-completion.sh</code>.
                     See the
                     <a href="https://github.com/E3CNC/E3CNC/wiki/Installation">wiki</a>
                     for details and other install methods.
@@ -748,11 +748,14 @@ origin: https://github.com/E3CNC/E3CNC.git
 primary_branch: main
 enable_node_updates: False
 is_system_service: False
-post_update_script: ~/E3CNC/scripts/post_update.sh
 info_tags:
     desc=E3CNC UI
 managed_services: klipper moonraker
 refresh_interval: 24</code></pre>
+
+                <p class="install-note">
+                    Run <code>./e3cnc-cli update</code> on the host for the full stack redeploy instead of relying on the update manager's post-update hook.
+                </p>
 
                 <p class="install-note">
                     Replace <code>~/E3CNC</code> with an absolute path if needed (e.g. <code>/home/pi/E3CNC</code>). The script
