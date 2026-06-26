@@ -921,7 +921,7 @@ def update_systemd_paths(inst: Optional[Instance] = None, dry_run: bool = False)
         warn("No instance detected")
         return False
 
-    current_path = str(current.path)
+    current_path = current.path
     all_ok = True
 
     # Create systemd drop-in directory
