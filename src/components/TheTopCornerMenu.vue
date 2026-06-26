@@ -7,7 +7,7 @@
             <v-list density="compact">
                 <!-- E3CNC Instance Info -->
                 <v-list-subheader v-if="instanceInfo" class="" style="height: auto">
-                    {{ $t('App.TopCornerMenu.KlipperControl') }}
+                    Instance
                 </v-list-subheader>
                 <v-list-item v-if="instanceInfo" class="minHeight30 pr-2" density="compact">
                     <template #title>
@@ -85,6 +85,30 @@
                         </template>
                     </v-list-item>
                 </template>
+                <!-- E3CNC Stack Control -->
+                <v-divider class="mt-0"></v-divider>
+                <v-list-subheader class="pt-2" style="height: auto">
+                    E3CNC
+                </v-list-subheader>
+                <v-list-item
+                    class="minHeight30 pr-2"
+                    link
+                    :disabled="e3cncUpdating"
+                    @click="e3cncUpdate()">
+                    <template #title>{{ e3cncUpdating ? 'Updating...' : 'Update Stack' }}</template>
+                    <template #append>
+                        <v-icon v-if="e3cncUpdating" class="mr-2" size="small" color="primary">
+                            {{ mdiLoading }}
+                        </v-icon>
+                        <v-icon v-else class="mr-2" size="small">{{ mdiPackageUp }}</v-icon>
+                    </template>
+                </v-list-item>
+                <v-list-item class="minHeight30 pr-2" link @click="e3cncRollback()">
+                    <template #title>Rollback</template>
+                    <template #append>
+                        <v-icon class="mr-2" size="small">{{ mdiUndoVariant }}</v-icon>
+                    </template>
+                </v-list-item>
                 <v-divider class="mt-0"></v-divider>
                 <v-list-subheader class="pt-2" style="height: auto">
                     {{ $t('App.TopCornerMenu.HostControl') }}
@@ -139,6 +163,10 @@ import {
     mdiToggleSwitchOff,
     mdiCheckCircle,
     mdiAlertCircle,
+    mdiLoading,
+    mdiPackageUp,
+    mdiUndoVariant,
+    mdiRefresh,
 } from '@mdi/js'
 import TopCornerMenuService from '@/components/ui/TopCornerMenuService.vue'
 import ConfirmationDialog from '@/components/dialogs/ConfirmationDialog.vue'
@@ -148,6 +176,7 @@ interface instanceInfo {
     port: number
     web_root: string
     running: boolean
+    current_version?: string
 }
 
 const store = useStore()
@@ -158,6 +187,51 @@ const socket = useSocket()
 
 const showMenu = ref(false)
 const instanceInfo = ref<instanceInfo | null>(null)
+const e3cncUpdating = ref(false)
+
+async function e3cncFetchInfo() {
+    const base = useBase()
+    const url = base.apiUrl.value + '/machine/e3cnc/info'
+    try {
+        const response = await fetch(url)
+        const data = await response.json()
+        if (data?.result?.ok && data?.result?.instances?.length) {
+            const running = data.result.instances.find((i: instanceInfo) => i.running)
+            const matched = running ?? data.result.instances[0]
+            matched.current_version = data.result.current_version
+            instanceInfo.value = matched
+        }
+    } catch {
+        // Endpoint not available
+    }
+}
+
+async function e3cncUpdate() {
+    const base = useBase()
+    e3cncUpdating.value = true
+    try {
+        const response = await fetch(base.apiUrl.value + '/machine/e3cnc/update', { method: 'POST' })
+        const data = await response.json()
+        if (data?.result?.ok) {
+            await e3cncFetchInfo()
+        }
+    } catch {
+        // Ignore
+    }
+    e3cncUpdating.value = false
+    showMenu.value = false
+}
+
+async function e3cncRollback() {
+    const base = useBase()
+    try {
+        await fetch(base.apiUrl.value + '/machine/e3cnc/rollback', { method: 'POST' })
+        await e3cncFetchInfo()
+    } catch {
+        // Ignore
+    }
+    showMenu.value = false
+}
 
 onMounted(async () => {
     const base = useBase()
@@ -208,7 +282,8 @@ const services = computed(() => {
     let services =
         store.state.server.system_info?.available_services?.filter((name: string) => name !== 'klipper_mcu') ?? []
 
-    if (hideOtherInstances.value && klipperInstance.value !== '') {
+    // Always filter to current instance services
+    if (klipperInstance.value !== '') {
         services = services.filter(
             (name: string) =>
                 (!name.toLowerCase().startsWith('klipper-') && name.toLowerCase() !== 'klipper') ||
@@ -216,7 +291,7 @@ const services = computed(() => {
         )
     }
 
-    if (hideOtherInstances.value && moonrakerInstance.value !== '') {
+    if (moonrakerInstance.value !== '') {
         services = services.filter(
             (name: string) =>
                 (!name.toLowerCase().startsWith('moonraker-') && name.toLowerCase() !== 'moonraker') ||
