@@ -9,6 +9,8 @@ This file is imported by both the CLI (e3cnc-cli) and TUI (e3cnc-tui) frontends.
 
 import json
 import os
+import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -220,18 +222,99 @@ def check_dependencies(output_callback=None) -> Tuple[bool, List[str]]:
 
 # ── Status ──────────────────────────────────────────────────────────────────
 
-def check_status(remote_host: Optional[str] = None, output_callback=None) -> Tuple[int, int, List[str]]:
+def _instance_name_from_printer_data(path: Path) -> str:
+    name = path.name
+    if name == "printer_data":
+        return "cnc"
+    match = re.fullmatch(r"printer_data_(.+)", name)
+    if match:
+        return f"cnc_{match.group(1)}"
+    match = re.fullmatch(r"printer_(.+)_data", name)
+    if match:
+        return match.group(1)
+    return name
+
+
+def _default_service_name(kind: str, instance_name: str) -> str:
+    if instance_name == "cnc":
+        return kind
+    legacy = re.fullmatch(r"cnc_(.+)", instance_name)
+    suffix = legacy.group(1) if legacy else instance_name
+    return f"{kind}-{suffix}"
+
+
+def _read_text(path: Path) -> str:
+    try:
+        return path.read_text().strip()
+    except OSError:
+        return ""
+
+
+def _read_service_name(printer_data_path: Path, kind: str, instance_name: str) -> str:
+    raw = _read_text(printer_data_path / f"{kind}.asvc")
+    if raw:
+        raw = raw.removesuffix(".service")
+        if raw.startswith(kind):
+            return raw
+        return f"{kind}-{raw}"
+    return _default_service_name(kind, instance_name)
+
+
+def _read_python_service_dir(env_path: Path, env_key: str, script_name: str, fallback: str) -> str:
+    text = _read_text(env_path)
+    match = re.search(rf"^{env_key}=\"?(.*?)\"?$", text, re.MULTILINE)
+    if match:
+        try:
+            args = shlex.split(match.group(1))
+            for token in args:
+                if token.endswith(f"/{script_name}"):
+                    return str(Path(token).parent.parent)
+        except ValueError:
+            pass
+    return fallback
+
+
+def _read_moonraker_port(conf_path: Path, default: int = 7125) -> int:
+    text = _read_text(conf_path)
+    match = re.search(r"(?m)^port:\s*(\d+)\s*$", text)
+    if match:
+        return int(match.group(1))
+    return default
+
+
+def _default_web_root(home: str, instance_name: str) -> str:
+    home_path = Path(home)
+    candidates: List[Path] = []
+    if instance_name != "cnc":
+        legacy = re.fullmatch(r"cnc_(.+)", instance_name)
+        if legacy:
+            candidates.append(home_path / f"mainsail-{legacy.group(1)}")
+        candidates.append(home_path / f"mainsail-{instance_name}")
+    candidates.append(home_path / "mainsail")
+    for candidate in candidates:
+        if candidate.exists():
+            return str(candidate)
+    return str(candidates[-1])
+
+
+def _default_instance(home: str) -> "Instance":
+    return Instance.from_printer_data(f"{home}/printer_data", home=home)
+
+
+def check_status(remote_host: Optional[str] = None, output_callback=None, inst: Optional["Instance"] = None) -> Tuple[int, int, List[str]]:
     """Check installation status. Returns (ok_count, total_checks, output_lines)."""
     lines: List[str] = []
 
     if remote_host:
         remote_home = _get_remote_home(remote_host)
         _run_remote = lambda cmd: _ssh_run(remote_host, cmd)
+        active_inst = inst or _default_instance(remote_home)
     else:
-        remote_home = Path.home()
+        remote_home = str(Path.home())
         _run_remote = lambda cmd: subprocess.run(
             cmd, capture_output=True, text=True, shell=True
         )
+        active_inst = inst or _default_instance(remote_home)
 
     total_checks = 9
     ok_count = 0
@@ -243,20 +326,19 @@ def check_status(remote_host: Optional[str] = None, output_callback=None) -> Tup
             lines.append(f"  ✓ {label}")
             ok_count += 1
             return True
-        else:
-            lines.append(f"  ⚠ {label} — not found")
-            return False
+        lines.append(f"  ⚠ {label} — not found")
+        return False
 
     repo_dir = f"{remote_home}/E3CNC_UI"
     _check("Repository checkout", f"test -d '{repo_dir}/.git' && echo 'found' || true", "found")
-    _check("Moonraker cnc_agent component", f"test -f '{remote_home}/moonraker/moonraker/components/cnc_agent/cnc_agent.py' && echo 'found' || true", "found")
-    _check("Moonraker cnc_metadata component", f"test -f '{remote_home}/moonraker/moonraker/components/cnc_metadata/cnc_metadata.py' && echo 'found' || true", "found")
-    _check("Metadata extractor script", f"test -x '{remote_home}/printer_data/scripts/cnc_metadata_extractor.py' && echo 'found' || true", "found")
-    _check("Moonraker config [cnc_agent] section", f"grep -qE '^\\[cnc_agent\\]' '{remote_home}/printer_data/config/moonraker.conf' 2>/dev/null && echo 'found' || true", "found")
-    _check("Moonraker config [update_manager E3CNC_UI] section", f"grep -qE '^\\[update_manager E3CNC_UI\\]' '{remote_home}/printer_data/config/moonraker.conf' 2>/dev/null && echo 'found' || true", "found")
-    _check("Klipper WCS plugin", f"test -f '{remote_home}/klipper/klippy/extras/work_coordinate_systems.py' && echo 'found' || true", "found")
-    _check("E3CNC macros directory", f"test -d '{remote_home}/printer_data/config/E3CNC/macros' && echo 'found' || true", "found")
-    _check("Frontend deployed", f"test -f '{remote_home}/mainsail/index.html' && echo 'found' || true", "found")
+    _check("Moonraker cnc_agent component", f"test -f '{active_inst.moonraker_dir}/moonraker/components/cnc_agent/cnc_agent.py' && echo 'found' || true", "found")
+    _check("Moonraker cnc_metadata component", f"test -f '{active_inst.moonraker_dir}/moonraker/components/cnc_metadata/cnc_metadata.py' && echo 'found' || true", "found")
+    _check("Metadata extractor script", f"test -x '{active_inst.scripts_dir}/cnc_metadata_extractor.py' && echo 'found' || true", "found")
+    _check("Moonraker config [cnc_agent] section", f"grep -qE '^\\[cnc_agent\\]' '{active_inst.moonraker_conf}' 2>/dev/null && echo 'found' || true", "found")
+    _check("Moonraker config [update_manager E3CNC_UI] section", f"grep -qE '^\\[update_manager E3CNC_UI\\]' '{active_inst.moonraker_conf}' 2>/dev/null && echo 'found' || true", "found")
+    _check("Klipper WCS plugin", f"test -f '{active_inst.klipper_dir}/klippy/extras/work_coordinate_systems.py' && echo 'found' || true", "found")
+    _check("E3CNC macros directory", f"test -d '{active_inst.E3CNC_dir}/macros' && echo 'found' || true", "found")
+    _check("Frontend deployed", f"test -f '{active_inst.web_root}/index.html' && echo 'found' || true", "found")
 
     lines.append("")
     if ok_count == total_checks:
@@ -291,24 +373,38 @@ class Instance:
     E3CNC_dir: str
     printer_cfg: str
     web_root: str
+    moonraker_dir: str = ""
+    klipper_dir: str = ""
+    moonraker_service: str = "moonraker"
+    klipper_service: str = "klipper"
+    moonraker_port: int = 7125
     is_running: bool = False
 
     @classmethod
-    @classmethod
-    def from_printer_data(cls, base: str, web_root: str = "") -> "Instance":
-        """Create an Instance from a printer_data directory path.
-
-        Derives moonraker_dir and klipper_dir from the instance suffix.
-        E.g. printer_data_2 → moonraker_2, klipper_2, mainsail-cnc_2.
-        """
+    def from_printer_data(cls, base: str, web_root: str = "", home: str = "") -> "Instance":
+        """Create an Instance from a printer_data directory path."""
+        printer_data_path = Path(base)
         config = f"{base}/config"
-        home = str(Path.home())
-        name = Path(base).name.replace("printer_data", "cnc")
-        suffix = name.replace("cnc", "", 1)
+        home = home or str(Path.home())
+        instance_name = _instance_name_from_printer_data(printer_data_path)
+        conf_path = printer_data_path / "config" / "moonraker.conf"
+        systemd_dir = printer_data_path / "systemd"
+        moonraker_dir = _read_python_service_dir(
+            systemd_dir / "moonraker.env",
+            "MOONRAKER_ARGS",
+            "moonraker.py",
+            f"{home}/moonraker",
+        )
+        klipper_dir = _read_python_service_dir(
+            systemd_dir / "klipper.env",
+            "KLIPPER_ARGS",
+            "klippy.py",
+            f"{home}/klipper",
+        )
         if not web_root:
-            web_root = f"{home}/mainsail{suffix}" if suffix else f"{home}/mainsail"
+            web_root = _default_web_root(home, instance_name)
         return cls(
-            name=name,
+            name=instance_name,
             printer_data_dir=base,
             config_dir=config,
             moonraker_conf=f"{config}/moonraker.conf",
@@ -318,20 +414,13 @@ class Instance:
             E3CNC_dir=f"{config}/E3CNC",
             printer_cfg=f"{config}/printer.cfg",
             web_root=web_root,
-            is_running=Path(f"{config}/moonraker.conf").exists(),
+            moonraker_dir=moonraker_dir,
+            klipper_dir=klipper_dir,
+            moonraker_service=_read_service_name(printer_data_path, "moonraker", instance_name),
+            klipper_service=_default_service_name("klipper", instance_name),
+            moonraker_port=_read_moonraker_port(conf_path),
+            is_running=conf_path.exists(),
         )
-
-    @property
-    def moonraker_dir(self) -> str:
-        """Derive moonraker directory from printer_data directory."""
-        suffix = Path(self.printer_data_dir).name.replace("printer_data", "")
-        return f"{Path(self.printer_data_dir).parent}/moonraker{suffix}"
-
-    @property
-    def klipper_dir(self) -> str:
-        """Derive klipper directory from printer_data directory."""
-        suffix = Path(self.printer_data_dir).name.replace("printer_data", "")
-        return f"{Path(self.printer_data_dir).parent}/klipper{suffix}"
 
 
 _active_instance: Optional[Instance] = None
@@ -341,12 +430,16 @@ def detect_instances() -> List[Instance]:
     """Scan for Klipper/Moonraker instances on this machine."""
     instances: List[Instance] = []
     home = str(Path.home())
+    seen = set()
 
-    for candidate in sorted(Path(home).glob("printer_data*")):
-        if candidate.is_dir():
+    for pattern in ("printer_data", "printer_data_*", "printer_*_data"):
+        for candidate in sorted(Path(home).glob(pattern)):
+            if candidate in seen or not candidate.is_dir():
+                continue
+            seen.add(candidate)
             conf = candidate / "config" / "moonraker.conf"
             if conf.exists():
-                instances.append(Instance.from_printer_data(str(candidate)))
+                instances.append(Instance.from_printer_data(str(candidate), home=home))
 
     return instances
 
@@ -365,6 +458,7 @@ def select_instance(instances: List[Instance]) -> Optional[Instance]:
         dot = "\x1b[32m●\x1b[0m" if inst.is_running else "\x1b[90m○\x1b[0m"
         print(f"  {i + 1:>2}) {dot} {Style.BOLD}{inst.name}{Style.RESET}")
         print(f"      Config: {inst.config_dir}")
+        print(f"      Service: {inst.moonraker_service}  Port: {inst.moonraker_port}")
         print()
 
     try:
@@ -393,24 +487,23 @@ def get_active_instance() -> Optional[Instance]:
     return _active_instance
 
 
-def set_active_instance(inst: Instance) -> None:
+def set_active_instance(inst: Optional[Instance]) -> None:
     """Set the globally active instance."""
     global _active_instance
     _active_instance = inst
 
 
 def instance_extra_vars(inst: Instance) -> List[str]:
-    """Generate Ansible extra vars for a specific instance.
-
-    These override vars/main.yml defaults for multi-instance support.
-    Each instance has its own printer_data, moonraker, and klipper dirs.
-    """
+    """Generate Ansible extra vars for a specific instance."""
     return [
         f"printer_data_dir={inst.printer_data_dir}",
         f"moonraker_dir={inst.moonraker_dir}",
         f"klipper_dir={inst.klipper_dir}",
         f"moonraker_conf={inst.moonraker_conf}",
         f"frontend_web_root={inst.web_root}",
+        f"moonraker_service={inst.moonraker_service}",
+        f"klipper_service={inst.klipper_service}",
+        f"moonraker_port={inst.moonraker_port}",
     ]
 
 

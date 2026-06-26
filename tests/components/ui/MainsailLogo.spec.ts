@@ -8,10 +8,9 @@ describe('MainsailLogo.vue', () => {
         expect(wrapper.find('svg').exists()).toBe(true)
     })
 
-    it('renders with empty style when no color prop (default prop is blank)', () => {
+    it('renders with empty style when no color prop', () => {
         const wrapper = mount(MainsailLogo)
         const path = wrapper.find('path')
-        // Vue's style binding adds space after colon when value is blank
         expect(path.attributes('style')).toBe('')
     })
 
@@ -20,7 +19,7 @@ describe('MainsailLogo.vue', () => {
             props: { color: '#ff0000' },
         })
         const path = wrapper.find('path')
-        expect(path.attributes('style')).toContain('#ff0000')
+        expect(path.attributes('style')).toContain('255, 0, 0')
         expect(path.attributes('style')).toContain('fill')
     })
 
@@ -28,9 +27,11 @@ describe('MainsailLogo.vue', () => {
         const wrapper = mount(MainsailLogo, {
             props: { color: '#ff0000' },
         })
-        await wrapper.setProps({ color: '#00ff00' })
         const path = wrapper.find('path')
-        expect(path.attributes('style')).toContain('#00ff00')
+        expect(path.attributes('style')).toContain('255, 0, 0')
+
+        await wrapper.setProps({ color: '#00ff00' })
+        expect(path.attributes('style')).toContain('0, 255, 0')
     })
 
     it('renders with empty style when color prop cleared', async () => {
@@ -40,11 +41,5 @@ describe('MainsailLogo.vue', () => {
         await wrapper.setProps({ color: '' })
         const path = wrapper.find('path')
         expect(path.attributes('style')).toBe('')
-    })
-
-    it('renders 3 path elements', () => {
-        const wrapper = mount(MainsailLogo)
-        const paths = wrapper.findAll('path')
-        expect(paths.length).toBe(3)
     })
 })

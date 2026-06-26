@@ -97,13 +97,15 @@ describe('ConnectionStatus.vue', () => {
         const arrowLeft = mrKlipper.find('#arrow_left path')
         const arrowRight = mrKlipper.find('#arrow_right path')
 
-        expect(arrowLeft.attributes('style')).toContain('rgb(45,68,90)')
-        expect(arrowRight.attributes('style')).toContain('rgb(45,68,90)')
+        expect(arrowLeft.attributes('style')).toContain('45, 68, 90')
+        expect(arrowRight.attributes('style')).toContain('45, 68, 90')
+        expect(arrowLeft.attributes('style')).toContain('fill')
+        expect(arrowRight.attributes('style')).toContain('fill')
 
         // Mainsail icon paths use `colorMainsail` (=surface, not muted)
-        // getOnSurface returns space-separated values → style is "rgb(100 150 200)"
+        // getOnSurface returns space-separated values → style is "rgb(100, 150, 200)" in jsdom
         const mainsailIcon = wrapper.find('#Mainsail_icon path')
-        expect(mainsailIcon.attributes('style')).toContain('rgb(100 150 200)')
+        expect(mainsailIcon.attributes('style')).toContain('rgb(100, 150, 200)')
 
         // Clean up
         document.documentElement.style.removeProperty('--v-theme-on-surface')
@@ -124,12 +126,12 @@ describe('ConnectionStatus.vue', () => {
 
         // Mainsail text uses colorMainsail which defaults to '200,200,200'
         const mainsailText = wrapper.find('#Mainsail_text text')
-        expect(mainsailText.attributes('style')).toContain('rgb(200,200,200)')
+        expect(mainsailText.attributes('style')).toContain('200, 200, 200')
 
         // Mainsail icon paths also use colorMainsail
         const mainsailPaths = wrapper.find('#Mainsail_icon').findAll('path')
         for (const path of mainsailPaths) {
-            expect(path.attributes('style')).toContain('rgb(200,200,200)')
+            expect(path.attributes('style')).toContain('200, 200, 200')
         }
     })
 })

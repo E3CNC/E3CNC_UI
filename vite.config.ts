@@ -166,7 +166,7 @@ export default defineConfig({
     },
 
     test: {
-        environment: 'happy-dom',
+        environment: 'jsdom',
         include: ['tests/**/*.spec.ts'],
         globals: true,
         setupFiles: ['tests/setup.ts'],

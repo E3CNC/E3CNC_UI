@@ -139,7 +139,7 @@ describe('WebrtcCameraStreamer.vue', () => {
         })
 
         const video = wrapper.find('video')
-        expect(video.attributes('muted')).toBeDefined()
+        expect(video.element.muted).toBe(true)
         expect(video.attributes('autoplay')).toBeDefined()
     })
 })

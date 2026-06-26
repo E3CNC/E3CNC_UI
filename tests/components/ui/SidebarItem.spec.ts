@@ -160,7 +160,7 @@ describe('MainsailLogo.vue', () => {
             props: { color: '#ff0000' },
         })
         const path = wrapper.find('path')
-        expect(path.attributes('style')).toContain('#ff0000')
+        expect(path.attributes('style')).toContain('255, 0, 0')
         expect(path.attributes('style')).toContain('fill')
     })
 
@@ -170,7 +170,7 @@ describe('MainsailLogo.vue', () => {
         })
         await wrapper.setProps({ color: '#00ff00' })
         const path = wrapper.find('path')
-        expect(path.attributes('style')).toContain('#00ff00')
+        expect(path.attributes('style')).toContain('0, 255, 0')
     })
 
     it('renders with empty style when color prop cleared', async () => {

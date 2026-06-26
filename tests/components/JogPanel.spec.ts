@@ -7,7 +7,8 @@ describe('JogPanel keyboard helpers', () => {
         const textarea = document.createElement('textarea')
         const select = document.createElement('select')
         const contentEditable = document.createElement('div')
-        contentEditable.contentEditable = 'true'
+        // jsdom doesn't implement isContentEditable, so we mock it
+        Object.defineProperty(contentEditable, 'isContentEditable', { value: true })
         const plainDiv = document.createElement('div')
 
         expect(isEditableTarget(input)).toBe(true)

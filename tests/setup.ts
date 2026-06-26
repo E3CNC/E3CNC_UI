@@ -8,27 +8,9 @@
 
 import { vi } from 'vitest'
 
-// Mock window.location
-Object.defineProperty(window, 'location', {
-    value: {
-        hostname: 'localhost',
-        port: '8080',
-        protocol: 'http:',
-        href: 'http://localhost:8080/',
-        pathname: '/',
-        search: '',
-        hash: '',
-    },
-    writable: true,
-})
-
-// Mock document.location
-Object.defineProperty(document, 'location', {
-    value: {
-        protocol: 'http:',
-    },
-    writable: true,
-})
+// jsdom provides a proper Location. Navigate to our test URL so
+// hostname/port/protocol are what the app expects.
+window.location.href = 'http://localhost:8080/'
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -149,6 +131,8 @@ class MockResizeObserver {
 
 Object.defineProperty(window, 'ResizeObserver', {
     value: MockResizeObserver,
+    configurable: true,
+    writable: true,
 })
 
 // Mock IntersectionObserver
@@ -160,6 +144,8 @@ class MockIntersectionObserver {
 
 Object.defineProperty(window, 'IntersectionObserver', {
     value: MockIntersectionObserver,
+    configurable: true,
+    writable: true,
 })
 
 // Mock fetch

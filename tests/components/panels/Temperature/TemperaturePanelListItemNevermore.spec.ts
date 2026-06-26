@@ -146,13 +146,13 @@ describe('TemperaturePanelListItemNevermore.vue', () => {
     it('uses color from icon color style', () => {
         const wrapper = mountNevermore()
         const icon = wrapper.find('.mock-v-icon')
-        expect(icon.attributes('style')).toContain('#00FF00')
+        expect(icon.attributes('style')).toContain('0, 255, 0')
     })
 
     it('falls back to white when no dataset color set', () => {
         store.state.gui.view.tempchart.datasetSettings = {}
         const wrapper = mountNevermore()
         const icon = wrapper.find('.mock-v-icon')
-        expect(icon.attributes('style')).toContain('#ffffff')
+        expect(icon.attributes('style')).toContain('255, 255, 255')
     })
 })

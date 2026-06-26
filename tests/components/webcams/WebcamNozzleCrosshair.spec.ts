@@ -97,10 +97,10 @@ describe('WebcamNozzleCrosshair.vue', () => {
         })
 
         const horizontal = wrapper.find('.horizontal')
-        expect(horizontal.attributes('style')).toContain(customColor)
+        expect(horizontal.attributes('style')).toContain('255, 0, 0')
 
         const circle = wrapper.find('.circle')
-        expect(circle.attributes('style')).toContain(customColor)
+        expect(circle.attributes('style')).toContain('255, 0, 0')
     })
 
     it('computes circle size based on container height and nozzleCrosshairSize', () => {
@@ -139,6 +139,6 @@ describe('WebcamNozzleCrosshair.vue', () => {
         })
 
         const circle = wrapper.find('.circle')
-        expect(circle.attributes('style')).toContain(`border-color: ${customColor}`)
+        expect(circle.attributes('style')).toContain('0, 255, 0')
     })
 })

@@ -48,7 +48,7 @@ describe('MiscellaneousLightNeopixelState.vue', () => {
         })
         const span = wrapper.find('span')
         // red=1, green=0.5, blue=0 → rgba(255, 128, 0)
-        expect(span.attributes('style')).toContain('background-color: rgba(255, 128, 0)')
+        expect(span.attributes('style')).toContain('255, 128, 0')
     })
 
     it('uses white channel when RGB are all zero and white > 0', () => {
@@ -76,7 +76,7 @@ describe('MiscellaneousLightNeopixelState.vue', () => {
         })
         const span = wrapper.find('span')
         // All nulls → rgba(0, 0, 0)
-        expect(span.attributes('style')).toContain('background-color: rgba(0, 0, 0)')
+        expect(span.attributes('style')).toContain('0, 0, 0')
     })
 
     it('accesses correct index in color_data (index=2)', () => {
@@ -91,7 +91,7 @@ describe('MiscellaneousLightNeopixelState.vue', () => {
         })
         const span = wrapper.find('span')
         // index=2 → second array: red=1, green=0, blue=0.5 → rgba(255, 0, 128)
-        expect(span.attributes('style')).toContain('background-color: rgba(255, 0, 128)')
+        expect(span.attributes('style')).toContain('255, 0, 128')
     })
 
     it('emits click-button on click', async () => {

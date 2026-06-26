@@ -103,7 +103,7 @@ describe('WebrtcMediaMTX.vue', () => {
         const wrapper = mount(WebrtcMediaMTX, createMountOptions())
 
         const video = wrapper.find('video')
-        expect(video.attributes('muted')).toBeDefined()
+        expect(video.element.muted).toBe(true)
         expect(video.attributes('autoplay')).toBeDefined()
     })
 })
