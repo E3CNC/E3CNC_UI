@@ -5,6 +5,24 @@
                 <v-btn :icon="mdiPowerStandby" rounded="0" v-bind="props" />
             </template>
             <v-list density="compact">
+                <!-- E3CNC Instance Info -->
+                <v-list-subheader v-if="instanceInfo" class="" style="height: auto">
+                    {{ $t('App.TopCornerMenu.KlipperControl') }}
+                </v-list-subheader>
+                <v-list-item v-if="instanceInfo" class="minHeight30 pr-2" density="compact">
+                    <template #title>
+                        <div class="text-caption">
+                            <div class="font-weight-bold">{{ instanceInfo.name }}</div>
+                            <div class="text-disabled">Port {{ instanceInfo.port }}</div>
+                        </div>
+                    </template>
+                    <template #append>
+                        <v-icon :color="instanceInfo.running ? 'green' : 'red'" size="small">
+                            {{ instanceInfo.running ? mdiCheckCircle : mdiAlertCircle }}
+                        </v-icon>
+                    </template>
+                </v-list-item>
+                <v-divider v-if="instanceInfo" class="mt-0" />
                 <template v-if="klipperState !== 'disconnected'">
                     <v-list-subheader class="" style="height: auto">
                         {{ $t('App.TopCornerMenu.KlipperControl') }}
@@ -106,16 +124,56 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useI18n } from 'vue-i18n'
 import { useBase } from '@/composables/useBase'
 import { useServices } from '@/composables/useServices'
 import { useSocket } from '@/composables/useSocket'
 import { ServerPowerStateDevice } from '@/store/server/power/types'
-import { mdiPowerStandby, mdiRestart, mdiPower, mdiToggleSwitch, mdiToggleSwitchOff } from '@mdi/js'
+import {
+    mdiPowerStandby,
+    mdiRestart,
+    mdiPower,
+    mdiToggleSwitch,
+    mdiToggleSwitchOff,
+    mdiCheckCircle,
+    mdiAlertCircle,
+} from '@mdi/js'
 import TopCornerMenuService from '@/components/ui/TopCornerMenuService.vue'
 import ConfirmationDialog from '@/components/dialogs/ConfirmationDialog.vue'
+
+interface instanceInfo {
+    name: string
+    port: number
+    web_root: string
+    running: boolean
+}
+
+const store = useStore()
+const { t } = useI18n()
+const { klipperState, printer_state, printerIsPrinting } = useBase()
+const { hideOtherInstances, klipperInstance, moonrakerInstance } = useServices()
+const socket = useSocket()
+
+const showMenu = ref(false)
+const instanceInfo = ref<instanceInfo | null>(null)
+
+onMounted(async () => {
+    const base = useBase()
+    const url = base.apiUrl.value + '/machine/e3cnc/info'
+    try {
+        const response = await fetch(url)
+        const data = await response.json()
+        if (data?.result?.ok && data?.result?.instances?.length) {
+            // Show the first running instance, or the first instance
+            const running = data.result.instances.find((i: instanceInfo) => i.running)
+            instanceInfo.value = running ?? data.result.instances[0]
+        }
+    } catch {
+        // Endpoint not available — ignore
+    }
+})
 
 interface dialogPowerDeviceChange {
     show: boolean
@@ -132,13 +190,6 @@ interface dialogConfirmation {
     actionButtonText: string
 }
 
-const store = useStore()
-const { t } = useI18n()
-const { klipperState, printer_state, printerIsPrinting } = useBase()
-const { hideOtherInstances, klipperInstance, moonrakerInstance } = useServices()
-const socket = useSocket()
-
-const showMenu = ref(false)
 const dialogPowerDeviceChange = ref<dialogPowerDeviceChange>({
     show: false,
     device: '',
