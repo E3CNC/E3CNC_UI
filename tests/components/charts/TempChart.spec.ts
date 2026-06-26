@@ -206,4 +206,66 @@ describe('TempChart.vue', () => {
 
         expect(wrapper.classes()).toContain('w-100')
     })
+
+    it('builds chart options with temperature data series', () => {
+        const store = createStoreWithState({
+            printer: {
+                tempHistory: {
+                    series: [
+                        { name: 'extruder', parameter: 'temperature', units: 'C', hidden: false },
+                        { name: 'heater_bed', parameter: 'temperature', units: 'C', hidden: true },
+                    ],
+                    source: [
+                        { date: 1000000, 'extruder:temperature': 200, 'heater_bed:temperature': 60 },
+                        { date: 1000010, 'extruder:temperature': 205, 'heater_bed:temperature': 61 },
+                    ],
+                },
+            },
+        })
+        const wrapper = mountTempChart(store)
+
+        // Computed options should be passed as prop to e-chart
+        expect(wrapper.find('.e-chart').exists()).toBe(true)
+        // The chart option should include xAxis with type 'time' for time-series data
+        const chartOption = wrapper.findComponent({ name: 'EChart' }).props('option')
+        expect(chartOption.xAxis.type).toBe('time')
+        expect(chartOption.series.length).toBeGreaterThan(0)
+    })
+
+    it('renders with autoscale disabled', () => {
+        const store = createStoreWithState({
+            gui: {
+                view: {
+                    tempchart: { autoscale: false },
+                },
+                dashboard: {
+                    nonExpandPanels: { mobile: [], tablet: [], desktop: [], widescreen: [] },
+                    floatingPanels: {},
+                },
+                general: { printername: 'Test' },
+                control: {},
+                uiSettings: { tempchartHeight: 250 },
+                navigationSettings: { entries: [] },
+            },
+        })
+        const wrapper = mountTempChart(store)
+        expect(wrapper.find('.e-chart').exists()).toBe(true)
+    })
+
+    it('renders with PWM axis display enabled', () => {
+        // override the default getter via store creation
+        const store = createStoreWithState({
+            printer: {
+                print_stats: { state: 'ready' },
+                idle_timeout: { state: 'Idle' },
+                toolhead: { homed_axes: 'xyz' },
+                tempHistory: {
+                    series: [{ name: 'heater_fan', parameter: 'temperature', units: 'PWM', hidden: false }],
+                    source: [],
+                },
+            },
+        })
+        const wrapper = mountTempChart(store)
+        expect(wrapper.find('.e-chart').exists()).toBe(true)
+    })
 })
