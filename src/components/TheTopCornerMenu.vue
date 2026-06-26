@@ -144,6 +144,18 @@
             :text="dialogConfirmation.description"
             :action-button-text="dialogConfirmation.actionButtonText"
             @action="executeDialog" />
+
+        <!-- E3CNC update overlay -->
+        <v-overlay v-model="e3cncUpdating" class="align-center justify-center" persistent>
+            <v-card class="pa-6 text-center" elevation="6">
+                <v-progress-circular
+                    :size="48"
+                    :width="4"
+                    color="primary"
+                    indeterminate />
+                <p class="mt-4 mb-0 text-body-2">Updating E3CNC stack...</p>
+            </v-card>
+        </v-overlay>
     </div>
 </template>
 
