@@ -200,7 +200,8 @@ def find_stack_artifact_asset(version: Optional[str] = None) -> Optional[Dict[st
 
 
 def download_artifact(asset: Dict[str, Any], dest_dir: Path) -> Optional[Path]:
-    """Download a release artifact to dest_dir. Returns the path to the downloaded file."""
+    """Download a release artifact to dest_dir. Also downloads .sha256 if available.
+    Returns the path to the downloaded file."""
     url = asset.get("browser_download_url", "")
     name = asset.get("name", "artifact")
     if not url:
@@ -229,6 +230,18 @@ def download_artifact(asset: Dict[str, Any], dest_dir: Path) -> Optional[Path]:
         part_path.rename(final_path)
         size_mb = downloaded / (1024 * 1024)
         info(f"Downloaded {name} ({size_mb:.1f} MB)")
+
+        # Also download checksum file if it exists alongside the artifact
+        checksum_name = f"{name}.sha256"
+        checksum_url = f"{url}.sha256"
+        try:
+            req_checksum = Request(checksum_url, headers={"Accept": "application/octet-stream"})
+            with urlopen(req_checksum, timeout=30) as resp_checksum:
+                checksum_data = resp_checksum.read()
+                (dest_dir / checksum_name).write_bytes(checksum_data)
+        except (URLError, OSError):
+            pass  # Checksum may not exist
+
         return final_path
     except (URLError, OSError) as e:
         if part_path.exists():

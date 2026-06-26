@@ -1073,6 +1073,12 @@ def _get_instance(args: argparse.Namespace) -> Optional[Instance]:
                 return inst
         warn(f"Instance '{args.instance}' not found. Available: {[i.name for i in instances]}")
         return None
+
+    # Auto-select if only one instance, otherwise delegate to interactive prompt
+    instances = detect_instances()
+    if len(instances) == 1:
+        set_active_instance(instances[0])
+        return instances[0]
     return get_active_instance()
 
 
