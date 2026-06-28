@@ -284,7 +284,9 @@ onMounted(async () => {
         if (data?.result?.ok && data?.result?.instances?.length) {
             // Show the first running instance, or the first instance
             const running = data.result.instances.find((i: instanceInfo) => i.running)
-            instanceInfo.value = running ?? data.result.instances[0]
+            const matched = running ?? data.result.instances[0]
+            matched.current_version = data.result.current_version
+            instanceInfo.value = matched
         }
     } catch {
         // Endpoint not available — ignore

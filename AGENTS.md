@@ -11,7 +11,7 @@ This file documents the current state and capabilities of AI agents used in this
 - Phase 1: All deps upgraded (Vue 3.5, Vuetify 3, vue-router 4, vue-i18n 11, vuex 4, Pinia 2, TS 5.7)
 - Phase 2: Global infra (`createApp`, `@vue/compat` MODE 2, Vuetify 3, mitt, WebSocket composable, directives, router v4, i18n v11, Vuex 4)
 - Phase 3: Router v4, i18n v11, Vuex 4 in place
-- Phase 4: All 18 mixin `.ts` files → `use*()` composables in `src/composables/`
+- Phase 4: All `.ts` mixin files → `use*()` composables in `src/composables/` (20 composables)
 - Phase 5: All 255+ `.vue` files rewritten from class components to `<script setup>`
 - Phase 6: Vuetify 3 template migration (list-item, tabs, subheader, checkbox, table renames)
 - Phase 7a: Mixin files deleted (`src/components/mixins/`)
@@ -29,7 +29,7 @@ This file documents the current state and capabilities of AI agents used in this
 - All action/mutation files: `Vue.$socket.emit/emitAndWait/emitBatch` → `getSocket().emit/emitAndWait/emitBatch`, `Vue.$toast.success/error` → `$toast.success/error`
 - All store files: `import Vue from 'vue'` removed (zero remaining)
 - `src/plugins/helpers.ts`: `Vue.set` → direct assignment, import removed
-- `src/components/inputs/CodemirrorAsync.ts`: `Vue.component` → `defineAsyncComponent`
+- `src/components/inputs/CodemirrorAsync.vue`: `Vue.component` → dynamic import from `Codemirror.vue`
 - `src/components/webcams/streamers/DynamicCamLoader.ts`: `Vue.component` → exported `getDynamicCamImport()`
 - **Zero `import Vue from 'vue'` remaining anywhere in `src/`**
 - Fixed pre-existing runtime bugs: `i18n.t` → `i18n.global.t` in 5 files, `$vuetify.breakpoint` → `useDisplay()` in 4 files, `attrs['aria-expanded']` → `boolMenu` in TheNotificationMenu
@@ -84,7 +84,7 @@ with Ansible playbooks for idempotent deployment.
 | 12    | INSTALLATION.md updated                                                       | ✅     |
 | 14    | Bash scripts deprecated in docs (kept for legacy)                             | ✅     |
 
-### Single-Deploy Migration (current branch: `single-deploy`)
+### Single-Deploy Migration (branch: `single-deploy`, merged into `main`)
 
 | Phase | What                                                                          | Status |
 | ----- | ----------------------------------------------------------------------------- | ------ |
@@ -107,8 +107,9 @@ Plus fixes discovered during rollout:
   after every `git pull`, which downloads the nightly release, re-vendors the agent,
   re-deploys plugins, and restarts Moonraker automatically. Repo must be cloned
   manually first — Moonraker does not clone from scratch.
-- **Fixed missing dep**: `vue-load-image` was imported in `src/main.ts` but missing
-  from `package.json` — was blocking all CI builds.
+- **Fixed missing dep**: `vue-load-image` npm package was blocking CI builds.
+  Replaced with a local Vue 3 component at `src/components/ui/VueLoadImage.vue`,
+  and the npm import was removed from `src/main.ts`.
 
 ### Key commits
 
@@ -128,12 +129,12 @@ a9144473 spec: add Ansible migration plan
 
 - **Purpose**: Interactive CLI agent specializing in software engineering tasks for this project.
 - **Current Role**: Frontend maintenance, docs sync, single-deploy migration
-- **Access**: shell commands, file system, Chrome DevTools, SSH to the CNC host using `ssh cnf` (configured in `~/.ssh/config`). Always access the CNC host within a `tmux` session — use `tmux new-session -s cnc 'ssh cnc'` or `tmux attach -t cnc` if one already exists.
+- **Access**: shell commands, file system, Chrome DevTools, SSH to the CNC host using `ssh cnc` (configured in `~/.ssh/config`). Always access the CNC host within a `tmux` session — use `tmux new-session -s cnc 'ssh cnc'` or `tmux attach -t cnc` if one already exists.
 - **Package Manager**: Bun (not npm). Use `bun install`, `bun run`, `bunx`.
 - **Dev Server**: Run within `tmux`; check for existing sessions first. HMR is active.
-- **CLI**: `./e3cnc-cli` — unified CLI with single-deploy stack commands: `update`, `releases`, `rollback`, `prune`, plus legacy `install`/`deploy`/`uninstall`/`status`/`backup`/`restore`/`diagnose`/`check`/`logs`.
+- **CLI**: `./e3cnc-cli` — unified CLI with single-deploy stack commands: `update` (alias `redeploy`), `releases` (alias `rel`), `rollback`, `prune`, plus legacy `install`/`deploy`/`uninstall`/`status`/`backup`/`restore`/`diagnose`/`check`/`logs`, and management `instances`/`migrate`.
 - **Ansible**: Playbooks at `ansible/playbooks/` (legacy, being phased out). Run `./e3cnc-cli update` for full-stack updates.
-- **Wiki**: The project wiki is available at `~/repos/E3CNC.wiki/` (cloned from `https://github.com/E3CNC/E3CNC.wiki.git`). Update `Home.md` and `Changelog.md` when shipping significant changes.
+- **Wiki**: The project wiki is available at `~/repos/E3CNC_UI.wiki/` (cloned from `https://github.com/E3CNC/E3CNC.wiki.git`). Update `Home.md` and `Changelog.md` when shipping significant changes.
 - **CI**: Releases are triggered manually via GitHub Actions (`workflow_dispatch`). Check status with `gh run list`.
 
 ## Operational Guidelines

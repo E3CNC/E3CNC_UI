@@ -11,6 +11,7 @@ const mockPrinterIsPrinting = ref(false)
 const mockHideOtherInstances = ref(false)
 const mockKlipperInstance = ref('')
 const mockMoonrakerInstance = ref('')
+const mockApiUrl = ref('http://localhost:4173')
 const mockSocketEmit = vi.fn()
 
 // i18n mock
@@ -72,6 +73,21 @@ vi.mock('vuetify/components', () => ({
         name: 'VListSubheader',
         template: '<div class="v-list-subheader"><slot /></div>',
     },
+    VOverlay: {
+        name: 'VOverlay',
+        props: { modelValue: Boolean },
+        template: '<div v-if="modelValue" class="v-overlay"><slot /></div>',
+    },
+    VProgressCircular: {
+        name: 'VProgressCircular',
+        props: { size: Number, width: Number, color: String, indeterminate: Boolean },
+        template: '<div class="v-progress-circular" />',
+    },
+    VCard: {
+        name: 'VCard',
+        props: { elevation: Number },
+        template: '<div class="v-card"><slot /></div>',
+    },
 }))
 
 vi.mock('@/composables/useSocket', () => ({
@@ -83,6 +99,7 @@ vi.mock('@/composables/useBase', () => ({
         klipperState: mockKlipperState,
         printer_state: mockPrinterState,
         printerIsPrinting: mockPrinterIsPrinting,
+        apiUrl: mockApiUrl,
     }),
 }))
 
@@ -193,6 +210,8 @@ describe('TheTopCornerMenu.vue', () => {
         mockHideOtherInstances.value = false
         mockKlipperInstance.value = ''
         mockMoonrakerInstance.value = ''
+        mockApiUrl.value = 'http://localhost:4173'
+        global.fetch = undefined as any
     })
 
     // ── 1. Renders menu activator button ──
@@ -565,5 +584,184 @@ describe('TheTopCornerMenu.vue', () => {
         const devices = vmAny(wrapper).powerDevices
         expect(devices.length).toBe(1)
         expect(devices[0].device).toBe('Light')
+    })
+
+    // ── 19. e3cncFetchInfo selects running instance ──
+    it('e3cncFetchInfo selects running instance from API response', async () => {
+        const wrapper = await mountComponent()
+
+        global.fetch = vi.fn().mockResolvedValue({
+            json: () =>
+                Promise.resolve({
+                    result: {
+                        ok: true,
+                        current_version: '0.8.1',
+                        instances: [
+                            { name: 'First', port: 7125, web_root: '/', running: false },
+                            { name: 'Second', port: 7126, web_root: '/', running: true },
+                        ],
+                    },
+                }),
+        })
+
+        await vmAny(wrapper).e3cncFetchInfo()
+        await wrapper.vm.$nextTick()
+
+        expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('/machine/e3cnc/info'))
+        expect(vmAny(wrapper).instanceInfo.name).toBe('Second')
+        expect(vmAny(wrapper).instanceInfo.current_version).toBe('0.8.1')
+    })
+
+    // ── 20. e3cncFetchInfo falls back to first instance when none running ──
+    it('e3cncFetchInfo falls back to first instance when none running', async () => {
+        const wrapper = await mountComponent()
+
+        global.fetch = vi.fn().mockResolvedValue({
+            json: () =>
+                Promise.resolve({
+                    result: {
+                        ok: true,
+                        current_version: '0.8.0',
+                        instances: [
+                            { name: 'Alpha', port: 7125, web_root: '/', running: false },
+                            { name: 'Beta', port: 7126, web_root: '/', running: false },
+                        ],
+                    },
+                }),
+        })
+
+        await vmAny(wrapper).e3cncFetchInfo()
+        await wrapper.vm.$nextTick()
+
+        expect(vmAny(wrapper).instanceInfo.name).toBe('Alpha')
+    })
+
+    // ── 21. e3cncFetchInfo handles fetch error gracefully ──
+    it('e3cncFetchInfo handles fetch error gracefully', async () => {
+        const wrapper = await mountComponent()
+
+        global.fetch = vi.fn().mockRejectedValue(new Error('Network error'))
+
+        await vmAny(wrapper).e3cncFetchInfo()
+        await wrapper.vm.$nextTick()
+
+        expect(vmAny(wrapper).instanceInfo).toBeNull()
+    })
+
+    // ── 22. e3cncRollback sends POST and fetches info on success ──
+    it('e3cncRollback sends POST and fetches info on success', async () => {
+        const wrapper = await mountComponent()
+
+        global.fetch = vi
+            .fn()
+            // First call: rollback POST
+            .mockResolvedValueOnce({
+                json: () => Promise.resolve({ result: { ok: true } }),
+            })
+            // Second call: e3cncFetchInfo after rollback
+            .mockResolvedValueOnce({
+                json: () =>
+                    Promise.resolve({
+                        result: {
+                            ok: true,
+                            current_version: '0.8.0',
+                            instances: [{ name: 'RolledBack', port: 7125, web_root: '/', running: true }],
+                        },
+                    }),
+            })
+
+        await vmAny(wrapper).e3cncRollback()
+        await wrapper.vm.$nextTick()
+
+        expect(global.fetch).toHaveBeenNthCalledWith(
+            1,
+            expect.stringContaining('/machine/e3cnc/rollback'),
+            expect.objectContaining({ method: 'POST' }),
+        )
+        expect(global.fetch).toHaveBeenNthCalledWith(2, expect.stringContaining('/machine/e3cnc/info'))
+        expect(vmAny(wrapper).instanceInfo.name).toBe('RolledBack')
+    })
+
+    // ── 23. e3cncUpdate sends POST and triggers polling ──
+    it('e3cncUpdate sends POST and triggers polling', async () => {
+        vi.useFakeTimers()
+        const wrapper = await mountComponent()
+
+        // Update POST returns started, first poll returns success
+        global.fetch = vi
+            .fn()
+            .mockResolvedValueOnce({
+                json: () => Promise.resolve({ result: { status: 'started' } }),
+            })
+            .mockResolvedValueOnce({
+                json: () =>
+                    Promise.resolve({
+                        result: {
+                            ok: true,
+                            current_version: '0.8.1',
+                            instances: [{ name: 'Updated', port: 7125, web_root: '/', running: true }],
+                        },
+                    }),
+            })
+
+        const updatePromise = vmAny(wrapper).e3cncUpdate()
+
+        // Immediately after POST, loading state is active
+        expect(vmAny(wrapper).e3cncUpdating).toBe(true)
+
+        // Advance past the 5s poll interval
+        await vi.advanceTimersByTimeAsync(5000)
+        await updatePromise
+
+        expect(vmAny(wrapper).e3cncUpdating).toBe(false)
+        expect(vmAny(wrapper).instanceInfo?.current_version).toBe('0.8.1')
+        vi.useRealTimers()
+    })
+
+    // ── 24. Shows E3CNC section header in rendered menu ──
+    it('shows E3CNC section header in rendered menu', async () => {
+        const wrapper = await mountComponent()
+        await wrapper.setData({ showMenu: true })
+        await wrapper.vm.$nextTick()
+
+        const subheaders = wrapper.findAllComponents({ name: 'VListSubheader' })
+        const e3cncHeader = subheaders.find((sh) => sh.text().includes('E3CNC'))
+        expect(e3cncHeader).toBeTruthy()
+    })
+
+    // ── 25. Shows Update Stack and Rollback items in rendered menu ──
+    it('shows Update Stack and Rollback items in rendered menu', async () => {
+        const wrapper = await mountComponent()
+        await wrapper.setData({ showMenu: true })
+        await wrapper.vm.$nextTick()
+
+        const items = wrapper.findAllComponents({ name: 'VListItem' })
+        const updateItem = items.find((i) => i.text().includes('Update Stack'))
+        const rollbackItem = items.find((i) => i.text().includes('Rollback'))
+        expect(updateItem).toBeTruthy()
+        expect(rollbackItem).toBeTruthy()
+    })
+
+    // ── 26. Shows version in E3CNC section header when available ──
+    it('shows version in E3CNC section header when available', async () => {
+        const wrapper = await mountComponent()
+        await wrapper.setData({ showMenu: true, instanceInfo: { current_version: '0.8.1' } })
+        await wrapper.vm.$nextTick()
+
+        const subheaders = wrapper.findAllComponents({ name: 'VListSubheader' })
+        const e3cncHeader = subheaders.find((sh) => sh.text().includes('0.8.1'))
+        expect(e3cncHeader).toBeTruthy()
+    })
+
+    // ── 27. Disables Update Stack button during update ──
+    it('disables Update Stack button during update', async () => {
+        const wrapper = await mountComponent()
+        await wrapper.setData({ showMenu: true, e3cncUpdating: true })
+        await wrapper.vm.$nextTick()
+
+        const items = wrapper.findAllComponents({ name: 'VListItem' })
+        const updateItem = items.find((i) => i.text().includes('Updating'))
+        expect(updateItem).toBeTruthy()
+        expect(updateItem?.classes()).toContain('v-list-item--disabled')
     })
 })

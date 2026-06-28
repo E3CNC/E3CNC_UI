@@ -1,6 +1,6 @@
 {
   "name": "E3CNC",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "private": true,
   "type": "module",
   "description": "A web interface for Klipper-based CNC machines",
@@ -18,7 +18,7 @@
   "license": "GPL-3.0",
   "scripts": {
     "serve": "vite serve",
-    "dev": "tmux has-session -t E3CNC 2>/dev/null || tmux new-session -d -s E3CNC 'vite'",
+    "dev": "tmux has-session -t e3cnc 2>/dev/null || tmux new-session -d -s e3cnc 'vite'",
     "build": "vite build",
     "format": "bun run format:base -- --write",
     "format:base": "prettier .",
