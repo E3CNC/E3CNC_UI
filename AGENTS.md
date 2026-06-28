@@ -78,11 +78,15 @@ with Ansible playbooks for idempotent deployment.
 | Phase | What                                                                          | Status |
 | ----- | ----------------------------------------------------------------------------- | ------ |
 | 1     | `ansible/` skeleton (cfg, inventory, vars)                                    | ✅     |
-| 2–7   | 6 roles: agent, extractor, moonraker-config, klipper-extras, macros, frontend | ✅     |
+| 2–7   | 5 roles: bootstrap-stack, extractor, moonraker-config, macros, frontend       | ✅     |
 | 8–10  | Playbooks: `install.yml`, `deploy.yml`, `uninstall.yml`                       | ✅     |
 | 11    | `--check` mode on all command tasks                                           | ✅     |
 | 12    | INSTALLATION.md updated                                                       | ✅     |
 | 14    | Bash scripts deprecated in docs (kept for legacy)                             | ✅     |
+
+Note: `agent` and `klipper-extras` roles were removed in v0.8.2 — those components
+now ship inside the `vendor/moonraker/` and `vendor/klipper/` snapshots and are
+deployed by the bootstrap-stack role automatically.
 
 ### Single-Deploy Migration (branch: `single-deploy`, merged into `main`)
 
@@ -132,8 +136,8 @@ a9144473 spec: add Ansible migration plan
 - **Access**: shell commands, file system, Chrome DevTools, SSH to the CNC host using `ssh cnc` (configured in `~/.ssh/config`). Always access the CNC host within a `tmux` session — use `tmux new-session -s cnc 'ssh cnc'` or `tmux attach -t cnc` if one already exists.
 - **Package Manager**: Bun (not npm). Use `bun install`, `bun run`, `bunx`.
 - **Dev Server**: Run within `tmux`; check for existing sessions first. HMR is active.
-- **CLI**: `./e3cnc-cli` — unified CLI with single-deploy stack commands: `update` (alias `redeploy`), `releases` (alias `rel`), `rollback`, `prune`, plus legacy `install`/`deploy`/`uninstall`/`status`/`backup`/`restore`/`diagnose`/`check`/`logs`, and management `instances`/`migrate`.
-- **Ansible**: Playbooks at `ansible/playbooks/` (legacy, being phased out). Run `./e3cnc-cli update` for full-stack updates.
+- **CLI**: `./e3cnc-cli` — unified CLI with single-deploy stack commands: `install` (bootstrap + artifact), `update` (alias `redeploy`), `releases` (alias `rel`), `rollback`, `prune`, plus legacy `install`/`deploy`/`uninstall`/`status`/`backup`/`restore`/`diagnose`/`check`/`logs`, and management `instances`/`migrate`.
+- **Ansible**: Playbooks at `ansible/playbooks/` used for initial bootstrap (bootstrap-stack + moonraker-config). Content deployment (extractor, macros, frontend) now delivered via stack artifact downloaded by `e3cnc-cli install` and `e3cnc-cli update`.
 - **Wiki**: The project wiki is available at `~/repos/E3CNC_UI.wiki/` (cloned from `https://github.com/E3CNC/E3CNC.wiki.git`). Update `Home.md` and `Changelog.md` when shipping significant changes.
 - **CI**: Releases are triggered manually via GitHub Actions (`workflow_dispatch`). Check status with `gh run list`.
 

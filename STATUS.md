@@ -45,8 +45,9 @@
 - **Decision:** Split monolithic `e3cnc-cli` (1,896 lines, 5 responsibilities) into a `cli/` package
 - New structure:
   - `cli/__init__.py` (76 lines) — entry point + dispatch
-  - `cli/commands.py` (416 lines) — 15 cmd_* handlers
-  - `cli/helpers.py` (185 lines) — CLI helpers (_require_ansible, _get_instance, etc.)
+  - `cli/commands.py` (330 lines) — 15 cmd_* handlers
+  - `cli/helpers.py` (312 lines) — CLI helpers (_require_ansible, _get_instance,
+    _download_and_activate_release, etc.)
   - `cli/parser.py` (109 lines) — argparse setup
   - `cli/menu.py` (203 lines) — interactive menu
   - `e3cnc-cli` (17 lines) — thin wrapper for backward compatibility
@@ -119,7 +120,7 @@
 
 ### Git Status
 - Branch: `main`
-- Ahead of `origin/main` by **16 commits**
+- Ahead of `origin/main` by **18 commits**
 - Working tree: **clean**
 - Version: `0.8.2` (package.json, _e3cnc_shared.py, e3cnc-cli)
 
