@@ -130,6 +130,40 @@ class TestFreshInstallBootstrap:
         print(f"  {'✓' if ok else '✗'} {label}")
         return ok
 
+    def _deploy_frontend_to_container(self) -> str:
+        """Copy host's pre-built dist/ into the container and deploy to web root."""
+        docker = shutil.which("docker")
+        root = Path(__file__).resolve().parent.parent
+        dist_path = root / "dist"
+
+        if not dist_path.is_dir():
+            return "MISSING: host dist/ not found — run 'bun run build' first"
+
+        subprocess.run(
+            [docker, "cp", str(dist_path) + "/.", f"{self.CONTAINER_NAME}:/home/testbed/dist"],
+            check=True, capture_output=True,
+        )
+
+        out = self._exec(
+            "mkdir -p ~/e3cnc-web && "
+            "cp -r ~/dist/* ~/e3cnc-web/ && "
+            "sudo nginx -s reload 2>/dev/null || sudo nginx 2>/dev/null && "
+            "echo 'DEPLOYED'"
+        )
+        return out
+
+    def _verify_frontend_response(self) -> tuple:
+        """Curl the frontend and verify expected HTML content."""
+        http = self._exec(
+            "curl -s -o /tmp/fe-response.txt -w '%{http_code}' http://localhost/ 2>/dev/null || echo 'no-connect'"
+        )
+        status_ok = http.strip() == "200"
+        html = self._exec("cat /tmp/fe-response.txt 2>/dev/null || echo ''")
+        has_title = "<title>" in html
+        has_root = 'id="app"' in html or 'id=\"app\"' in html
+        has_pwa = "serviceWorker" in html
+        return status_ok, has_title, has_root, has_pwa, http.strip()
+
     # ── Test: file-level verification ─────────────────────────────────────
 
     def test_fresh_bootstrap_full_verification(self):
@@ -183,8 +217,23 @@ class TestFreshInstallBootstrap:
         print(f"  {'✓' if nginx_running else '✗'} nginx process: {'running' if nginx_running else 'NOT RUNNING'}")
         assert nginx_running, "nginx failed to start"
 
-        http = self._exec("curl -s -o /dev/null -w '%{http_code}' http://localhost/ 2>/dev/null || echo 'no-connect'")
-        print(f"  Frontend HTTP: {http}")
+        print("\n  ── Frontend ──")
+        deploy = self._deploy_frontend_to_container()
+        if "DEPLOYED" in deploy:
+            print("  ✓ Frontend copied from host dist/ and deployed")
+
+            status_ok, has_title, has_root, has_pwa, http_code = self._verify_frontend_response()
+            print(f"  {'✓' if status_ok else '✗'} HTTP status: {http_code}")
+            print(f"  {'✓' if has_title else '✗'} HTML has <title>")
+            print(f"  {'✓' if has_root else '✗'} HTML has Vue app root (#app)")
+            print(f"  {'✓' if has_pwa else '○'} PWA serviceWorker registered")
+
+            assert status_ok, f"Frontend returned HTTP {http_code}, expected 200"
+            assert has_title, "Frontend HTML missing <title>"
+            assert has_root, "Frontend HTML missing Vue app root"
+        else:
+            print(f"  ⚠ Frontend not deployed: {deploy}")
+            print("  (run 'bun run build' on the host to include this check)")
 
     # ── Test: full stack with simulated MCU ───────────────────────────────
 
