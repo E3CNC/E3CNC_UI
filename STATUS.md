@@ -41,7 +41,7 @@
 - Removed `tests/test_comment_mainsail_update_manager.py` (referenced deleted script)
 - Status: **cleanup complete**
 
-### 5. CLI Package Refactor (June 28)
+### 5. CLI Package Refactor & Install/Update Alignment (June 28)
 - **Decision:** Split monolithic `e3cnc-cli` (1,896 lines, 5 responsibilities) into a `cli/` package
 - New structure:
   - `cli/__init__.py` (76 lines) — entry point + dispatch
@@ -53,7 +53,16 @@
   - `e3cnc-cli` (17 lines) — thin wrapper for backward compatibility
 - Stripped ~800 lines of dead fallback code that duplicated `_e3cnc_shared.py`
 - All commands, help text, and version info unchanged
-- Status: **done, 31 new unit tests added**
+- **Install/Update aligned with artifact flow:**
+  - `cmd_install` now: Ansible bootstrap-stack + moonraker-config (infrastructure only)
+    → downloads + activates latest release artifact → post-install guide
+  - `cmd_update` reduced from 50 lines to 3 — delegates to shared
+    `_download_and_activate_release()` function
+  - Shared 9-step flow: find → download → verify → extract → activate
+    → sync → restart → health checks → finalize
+  - `--tags` support threaded through all 4 Ansible wrapper functions
+  - Help texts updated to reflect new flow
+- Status: **done, 99 unit tests pass**
 
 ### 6. Expanded Docker Integration Tests (June 28)
 - **Test 1 — Full file/config verification (PASSING):**
