@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Optional
 
 # Hardcoded CLI version for compatibility check
-_CLI_VERSION = "0.8.1"
+_CLI_VERSION = "0.8.2"
 
 # Import shared logic
 from _e3cnc_shared import (
@@ -76,7 +76,7 @@ from typing import List, NoReturn, Optional, Tuple
 
 # ── Metadata ────────────────────────────────────────────────────────────────
 
-VERSION = "0.8.1"  # fallback if _e3cnc_shared import fails
+VERSION = "0.8.2"  # fallback if _e3cnc_shared import fails
 TOOL_NAME = "e3cnc-cli"
 
 # ── Paths (relative to this script's location) ─────────────────────────────
@@ -1190,7 +1190,7 @@ def _ensure_system_packages() -> None:
 
 
 def cmd_install(args: argparse.Namespace) -> None:
-    """Full installation: agent, frontend, plugins, macros."""
+    """Full installation: bootstrap stack, extractor, config, macros, frontend."""
     header("Prerequisites")
     _require_ansible()
     _ensure_system_packages()
@@ -1548,8 +1548,8 @@ Examples:
   %(prog)s install                   Full install (local)
   %(prog)s install --remote pi@cnc   Full install (remote)
   %(prog)s install --check           Dry-run (check mode)
-  %(prog)s deploy                    Deploy frontend only
-  %(prog)s update                    Re-vendor + redeploy + restart
+  %(prog)s deploy                    Deploy frontend (download from release)
+  %(prog)s update                    Download stack artifact, activate, verify
   %(prog)s uninstall                 Remove all components
   %(prog)s status                    Check installation status
   %(prog)s status --remote cnc       Check remote status
@@ -1583,9 +1583,9 @@ Examples:
     p = subparsers = parser.add_subparsers(dest="command", title="Commands")
 
     p.add_parser("install", parents=[shared_remote, shared_check, shared_yes, shared_instance],
-                 help="Full installation: agent, frontend, plugins, macros")
+                 help="Full installation: bootstrap stack, extractor, config, macros, frontend")
     p.add_parser("deploy", parents=[shared_remote, shared_check, shared_instance],
-                 help="Deploy frontend only (build + copy + reload nginx)")
+                 help="Deploy frontend (download from GitHub release)")
     p.add_parser("update", parents=[shared_remote, shared_check, shared_yes, shared_instance],
                  aliases=["redeploy"],
                  help="Full-stack update: download stack artifact, activate, verify")
