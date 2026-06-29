@@ -923,6 +923,7 @@ def sync_runtime_files(inst: Optional[Instance] = None, dry_run: bool = False) -
         if dry_run:
             info(f"Would copy {script_src} -> {script_dest}")
         else:
+            script_dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(script_src, script_dest)
             script_dest.chmod(0o755)
         info("Synced metadata extractor")
