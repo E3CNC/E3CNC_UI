@@ -140,11 +140,11 @@ def _show_post_install_guide(inst: Optional[Instance] = None) -> None:
     print()
     info("Next steps:")
     print("    1. Run 'e3cnc-cli detect-mcu' to find your controller")
-    print("    2. Configure printer.cfg with your machine's settings")
-    print("    3. Build and flash Klipper firmware for your MCU")
-    print("       (see vendor/klipper/docs/Installation.md)")
-    print("    4. Restart Klipper: sudo systemctl start klipper")
-    print("    5. Run 'e3cnc-cli update' for future releases")
+    print("    2. Run 'e3cnc-cli init-config' to generate a printer.cfg template")
+    print("    3. Edit printer.cfg: fill in your stepper pins, endstops, and limits")
+    print("    4. Run 'e3cnc-cli flash-mcu' to build and flash Klipper firmware")
+    print("    5. Restart Klipper: sudo systemctl start klipper")
+    print("    6. Run 'e3cnc-cli update' for future releases")
     print()
     if not services_ok:
         warn("Some services failed to start — check logs with: e3cnc-cli logs")
@@ -477,4 +477,77 @@ def cmd_flash_mcu(args) -> None:
         print(f"  {line}")
     print()
     info("Firmware files are in: ~/klipper/out/")
+    print()
+
+
+def cmd_init_config(args) -> None:
+    """Generate a CNC printer.cfg with auto-detected MCU path."""
+    from cli.helpers import (
+        scan_serial_devices, _find_matching_preset,
+        _generate_cnc_printer_cfg,
+    )
+    from pathlib import Path
+
+    header("Init Config")
+
+    # Step 1: Detect MCU
+    devices = scan_serial_devices()
+    klipper_devs = [d for d in devices if d.get("is_klipper")]
+    all_devs = klipper_devs or devices
+
+    mcu_path = None
+    if all_devs:
+        # Pick Klipper device first, or first detected device
+        best = all_devs[0]
+        mcu_path = best["path"]
+        info(f"Detected MCU: {best['vendor']} {best['model']} ({best['path']})")
+        # Show all detected devices
+        if len(all_devs) > 1:
+            info("Other detected devices:")
+            for d in all_devs[1:]:
+                print(f"    {d['path']}  ({d['vendor']} {d['model']})")
+    else:
+        info("No MCU detected. The config will include a placeholder.")
+        info("Run 'e3cnc-cli detect-mcu' after connecting your controller.")
+
+    print()
+
+    # Step 2: Determine target path
+    inst = _get_instance(args)
+    if inst:
+        config_path = Path(inst.printer_cfg)
+    else:
+        config_path = Path.home() / "printer_data" / "config" / "printer.cfg"
+
+    if config_path.exists() and not args.yes:
+        try:
+            reply = input(
+                f"  {Style.YELLOW}Overwrite {config_path}? [y/N] {Style.RESET}"
+            ).strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            reply = "n"
+        if reply != "y":
+            info("Cancelled")
+            return
+
+    # Step 3: Generate and write config
+    config_dir = config_path.parent
+    config_dir.mkdir(parents=True, exist_ok=True)
+
+    content = _generate_cnc_printer_cfg(mcu_path)
+    try:
+        config_path.write_text(content)
+        ok(f"Generated: {config_path}")
+    except OSError as e:
+        fail(f"Failed to write {config_path}: {e}")
+        return
+
+    print()
+    info("Next steps:")
+    print("  1. Edit printer.cfg and search for '!!! ADJUST'")
+    print("  2. Fill in your machine's step/dir/enable pins")
+    print("  3. Set endstop pins and travel limits")
+    print("  4. Configure spindle control")
+    print("  5. Restart Klipper: sudo systemctl restart klipper")
+    print("  6. Connect to the web interface")
     print()

@@ -71,6 +71,9 @@ Examples:
     p.add_parser("flash-mcu", aliases=["flash", "build"],
                  parents=[shared_yes, shared_instance],
                  help="Build and flash Klipper firmware for a connected MCU")
+    p.add_parser("init-config", aliases=["init"],
+                 parents=[shared_yes, shared_instance],
+                 help="Generate a CNC printer.cfg with detected MCU path")
 
     # Single-deploy commands
     p.add_parser("releases", aliases=["rel"],

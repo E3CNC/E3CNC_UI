@@ -691,3 +691,62 @@ class TestMCUPresets:
         assert "flash-mcu" in choices
         assert "flash" in choices
         assert "build" in choices
+
+    def test_init_config_in_parser(self):
+        """init-config should be a valid subcommand with alias."""
+        from cli.parser import build_parser
+
+        parser = build_parser()
+        choices = parser._subparsers._group_actions[0].choices
+        assert "init-config" in choices
+        assert "init" in choices
+
+
+class TestGenerateCncConfig:
+    """Tests for cli.helpers._generate_cnc_printer_cfg()."""
+
+    def test_generates_with_mcu_path(self):
+        """When an MCU path is given, it should appear in the [mcu] section."""
+        from cli.helpers import _generate_cnc_printer_cfg
+
+        content = _generate_cnc_printer_cfg("/dev/serial/by-id/usb-Klipper_stm32f103_12345-if00")
+        assert "serial: /dev/serial/by-id/usb-Klipper_stm32f103_12345-if00" in content
+
+    def test_generates_without_mcu_path(self):
+        """When no MCU path is given, a placeholder comment should appear."""
+        from cli.helpers import _generate_cnc_printer_cfg
+
+        content = _generate_cnc_printer_cfg()
+        assert "run 'e3cnc-cli detect-mcu'" in content
+
+    def test_contains_required_sections(self):
+        """The generated config should have all required CNC sections."""
+        from cli.helpers import _generate_cnc_printer_cfg
+
+        content = _generate_cnc_printer_cfg("/dev/ttyACM0")
+        required = [
+            "[mcu]", "[printer]", "[stepper_x]", "[stepper_y]", "[stepper_z]",
+            "[idle_timeout]", "[force_move]", "[pause_resume]", "[gcode_arcs]",
+            "include E3CNC/macros/cnc_base.cfg",
+            "include E3CNC/macros/wcs_macros.cfg",
+            "include E3CNC/macros/e3cnc_macros.cfg",
+        ]
+        for section in required:
+            assert section in content, f"Missing section: {section}"
+
+    def test_has_adjust_markers(self):
+        """The config should include '!!! ADJUST' markers for user-editable fields."""
+        from cli.helpers import _generate_cnc_printer_cfg
+
+        content = _generate_cnc_printer_cfg("/dev/ttyACM0")
+        assert "!!! ADJUST" in content
+        # Should appear for stepper pins, limits, and velocity
+        assert content.count("!!! ADJUST") >= 10
+
+    def test_has_instructions(self):
+        """The config should include setup instructions."""
+        from cli.helpers import _generate_cnc_printer_cfg
+
+        content = _generate_cnc_printer_cfg("/dev/ttyACM0")
+        assert "INSTRUCTIONS" in content
+        assert "e3cnc-cli status" in content

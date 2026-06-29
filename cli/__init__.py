@@ -22,6 +22,7 @@ from cli.commands import (
     cmd_releases, cmd_rollback, cmd_migrate, cmd_prune, cmd_instances,
     cmd_detect_mcu,
     cmd_flash_mcu,
+    cmd_init_config,
 )
 
 
@@ -70,6 +71,8 @@ def main() -> None:
         "flash-mcu": cmd_flash_mcu,
         "flash": cmd_flash_mcu,
         "build": cmd_flash_mcu,
+        "init-config": cmd_init_config,
+        "init": cmd_init_config,
     }
 
     handler = dispatch.get(args.command)
