@@ -743,6 +743,11 @@ def backup_deployment_state(inst: Optional[Instance] = None) -> Optional[Path]:
         except (URLError, OSError, json.JSONDecodeError):
             pass
 
+        # Raw Moonraker SQLite database (works even when Moonraker is down)
+        db_dir = Path(active_inst.printer_data_dir) / "database"
+        for db_file in db_dir.glob("*.sqlite*"):
+            shutil.copy2(db_file, backup_dir / db_file.name)
+
     # Journal
     if JOURNAL_PATH.exists():
         shutil.copy2(JOURNAL_PATH, backup_dir / "journal.json")

@@ -56,9 +56,12 @@ Examples:
                  help="Full installation: bootstrap infrastructure + download release + activate")
     p.add_parser("deploy", parents=[shared_remote, shared_check, shared_instance],
                  help="Deploy frontend (download from GitHub release)")
-    p.add_parser("update", parents=[shared_remote, shared_check, shared_yes, shared_instance],
-                 aliases=["redeploy"],
-                 help="Full-stack update: download stack artifact, activate, verify")
+    # Update with dry-run support
+    update_parser = p.add_parser("update", parents=[shared_remote, shared_check, shared_yes, shared_instance],
+                                  aliases=["redeploy"],
+                                  help="Full-stack update: download stack artifact, activate, verify")
+    update_parser.add_argument("--dry-run", action="store_true",
+                               help="Show what would change without modifying anything")
     p.add_parser("uninstall", parents=[shared_remote, shared_check, shared_yes, shared_instance],
                  help="Remove all E3CNC components")
     p.add_parser("status", parents=[shared_remote, shared_instance],

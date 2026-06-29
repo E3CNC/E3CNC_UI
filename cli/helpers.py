@@ -205,8 +205,12 @@ def _download_and_activate_release(
     inst: Optional[Instance] = None,
     skip_backup: bool = False,
     auto_yes: bool = False,
+    dry_run: bool = False,
 ) -> str:
     """Download the latest stack artifact, verify, extract, sync, and restart services.
+
+    When dry_run=True, performs discovery, download, backup, and shows what
+    would change — but does NOT activate the release or touch live paths.
 
     Used by both cmd_install and cmd_update. Returns the activated version string.
     """
@@ -261,9 +265,28 @@ def _download_and_activate_release(
             if reply != "y":
                 fail("Cancelled")
 
-    # Backup only for updates (fresh install has nothing to back up)
+    # Backup configs before anything destructive
     if not skip_backup:
         backup_deployment_state(inst)
+
+    if dry_run:
+        info("Dry-run complete — no files were modified.")
+        print()
+        info("The following would happen on a real update:")
+        print(f"  1. Release v{version} extracted to {RELEASES_DIR / version}")
+        print(f"  2. Activated as current release (symlink updated)")
+        print(f"  3. Runtime files synced to live paths:")
+        print(f"     - Moonraker components (cnc_agent, cnc_metadata)")
+        print(f"     - Klipper extras")
+        print(f"     - Macros ({inst.E3CNC_dir}/macros/)" if inst else "")
+        print(f"     - Metadata extractor")
+        print(f"  4. Services restarted (Moonraker, nginx)")
+        print(f"  5. Health checks run")
+        print(f"  6. Rollback on failure")
+        print()
+        info("Config files (printer.cfg, moonraker.conf, moonraker DB)")
+        info("are backed up and will NOT be overwritten.")
+        return version
 
     _step("Extracting release")
     release_dir = extract_artifact(artifact_path, RELEASES_DIR, version)

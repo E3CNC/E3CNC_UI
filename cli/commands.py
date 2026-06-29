@@ -163,11 +163,15 @@ def cmd_update(args) -> None:
 
     header("Stack Update")
 
+    if args.dry_run:
+        info("Dry-run mode — no files will be modified")
+        print()
+
     if args.remote:
         warn("Remote update not yet supported — running locally")
 
     inst = _get_instance(args) if not args.remote else None
-    _download_and_activate_release(inst=inst, skip_backup=False, auto_yes=args.yes)
+    _download_and_activate_release(inst=inst, skip_backup=False, auto_yes=args.yes, dry_run=args.dry_run)
 
 
 def cmd_releases(args) -> None:
