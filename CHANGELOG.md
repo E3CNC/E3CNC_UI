@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.8.3 (2026-06-29)
+- Version bump from v0.8.2 → v0.8.3
+- No functional changes — marks the current release state after documentation updates
+- Full v0.8.2 changelog below
+
 ## v0.8.2 (2026-06-29)
 - **CLI commands added**: `detect-mcu` (scan USB/serial for controllers), `flash-mcu` (6 MCU presets, builds firmware), `init-config` (generates CNC printer.cfg template with auto-detected MCU path)
 - **Update safety**: `--dry-run` flag previews changes without modifying anything. Pre-update backup now includes raw Moonraker SQLite DB (`moonraker-sql.db`) in addition to printer.cfg, moonraker.conf, and API export.

@@ -48,7 +48,7 @@
 ### Git Status
 - Branch: `main`
 - Ahead of `origin/main` by **0 commits** (up to date)
-- Version: `0.8.2`
+- Version: `0.8.3`
 
 ### Test Suite
 | Suite | Count | Status |
