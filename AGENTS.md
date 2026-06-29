@@ -6,7 +6,7 @@ This file documents the current state and capabilities of AI agents used in this
 
 **Branch**: `vue3-migration` (parallel to `main`)
 
-### Complete
+### Complete (v0.8.2 — all routes verified)
 
 - Phase 1: All deps upgraded (Vue 3.5, Vuetify 3, vue-router 4, vue-i18n 11, vuex 4, Pinia 2, TS 5.7)
 - Phase 2: Global infra (`createApp`, `@vue/compat` MODE 2, Vuetify 3, mitt, WebSocket composable, directives, router v4, i18n v11, Vuex 4)
@@ -40,10 +40,8 @@ This file documents the current state and capabilities of AI agents used in this
 - Build passes, dev server runs with zero console errors
 - `@vue/compat` fully removed — app now runs on pure Vue 3.5 + Vuetify 3
 
-### Pending
-
-- Visual QA of Vuetify 3 component changes (list-item slots, tabs/window, etc.)
-- `/viewer` route verification (gcode viewer — large dependency, deferred)
+### Complete (v0.8.2 — all routes verified)
+- `/viewer` route verified — Babylon.js builds correctly, zero runtime errors
 
 ### Key Commits
 

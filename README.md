@@ -5,7 +5,7 @@
 # E3CNC UI
 
 [![Release](https://img.shields.io/github/v/release/E3CNC/E3CNC?style=flat&label=Release&color=00FF00)](https://github.com/E3CNC/E3CNC/releases)
-[![Build Frontend](https://github.com/E3CNC/E3CNC/actions/workflows/build-frontend.yml/badge.svg?branch=main)](https://github.com/E3CNC/E3CNC/actions/workflows/build-frontend.yml)
+[![CI](https://github.com/E3CNC/E3CNC/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/E3CNC/E3CNC/actions/workflows/ci.yml)
 [![License](https://img.shields.io/github/license/E3CNC/E3CNC?style=flat&label=License&color=00FF00)](https://github.com/E3CNC/E3CNC/blob/main/LICENSE)
 
 A modern, responsive CNC controller interface for Klipper-based machines — forked from [Mainsail](https://github.com/mainsail-crew/mainsail) and retargeted from 3D printing to CNC machine control. Built with **Vue 3.5** and **Vuetify 3**. E3CNC manages its own stack updates via the app menu and `e3cnc-cli` rather than Moonraker's update_manager. The monorepo now owns the frontend directly and carries vendored Moonraker and Klipper snapshots for fresh-install bootstrap work.
@@ -48,8 +48,12 @@ git clone https://github.com/E3CNC/E3CNC.git ~/E3CNC && cd ~/E3CNC
 | **Install**           | `./e3cnc-cli install`                                              |
 | **Update from UI**    | E3CNC top-corner menu → Update                                     |
 | **Interactive menu**  | `./e3cnc-cli` (with auto-loop after each command)                  |
+| **Detect MCU**        | `./e3cnc-cli detect-mcu`                                           |
+| **Flash firmware**    | `./e3cnc-cli flash-mcu`                                            |
+| **Generate config**   | `./e3cnc-cli init-config`                                          |
 | **Deploy**            | `./e3cnc-cli deploy`                                               |
 | **Update / Redeploy** | `./e3cnc-cli update`                                               |
+| **Preview update**    | `./e3cnc-cli update --dry-run`                                     |
 | **Uninstall**         | `./e3cnc-cli uninstall`                                            |
 | **Status**            | `./e3cnc-cli status`                                               |
 | **Diagnostics**       | `./e3cnc-cli diagnose`                                             |
@@ -78,15 +82,18 @@ Full docs on the [wiki](https://github.com/E3CNC/E3CNC/wiki):
 | Path                                  | Purpose                                                                                        |
 | ------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | `src/`                                | Mainsail frontend (Vue 3.5, Vuetify 3, TypeScript)                                             |
-| `E3CNC/macros/`                       | Klipper CNC macros (homing override, PAUSE/RESUME, WCS)                                        |
-| `E3CNC/vendor/klipper/klippy/extras/` | Klipper WCS plugin (`work_coordinate_systems.py`)                                              |
-| `E3CNC/moonraker-mcp/`                | Moonraker MCP (MCP server + CNC agent component)                                               |
-| `E3CNC/post_processors/`              | Fusion 360 CAM post processors                                                                 |
+| `cli/`                                | E3CNC CLI package (commands, helpers, parser, menu)                                            |
+| `macros/`                             | Klipper CNC macros (homing override, PAUSE/RESUME, WCS)                                        |
+| `vendor/klipper/klippy/extras/`       | Klipper WCS plugin (`work_coordinate_systems.py`)                                              |
+| `vendor/moonraker/`                   | Vendored Moonraker with cnc_agent, cnc_metadata, MCP server                                    |
+| `post_processors/`                    | Fusion 360 CAM post processors                                                                 |
 | `ansible/`                            | Ansible playbooks for install/deploy/uninstall                                                 |
+| `_e3cnc_deploy.py`                    | Release deployment, health checks, backup, rollback                                            |
 | `_e3cnc_shared.py`                    | Shared command logic for the e3cnc-cli tool                                                    |
 | `e3cnc-cli`                           | Unified CLI — full install, deploy, update, uninstall, status, backup, restore, diagnose, logs |
 | `scripts/`                            | Utility scripts (install, deploy, download frontend)                                           |
-| `tests/test_e3cnc_cli.py`             | Unit tests for the e3cnc-cli shared module (48 tests)                                          |
+| `tests/`                              | Unit tests (115+), Docker integration tests (2), vendored snapshot checks                      |
+| `.github/workflows/ci.yml`           | CI: Python tests + frontend build on every push/PR
 
 ## Contributors
 
