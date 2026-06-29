@@ -313,7 +313,7 @@ class TestFreshInstallBootstrap:
         # ── Start Linux MCU process (creates its own PTY at /tmp/klipper_host_mcu) ──
         print("\n  ── Starting Linux MCU ──")
         sim_pid = self._exec_bg(
-            "nohup $HOME/klipper/out/klipper.elf -r -I /tmp/klipper_host_mcu"
+            "nohup $HOME/klipper/out/klipper.elf -I /tmp/klipper_host_mcu"
         )
         time.sleep(2)
         pty_check = self._exec("test -L /tmp/klipper_host_mcu && echo 'FOUND' || echo 'MISSING'")
