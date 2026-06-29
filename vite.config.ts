@@ -127,6 +127,7 @@ export default defineConfig({
 
     build: {
         target: 'safari12',
+        chunkSizeWarningLimit: 2000,
         rollupOptions: {
             output: {
                 manualChunks: (id: string) => {
@@ -136,7 +137,17 @@ export default defineConfig({
                             return 'codemirror'
                         }
 
-                        // split these libs into their own chunks
+                        // split vuetify (largest UI dep)
+                        if (id.includes('/vuetify/')) {
+                            return 'vuetify'
+                        }
+
+                        // split vue core + ecosystem
+                        if (id.includes('/vue/') && !id.includes('/vue-router/') && !id.includes('/vuex/') && !id.includes('/vue-i18n/')) {
+                            return 'vue-core'
+                        }
+
+                        // split echarts and overlayscrollbars into their own chunks
                         const chunkedLibs = ['echarts', 'overlayscrollbars']
                         for (const lib of chunkedLibs) {
                             if (id.includes(`/node_modules/${lib}/`)) {
