@@ -63,7 +63,7 @@ git clone https://github.com/E3CNC/E3CNC.git ~/E3CNC && cd ~/E3CNC
 | **Remote install**    | `./e3cnc-cli install --remote pi@cnc`                              |
 | **Dry-run install**   | `./e3cnc-cli install --check`                                      |
 | **Logs**              | `./e3cnc-cli logs`                                                 |
-| **Tab completion**    | `source scripts/e3cnc-completion.sh`                               |
+| **Tab completion**    | `source build-scripts/e3cnc-completion.sh`                         |
 | **Select instance**   | `./e3cnc-cli --instance cnc_2 status` or use the `[W]` menu option |
 
 ## Documentation

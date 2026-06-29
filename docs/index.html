@@ -773,30 +773,23 @@ cd ~/E3CNC
                     for details and other install methods.
                 </p>
 
-                <h3 style="margin-top: 2em">Alternate: Update Manager</h3>
+                <h3 style="margin-top: 2em">Updates</h3>
 
                 <p class="install-intro">
-                    Already have Klipper + Moonraker + Mainsail? Add this block to
-                    <code>~/printer_data/config/moonraker.conf</code>
-                    , restart Klipper, then click
+                    E3CNC no longer relies on Moonraker's
+                    <code>[update_manager]</code>
+                    integration for full-stack updates. Use
+                    <code>./e3cnc-cli update</code>
+                    or the in-app
                     <strong>Update</strong>
-                    in
-                    <strong>Machine &rarr; Update Manager</strong>
-                    .
+                    action instead.
                 </p>
 
-                <pre class="install-config"><code>[update_manager E3CNC]
-type: git_repo
-channel: dev
-path: ~/E3CNC
-origin: https://github.com/E3CNC/E3CNC.git
-primary_branch: main
-enable_node_updates: False
-is_system_service: False
-info_tags:
-    desc=E3CNC UI
-managed_services: klipper moonraker
-refresh_interval: 24</code></pre>
+                <pre class="install-config"><code># Preview changes safely
+./e3cnc-cli update --dry-run
+
+# Apply the latest release
+./e3cnc-cli update</code></pre>
 
                 <p class="install-note">
                     Run
@@ -832,7 +825,7 @@ refresh_interval: 24</code></pre>
                         <span class="arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
                     </a>
                     <a href="https://github.com/E3CNC/E3CNC/wiki/Installation-Update-Manager">
-                        Update Manager Install
+                        Update Workflow Changes
                         <span class="arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
                     </a>
                     <a href="https://github.com/E3CNC/E3CNC/releases">
