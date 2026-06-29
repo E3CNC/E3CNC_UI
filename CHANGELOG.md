@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.8.4 (2026-06-29)
+- **Fixed**: `sync_runtime_files()` now creates the scripts directory before copying `cnc_metadata_extractor.py`. On multi-instance fresh setups, the `scripts/` dir didn't exist yet, causing `FileNotFoundError`.
+
 ## v0.8.3 (2026-06-29)
 - Version bump from v0.8.2 → v0.8.3
 - No functional changes — marks the current release state after documentation updates
