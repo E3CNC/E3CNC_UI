@@ -303,6 +303,8 @@ class TestFreshInstallBootstrap:
             "max_velocity: 300\n"
             "max_accel: 3000\n"
             "\n"
+            "[pause_resume]\n"
+            "\n"
             "[include E3CNC/macros/cnc_base.cfg]\n"
             "[include E3CNC/macros/wcs_macros.cfg]\n"
             "[include E3CNC/macros/e3cnc_macros.cfg]\n"
