@@ -1,12 +1,16 @@
 # Changelog
 
-## v0.8.2 (2026-06-28)
-- **Vendor code restructured** — Moonraker components (cnc_agent, cnc_metadata, MCP) and Klipper extras (work_coordinate_systems.py) moved into `vendor/moonraker/` and `vendor/klipper/` so the release artifact contains the complete, pre-integrated stack
-- **CI builds full vendor stack** — `build-frontend.yml` now bundles entire `vendor/moonraker/` and `vendor/klipper/` directories instead of cherry-picking individual files
-- **Nginx co-existence** — removed `default_server` from listen directive, uses `server_name e3cnc.local` instead of catch-all `_`. Added `nginx -t` config validation before reload. No longer disables the default nginx site.
-- **Bootstrap integration test fix** — flattened `bootstrap.*` namespace in Ansible vars to prevent extra-var shadowing (root cause of `'bootstrap' is undefined` error)
-- **KIAUH multi-instance fix** — `_read_service_name()` now ignores multiline `.asvc` files and falls back to instance-name-derived defaults, preventing bogus service names like `moonraker-klipper_mcu`
-- **Moonraker update-manager removed** — E3CNC owns its own updates via in-app menu and `e3cnc-cli update`. Legacy `[update_manager E3CNC]` blocks are cleaned up automatically.
+## v0.8.2 (2026-06-29)
+- **CLI commands added**: `detect-mcu` (scan USB/serial for controllers), `flash-mcu` (6 MCU presets, builds firmware), `init-config` (generates CNC printer.cfg template with auto-detected MCU path)
+- **Update safety**: `--dry-run` flag previews changes without modifying anything. Pre-update backup now includes raw Moonraker SQLite DB (`moonraker-sql.db`) in addition to printer.cfg, moonraker.conf, and API export.
+- **Viewer route verified**: Babylon.js gcode viewer loads correctly, zero runtime errors, 1.8 MB chunk code-split from main bundle.
+- **Build code-split**: Vuetify (569 KB) and Vue core (206 KB) split into separate chunks. Index chunk reduced from 1.9 MB → 1.2 MB. Zero build warnings.
+- **CI workflow**: Tests (pytest, 115 tests) + frontend build (bun) run on every push/PR. Cached pip and bun dependencies.
+- **Integration tests fixed**: `.dockerignore` reduced build context from 5.4 MB → 288 KB. Pre-installed ansible + python3-pip/venv in Docker image. Added `vendor/klipper/scripts/klippy-requirements.txt` (Klipper deps were silently skipped). Switched to Linux MCU process (bidirectional serial) instead of host simulator (one-way only).
+- **Real hardware test**: Full update v0.8.0→v0.8.2 on BTT-CB1 (Debian 11, Python 3.9, STM32G0B1 MCU). Auto-rollback verified, Klippy reconnection confirmed, all 6 health checks pass.
+- **Python 3.9 compatibility**: Replaced `str | None` syntax with `'str | None'` string annotations for Debian 11 compatibility.
+- **Health check retries**: Increased from 3→6 (30s max) for slower ARM boards.
+- **DB backup fix**: Glob pattern broadened to match `*.db`, `*.sqlite`, `*.sqlite3` (real Moonraker uses `moonraker-sql.db`).
 
 ## v0.8.1 (2026-06-28)
 - Fix `UnicodeEncodeError` in `print_banner()` on latin-1 terminals
