@@ -1013,7 +1013,10 @@ def sync_runtime_files(inst: Optional[Instance] = None, dry_run: bool = False) -
                     if dry_run:
                         info(f"Would copy {f} -> {dest / f.name}")
                     else:
-                        shutil.copy2(f, dest / f.name)
+                        try:
+                            shutil.copy2(f, dest / f.name)
+                        except shutil.SameFileError:
+                            pass
             info(f"Synced Moonraker component: {comp}")
         else:
             warn(f"Moonraker component source not found: {src}")
@@ -1029,7 +1032,10 @@ def sync_runtime_files(inst: Optional[Instance] = None, dry_run: bool = False) -
                 if dry_run:
                     info(f"Would copy {f} -> {mcp_dest / f.name}")
                 else:
-                    shutil.copy2(f, mcp_dest / f.name)
+                    try:
+                        shutil.copy2(f, mcp_dest / f.name)
+                    except shutil.SameFileError:
+                        pass
         info("Synced MCP server")
 
     # 3. Klipper extras — from vendor tree
@@ -1042,7 +1048,10 @@ def sync_runtime_files(inst: Optional[Instance] = None, dry_run: bool = False) -
                 if dry_run:
                     info(f"Would copy {f} -> {extras_dest / f.name}")
                 else:
-                    shutil.copy2(f, extras_dest / f.name)
+                    try:
+                        shutil.copy2(f, extras_dest / f.name)
+                    except shutil.SameFileError:
+                        pass
         info("Synced Klipper extras")
     else:
         warn(f"Klipper extras source not found: {extras_src}")
