@@ -1,10 +1,6 @@
 """Interactive menu for the E3CNC CLI."""
 
 import sys
-import tty
-import termios
-import atexit
-from pathlib import Path
 
 from _e3cnc_shared import (
     VERSION, TOOL_NAME, Style,
@@ -13,69 +9,6 @@ from _e3cnc_shared import (
     INSTANCES_DIR, Instance,
 )
 from _e3cnc_deploy import get_current_release, generate_admin_page
-
-
-# ── Raw terminal input ─────────────────────────────────────────────────
-
-_old_term: list = []
-
-
-def _setup_terminal() -> None:
-    """Switch stdin to non-canonical mode for single-key input.
-    Leaves output processing intact so newlines work normally."""
-    if not sys.stdin.isatty():
-        return
-    fd = sys.stdin.fileno()
-    old = termios.tcgetattr(fd)
-    _old_term.append(old)
-    new = termios.tcgetattr(fd)
-    # Disable canonical mode, echo, and signal chars on INPUT only
-    new[tty.LFLAG] &= ~(termios.ECHO | termios.ICANON | termios.ISIG)
-    # Read one byte at a time, no timeout
-    new[tty.CC][termios.VMIN] = 1
-    new[tty.CC][termios.VTIME] = 0
-    termios.tcsetattr(fd, termios.TCSADRAIN, new)
-
-
-def _restore_terminal() -> None:
-    """Restore terminal to cooked mode."""
-    if _old_term:
-        for fd_term in _old_term:
-            try:
-                termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, fd_term)
-            except (termios.error, OSError, ValueError):
-                pass
-        _old_term.clear()
-
-
-atexit.register(_restore_terminal)
-
-
-def _get_key() -> str:
-    """Read a single keypress. Returns escape sequences for arrows/enter."""
-    fd = sys.stdin.fileno()
-    try:
-        ch = sys.stdin.read(1)
-    except (OSError, ValueError):
-        return ""
-    if ch == "\x1b":
-        # Read the rest of the escape sequence (non-blocking)
-        import select
-        rest = ""
-        for _ in range(2):
-            if select.select([sys.stdin], [], [], 0.05)[0]:
-                try:
-                    rest += sys.stdin.read(1)
-                except (OSError, ValueError):
-                    break
-            else:
-                break
-        if rest:
-            return ch + rest
-    return ch
-
-
-# ── Menu ───────────────────────────────────────────────────────────────
 
 
 def _interactive_menu() -> None:
@@ -114,115 +47,45 @@ def _interactive_menu() -> None:
         ("[Q] Quit",        "quit"),
     ]
     display = [(l, c) for l, c in all_items if l]
-    cur_idx = 0
-    has_terminal = sys.stdin.isatty()
 
-    # Resolve active instance before raw mode so select_instance() has echo
-    cur = get_active_instance()
+    # Build shortcut map from bracket content
+    shortcut_map = {}
+    for label, cmd in display:
+        if "[" in label and "]" in label:
+            key = label[label.index("[") + 1:label.index("]")]
+            shortcut_map[key.lower()] = cmd
+            shortcut_map[key.upper()] = cmd
 
-    if has_terminal:
-        _setup_terminal()
+    while True:
+        print_banner()
+        print(f"  {Style.BOLD}{Style.GREEN}{TOOL_NAME} v{VERSION}{Style.RESET}")
 
-    try:
-        while True:
-            print_banner()
-            print(f"  {Style.BOLD}{Style.GREEN}{TOOL_NAME} v{VERSION}{Style.RESET}")
+        cur = get_active_instance()
+        if cur:
+            label = cur.name if cur.name != "cnc" else "default"
+            print(f"  {Style.DIM}Instance: {label}  ({cur.config_dir}){Style.RESET}")
 
-            # Refresh instance after switch/create/run operations
-            if cur:
-                label = cur.name if cur.name != "cnc" else "default"
-                print(f"  {Style.DIM}Instance: {label}  ({cur.config_dir}){Style.RESET}")
+        print()
+        print(f"  {Style.BOLD}Select an action:{Style.RESET}")
+        print()
 
+        for i, (label, cmd) in enumerate(display):
+            print(f"  {i + 1:>2}) {label}")
+
+        print()
+        try:
+            choice = input(f"  {Style.BOLD}Choice [1-{len(display)}]{Style.RESET} ").strip()
+        except (EOFError, KeyboardInterrupt):
             print()
-            print(f"  {Style.BOLD}Select an action:{Style.RESET}")
-            print()
+            break
 
-            for i, (label, cmd) in enumerate(display):
-                if i == cur_idx and has_terminal:
-                    print(f"  {Style.GREEN}>{Style.RESET} {i + 1:>2}) {label}")
-                else:
-                    print(f"    {i + 1:>2}) {label}")
+        if not choice:
+            continue
 
-            print()
-            if has_terminal:
-                sys.stdout.write(f"  {Style.DIM}arrows to move, enter to select, q to quit{Style.RESET}")
-                sys.stdout.flush()
-
-                key = _get_key()
-                if key == "q" or key == "Q":
-                    ok("Goodbye")
-                    break
-
-                if key == "\x1b[A":  # Up arrow
-                    cur_idx = (cur_idx - 1) % len(display)
-                    sys.stdout.write("\r\033[2K")
-                    sys.stdout.flush()
-                    continue
-
-                if key == "\x1b[B":  # Down arrow
-                    cur_idx = (cur_idx + 1) % len(display)
-                    sys.stdout.write("\r\033[2K")
-                    sys.stdout.flush()
-                    continue
-
-                if key in ("\r", "\n"):  # Enter
-                    _, cmd = display[cur_idx]
-                    if cmd == "quit":
-                        ok("Goodbye")
-                        break
-                    _restore_terminal()
-                    if cmd == "switch":
-                        _switch_instance()
-                    elif cmd == "create-instance":
-                        _create_instance()
-                    else:
-                        _run_menu_command(cmd)
-                    cur = get_active_instance()
-                    _setup_terminal()
-                    continue
-
-                if key and key.isdigit():
-                    idx = int(key) - 1
-                    if 0 <= idx < len(display):
-                        cur_idx = idx
-                        _, cmd = display[idx]
-                        if cmd == "quit":
-                            ok("Goodbye")
-                            break
-                        _restore_terminal()
-                        if cmd == "switch":
-                            _switch_instance()
-                        elif cmd == "create-instance":
-                            _create_instance()
-                        else:
-                            _run_menu_command(cmd)
-                        cur = get_active_instance()
-                        _setup_terminal()
-                        continue
-
-                if key in ("\x03",):  # Ctrl+C
-                    print()
-                    break
-            else:
-                # Non-TTY mode: use regular input()
-                try:
-                    choice = input(f"  {Style.BOLD}Choice [1-{len(display)}]{Style.RESET} ").strip()
-                except (EOFError, KeyboardInterrupt):
-                    print()
-                    break
-
-                if not choice:
-                    continue
-
-                try:
-                    idx = int(choice) - 1
-                    if idx < 0 or idx >= len(display):
-                        print(f"  {Style.YELLOW}Invalid choice: {choice}{Style.RESET}")
-                        continue
-                except ValueError:
-                    print(f"  {Style.YELLOW}Invalid choice: {choice}{Style.RESET}")
-                    continue
-
+        # Try number
+        try:
+            idx = int(choice) - 1
+            if 0 <= idx < len(display):
                 _, cmd = display[idx]
                 if cmd == "quit":
                     ok("Goodbye")
@@ -233,9 +96,25 @@ def _interactive_menu() -> None:
                     _create_instance()
                 else:
                     _run_menu_command(cmd)
+                continue
+        except ValueError:
+            pass
 
-    finally:
-        _restore_terminal()
+        # Try shortcut key
+        if choice in shortcut_map:
+            cmd = shortcut_map[choice]
+            if cmd == "quit":
+                ok("Goodbye")
+                break
+            if cmd == "switch":
+                _switch_instance()
+            elif cmd == "create-instance":
+                _create_instance()
+            else:
+                _run_menu_command(cmd)
+            continue
+
+        print(f"  {Style.YELLOW}Invalid choice: {choice}{Style.RESET}")
 
 
 def _run_menu_command(cmd: str) -> None:
@@ -319,8 +198,6 @@ def _run_menu_command(cmd: str) -> None:
 
 def _switch_instance() -> None:
     """Let the user switch the active instance interactively."""
-    from _e3cnc_shared import detect_instances
-
     instances = detect_instances()
     if not instances:
         warn("No instances detected")
@@ -436,10 +313,7 @@ timeout: 30
     generate_admin_page()
 
     printer_cfg = data / "config" / "printer.cfg"
-    printer_cfg.write_text("""# E3CNC bootstrap placeholder printer.cfg
-# Replace with your actual machine configuration.
-# Run 'e3cnc-cli init-config' to generate a CNC template.
-""")
+    printer_cfg.write_text("# E3CNC bootstrap placeholder printer.cfg\n")
     ok("Placeholder printer.cfg created")
 
     print()
