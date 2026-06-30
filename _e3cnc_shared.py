@@ -1205,3 +1205,124 @@ def run_ansible_playbook(
     else:
         _o(f"  ✗ {label} failed (exit code {rc})")
         return CmdResult(False, "\n".join(out), label, returncode=rc)
+
+
+# ── KIAUH import ─────────────────────────────────────────────────────────
+
+
+def import_kiauh_instance(kiauh_inst: Instance) -> Optional[Instance]:
+    """Create an E3CNC-style instance from an existing KIAUH instance.
+
+    Extracts the KIAUH instance's config and creates a new E3CNC instance
+    at ~/e3cnc/instances/{name}/ without modifying the original KIAUH setup.
+    """
+    import shutil as _shutil
+
+    name = kiauh_inst.name
+
+    # Check if already imported
+    inst_dir = INSTANCES_DIR / name
+    if inst_dir.exists():
+        warn(f"Instance '{name}' already exists at {inst_dir}")
+        return None
+
+    # Create directory structure
+    data = inst_dir / "data"
+    frontend = inst_dir / "frontend"
+    for subdir in ["config", "config/E3CNC/macros", "logs", "database", "comms", "scripts", "gcodes"]:
+        (data / subdir).mkdir(parents=True, exist_ok=True)
+    frontend.mkdir(parents=True, exist_ok=True)
+
+    # Copy printer.cfg (the machine config)
+    klippy_cfg = Path(kiauh_inst.printer_cfg)
+    if klippy_cfg.exists():
+        _shutil.copy2(klippy_cfg, data / "config" / "printer.cfg")
+        ok(f"Copied printer.cfg from KIAUH instance '{name}'")
+    else:
+        (data / "config" / "printer.cfg").write_text("# Placeholder — no KIAUH printer.cfg found\n")
+
+    # Copy moonraker.conf and patch for the new paths
+    mr_conf = Path(kiauh_inst.moonraker_conf)
+    if mr_conf.exists():
+        new_conf = data / "config" / "moonraker.conf"
+        content = mr_conf.read_text()
+        # Override paths for the new layout
+        content += f"""
+
+# E3CNC instance paths (auto-generated from KIAUH import)
+[file_manager]
+config_path: {data / 'config'}
+
+[database]
+database_path: {data / 'database'}
+"""
+        # Update port to be unique
+        existing_ports = {inst.moonraker_port for inst in detect_instances()}
+        port = kiauh_inst.moonraker_port
+        while port in existing_ports:
+            port += 1
+        if port != kiauh_inst.moonraker_port:
+            content = content.replace(f"port: {kiauh_inst.moonraker_port}", f"port: {port}")
+            info(f"Port adjusted from {kiauh_inst.moonraker_port} to {port} (was taken)")
+
+        new_conf.write_text(content)
+        ok(f"Copied moonraker.conf from KIAUH instance '{name}'")
+    else:
+        _generate_minimal_moonraker_conf(data, kiauh_inst.moonraker_port)
+        info(f"Generated new moonraker.conf for '{name}'")
+
+    # Copy config/E3CNC directory if present
+    e3cnc_dir = Path(kiauh_inst.E3CNC_dir)
+    if e3cnc_dir.is_dir():
+        _shutil.copytree(e3cnc_dir, data / "config" / "E3CNC", dirs_exist_ok=True)
+        ok("Copied E3CNC config from KIAUH instance")
+
+    # Copy frontend if present
+    fe_src = Path(kiauh_inst.web_root)
+    if fe_src.is_dir() and fe_src != frontend:
+        _shutil.copytree(fe_src, frontend, dirs_exist_ok=True)
+        ok(f"Copied frontend from {fe_src}")
+
+    # Generate admin page
+    try:
+        from _e3cnc_deploy import generate_admin_page
+        generate_admin_page()
+    except ImportError:
+        pass
+
+    new_inst = Instance.from_name(name)
+
+    # Register with supervisor
+    try:
+        from _e3cnc_supervisor import register_instance
+        register_instance(new_inst)
+    except ImportError:
+        pass
+
+    ok(f"Instance '{name}' imported from KIAUH layout")
+    print()
+    return new_inst
+
+
+def _generate_minimal_moonraker_conf(data_dir: Path, port: int) -> Path:
+    """Generate a minimal moonraker.conf for a new instance."""
+    conf_path = data_dir / "config" / "moonraker.conf"
+    conf_path.write_text(f"""[server]
+host: 0.0.0.0
+port: {port}
+klippy_uds_address: {data_dir / 'comms' / 'klippy.sock'}
+
+[file_manager]
+config_path: {data_dir / 'config'}
+
+[database]
+database_path: {data_dir / 'database'}
+
+[authorization]
+cors_domains:
+    *
+trusted_clients:
+    127.0.0.1
+    ::1
+""")
+    return conf_path

@@ -57,6 +57,7 @@ def _tui_menu() -> None:
         ("[k] Check Deps",     "check",          ""),
         ("[a] Backup",         "backup",         ""),
         ("[e] Restore",        "restore",        ""),
+        ("[i] Import KIAUH",  "import-instance",""),
         ("[g] Diagnose",       "diagnose",       ""),
         ("[l] Logs",           "logs",           ""),
         ("[h] Restart Svc",   "restart",        ""),

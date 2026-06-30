@@ -388,6 +388,43 @@ def cmd_restart(args) -> None:
         svc_restart(inst)
 
 
+def cmd_import_instance(args) -> None:
+    """Import a KIAUH instance into the new E3CNC layout.
+
+    Creates ~/e3cnc/instances/{name}/ with configs copied from the
+    existing KIAUH installation. The original KIAUH setup is untouched.
+    """
+    from _e3cnc_shared import import_kiauh_instance, _scan_kiauh_instances
+
+    header("Import KIAUH Instance")
+
+    kiauh_insts = _scan_kiauh_instances()
+    if not kiauh_insts:
+        info("No KIAUH instances detected on this system")
+        return
+
+    if len(kiauh_insts) == 1:
+        target = kiauh_insts[0]
+    else:
+        print()
+        for i, inst in enumerate(kiauh_insts):
+            print(f"  {i + 1:>2}) {inst.name}  ({inst.config_dir})")
+        print()
+        try:
+            choice = input(f"  {Style.BOLD}Choose instance [1-{len(kiauh_insts)}]{Style.RESET} ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            return
+        try:
+            idx = int(choice) - 1
+            target = kiauh_insts[idx]
+        except (ValueError, IndexError):
+            warn("Invalid choice")
+            return
+
+    import_kiauh_instance(target)
+
+
 def cmd_admin_page(args) -> None:
     """Regenerate the admin page at ~/e3cnc/admin/index.html."""
     from _e3cnc_deploy import generate_admin_page

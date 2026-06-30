@@ -114,6 +114,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_parser("admin-page",
                  help="Regenerate the admin page at /admin")
 
+    p.add_parser("import-instance",
+                 help="Import a KIAUH instance into the new E3CNC layout")
+
     cli_log = p.add_parser("clilog",
                            help="View the CLI log at ~/e3cnc/cli.log")
     cli_log.add_argument("--lines", "-n", type=int, default=50)
