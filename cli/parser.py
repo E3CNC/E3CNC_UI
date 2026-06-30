@@ -104,7 +104,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     mig_inst = p.add_parser("migrate-instances",
                             parents=[shared_yes],
-                            help="Migrate KIAUH instance layout to new ~/e3cnc/instances/{name} layout")
+                            help="Migrate KIAUH instance layout to new ~/e3cnc/instances/{name} layout",
+                            description="Migrate KIAUH-layout instances (printer_data, printer_*_data) to the new ~/e3cnc/instances/{name} layout.")
 
     bp = p.add_parser("backup", parents=[shared_remote, shared_instance],
                       help="Create a timestamped backup")
