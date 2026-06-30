@@ -458,6 +458,21 @@ def cmd_status(args) -> None:
     print(f"  {Style.DIM}Repository root: {Path(__file__).resolve().parent.parent}{Style.RESET}")
     check_status(args.remote, output_callback=lambda line: print(line, end=""), inst=inst)
 
+    # Show access URL
+    if inst:
+        import socket
+        try:
+            hostname = socket.gethostname()
+        except Exception:
+            hostname = "<host>"
+        port = inst.moonraker_port
+        if port == 7125:
+            print(f"\n  {Style.GREEN}Web UI:{Style.RESET}     http://{hostname}/")
+        else:
+            print(f"\n  {Style.GREEN}Web UI:{Style.RESET}     http://{hostname}:{port}/")
+        print(f"  {Style.GREEN}Admin:{Style.RESET}      http://{hostname}/admin")
+        print(f"  {Style.GREEN}API:{Style.RESET}        http://{hostname}:{port}/server/info")
+
 
 def cmd_backup(args) -> None:
     """Create a timestamped backup."""
