@@ -1359,18 +1359,53 @@ def generate_admin_page() -> None:
     hostname = socket.gethostname()
     current = get_current_release()
 
-    rows = ""
+    cards = ""
     for inst in instances:
         dot = "&#9679;" if inst.is_running else "&#9678;"
         color = "#22c55e" if inst.is_running else "#6b7280"
-        rows += f"""<tr>
-      <td><span style="color:{color}">{dot}</span> <strong>{inst.name}</strong></td>
-      <td>{inst.moonraker_service}<br><span class="dim">{inst.klipper_service}</span></td>
-      <td>{inst.moonraker_port}</td>
-      <td class="path">{inst.config_dir}</td>
-      <td class="path">{inst.web_root}</td>
-      <td class="path">{inst.printer_data_dir}</td>
-    </tr>"""
+        bg = "rgba(34,197,94,0.05)" if inst.is_running else "rgba(100,116,139,0.05)"
+        border = "1px solid rgba(34,197,94,0.2)" if inst.is_running else "1px solid rgba(100,116,139,0.15)"
+        web_port = "" if inst.web_port == 80 else f":{inst.web_port}"
+        cards += f"""<div class="card" style="border: {border}; background: {bg};">
+      <div class="card-header">
+        <span class="status-dot" style="color:{color}">{dot}</span>
+        <strong class="instance-name">{inst.name}</strong>
+        <span class="release-badge">{current.version if current else '—'}</span>
+      </div>
+      <div class="card-body">
+        <a class="url-link" href="http://{hostname}{web_port}/" target="_blank">http://{hostname}{web_port}/ ↗</a>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">API</span>
+            <span class="value mono"><a href="http://{hostname}:{inst.moonraker_port}/server/info" target="_blank">{hostname}:{inst.moonraker_port}</a></span>
+          </div>
+          <div class="info-item">
+            <span class="label">Admin</span>
+            <span class="value mono"><a href="/admin" target="_blank">{hostname}/admin</a></span>
+          </div>
+          <div class="info-item">
+            <span class="label">Moonraker</span>
+            <span class="value mono">{inst.moonraker_service}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Klipper</span>
+            <span class="value mono">{inst.klipper_service}</span>
+          </div>
+          <div class="info-item full">
+            <span class="label">Config</span>
+            <span class="value mono">{inst.config_dir}</span>
+          </div>
+          <div class="info-item full">
+            <span class="label">Web Root</span>
+            <span class="value mono">{inst.web_root}</span>
+          </div>
+          <div class="info-item full">
+            <span class="label">Data</span>
+            <span class="value mono">{inst.printer_data_dir}</span>
+          </div>
+        </div>
+      </div>
+    </div>"""
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -1383,35 +1418,40 @@ def generate_admin_page() -> None:
   body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 2rem; }}
   h1 {{ font-size: 1.5rem; color: #38bdf8; margin-bottom: 0.25rem; }}
   .subtitle {{ color: #94a3b8; font-size: 0.875rem; margin-bottom: 2rem; }}
-  table {{ width: 100%; border-collapse: collapse; }}
-  th {{ text-align: left; padding: 0.75rem 0.5rem; border-bottom: 1px solid #334155; color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }}
-  td {{ padding: 0.75rem 0.5rem; border-bottom: 1px solid #1e293b; font-size: 0.875rem; vertical-align: top; }}
-  .path {{ font-family: 'SF Mono', Monaco, monospace; font-size: 0.75rem; color: #64748b; }}
-  .dim {{ color: #64748b; font-size: 0.75rem; }}
-  .footer {{ margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #334155; color: #64748b; font-size: 0.75rem; }}
+  .cards {{ display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 1rem; }}
+  .card {{ border-radius: 0.75rem; padding: 1.25rem; }}
+  .card-header {{ display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }}
+  .status-dot {{ font-size: 1.25rem; }}
+  .instance-name {{ font-size: 1.125rem; }}
+  .release-badge {{ margin-left: auto; font-size: 0.7rem; background: rgba(56,189,248,0.15); color: #38bdf8; padding: 0.15rem 0.5rem; border-radius: 999px; }}
+  .url-link {{ display: block; font-size: 0.9rem; color: #38bdf8; text-decoration: none; padding: 0.5rem 0.75rem; background: rgba(56,189,248,0.08); border-radius: 0.5rem; margin-bottom: 1rem; }}
+  .url-link:hover {{ background: rgba(56,189,248,0.15); }}
+  .info-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }}
+  .info-item.full {{ grid-column: 1 / -1; }}
+  .label {{ display: block; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 0.15rem; }}
+  .value {{ font-size: 0.85rem; }}
+  .mono {{ font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace; font-size: 0.75rem; }}
+  .mono a {{ color: #94a3b8; text-decoration: none; }}
+  .mono a:hover {{ color: #e2e8f0; text-decoration: underline; }}
+  .footer {{ margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #1e293b; color: #64748b; font-size: 0.75rem; }}
   @media (prefers-color-scheme: light) {{
     body {{ background: #f8fafc; color: #1e293b; }}
     h1 {{ color: #0284c7; }}
-    th {{ color: #64748b; border-bottom-color: #e2e8f0; }}
-    td {{ border-bottom-color: #f1f5f9; }}
-    .subtitle, .footer, .dim, .path {{ color: #94a3b8; }}
+    .card {{ background: #ffffff !important; border-color: #e2e8f0 !important; }}
+    .subtitle, .footer {{ color: #94a3b8; }}
+    .release-badge {{ background: rgba(2,132,199,0.1); color: #0284c7; }}
+    .url-link {{ background: rgba(2,132,199,0.06); color: #0284c7; }}
+    .mono a {{ color: #64748b; }}
+    .mono a:hover {{ color: #1e293b; }}
   }}
 </style>
 </head>
 <body>
   <h1>E3CNC Admin</h1>
-  <p class="subtitle">{hostname} &mdash; v{VERSION}{' &mdash; Release: ' + current.version if current else ''}</p>
-  <table>
-    <tr>
-      <th>Instance</th>
-      <th>Services</th>
-      <th>Port</th>
-      <th>Config</th>
-      <th>Web Root</th>
-      <th>Data</th>
-    </tr>
-    {rows}
-  </table>
+  <p class="subtitle">{hostname} &mdash; v{VERSION}</p>
+  <div class="cards">
+    {cards}
+  </div>
   <div class="footer">
     Generated: {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")}
   </div>
