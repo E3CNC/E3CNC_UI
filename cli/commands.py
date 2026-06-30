@@ -337,6 +337,23 @@ def cmd_instances(args) -> None:
         print(f"      Release:    {release_ver}")
         print()
 
+    # Offer to create a new instance if running interactively
+    if sys.stdin.isatty():
+        print(f"  {len(insts) + 1:>2}) + Create new instance")
+        print()
+        try:
+            choice = input(f"  {Style.BOLD}Option [1-{len(insts) + 1}]{Style.RESET} ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            return
+        if choice == str(len(insts) + 1):
+            from _e3cnc_shared import _create_new_instance, set_active_instance
+            inst = _create_new_instance()
+            if inst:
+                set_active_instance(inst)
+                info(f"Switched to: {Style.BOLD}{inst.name}{Style.RESET}")
+            return
+
     info("Run 'e3cnc-cli status --instance <name>' for component details")
     info("Run 'e3cnc-cli update --instance <name>' to update")
 

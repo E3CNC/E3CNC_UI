@@ -342,11 +342,19 @@ def _switch_instance() -> None:
         print(f"  {i + 1:>2}) {dot} {Style.BOLD}{inst.name}{Style.RESET}")
         print(f"      Config: {inst.config_dir}")
 
+    create_idx = len(instances) + 1
     print()
+    print(f"  {create_idx:>2}) + Create new instance")
+    print()
+
     try:
-        choice = input(f"  {Style.BOLD}Choose instance [1-{len(instances)}]{Style.RESET} ").strip()
+        choice = input(f"  {Style.BOLD}Choose instance [1-{create_idx}]{Style.RESET} ").strip()
     except (EOFError, KeyboardInterrupt):
         print()
+        return
+
+    if choice == str(create_idx):
+        _create_instance()
         return
 
     try:
