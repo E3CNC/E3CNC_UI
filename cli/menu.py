@@ -40,48 +40,49 @@ def _tui_menu() -> None:
     all_items = [
         ("",                               "",               ""),
         ("── Maintenance ──",               "",               ""),
-        (" 1) Status",                      "status",         "Check installation status"),
-        (" 2) Install",                     "install",        "Bootstrap + download release"),
-        (" 3) Deploy",                      "deploy",         "Deploy frontend from release"),
-        (" 4) Update",                      "update",         "Full-stack update & verify"),
-        (" 5) Uninstall",                   "uninstall",      "Remove all E3CNC components"),
+        ("[1] Status",                      "status",         "Check installation status"),
+        ("[2] Install",                     "install",        "Bootstrap + download release"),
+        ("[3] Deploy",                      "deploy",         "Deploy frontend from release"),
+        ("[4] Update",                      "update",         "Full-stack update & verify"),
+        ("[5] Uninstall",                   "uninstall",      "Remove all E3CNC components"),
         ("",                               "",               ""),
         ("── MCU ──",                       "",               ""),
-        (" 6) Detect MCU",                  "detect-mcu",     "Scan for connected MCU devices"),
-        (" 7) Flash MCU",                   "flash-mcu",      "Build & flash Klipper firmware"),
-        (" 8) Init Config",                 "init-config",    "Generate CNC printer.cfg"),
+        ("[6] Detect MCU",                  "detect-mcu",     "Scan for connected MCU devices"),
+        ("[7] Flash MCU",                   "flash-mcu",      "Build & flash Klipper firmware"),
+        ("[8] Init Config",                 "init-config",    "Generate CNC printer.cfg"),
         ("",                               "",               ""),
         ("── Instances ──",                 "",               ""),
-        (" 9) Create Instance",             "create-instance","Create a new E3CNC instance"),
-        ("10) Releases",                    "releases",       "List installed releases"),
-        ("11) Rollback",                    "rollback",       "Roll back to a previous release"),
-        ("12) Prune",                       "prune",          "Remove old releases"),
-        ("13) Migrate Instances",           "migrate-instances","Import KIAUH instances to new layout"),
+        ("[9] Create Instance",             "create-instance","Create a new E3CNC instance"),
+        ("[0] Releases",                    "releases",       "List installed releases"),
+        ("[R] Rollback",                    "rollback",       "Roll back to a previous release"),
+        ("[P] Prune",                       "prune",          "Remove old releases"),
+        ("[M] Migrate Instances",           "migrate-instances","Import KIAUH instances to new layout"),
         ("",                               "",               ""),
         ("── Tools ──",                     "",               ""),
-        ("14) Import KIAUH",                "import-instance","Copy KIAUH config into E3CNC layout"),
-        ("15) Instances",                   "instances",      "List all instances with URLs"),
-        ("16) Check Deps",                  "check",          "Verify system dependencies"),
-        ("17) Restart Svc",                 "restart",        "Restart Moonraker & Klipper"),
-        ("18) Admin Page",                  "admin-page",     "Generate admin overview page"),
-        ("19) CLI Log",                     "clilog",         "View CLI operation logs"),
-        ("20) Backup",                      "backup",         "Create timestamped backup"),
-        ("21) Restore",                     "restore",        "Restore from a backup"),
-        ("22) Diagnose",                    "diagnose",       "Run system diagnostics"),
-        ("23) Logs",                        "logs",           "Tail Moonraker & nginx logs"),
+        ("[I] Import KIAUH",                "import-instance","Copy KIAUH config into E3CNC layout"),
+        ("[S] Instances",                   "instances",      "List all instances with URLs"),
+        ("[C] Check Deps",                  "check",          "Verify system dependencies"),
+        ("[T] Restart Svc",                 "restart",        "Restart Moonraker & Klipper"),
+        ("[A] Admin Page",                  "admin-page",     "Generate admin overview page"),
+        ("[L] CLI Log",                     "clilog",         "View CLI operation logs"),
+        ("[B] Backup",                      "backup",         "Create timestamped backup"),
+        ("[E] Restore",                     "restore",        "Restore from a backup"),
+        ("[G] Diagnose",                    "diagnose",       "Run system diagnostics"),
+        ("[O] Logs",                        "logs",           "Tail Moonraker & nginx logs"),
         ("",                               "",               ""),
         ("── Navigation ──",                "",               ""),
-        ("24) Switch Instance",             "switch",         "Change active instance"),
-        ("25) Quit",                        "quit",           "Exit the CLI"),
+        ("[W] Switch Instance",             "switch",         "Change active instance"),
+        ("[Q] Quit",                        "quit",           "Exit the CLI"),
     ]
     entries = []
     for item in all_items:
-        if item[2]:  # has description
-            entries.append(f"{item[0]:24s}{item[2]}")
-        elif item[1]:  # has command but no description
-            entries.append(item[0])
-        else:  # header
-            entries.append(item[0])
+        label, cmd, desc = item
+        if desc:  # has description
+            entries.append(f"{label:24s}{desc}")
+        elif cmd:  # has command but no description
+            entries.append(label)
+        else:  # header or blank
+            entries.append(label)
     cmd_map = {item[0]: item[1] for item in all_items if item[1]}
 
     while True:
