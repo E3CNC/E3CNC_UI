@@ -326,7 +326,7 @@ def _download_and_activate_release(
 
     _step("Running health checks")
     results = run_health_checks(inst)
-    all_passed = all(r.passed for r in results)
+    all_passed = all(r.passed for r in results if not r.optional)
     for r in results:
         if r.passed:
             ok(f"{r.name}: {r.detail}")

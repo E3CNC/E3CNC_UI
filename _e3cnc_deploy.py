@@ -388,6 +388,7 @@ class HealthCheckResult:
     name: str
     passed: bool
     detail: str = ""
+    optional: bool = False
     timeout: int = 10
 
 
@@ -417,8 +418,9 @@ def run_health_checks(inst: Optional[Instance] = None) -> List[HealthCheckResult
         r = _check_service(moonraker_service)
         results.append(r)
 
-    # 3. Klippy connected
+    # 3. Klippy connected (optional — may not be running on bootstrap)
     r = _check_klippy_connected(moonraker_port)
+    r.optional = True
     results.append(r)
 
     # 4. E3CNC component loaded
@@ -433,8 +435,9 @@ def run_health_checks(inst: Optional[Instance] = None) -> List[HealthCheckResult
     r = _check_journal()
     results.append(r)
 
-    # 7. Klipper process
+    # 7. Klipper process (optional — may not have a valid printer.cfg yet)
     r = _check_service(klipper_service)
+    r.optional = True
     results.append(r)
 
     return results
