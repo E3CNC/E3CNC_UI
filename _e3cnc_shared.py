@@ -1309,6 +1309,12 @@ database_path: {data / 'database'}
     except ImportError:
         pass
 
+    # Deploy nginx config for web access
+    try:
+        deploy_nginx_config(new_inst)
+    except Exception:
+        pass
+
     ok(f"Instance '{name}' imported from KIAUH layout")
     print()
     return new_inst
