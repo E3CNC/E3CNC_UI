@@ -758,6 +758,13 @@ timeout: 30
     except ImportError:
         pass
 
+    # Register with supervisor if available
+    try:
+        from _e3cnc_supervisor import register_instance
+        register_instance(new_inst)
+    except ImportError:
+        pass
+
     ok(f"Instance '{name}' created (port {port})")
     print()
     return Instance.from_name(name)

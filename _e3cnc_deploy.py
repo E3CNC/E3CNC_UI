@@ -441,8 +441,21 @@ def run_health_checks(inst: Optional[Instance] = None) -> List[HealthCheckResult
 
 
 def _check_service(service_name: str) -> HealthCheckResult:
-    """Check if a systemd service is active."""
+    """Check if a service is active (supervisor first, then systemd)."""
     for attempt in range(HEALTH_CHECK_RETRIES):
+        # Try supervisor first
+        if shutil.which("supervisorctl"):
+            result = subprocess.run(
+                ["supervisorctl", "status", service_name],
+                capture_output=True, text=True, timeout=5,
+            )
+            if "RUNNING" in result.stdout:
+                return HealthCheckResult(
+                    name=f"Service {service_name}",
+                    passed=True,
+                    detail="running (supervisor)",
+                )
+        # Fallback: systemd
         result = subprocess.run(
             ["systemctl", "is-active", service_name],
             capture_output=True, text=True, timeout=5,

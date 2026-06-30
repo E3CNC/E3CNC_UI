@@ -394,9 +394,16 @@ def cmd_uninstall(args) -> None:
 
     _run_ansible_cmd(UNINSTALL_PLAYBOOK, args, "Uninstall")
 
-    # Clean up new-layout instance directory if it exists
+    # Unregister from supervisor if available
     inst = _get_instance(args)
     if inst:
+        try:
+            from _e3cnc_supervisor import unregister_instance
+            unregister_instance(inst)
+        except ImportError:
+            pass
+
+        # Clean up new-layout instance directory
         inst_dir = INSTANCES_DIR / inst.name
         if inst_dir.is_dir():
             import shutil

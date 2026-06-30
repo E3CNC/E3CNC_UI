@@ -22,7 +22,7 @@ from _e3cnc_deploy import (
     extract_artifact, run_pre_flight_checks,
     activate_release, deactivate_release, Journal,
     install_pip_deps, run_migrations,
-    sync_runtime_files, update_systemd_paths, restart_services,
+    sync_runtime_files,
     run_health_checks, prune_releases,
     backup_deployment_state, rollback_to, rollback_previous, auto_rollback,
 )
@@ -315,8 +315,14 @@ def _download_and_activate_release(
         warn("Runtime file sync had issues — continuing")
 
     _step("Restarting services")
-    update_systemd_paths(inst)
-    restart_services(inst)
+    from _e3cnc_supervisor import _has_supervisor, update_service_paths, restart_services as sv_restart
+    if _has_supervisor():
+        update_service_paths(inst)
+        sv_restart(inst)
+    else:
+        from _e3cnc_deploy import update_systemd_paths, restart_services
+        update_systemd_paths(inst)
+        restart_services(inst)
 
     _step("Running health checks")
     results = run_health_checks(inst)
