@@ -630,7 +630,7 @@ def select_instance(instances: List[Instance]) -> Optional[Instance]:
                 show_shortcut_hints=False,
                 menu_highlight_style=("fg_green", "bold"),
                 quit_keys=("q", "Q"),
-                clear_screen=False,
+                clear_screen=True,
             )
             choice = menu.show()
             if choice is None or choice == len(entries) - 1:

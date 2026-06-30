@@ -101,7 +101,7 @@ def _tui_menu() -> None:
             show_shortcut_hints=False,
             menu_highlight_style=("fg_green", "bold"),
             quit_keys=("q", "Q"),
-            clear_screen=False,
+            clear_screen=True,
             clear_menu_on_exit=True,
         )
 
@@ -400,7 +400,7 @@ def _switch_instance() -> None:
             show_shortcut_hints=False,
             menu_highlight_style=("fg_green", "bold"),
             quit_keys=("q", "Q"),
-            clear_screen=False,
+            clear_screen=True,
         )
         choice = menu.show()
         if choice is None or choice == len(entries) - 1:
