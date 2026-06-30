@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.9.0 (2026-06-30)
+- **Interactive TUI menu** — full-screen menu with semi-graphical display, keyboard shortcuts (`[s]` Status, `[i]` Install, etc.), arrow key navigation, and inline descriptions for all 25 commands
+- **Supervisor process management** — new `_e3cnc_supervisor.py` module manages Moonraker/Klipper via `supervisord` instead of systemd. Automatic registration on install/import, fallback to systemd when supervisor unavailable. Bootstrap stack Ansible role installs supervisor package.
+- **`e3cnc-cli restart`** — new command to restart instance services (supervisor-aware, falls back to systemd)
+- **Per-instance web ports** — first instance gets port 80, subsequent instances get 8080, 8081, ... Web port persisted in `moonraker.conf` as `# e3cnc_web_port: N`. All nginx configs generated and reloaded automatically.
+- **Card-based admin page** — `/admin` endpoint rewritten as modern card layout with clickable IP-based URLs for each instance's Web UI, API, and config files
+- **KIAUH import** — new `import-instance` command safely copies existing KIAUH instances into `~/e3cnc/instances/{name}/` layout without modifying originals. Handles port conflicts, generates nginx configs, registers with supervisor.
+- **`migrate-instances` command** — batch migration of all KIAUH instances to the new E3CNC layout
+- **`detect-mcu` / `flash-mcu` / `init-config`** — new CLI commands for MCU scanning, firmware flashing, and CNC printer.cfg generation
+- **`admin-page` / `clilog`** — new CLI commands for admin page regeneration and viewing CLI operation logs
+- **CLI logging** — all CLI operations logged with timestamps to `~/e3cnc/cli.log`
+- **Klipper health checks made optional** — health checks for Klippy connection and Klipper process no longer trigger rollback, allowing updates on placeholder/printer-less instances
+- **Persistent web ports on import** — `_compute_web_port()` now correctly assigns unique ports across imports. Web port written to `moonraker.conf` on `_create_new_instance()` and `import_kiauh_instance()`.
+- **Fixed menu crash on `[p] Prune`** — `_Fake` args object was missing `keep` attribute
+- **Fixed menu crash on `[s] Status`** — `get_active_instance()` no longer triggers selection prompt when `--instance` flag is provided
+- **Fixed instance selection crash** — all `simple-term-menu` menus now use `[x]` bracket shortcuts for compatibility
+- **`clear_screen=True`** on all menus — command output displays on a clean screen with visible "Press Enter" prompt before menu reloads
+- **Frontend JS patch** — auto-detect port array patched to try `window.location.port` first, fixing multi-instance Moonraker connection in proxied environments
+- **Comprehensive unit tests** — 180+ tests covering all CLI commands, parser, menu dispatch, MCU detection, health checks, and integration validation
+
 ## v0.8.4 (2026-06-29)
 - **Fixed**: `sync_runtime_files()` now creates the scripts directory before copying `cnc_metadata_extractor.py`. On multi-instance fresh setups, the `scripts/` dir didn't exist yet, causing `FileNotFoundError`.
 
