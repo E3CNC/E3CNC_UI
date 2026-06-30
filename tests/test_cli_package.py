@@ -750,3 +750,486 @@ class TestGenerateCncConfig:
         content = _generate_cnc_printer_cfg("/dev/ttyACM0")
         assert "INSTRUCTIONS" in content
         assert "e3cnc-cli status" in content
+
+
+# ── All CLI command tests ──────────────────────────────────────────────────
+
+
+class TestCmdStatus:
+    """Tests for cli.commands.cmd_status()."""
+
+    def test_calls_check_status(self, mock_detect_instances):
+        """cmd_status should call check_status with the active instance."""
+        from cli.commands import cmd_status
+
+        with patch("cli.commands.check_status") as mock_cs:
+            with patch("_e3cnc_deploy._get_local_ip", return_value="192.168.0.1"):
+                cmd_status(_make_args(instance="test1"))
+                mock_cs.assert_called_once()
+
+    def test_shows_urls(self, mock_detect_instances, capsys):
+        """cmd_status should print Web UI / Admin / API URLs."""
+        from cli.commands import cmd_status
+
+        with patch("_e3cnc_deploy._get_local_ip", return_value="10.0.0.1"):
+            with patch("cli.commands.check_status"):
+                cmd_status(_make_args(instance="test1"))
+        out = capsys.readouterr().out
+        assert "Web UI" in out
+        assert "Admin" in out
+        assert "API" in out
+
+    def test_shows_web_port_for_non_default(self, mock_detect_instances, capsys):
+        """Non-default web port should appear in Web UI URL."""
+        from cli.commands import cmd_status
+
+        with patch("_e3cnc_deploy._get_local_ip", return_value="10.0.0.1"):
+            with patch("cli.commands.check_status"):
+                cmd_status(_make_args(instance="test1"))
+        out = capsys.readouterr().out
+        # test1 has web_port=80, should show http://10.0.0.1/
+        assert "http://10.0.0.1/" in out
+
+
+class TestCmdInstances:
+    """Tests for cli.commands.cmd_instances()."""
+
+    def test_lists_instances(self, capsys):
+        """cmd_instances should list all detected instances."""
+        from cli.commands import cmd_instances
+        from _e3cnc_shared import Instance
+
+        instances = [
+            Instance(name="alpha", printer_data_dir="/tmp/a", config_dir="/tmp/a/config",
+                     moonraker_conf="/tmp/a/config/moonraker.conf", moonraker_log="/tmp/a/logs/moonraker.log",
+                     scripts_dir="/tmp/a/scripts", macros_dir="/tmp/a/config/macros",
+                     E3CNC_dir="/tmp/a/config/E3CNC", printer_cfg="/tmp/a/config/printer.cfg",
+                     web_root="/tmp/web", moonraker_port=7126, web_port=8080),
+            Instance(name="beta", printer_data_dir="/tmp/b", config_dir="/tmp/b/config",
+                     moonraker_conf="/tmp/b/config/moonraker.conf", moonraker_log="/tmp/b/logs/moonraker.log",
+                     scripts_dir="/tmp/b/scripts", macros_dir="/tmp/b/config/macros",
+                     E3CNC_dir="/tmp/b/config/E3CNC", printer_cfg="/tmp/b/config/printer.cfg",
+                     web_root="/tmp/web", moonraker_port=7127, web_port=8081),
+        ]
+
+        with patch("_e3cnc_shared.detect_instances", return_value=instances):
+            with patch("_e3cnc_deploy._get_local_ip", return_value="10.0.0.1"):
+                with patch("_e3cnc_deploy.get_current_release", return_value=MagicMock(version="v1.0")):
+                    cmd_instances(_make_args())
+        out = capsys.readouterr().out
+        assert "alpha" in out
+        assert "beta" in out
+
+    def test_shows_instance_urls(self, mock_detect_instances, capsys):
+        """Each instance should show API and Web UI URLs."""
+        from cli.commands import cmd_instances
+
+        with patch("_e3cnc_deploy._get_local_ip", return_value="10.0.0.1"):
+            cmd_instances(_make_args())
+        out = capsys.readouterr().out
+        assert "Web UI" in out
+        assert "API" in out
+
+    def test_no_instances_shows_info(self, capsys):
+        """When no instances exist, show info message."""
+        from cli.commands import cmd_instances
+
+        with patch("_e3cnc_shared.detect_instances", return_value=[]):
+            cmd_instances(_make_args())
+        out = capsys.readouterr().out
+        assert "No instances detected" in out
+
+
+class TestCmdReleases:
+    """Tests for cli.commands.cmd_releases()."""
+
+    def test_does_not_crash_with_no_releases(self):
+        """cmd_releases should handle no installed releases gracefully."""
+        from cli.commands import cmd_releases
+
+        with patch("_e3cnc_deploy.get_releases", return_value=[]):
+            with patch("_e3cnc_deploy.get_current_release", return_value=None):
+                cmd_releases(_make_args())
+
+
+class TestCmdRestart:
+    """Tests for cli.commands.cmd_restart()."""
+
+    def test_restarts_via_supervisor(self, mock_detect_instances):
+        """When supervisor is available, restart via supervisor."""
+        from cli.commands import cmd_restart
+
+        with patch("_e3cnc_supervisor._has_supervisor", return_value=True):
+            with patch("_e3cnc_supervisor._config_path") as mock_cfg:
+                mock_cfg.return_value.exists.return_value = True
+                with patch("_e3cnc_supervisor.restart_services") as mock_rs:
+                    cmd_restart(_make_args(instance="test1"))
+                    mock_rs.assert_called_once()
+
+    def test_falls_back_to_systemd(self, mock_detect_instances):
+        """Without supervisor, fall back to systemd restart."""
+        from cli.commands import cmd_restart
+
+        with patch("_e3cnc_supervisor._has_supervisor", return_value=False):
+            with patch("_e3cnc_deploy.restart_services") as mock_rs:
+                cmd_restart(_make_args(instance="test1"))
+                mock_rs.assert_called_once()
+
+    def test_registers_then_restarts(self, mock_detect_instances):
+        """If supervisor config doesn't exist, register first then restart."""
+        from cli.commands import cmd_restart
+
+        with patch("_e3cnc_supervisor._has_supervisor", return_value=True):
+            with patch("_e3cnc_supervisor._config_path") as mock_cfg:
+                mock_cfg.return_value.exists.return_value = False
+                with patch("_e3cnc_supervisor.register_instance", return_value=True) as mock_reg:
+                    with patch("cli.commands.ok"):
+                        cmd_restart(_make_args(instance="test1"))
+                        mock_reg.assert_called_once()
+
+    def test_fails_without_instance(self):
+        """cmd_restart with no instance should fail."""
+        from cli.commands import cmd_restart
+
+        with patch("cli.commands._get_instance", return_value=None):
+            with patch("_e3cnc_shared.get_active_instance", return_value=None):
+                with pytest.raises(SystemExit):
+                    cmd_restart(_make_args())
+
+
+class TestCmdDetectMCU:
+    """Tests for cli.commands.cmd_detect_mcu()."""
+
+    def test_does_not_crash(self):
+        """cmd_detect_mcu should run without errors."""
+        from cli.commands import cmd_detect_mcu
+
+        with patch("cli.helpers.scan_serial_devices", return_value=[]):
+            cmd_detect_mcu(_make_args())
+
+
+class TestCmdInitConfig:
+    """Tests for cli.commands.cmd_init_config()."""
+
+    def test_generates_config(self, mock_detect_instances):
+        """cmd_init_config should generate a printer.cfg for the instance."""
+        from cli.commands import cmd_init_config
+
+        with patch("cli.helpers.scan_serial_devices", return_value=[]):
+            with patch("cli.commands._get_instance") as mock_gi:
+                mock_gi.return_value = mock_detect_instances[0]
+                with patch("builtins.input", return_value="y"):
+                    with patch("pathlib.Path.write_text"):
+                        cmd_init_config(_make_args(instance="test1"))
+
+    def test_cancels_on_no(self, mock_detect_instances):
+        """When user says no, do not overwrite printer.cfg."""
+        from cli.commands import cmd_init_config
+
+        with patch("cli.helpers.scan_serial_devices", return_value=[]):
+            with patch("cli.commands._get_instance") as mock_gi:
+                inst = mock_detect_instances[0]
+                mock_gi.return_value = inst
+                with patch("pathlib.Path.exists", return_value=True):
+                    with patch("builtins.input", return_value="n"):
+                        with patch("pathlib.Path.write_text") as mock_write:
+                            cmd_init_config(_make_args(instance="test1"))
+                            mock_write.assert_not_called()
+
+    def test_uses_yes_flag(self, mock_detect_instances):
+        """With --yes flag, skip overwrite confirmation."""
+        from cli.commands import cmd_init_config
+
+        with patch("cli.helpers.scan_serial_devices", return_value=[]):
+            with patch("cli.commands._get_instance") as mock_gi:
+                mock_gi.return_value = mock_detect_instances[0]
+                with patch("pathlib.Path.write_text") as mock_write:
+                    cmd_init_config(_make_args(instance="test1", yes=True))
+                    mock_write.assert_called_once()
+
+
+class TestCmdAdminPage:
+    """Tests for cli.commands.cmd_admin_page()."""
+
+    def test_generates_admin_page(self):
+        """cmd_admin_page should call generate_admin_page."""
+        from cli.commands import cmd_admin_page
+
+        with patch("_e3cnc_deploy.generate_admin_page") as mock:
+            cmd_admin_page(_make_args())
+            mock.assert_called_once()
+
+
+class TestCmdCliLog:
+    """Tests for cli.commands.cmd_clilog()."""
+
+    def test_shows_log_when_exists(self, tmp_path):
+        """When the CLI log file exists, show its contents."""
+        from cli.commands import cmd_clilog
+
+        log_file = tmp_path / "cli.log"
+        log_file.write_text("line1\nline2\nline3\n")
+
+        with patch("_e3cnc_shared.LOG_FILE", log_file):
+            with patch("sys.stdout"):
+                cmd_clilog(_make_args(lines=5))
+
+    def test_shows_info_when_no_log(self):
+        """When no CLI log exists, show info message."""
+        from cli.commands import cmd_clilog
+
+        with patch("_e3cnc_shared.LOG_FILE") as mock_log:
+            mock_log.exists.return_value = False
+            cmd_clilog(_make_args(lines=5))
+
+
+class TestCmdLogs:
+    """Tests for cli.commands.cmd_logs()."""
+
+    def test_calls_run_logs(self, mock_detect_instances):
+        """cmd_logs should call run_logs with the instance."""
+        from cli.commands import cmd_logs
+
+        with patch("cli.commands.run_logs", return_value=MagicMock(success=True)):
+            cmd_logs(_make_args(instance="test1", lines=10))
+
+    def test_shows_empty_logs(self):
+        """cmd_logs with no instance should show empty logs, not crash."""
+        from cli.commands import cmd_logs
+
+        with patch("cli.commands._get_instance", return_value=None):
+            with patch("_e3cnc_shared.get_active_instance", return_value=None):
+                cmd_logs(_make_args(lines=10))
+
+
+class TestCmdBackup:
+    """Tests for cli.commands.cmd_backup()."""
+
+    def test_calls_run_backup(self, mock_detect_instances):
+        """cmd_backup should call run_backup with the instance."""
+        from cli.commands import cmd_backup
+
+        with patch("cli.commands.run_backup", return_value=MagicMock(success=True)):
+            cmd_backup(_make_args(instance="test1"))
+
+    def test_fails_on_backup_error(self, mock_detect_instances):
+        """When backup fails, cmd_backup should exit with 1."""
+        from cli.commands import cmd_backup
+
+        with patch("cli.commands.run_backup", return_value=MagicMock(success=False)):
+            with pytest.raises(SystemExit):
+                cmd_backup(_make_args(instance="test1"))
+
+
+class TestCmdDiagnose:
+    """Tests for cli.commands.cmd_diagnose()."""
+
+    def test_calls_run_diagnose(self, mock_detect_instances):
+        """cmd_diagnose should call run_diagnose with the instance."""
+        from cli.commands import cmd_diagnose
+
+        with patch("cli.commands.run_diagnose", return_value=MagicMock(success=True)):
+            cmd_diagnose(_make_args(instance="test1"))
+
+    def test_fails_on_diagnose_error(self, mock_detect_instances):
+        """When diagnose fails, cmd_diagnose should exit with 1."""
+        from cli.commands import cmd_diagnose
+
+        with patch("cli.commands.run_diagnose", return_value=MagicMock(success=False)):
+            with pytest.raises(SystemExit):
+                cmd_diagnose(_make_args(instance="test1"))
+
+
+class TestCmdPrune:
+    """Tests for cli.commands.cmd_prune()."""
+
+    def test_calls_prune_releases(self):
+        """cmd_prune should call prune_releases."""
+        from cli.commands import cmd_prune
+
+        with patch("cli.commands.prune_releases", return_value=(0, 0)):
+            cmd_prune(_make_args(keep=3, dry_run=False))
+
+    def test_dry_run_does_not_delete(self):
+        """With --dry-run, prune_releases should be called with dry_run=True."""
+        from cli.commands import cmd_prune
+
+        with patch("cli.commands.prune_releases", return_value=(0, 0)) as mock:
+            cmd_prune(_make_args(keep=3, dry_run=True))
+            mock.assert_called_once()
+
+
+class TestCmdImportInstance:
+    """Tests for cli.commands.cmd_import_instance()."""
+
+    def test_shows_info_when_no_kiauh(self):
+        """When no KIAUH instances exist, show info."""
+        from cli.commands import cmd_import_instance
+
+        with patch("_e3cnc_shared._scan_kiauh_instances", return_value=[]):
+            cmd_import_instance(_make_args())
+
+    def test_imports_single_instance(self):
+        """With one KIAUH instance, import it automatically."""
+        from cli.commands import cmd_import_instance
+        from _e3cnc_shared import Instance
+
+        inst = Instance(
+            name="kiauh1",
+            printer_data_dir="/tmp/kiauh1_data",
+            config_dir="/tmp/kiauh1_data/config",
+            moonraker_conf="/tmp/kiauh1_data/config/moonraker.conf",
+            moonraker_log="/tmp/kiauh1_data/logs/moonraker.log",
+            scripts_dir="/tmp/kiauh1_data/scripts",
+            macros_dir="/tmp/kiauh1_data/config/macros",
+            E3CNC_dir="/tmp/kiauh1_data/config/E3CNC",
+            printer_cfg="/tmp/kiauh1_data/config/printer.cfg",
+            web_root="/tmp/kiauh1_web",
+            moonraker_port=7145,
+        )
+
+        with patch("_e3cnc_shared._scan_kiauh_instances", return_value=[inst]):
+            with patch("_e3cnc_shared.import_kiauh_instance") as mock:
+                cmd_import_instance(_make_args())
+                mock.assert_called_once_with(inst)
+
+
+class TestCmdMigrateInstances:
+    """Tests for cli.commands.cmd_migrate_instances()."""
+
+    def test_does_not_crash(self):
+        """cmd_migrate_instances should handle no KIAUH instances gracefully."""
+        from cli.commands import cmd_migrate_instances
+
+        with patch("_e3cnc_shared._scan_kiauh_instances", return_value=[]):
+            with patch("_e3cnc_shared.INSTANCES_DIR") as mock_dir:
+                mock_dir.is_dir.return_value = True
+                with patch("_e3cnc_deploy.generate_admin_page"):
+                    cmd_migrate_instances(_make_args(yes=True))
+
+
+class TestCmdInstall:
+    """Tests for cli.commands.cmd_install()."""
+
+    def test_uses_provided_name(self):
+        """When --name is provided, use it directly."""
+        from cli.commands import cmd_install
+
+        with patch("cli.commands._require_ansible"):
+            with patch("cli.helpers._download_and_activate_release", return_value="v0.8.4"):
+                with patch("cli.commands._run_ansible_cmd") as mock_ansible:
+                    mock_ansible.return_value = MagicMock(returncode=0)
+                    with patch("cli.commands.ok"):
+                        with patch("_e3cnc_shared._create_new_instance"):
+                            with patch("cli.commands.header"):
+                                cmd_install(_make_args(name="mytest", yes=True))
+                                mock_ansible.assert_called()
+
+
+class TestCmdUpdate:
+    """Tests for cli.commands.cmd_update()."""
+
+    def test_calls_update_helpers(self, mock_detect_instances):
+        """cmd_update should call _download_and_activate_release."""
+        from cli.commands import cmd_update
+
+        with patch("cli.helpers._download_and_activate_release") as mock:
+            with patch("cli.commands._get_instance") as mock_gi:
+                mock_gi.return_value = mock_detect_instances[0]
+                with patch("cli.commands.ok"):
+                    cmd_update(_make_args(instance="test1"))
+                    mock.assert_called_once()
+
+    def test_dry_run_mode(self, mock_detect_instances):
+        """With --dry-run, cmd_update should pass dry_run=True."""
+        from cli.commands import cmd_update
+
+        with patch("cli.helpers._download_and_activate_release") as mock:
+            with patch("cli.commands._get_instance") as mock_gi:
+                mock_gi.return_value = mock_detect_instances[0]
+                cmd_update(_make_args(instance="test1", dry_run=True))
+                _, kwargs = mock.call_args
+                assert kwargs.get("dry_run") is True
+
+
+class TestCmdUninstall:
+    """Tests for cli.commands.cmd_uninstall()."""
+
+    def test_cleans_up_supervisor(self, mock_detect_instances):
+        """When supervisor is available, unregister the instance."""
+        from cli.commands import cmd_uninstall
+
+        with patch("cli.commands._run_ansible_cmd"):
+            with patch("cli.commands._get_instance") as mock_gi:
+                inst = mock_detect_instances[0]
+                mock_gi.return_value = inst
+                with patch("_e3cnc_supervisor.unregister_instance") as mock:
+                    with patch("_e3cnc_deploy.generate_admin_page"):
+                        with patch("cli.commands.ok"):
+                            with patch("shutil.rmtree"):
+                                cmd_uninstall(_make_args(instance="test1"))
+                                mock.assert_called_once_with(inst)
+
+    def test_removes_instance_directory(self, mock_detect_instances):
+        """Uninstall should remove the instance directory from new layout."""
+        from cli.commands import cmd_uninstall
+
+        with patch("cli.commands._run_ansible_cmd"):
+            with patch("cli.commands._get_instance") as mock_gi:
+                inst = mock_detect_instances[0]
+                mock_gi.return_value = inst
+                with patch("_e3cnc_supervisor.unregister_instance"):
+                    with patch("_e3cnc_deploy.generate_admin_page"):
+                        with patch("cli.commands.ok"):
+                            with patch("_e3cnc_shared.INSTANCES_DIR") as mock_dir:
+                                mock_dir.__truediv__.return_value.is_dir.return_value = True
+                                with patch("shutil.rmtree") as mock_rm:
+                                    cmd_uninstall(_make_args(instance="test1"))
+                                    mock_rm.assert_called_once()
+
+
+class TestMainDispatchAllCommands:
+    """Verify main() dispatches ALL CLI commands correctly."""
+
+    COMMANDS = [
+        "check", "status", "instances", "releases",
+        "restart", "admin-page", "clilog", "detect-mcu",
+        "prune", "import-instance", "backup", "diagnose",
+        "logs", "install", "uninstall", "update", "deploy",
+    ]
+
+    @pytest.mark.parametrize("cmd", COMMANDS)
+    def test_all_commands_dispatch(self, cmd):
+        """Each command should dispatch via main()."""
+        from cli import main
+
+        handler_name = f"cmd_{cmd.replace('-', '_')}"
+        with patch("sys.argv", ["e3cnc-cli", cmd]):
+            with patch(f"cli.{handler_name}") as mock:
+                with patch("_e3cnc_shared.print_banner"):
+                    main()
+                    mock.assert_called_once()
+
+
+class TestMenuDispatchAllCommands:
+    """Verify _run_menu_command dispatches ALL commands correctly."""
+
+    COMMANDS = [
+        "status", "install", "deploy", "update", "uninstall",
+        "check", "backup", "restore", "diagnose", "logs",
+        "releases", "rollback", "prune", "instances",
+        "detect-mcu", "flash-mcu", "init-config",
+        "restart", "import-instance", "admin-page", "clilog",
+        "migrate-instances",
+    ]
+
+    @pytest.mark.parametrize("cmd", COMMANDS)
+    def test_menu_dispatches_all(self, cmd):
+        """Each command should dispatch via _run_menu_command."""
+        from cli.menu import _run_menu_command
+
+        handler_name = f"cmd_{cmd.replace('-', '_')}"
+        with patch(f"cli.commands.{handler_name}") as mock:
+            with patch("builtins.input", return_value="y"):
+                _run_menu_command(cmd)
+                mock.assert_called_once()
