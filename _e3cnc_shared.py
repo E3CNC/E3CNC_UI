@@ -1281,6 +1281,15 @@ database_path: {data / 'database'}
         _generate_minimal_moonraker_conf(data, kiauh_inst.moonraker_port)
         info(f"Generated new moonraker.conf for '{name}'")
 
+    # Persist web port in moonraker.conf
+    conf_path = data / "config" / "moonraker.conf"
+    wp = _compute_web_port(name)
+    conf_text = conf_path.read_text()
+    if "# e3cnc_web_port:" not in conf_text:
+        conf_text = conf_text.replace("[server]", f"# e3cnc_web_port: {wp}\n[server]", 1)
+        conf_path.write_text(conf_text)
+        ok(f"Web port {wp} persisted for '{name}'")
+
     # Copy config/E3CNC directory if present
     e3cnc_dir = Path(kiauh_inst.E3CNC_dir)
     if e3cnc_dir.is_dir():
