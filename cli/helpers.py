@@ -330,6 +330,8 @@ def _download_and_activate_release(
         journal.save()
         ok(f"Release {version} activated")
         prune_releases(DEFAULT_KEEP_RELEASES)
+        from _e3cnc_deploy import generate_admin_page
+        generate_admin_page()
         return version
     else:
         warn(f"Health checks failed — rolling back to {journal.previous}")

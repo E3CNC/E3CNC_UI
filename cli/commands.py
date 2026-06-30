@@ -116,6 +116,10 @@ def cmd_install(args) -> None:
     version = _download_and_activate_release(inst=inst, skip_backup=True, auto_yes=args.yes)
     ok(f"E3CNC v{version} deployed")
 
+    # Generate admin page
+    from _e3cnc_deploy import generate_admin_page
+    generate_admin_page()
+
     # Step 3: Post-install guidance
     _show_post_install_guide(inst)
 
@@ -335,6 +339,15 @@ def cmd_instances(args) -> None:
 
     info("Run 'e3cnc-cli status --instance <name>' for component details")
     info("Run 'e3cnc-cli update --instance <name>' to update")
+
+
+def cmd_admin_page(args) -> None:
+    """Regenerate the admin page at ~/e3cnc/admin/index.html."""
+    from _e3cnc_deploy import generate_admin_page
+
+    header("Admin Page")
+    generate_admin_page()
+    info("Available at http://<host>/admin")
 
 
 def cmd_uninstall(args) -> None:

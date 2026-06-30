@@ -73,6 +73,7 @@
     - '{{ moonraker_dir }}'
     - '{{ klipper_dir }}'
     - '{{ frontend.web_root }}'
+    - '{{ e3cnc_root }}/admin'
   when: e3cnc_bootstrap_needed
 
 - name: Check vendored Moonraker snapshot exists in the monorepo
@@ -322,6 +323,11 @@
           location /access/ {
               proxy_pass http://127.0.0.1:{{ moonraker_port }}/access/;
               proxy_set_header Host $host;
+          }
+
+          location /admin {
+              alias {{ e3cnc_root }}/admin;
+              index index.html;
           }
       }
   become: true

@@ -1315,3 +1315,82 @@ def run_migrations(release_dir: Optional[Path] = None, direction: str = "up", dr
             all_ok = False
 
     return all_ok
+
+
+# ── Admin page ──────────────────────────────────────────────────────────
+
+ADMIN_PAGE_DIR = E3CNC_DIR / "admin"
+
+
+def generate_admin_page() -> None:
+    """Generate a static admin page at ~/e3cnc/admin/index.html with instance info."""
+    from _e3cnc_shared import detect_instances, VERSION
+    import socket, platform
+
+    ADMIN_PAGE_DIR.mkdir(parents=True, exist_ok=True)
+
+    instances = detect_instances()
+    hostname = socket.gethostname()
+    current = get_current_release()
+
+    rows = ""
+    for inst in instances:
+        dot = "&#9679;" if inst.is_running else "&#9678;"
+        color = "#22c55e" if inst.is_running else "#6b7280"
+        rows += f"""<tr>
+      <td><span style="color:{color}">{dot}</span> <strong>{inst.name}</strong></td>
+      <td>{inst.moonraker_service}<br><span class="dim">{inst.klipper_service}</span></td>
+      <td>{inst.moonraker_port}</td>
+      <td class="path">{inst.config_dir}</td>
+      <td class="path">{inst.web_root}</td>
+      <td class="path">{inst.printer_data_dir}</td>
+    </tr>"""
+
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E3CNC Admin</title>
+<style>
+  * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+  body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 2rem; }}
+  h1 {{ font-size: 1.5rem; color: #38bdf8; margin-bottom: 0.25rem; }}
+  .subtitle {{ color: #94a3b8; font-size: 0.875rem; margin-bottom: 2rem; }}
+  table {{ width: 100%; border-collapse: collapse; }}
+  th {{ text-align: left; padding: 0.75rem 0.5rem; border-bottom: 1px solid #334155; color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }}
+  td {{ padding: 0.75rem 0.5rem; border-bottom: 1px solid #1e293b; font-size: 0.875rem; vertical-align: top; }}
+  .path {{ font-family: 'SF Mono', Monaco, monospace; font-size: 0.75rem; color: #64748b; }}
+  .dim {{ color: #64748b; font-size: 0.75rem; }}
+  .footer {{ margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #334155; color: #64748b; font-size: 0.75rem; }}
+  @media (prefers-color-scheme: light) {{
+    body {{ background: #f8fafc; color: #1e293b; }}
+    h1 {{ color: #0284c7; }}
+    th {{ color: #64748b; border-bottom-color: #e2e8f0; }}
+    td {{ border-bottom-color: #f1f5f9; }}
+    .subtitle, .footer, .dim, .path {{ color: #94a3b8; }}
+  }}
+</style>
+</head>
+<body>
+  <h1>E3CNC Admin</h1>
+  <p class="subtitle">{hostname} &mdash; v{VERSION}{' &mdash; Release: ' + current.version if current else ''}</p>
+  <table>
+    <tr>
+      <th>Instance</th>
+      <th>Services</th>
+      <th>Port</th>
+      <th>Config</th>
+      <th>Web Root</th>
+      <th>Data</th>
+    </tr>
+    {rows}
+  </table>
+  <div class="footer">
+    Generated: {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")}
+  </div>
+</body>
+</html>"""
+
+    (ADMIN_PAGE_DIR / "index.html").write_text(html)
+    ok("Admin page generated")

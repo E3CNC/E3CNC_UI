@@ -107,6 +107,9 @@ def build_parser() -> argparse.ArgumentParser:
                             help="Migrate KIAUH instance layout to new ~/e3cnc/instances/{name} layout",
                             description="Migrate KIAUH-layout instances (printer_data, printer_*_data) to the new ~/e3cnc/instances/{name} layout.")
 
+    p.add_parser("admin-page",
+                 help="Regenerate the admin page at /admin")
+
     bp = p.add_parser("backup", parents=[shared_remote, shared_instance],
                       help="Create a timestamped backup")
 
