@@ -440,8 +440,8 @@ class Instance:
 
         # Resolve moonraker/klipper dirs from current release (if any)
         current_link = Path.home() / "e3cnc" / "current"
-        moonraker_dir = ""
-        klipper_dir = ""
+        moonraker_dir = str(Path.home() / "moonraker")
+        klipper_dir = str(Path.home() / "klipper")
         if current_link.is_symlink():
             current_path = current_link.resolve()
             mdir = current_path / "vendor" / "moonraker"
