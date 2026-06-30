@@ -292,6 +292,7 @@ def _run_menu_command(cmd: str) -> None:
     args.lines = 50
     args.instance = None
     args.dry_run = False
+    args.keep = 3
     args.name = None
     args.command = cmd
 
