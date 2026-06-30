@@ -137,43 +137,25 @@ def _interactive_menu() -> None:
                 sys.stdout.write(f"  {Style.DIM}arrows to move, enter to select, q to quit{Style.RESET}")
                 sys.stdout.flush()
 
-            key = _get_key() if has_terminal else ""
-            if key == "q" or key == "Q":
-                ok("Goodbye")
-                break
-
-            if key == "\x1b[A":  # Up arrow
-                cur_idx = (cur_idx - 1) % len(display)
-                sys.stdout.write("\r\033[2K")
-                sys.stdout.flush()
-                continue
-
-            if key == "\x1b[B":  # Down arrow
-                cur_idx = (cur_idx + 1) % len(display)
-                sys.stdout.write("\r\033[2K")
-                sys.stdout.flush()
-                continue
-
-            if key in ("\r", "\n"):  # Enter
-                _, cmd = display[cur_idx]
-                if cmd == "quit":
+                key = _get_key()
+                if key == "q" or key == "Q":
                     ok("Goodbye")
                     break
-                _restore_terminal()
-                if cmd == "switch":
-                    _switch_instance()
-                elif cmd == "create-instance":
-                    _create_instance()
-                else:
-                    _run_menu_command(cmd)
-                _setup_terminal()
-                continue
 
-            if key and key.isdigit():
-                idx = int(key) - 1
-                if 0 <= idx < len(display):
-                    cur_idx = idx
-                    _, cmd = display[idx]
+                if key == "\x1b[A":  # Up arrow
+                    cur_idx = (cur_idx - 1) % len(display)
+                    sys.stdout.write("\r\033[2K")
+                    sys.stdout.flush()
+                    continue
+
+                if key == "\x1b[B":  # Down arrow
+                    cur_idx = (cur_idx + 1) % len(display)
+                    sys.stdout.write("\r\033[2K")
+                    sys.stdout.flush()
+                    continue
+
+                if key in ("\r", "\n"):  # Enter
+                    _, cmd = display[cur_idx]
                     if cmd == "quit":
                         ok("Goodbye")
                         break
@@ -187,9 +169,57 @@ def _interactive_menu() -> None:
                     _setup_terminal()
                     continue
 
-            if key in ("\x03",):  # Ctrl+C
-                print()
-                break
+                if key and key.isdigit():
+                    idx = int(key) - 1
+                    if 0 <= idx < len(display):
+                        cur_idx = idx
+                        _, cmd = display[idx]
+                        if cmd == "quit":
+                            ok("Goodbye")
+                            break
+                        _restore_terminal()
+                        if cmd == "switch":
+                            _switch_instance()
+                        elif cmd == "create-instance":
+                            _create_instance()
+                        else:
+                            _run_menu_command(cmd)
+                        _setup_terminal()
+                        continue
+
+                if key in ("\x03",):  # Ctrl+C
+                    print()
+                    break
+            else:
+                # Non-TTY mode: use regular input()
+                try:
+                    choice = input(f"  {Style.BOLD}Choice [1-{len(display)}]{Style.RESET} ").strip()
+                except (EOFError, KeyboardInterrupt):
+                    print()
+                    break
+
+                if not choice:
+                    continue
+
+                try:
+                    idx = int(choice) - 1
+                    if idx < 0 or idx >= len(display):
+                        print(f"  {Style.YELLOW}Invalid choice: {choice}{Style.RESET}")
+                        continue
+                except ValueError:
+                    print(f"  {Style.YELLOW}Invalid choice: {choice}{Style.RESET}")
+                    continue
+
+                _, cmd = display[idx]
+                if cmd == "quit":
+                    ok("Goodbye")
+                    break
+                if cmd == "switch":
+                    _switch_instance()
+                elif cmd == "create-instance":
+                    _create_instance()
+                else:
+                    _run_menu_command(cmd)
 
     finally:
         _restore_terminal()
