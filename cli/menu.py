@@ -77,11 +77,13 @@ def _tui_menu() -> None:
     entries = []
     for item in all_items:
         label, cmd, desc = item
-        if desc:  # has description
+        if not label and not cmd:  # blank line — skip
+            continue
+        elif not cmd:  # section header
+            entries.append(f"[-] {label}")
+        elif desc:  # has description
             entries.append(f"{label:24s}{desc}")
-        elif cmd:  # has command but no description
-            entries.append(label)
-        else:  # header or blank
+        else:
             entries.append(label)
     cmd_map = {item[0]: item[1] for item in all_items if item[1]}
 
