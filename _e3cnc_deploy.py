@@ -1118,6 +1118,10 @@ def update_systemd_paths(inst: Optional[Instance] = None, dry_run: bool = False)
     current_path = current.path
     all_ok = True
 
+    # Ensure sudo access before modifying systemd
+    from _e3cnc_shared import _ensure_local_sudo_access
+    sudo_ok = _ensure_local_sudo_access("updating systemd service paths")
+
     # Create systemd drop-in directory
     services = {
         active_inst.moonraker_service: {
