@@ -1340,14 +1340,17 @@ def _compute_web_port(name: str) -> int:
     """Compute the web port for an instance.
 
     'cnc' and 'default' get port 80. Other instances get 8080, 8081, ...
+    based on the count of existing instance directories.
     """
     if name in ("cnc", "default"):
         return 80
-    used = {inst.web_port for inst in detect_instances()}
-    for port in range(8080, 9000):
-        if port not in used:
-            return port
-    return 8080
+    count = 0
+    if INSTANCES_DIR.is_dir():
+        for d in sorted(INSTANCES_DIR.iterdir()):
+            if d.is_dir() and not d.name.startswith(".") and d.name not in ("cnc", "default"):
+                if d.name != name:
+                    count += 1
+    return 8080 + count
 
 
 def generate_nginx_config(inst: Instance) -> str:
