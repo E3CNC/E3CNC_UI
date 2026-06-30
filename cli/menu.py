@@ -21,12 +21,20 @@ _old_term: list = []
 
 
 def _setup_terminal() -> None:
-    """Switch stdin to raw mode for single-key input."""
+    """Switch stdin to non-canonical mode for single-key input.
+    Leaves output processing intact so newlines work normally."""
     if not sys.stdin.isatty():
         return
     fd = sys.stdin.fileno()
-    _old_term.append(termios.tcgetattr(fd))
-    tty.setraw(fd)
+    old = termios.tcgetattr(fd)
+    _old_term.append(old)
+    new = termios.tcgetattr(fd)
+    # Disable canonical mode, echo, and signal chars on INPUT only
+    new[tty.LFLAG] &= ~(termios.ECHO | termios.ICANON | termios.ISIG)
+    # Read one byte at a time, no timeout
+    new[tty.CC][termios.VMIN] = 1
+    new[tty.CC][termios.VTIME] = 0
+    termios.tcsetattr(fd, termios.TCSADRAIN, new)
 
 
 def _restore_terminal() -> None:
