@@ -9,11 +9,101 @@ from _e3cnc_shared import (
     INSTANCES_DIR, Instance,
 )
 from _e3cnc_deploy import get_current_release, generate_admin_page
-from cli.keyreader import read_key, restore_terminal, enable_echo
+
+# ── Terminal menu library (soft dependency) ────────────────────────────
+
+_has_tui = False
+try:
+    from simple_term_menu import TerminalMenu
+    _has_tui = True
+except ImportError:
+    pass
 
 
 def _interactive_menu() -> None:
     """Display the interactive menu and dispatch user choices."""
+    if sys.stdin.isatty() and _has_tui:
+        _tui_menu()
+    else:
+        _numbered_menu()
+
+
+def _tui_menu() -> None:
+    """Full TUI menu with arrow keys, using simple-term-menu."""
+    from cli.commands import (
+        cmd_check, cmd_install, cmd_deploy, cmd_update, cmd_uninstall,
+        cmd_status, cmd_backup, cmd_restore, cmd_diagnose, cmd_logs,
+        cmd_releases, cmd_rollback, cmd_prune, cmd_instances, cmd_migrate,
+        cmd_detect_mcu, cmd_flash_mcu, cmd_init_config,
+    )
+
+    all_items = [
+        ("[S] Status",         "status",         ""),
+        ("[I] Install",        "install",        ""),
+        ("[D] Deploy",         "deploy",         ""),
+        ("[U] Update",         "update",         ""),
+        ("[X] Uninstall",      "uninstall",      ""),
+        ("---",                "",               ""),
+        ("[D] Detect MCU",     "detect-mcu",     ""),
+        ("[F] Flash MCU",      "flash-mcu",      ""),
+        ("[C] Init Config",    "init-config",    ""),
+        ("---",                "",               ""),
+        ("[N] Create Instance","create-instance",""),
+        ("[R] Releases",       "releases",       ""),
+        ("[B] Rollback",       "rollback",       ""),
+        ("[P] Prune",          "prune",          ""),
+        ("---",                "",               ""),
+        ("[T] Instances",      "instances",      ""),
+        ("[K] Check Deps",     "check",          ""),
+        ("[A] Backup",         "backup",         ""),
+        ("[E] Restore",        "restore",        ""),
+        ("[G] Diagnose",       "diagnose",       ""),
+        ("[L] Logs",           "logs",           ""),
+        ("---",                "",               ""),
+        ("[W] Switch Instance","switch",         ""),
+        ("[Q] Quit",           "quit",           ""),
+    ]
+    entries = [item[0] for item in all_items]
+    cmd_map = {item[0]: item[1] for item in all_items if item[1]}
+    entry_count = len([e for e in entries if e != "---"])
+
+    while True:
+        cur = get_active_instance()
+        label = cur.name if cur and cur.name != "cnc" else "default"
+        config = cur.config_dir if cur else ""
+        title = f"  {TOOL_NAME} v{VERSION}  —  Instance: {label}"
+
+        menu = TerminalMenu(
+            menu_entries=entries,
+            title=title,
+            status_bar=f"  {config}" if config else None,
+            cycle_cursor=True,
+            show_shortcut_hints=True,
+            shortcut_key_highlight_style=("fg_yellow", "bold"),
+            quit_keys=("q", "Q"),
+        )
+
+        choice = menu.show()
+
+        if choice is None:  # Quit
+            ok("Goodbye")
+            break
+
+        entry = entries[choice]
+        cmd = cmd_map.get(entry, "")
+        if cmd == "switch":
+            _switch_instance()
+        elif cmd == "create-instance":
+            _create_instance()
+        elif cmd == "quit":
+            ok("Goodbye")
+            break
+        elif cmd:
+            _run_menu_command(cmd)
+
+
+def _numbered_menu() -> None:
+    """Fallback numbered menu for piped/non-TTY use or when simple-term-menu is missing."""
     from cli.commands import (
         cmd_check, cmd_install, cmd_deploy, cmd_update, cmd_uninstall,
         cmd_status, cmd_backup, cmd_restore, cmd_diagnose, cmd_logs,
@@ -49,19 +139,14 @@ def _interactive_menu() -> None:
     ]
     display = [(l, c) for l, c in all_items if l]
 
-    # Build shortcut map: lowercased bracket content -> command
+    # Build shortcut map
     shortcut_map = {}
     for label, cmd in display:
         if "[" in label and "]" in label:
             key = label[label.index("[") + 1:label.index("]")]
             shortcut_map[key.lower()] = cmd
 
-    cur_idx = 0
-    num_buf = ""
-    has_tty = sys.stdin.isatty()
-
     while True:
-        # ── Render menu ─────────────────────────────────────
         print_banner()
         print(f"  {Style.BOLD}{Style.GREEN}{TOOL_NAME} v{VERSION}{Style.RESET}")
 
@@ -75,155 +160,47 @@ def _interactive_menu() -> None:
         print()
 
         for i, (label, cmd) in enumerate(display):
-            if has_tty and i == cur_idx:
-                print(f"  {Style.GREEN}\u25b6{Style.RESET} {i + 1:>2}) {label}")
-            else:
-                print(f"    {i + 1:>2}) {label}")
+            print(f"  {i + 1:>2}) {label}")
 
         print()
+        try:
+            choice = input(f"  {Style.BOLD}Choice [1-{len(display)}]{Style.RESET} ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            break
 
-        if has_tty:
-            hint = "arrows, enter, or type number/shortcut"
-            if num_buf:
-                hint += f"  [{Style.BOLD}{num_buf}{Style.RESET}]"
-            sys.stdout.write(f"  {Style.DIM}{hint}{Style.RESET}")
-            sys.stdout.flush()
+        if not choice:
+            continue
 
-            # ── Key input loop ────────────────────────────
-            key = read_key()
-
-            if key == "CTRLC":
-                print()
-                break
-
-            if key == "q" or key == "Q":
-                ok("Goodbye")
-                break
-
-            if key == "UP":
-                cur_idx = (cur_idx - 1) % len(display)
-                num_buf = ""
-                # Cursor-up to overwrite prompt line
-                sys.stdout.write("\033[1A\033[2K\r")
-                sys.stdout.flush()
+        # Number
+        try:
+            idx = int(choice) - 1
+            if 0 <= idx < len(display):
+                cmd = display[idx][1]
+                _run_menu_action(cmd)
                 continue
+        except ValueError:
+            pass
 
-            if key == "DOWN":
-                cur_idx = (cur_idx + 1) % len(display)
-                num_buf = ""
-                sys.stdout.write("\033[1A\033[2K\r")
-                sys.stdout.flush()
-                continue
+        # Shortcut
+        if choice.lower() in shortcut_map:
+            _run_menu_action(shortcut_map[choice.lower()])
+            continue
 
-            if key == "ENTER":
-                restore_terminal()
-                # Resolve number buffer if present
-                if num_buf:
-                    try:
-                        idx = int(num_buf) - 1
-                        if 0 <= idx < len(display):
-                            cur_idx = idx
-                        else:
-                            num_buf = ""
-                    except ValueError:
-                        pass
-                num_buf = ""
-                _, cmd = display[cur_idx]
-                if cmd == "quit":
-                    ok("Goodbye")
-                    break
-                if cmd == "switch":
-                    _switch_instance()
-                elif cmd == "create-instance":
-                    _create_instance()
-                else:
-                    _run_menu_command(cmd)
-                continue
+        print(f"  {Style.YELLOW}Invalid choice: {choice}{Style.RESET}")
 
-            if key == "TAB":
-                # Move down one item
-                cur_idx = (cur_idx + 1) % len(display)
-                num_buf = ""
-                sys.stdout.write("\033[1A\033[2K\r")
-                sys.stdout.flush()
-                continue
 
-            # Number input — accumulate digits
-            if key.isdigit():
-                num_buf += key
-                sys.stdout.write("\033[1A\033[2K\r")
-                sys.stdout.flush()
-                continue
-
-            # Try shortcut key
-            restored = False
-            if key.lower() in shortcut_map:
-                cmd = shortcut_map[key.lower()]
-                if cmd == "quit":
-                    ok("Goodbye")
-                    break
-                restore_terminal()
-                restored = True
-                if cmd == "switch":
-                    _switch_instance()
-                elif cmd == "create-instance":
-                    _create_instance()
-                else:
-                    _run_menu_command(cmd)
-                num_buf = ""
-                continue
-
-            # Clear on unknown key
-            num_buf = ""
-            sys.stdout.write("\033[1A\033[2K\r")
-            sys.stdout.flush()
-
-        else:
-            # Non-TTY: use regular input()
-            try:
-                choice = input(f"  {Style.BOLD}Choice [1-{len(display)}]{Style.RESET} ").strip()
-            except (EOFError, KeyboardInterrupt):
-                print()
-                break
-
-            if not choice:
-                continue
-
-            # Number
-            try:
-                idx = int(choice) - 1
-                if 0 <= idx < len(display):
-                    _, cmd = display[idx]
-                    if cmd == "quit":
-                        ok("Goodbye")
-                        break
-                    if cmd == "switch":
-                        _switch_instance()
-                    elif cmd == "create-instance":
-                        _create_instance()
-                    else:
-                        _run_menu_command(cmd)
-                    continue
-            except ValueError:
-                pass
-
-            # Shortcut
-            if choice.lower() in shortcut_map:
-                cmd = shortcut_map[choice.lower()]
-                if cmd == "quit":
-                    ok("Goodbye")
-                    break
-                if cmd == "switch":
-                    _switch_instance()
-                elif cmd == "create-instance":
-                    _create_instance()
-                else:
-                    _run_menu_command(cmd)
-                continue
-
-            print(f"  {Style.YELLOW}Invalid choice: {choice}{Style.RESET}")
-
-    # ── Non-TTY path ───────────────────────────────────────
+def _run_menu_action(cmd: str) -> None:
+    """Dispatch a menu action (switch, create-instance, or command)."""
+    if cmd == "quit":
+        ok("Goodbye")
+        return
+    if cmd == "switch":
+        _switch_instance()
+    elif cmd == "create-instance":
+        _create_instance()
+    else:
+        _run_menu_command(cmd)
 
 
 def _run_menu_command(cmd: str) -> None:
