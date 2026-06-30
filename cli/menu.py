@@ -44,7 +44,7 @@ def _tui_menu() -> None:
         ("[U] Update",         "update",         ""),
         ("[X] Uninstall",      "uninstall",      ""),
         ("---",                "",               ""),
-        ("[D] Detect MCU",     "detect-mcu",     ""),
+        ("[M] Detect MCU",     "detect-mcu",     ""),
         ("[F] Flash MCU",      "flash-mcu",      ""),
         ("[C] Init Config",    "init-config",    ""),
         ("---",                "",               ""),
