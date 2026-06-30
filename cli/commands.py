@@ -1,5 +1,6 @@
 """Command handlers for the E3CNC CLI."""
 
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -75,6 +76,25 @@ def cmd_install(args) -> None:
         info(f"Installing instance: {Style.BOLD}{args.name}{Style.RESET}")
     else:
         inst = _get_instance(args)
+        # No existing instances detected — prompt for a name
+        if not inst and sys.stdin.isatty():
+            print()
+            try:
+                prompt = f"  {Style.BOLD}Name this machine [default]: {Style.RESET}"
+                raw = input(prompt).strip()
+            except (EOFError, KeyboardInterrupt):
+                raw = ""
+            name = raw or "default"
+            name = re.sub(r"[^a-z0-9-]", "", name.lower().replace(" ", "-")) or "default"
+            info(f"Creating instance: {Style.BOLD}{name}{Style.RESET}")
+            inst = Instance.from_name(name)
+            set_active_instance(inst)
+        elif not inst:
+            # Non-interactive and no instance — use default
+            name = "default"
+            info(f"Using instance: {Style.BOLD}default{Style.RESET}")
+            inst = Instance.from_name("default")
+            set_active_instance(inst)
 
     header("Prerequisites")
     _require_ansible()
