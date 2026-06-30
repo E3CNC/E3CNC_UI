@@ -328,10 +328,12 @@ def cmd_instances(args) -> None:
 
     for inst in insts:
         dot = "\033[32m\u25cf\033[0m" if inst.is_running else "\033[90m\u25cb\033[0m"
+        web = "" if inst.web_port == 80 else f":{inst.web_port}"
         print(f"  {dot} {Style.BOLD}{inst.name}{Style.RESET}")
         print(f"      Config:     {inst.config_dir}")
         print(f"      Services:   {inst.moonraker_service}, {inst.klipper_service}")
-        print(f"      Port:       {inst.moonraker_port}")
+        print(f"      API:        http://<host>:{inst.moonraker_port}/server/info")
+        print(f"      Web UI:     http://<host>{web}/")
         print(f"      Web root:   {inst.web_root}")
         print(f"      Data:       {inst.printer_data_dir}")
         print(f"      Release:    {release_ver}")
