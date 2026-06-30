@@ -443,10 +443,10 @@ def run_health_checks(inst: Optional[Instance] = None) -> List[HealthCheckResult
 def _check_service(service_name: str) -> HealthCheckResult:
     """Check if a service is active (supervisor first, then systemd)."""
     for attempt in range(HEALTH_CHECK_RETRIES):
-        # Try supervisor first
+        # Try supervisor first (needs sudo for the unix socket)
         if shutil.which("supervisorctl"):
             result = subprocess.run(
-                ["supervisorctl", "status", service_name],
+                ["sudo", "supervisorctl", "status", service_name],
                 capture_output=True, text=True, timeout=5,
             )
             if "RUNNING" in result.stdout:
