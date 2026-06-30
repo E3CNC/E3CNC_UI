@@ -1356,12 +1356,8 @@ def generate_admin_page() -> None:
     ADMIN_PAGE_DIR.mkdir(parents=True, exist_ok=True)
 
     instances = detect_instances()
-    hostname = socket.gethostname()
-    # Use IP address for URLs (more reliable than mDNS hostname)
-    try:
-        ip = socket.gethostbyname(hostname)
-    except Exception:
-        ip = hostname
+    # Get local IP address (reliable, works even if hostname resolves to 127.0.0.1)
+    ip = _get_local_ip()
     current = get_current_release()
 
     cards = ""
@@ -1465,3 +1461,21 @@ def generate_admin_page() -> None:
 
     (ADMIN_PAGE_DIR / "index.html").write_text(html)
     ok("Admin page generated")
+
+
+def _get_local_ip() -> str:
+    """Get the primary local network IP address.
+
+    Uses a UDP socket to 8.8.8.8 to determine the default interface IP.
+    This is reliable even when gethostbyname(hostname) returns 127.0.0.1.
+    """
+    import socket as _socket
+    try:
+        s = _socket.socket(_socket.AF_INET, _socket.SOCK_DGRAM)
+        s.settimeout(3)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "127.0.0.1"
