@@ -575,35 +575,117 @@ def detect_instances() -> List[Instance]:
 
 def select_instance(instances: List[Instance]) -> Optional[Instance]:
     """Pick an instance interactively, or return the only one."""
+    import re as _re
+
     if not instances:
         return None
     if len(instances) == 1:
         return instances[0]
 
-    print()
-    print(f"  {Style.BOLD}Multiple instances detected:{Style.RESET}")
-    print()
-    for i, inst in enumerate(instances):
-        dot = "\x1b[32m\u25cf\x1b[0m" if inst.is_running else "\x1b[90m\u25cb\x1b[0m"
-        print(f"  {i + 1:>2}) {dot} {Style.BOLD}{inst.name}{Style.RESET}")
-        print(f"      Config: {inst.config_dir}")
-        print(f"      Service: {inst.moonraker_service}  Port: {inst.moonraker_port}")
+    while True:
+        print()
+        print(f"  {Style.BOLD}Multiple instances detected:{Style.RESET}")
+        print()
+        for i, inst in enumerate(instances):
+            dot = "\x1b[32m\u25cf\x1b[0m" if inst.is_running else "\x1b[90m\u25cb\x1b[0m"
+            print(f"  {i + 1:>2}) {dot} {Style.BOLD}{inst.name}{Style.RESET}")
+            print(f"      Config: {inst.config_dir}")
+            print(f"      Service: {inst.moonraker_service}  Port: {inst.moonraker_port}")
+            print()
+
+        create_idx = len(instances) + 1
+        print(f"  {create_idx:>2}) + Create new instance")
         print()
 
-    try:
-        choice = input(f"  {Style.BOLD}Choose instance [1-{len(instances)}]{Style.RESET} ").strip()
-    except (EOFError, KeyboardInterrupt):
-        print()
-        return None
+        try:
+            choice = input(f"  {Style.BOLD}Choose instance [1-{create_idx}]{Style.RESET} ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            return None
 
-    try:
-        idx = int(choice) - 1
-        if 0 <= idx < len(instances):
-            return instances[idx]
-    except ValueError:
-        pass
+        if choice == str(create_idx):
+            # Create a new instance
+            print()
+            try:
+                raw = input(f"  {Style.BOLD}Instance name: {Style.RESET}").strip()
+            except (EOFError, KeyboardInterrupt):
+                print()
+                continue
 
-    return instances[0]
+            name = _re.sub(r"[^a-z0-9-]", "", raw.lower().replace(" ", "-"))
+            if not name:
+                warn("Invalid name — use lowercase letters, numbers, and hyphens")
+                continue
+
+            if (INSTANCES_DIR / name).exists():
+                warn(f"Instance '{name}' already exists")
+                continue
+
+            new_inst = Instance.from_name(name)
+
+            # Create directory structure
+            data = INSTANCES_DIR / name / "data"
+            frontend = INSTANCES_DIR / name / "frontend"
+            for subdir in ["config", "config/E3CNC/macros", "logs", "database", "comms", "scripts", "gcodes"]:
+                (data / subdir).mkdir(parents=True, exist_ok=True)
+            frontend.mkdir(parents=True, exist_ok=True)
+
+            # Find available port
+            used_ports = {inst.moonraker_port for inst in instances}
+            port = 7125
+            while port in used_ports:
+                port += 1
+
+            conf_path = data / "config" / "moonraker.conf"
+            conf_path.write_text(f"""[server]
+host: 0.0.0.0
+port: {port}
+klippy_uds_address: {data / 'comms' / 'klippy.sock'}
+
+[file_manager]
+config_path: {data / 'config'}
+
+[database]
+database_path: {data / 'database'}
+
+[authorization]
+cors_domains:
+    *
+trusted_clients:
+    127.0.0.1
+    ::1
+
+[cnc_agent]
+
+[cnc_metadata]
+extractor_path: {data / 'scripts' / 'cnc_metadata_extractor.py'}
+timeout: 30
+""")
+
+            printer_cfg = data / "config" / "printer.cfg"
+            printer_cfg.write_text("# E3CNC bootstrap placeholder printer.cfg\n")
+
+            # Recreate new_inst with correct port and running state
+            new_inst = Instance.from_name(name)
+
+            try:
+                from _e3cnc_deploy import generate_admin_page
+                generate_admin_page()
+            except ImportError:
+                pass
+
+            ok(f"Instance '{name}' created (port {port})")
+            print()
+            return new_inst
+
+        try:
+            idx = int(choice) - 1
+            if 0 <= idx < len(instances):
+                return instances[idx]
+        except ValueError:
+            pass
+
+        warn(f"Invalid choice: {choice}")
 
 
 def get_active_instance() -> Optional[Instance]:
