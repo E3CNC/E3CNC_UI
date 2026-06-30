@@ -9,6 +9,7 @@ from _e3cnc_shared import (
     INSTANCES_DIR, Instance,
 )
 from _e3cnc_deploy import get_current_release, generate_admin_page
+from cli.keyreader import read_key, restore_terminal, enable_echo
 
 
 def _interactive_menu() -> None:
@@ -48,15 +49,19 @@ def _interactive_menu() -> None:
     ]
     display = [(l, c) for l, c in all_items if l]
 
-    # Build shortcut map from bracket content
+    # Build shortcut map: lowercased bracket content -> command
     shortcut_map = {}
     for label, cmd in display:
         if "[" in label and "]" in label:
             key = label[label.index("[") + 1:label.index("]")]
             shortcut_map[key.lower()] = cmd
-            shortcut_map[key.upper()] = cmd
+
+    cur_idx = 0
+    num_buf = ""
+    has_tty = sys.stdin.isatty()
 
     while True:
+        # ── Render menu ─────────────────────────────────────
         print_banner()
         print(f"  {Style.BOLD}{Style.GREEN}{TOOL_NAME} v{VERSION}{Style.RESET}")
 
@@ -70,23 +75,60 @@ def _interactive_menu() -> None:
         print()
 
         for i, (label, cmd) in enumerate(display):
-            print(f"  {i + 1:>2}) {label}")
+            if has_tty and i == cur_idx:
+                print(f"  {Style.GREEN}\u25b6{Style.RESET} {i + 1:>2}) {label}")
+            else:
+                print(f"    {i + 1:>2}) {label}")
 
         print()
-        try:
-            choice = input(f"  {Style.BOLD}Choice [1-{len(display)}]{Style.RESET} ").strip()
-        except (EOFError, KeyboardInterrupt):
-            print()
-            break
 
-        if not choice:
-            continue
+        if has_tty:
+            hint = "arrows, enter, or type number/shortcut"
+            if num_buf:
+                hint += f"  [{Style.BOLD}{num_buf}{Style.RESET}]"
+            sys.stdout.write(f"  {Style.DIM}{hint}{Style.RESET}")
+            sys.stdout.flush()
 
-        # Try number
-        try:
-            idx = int(choice) - 1
-            if 0 <= idx < len(display):
-                _, cmd = display[idx]
+            # ── Key input loop ────────────────────────────
+            key = read_key()
+
+            if key == "CTRLC":
+                print()
+                break
+
+            if key == "q" or key == "Q":
+                ok("Goodbye")
+                break
+
+            if key == "UP":
+                cur_idx = (cur_idx - 1) % len(display)
+                num_buf = ""
+                # Cursor-up to overwrite prompt line
+                sys.stdout.write("\033[1A\033[2K\r")
+                sys.stdout.flush()
+                continue
+
+            if key == "DOWN":
+                cur_idx = (cur_idx + 1) % len(display)
+                num_buf = ""
+                sys.stdout.write("\033[1A\033[2K\r")
+                sys.stdout.flush()
+                continue
+
+            if key == "ENTER":
+                restore_terminal()
+                # Resolve number buffer if present
+                if num_buf:
+                    try:
+                        idx = int(num_buf) - 1
+                        if 0 <= idx < len(display):
+                            cur_idx = idx
+                        else:
+                            num_buf = ""
+                    except ValueError:
+                        pass
+                num_buf = ""
+                _, cmd = display[cur_idx]
                 if cmd == "quit":
                     ok("Goodbye")
                     break
@@ -97,24 +139,91 @@ def _interactive_menu() -> None:
                 else:
                     _run_menu_command(cmd)
                 continue
-        except ValueError:
-            pass
 
-        # Try shortcut key
-        if choice in shortcut_map:
-            cmd = shortcut_map[choice]
-            if cmd == "quit":
-                ok("Goodbye")
+            if key == "TAB":
+                # Move down one item
+                cur_idx = (cur_idx + 1) % len(display)
+                num_buf = ""
+                sys.stdout.write("\033[1A\033[2K\r")
+                sys.stdout.flush()
+                continue
+
+            # Number input — accumulate digits
+            if key.isdigit():
+                num_buf += key
+                sys.stdout.write("\033[1A\033[2K\r")
+                sys.stdout.flush()
+                continue
+
+            # Try shortcut key
+            restored = False
+            if key.lower() in shortcut_map:
+                cmd = shortcut_map[key.lower()]
+                if cmd == "quit":
+                    ok("Goodbye")
+                    break
+                restore_terminal()
+                restored = True
+                if cmd == "switch":
+                    _switch_instance()
+                elif cmd == "create-instance":
+                    _create_instance()
+                else:
+                    _run_menu_command(cmd)
+                num_buf = ""
+                continue
+
+            # Clear on unknown key
+            num_buf = ""
+            sys.stdout.write("\033[1A\033[2K\r")
+            sys.stdout.flush()
+
+        else:
+            # Non-TTY: use regular input()
+            try:
+                choice = input(f"  {Style.BOLD}Choice [1-{len(display)}]{Style.RESET} ").strip()
+            except (EOFError, KeyboardInterrupt):
+                print()
                 break
-            if cmd == "switch":
-                _switch_instance()
-            elif cmd == "create-instance":
-                _create_instance()
-            else:
-                _run_menu_command(cmd)
-            continue
 
-        print(f"  {Style.YELLOW}Invalid choice: {choice}{Style.RESET}")
+            if not choice:
+                continue
+
+            # Number
+            try:
+                idx = int(choice) - 1
+                if 0 <= idx < len(display):
+                    _, cmd = display[idx]
+                    if cmd == "quit":
+                        ok("Goodbye")
+                        break
+                    if cmd == "switch":
+                        _switch_instance()
+                    elif cmd == "create-instance":
+                        _create_instance()
+                    else:
+                        _run_menu_command(cmd)
+                    continue
+            except ValueError:
+                pass
+
+            # Shortcut
+            if choice.lower() in shortcut_map:
+                cmd = shortcut_map[choice.lower()]
+                if cmd == "quit":
+                    ok("Goodbye")
+                    break
+                if cmd == "switch":
+                    _switch_instance()
+                elif cmd == "create-instance":
+                    _create_instance()
+                else:
+                    _run_menu_command(cmd)
+                continue
+
+            print(f"  {Style.YELLOW}Invalid choice: {choice}{Style.RESET}")
+
+    # ── Non-TTY path ───────────────────────────────────────
 
 
 def _run_menu_command(cmd: str) -> None:
