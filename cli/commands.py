@@ -321,6 +321,9 @@ def cmd_instances(args) -> None:
         info("Install one with: e3cnc-cli install --name <name>")
         return
 
+    from _e3cnc_deploy import _get_local_ip
+    ip = _get_local_ip()
+
     # Check for current release version
     from _e3cnc_deploy import get_current_release
     current = get_current_release()
@@ -332,8 +335,8 @@ def cmd_instances(args) -> None:
         print(f"  {dot} {Style.BOLD}{inst.name}{Style.RESET}")
         print(f"      Config:     {inst.config_dir}")
         print(f"      Services:   {inst.moonraker_service}, {inst.klipper_service}")
-        print(f"      API:        http://<host>:{inst.moonraker_port}/server/info")
-        print(f"      Web UI:     http://<host>{web}/")
+        print(f"      API:        http://{ip}:{inst.moonraker_port}/server/info")
+        print(f"      Web UI:     http://{ip}{web}/")
         print(f"      Web root:   {inst.web_root}")
         print(f"      Data:       {inst.printer_data_dir}")
         print(f"      Release:    {release_ver}")
@@ -502,16 +505,16 @@ def cmd_status(args) -> None:
 
     # Show access URL
     if inst:
-        import socket
-        hostname = socket.gethostname()
+        from _e3cnc_deploy import _get_local_ip
+        ip = _get_local_ip()
         port = inst.moonraker_port
         web = inst.web_port
         if web == 80:
-            print(f"\n  {Style.GREEN}Web UI:{Style.RESET}     http://{hostname}/")
+            print(f"\n  {Style.GREEN}Web UI:{Style.RESET}     http://{ip}/")
         else:
-            print(f"\n  {Style.GREEN}Web UI:{Style.RESET}     http://{hostname}:{web}/")
-        print(f"  {Style.GREEN}Admin:{Style.RESET}      http://{hostname}/admin")
-        print(f"  {Style.GREEN}API:{Style.RESET}        http://{hostname}:{port}/server/info")
+            print(f"\n  {Style.GREEN}Web UI:{Style.RESET}     http://{ip}:{web}/")
+        print(f"  {Style.GREEN}Admin:{Style.RESET}      http://{ip}/admin")
+        print(f"  {Style.GREEN}API:{Style.RESET}        http://{ip}:{port}/server/info")
 
 
 def cmd_backup(args) -> None:
