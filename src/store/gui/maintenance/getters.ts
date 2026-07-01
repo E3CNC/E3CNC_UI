@@ -3,7 +3,7 @@ import type { GuiMaintenanceState, GuiMaintenanceStateEntry } from '@/store/gui/
 import { RootState } from '@/store/types'
 
 export const getters: GetterTree<GuiMaintenanceState, RootState> = {
-    getEntries: (state) => {
+    getEntries: (state: GuiMaintenanceState) => {
         const entries: GuiMaintenanceStateEntry[] = []
 
         Object.keys(state.entries).forEach((id: string) => {
@@ -13,7 +13,7 @@ export const getters: GetterTree<GuiMaintenanceState, RootState> = {
         return entries
     },
 
-    getOverdueEntries: (state, getters, rootState) => {
+    getOverdueEntries: (state: GuiMaintenanceState, getters: any, rootState: RootState) => {
         const currentTotalPrintTime = rootState.server?.history?.job_totals.total_print_time ?? 0
         const currentTotalFilamentUsed = rootState.server?.history?.job_totals.total_filament_used ?? 0
         const currentDate = new Date().getTime() / 1000

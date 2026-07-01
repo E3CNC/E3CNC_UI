@@ -92,37 +92,37 @@ describe('ToolSlider.vue', () => {
     }
 
     it('renders label', () => {
-        const wrapper = mountComponent({ icon: 'mdi-speedometer' })
+        const wrapper: any = mountComponent({ icon: 'mdi-speedometer' })
         expect(wrapper.text()).toContain('Speed')
     })
 
     it('renders value with unit', () => {
-        const wrapper = mountComponent()
+        const wrapper: any = mountComponent()
         expect(wrapper.text()).toContain('100')
         expect(wrapper.text()).toContain('mm/min')
     })
 
     it('tracks target prop in _value', async () => {
-        const wrapper = mountComponent({ target: 200 })
-        expect(wrapper.vm._value).toBe(200)
+        const wrapper: any = mountComponent({ target: 200 })
+        expect((wrapper.vm as any)._value).toBe(200)
         await wrapper.setProps({ target: 300 })
-        expect(wrapper.vm._value).toBe(300)
+        expect((wrapper.vm as any)._value).toBe(300)
     })
 
     it('applies multi scale to target', () => {
-        const wrapper = mountComponent({ target: 50, multi: 2 })
-        expect(wrapper.vm._value).toBe(100)
+        const wrapper: any = mountComponent({ target: 50, multi: 2 })
+        expect((wrapper.vm as any)._value).toBe(100)
     })
 
     it('sendCmd dispatches and emits', () => {
         const store = createStore({ state: { gui: { uiSettings: {} } } })
         const dispatchSpy = vi.spyOn(store, 'dispatch')
-        const wrapper = shallowMount(ToolSlider, {
+        const wrapper: any = shallowMount(ToolSlider, {
             props: baseProps,
             global: { plugins: [store], mocks: { $t: (k: string) => k }, stubs: vuetifyStubs },
         })
-        wrapper.vm._value = 150
-        wrapper.vm.sendCmd()
+        (wrapper.vm as any)._value = 150
+        (wrapper.vm as any).sendCmd()
         expect(dispatchSpy).toHaveBeenCalledWith('server/addEvent', { message: 'G1 F150', type: 'command' })
         expect(mockSocketEmit).toHaveBeenCalledWith('printer.gcode.script', { script: 'G1 F150' })
     })
@@ -130,102 +130,102 @@ describe('ToolSlider.vue', () => {
     it('sendCmd uses attributeScale', () => {
         const store = createStore({ state: { gui: { uiSettings: {} } } })
         const dispatchSpy = vi.spyOn(store, 'dispatch')
-        const wrapper = shallowMount(ToolSlider, {
+        const wrapper: any = shallowMount(ToolSlider, {
             props: { ...baseProps, attributeName: 'F', attributeScale: 60 },
             global: { plugins: [store], mocks: { $t: (k: string) => k }, stubs: vuetifyStubs },
         })
-        wrapper.vm._value = 2
-        wrapper.vm.sendCmd()
+        (wrapper.vm as any)._value = 2
+        (wrapper.vm as any).sendCmd()
         expect(dispatchSpy).toHaveBeenCalledWith('server/addEvent', { message: 'G1 F120', type: 'command' })
     })
 
     it('increment increases _value', () => {
-        const wrapper = mountComponent()
-        wrapper.vm._value = 100
-        wrapper.vm.increment()
-        expect(wrapper.vm._value).toBe(101)
+        const wrapper: any = mountComponent()
+        (wrapper.vm as any)._value = 100
+        (wrapper.vm as any).increment()
+        expect((wrapper.vm as any)._value).toBe(101)
     })
 
     it('decrement decreases _value', () => {
-        const wrapper = mountComponent()
-        wrapper.vm._value = 100
-        wrapper.vm.decrement()
-        expect(wrapper.vm._value).toBe(99)
+        const wrapper: any = mountComponent()
+        (wrapper.vm as any)._value = 100
+        (wrapper.vm as any).decrement()
+        expect((wrapper.vm as any)._value).toBe(99)
     })
 
     it('increment clamps at processedMax when not dynamic', () => {
-        const wrapper = mountComponent({ max: 100 })
-        wrapper.vm._value = 100
-        wrapper.vm.increment()
-        expect(wrapper.vm._value).toBe(100)
+        const wrapper: any = mountComponent({ max: 100 })
+        (wrapper.vm as any)._value = 100
+        (wrapper.vm as any).increment()
+        expect((wrapper.vm as any)._value).toBe(100)
     })
 
     it('decrement clamps at min', () => {
-        const wrapper = mountComponent({ min: 0 })
-        wrapper.vm._value = 0
-        wrapper.vm.decrement()
-        expect(wrapper.vm._value).toBe(0)
+        const wrapper: any = mountComponent({ min: 0 })
+        (wrapper.vm as any)._value = 0
+        (wrapper.vm as any).decrement()
+        expect((wrapper.vm as any)._value).toBe(0)
     })
 
     it('resetSlider resets to defaultValue', () => {
-        const wrapper = mountComponent({ defaultValue: 50, max: 100 })
-        wrapper.vm._value = 200
-        wrapper.vm.resetSlider()
-        expect(wrapper.vm._value).toBe(50)
+        const wrapper: any = mountComponent({ defaultValue: 50, max: 100 })
+        (wrapper.vm as any)._value = 200
+        (wrapper.vm as any).resetSlider()
+        expect((wrapper.vm as any)._value).toBe(50)
     })
 
     it('colorBar is warning when _value exceeds max', () => {
-        const wrapper = mountComponent({ max: 100 })
-        wrapper.vm._value = 150
-        expect(wrapper.vm.colorBar).toBe('warning')
+        const wrapper: any = mountComponent({ max: 100 })
+        (wrapper.vm as any)._value = 150
+        expect((wrapper.vm as any).colorBar).toBe('warning')
     })
 
     it('colorBar is primary when _value within max', () => {
-        const wrapper = mountComponent({ max: 100 })
-        wrapper.vm._value = 50
-        expect(wrapper.vm.colorBar).toBe('primary')
+        const wrapper: any = mountComponent({ max: 100 })
+        (wrapper.vm as any)._value = 50
+        expect((wrapper.vm as any).colorBar).toBe('primary')
     })
 
     it('hasInputField renders input field', () => {
-        const wrapper = mountComponent({ hasInputField: true })
+        const wrapper: any = mountComponent({ hasInputField: true })
         expect(wrapper.find('.v-text-field-stub').exists()).toBe(true)
     })
 
     it('submitInput with valid value sends cmd', () => {
         const store = createStore({ state: { gui: { uiSettings: {} } } })
         const dispatchSpy = vi.spyOn(store, 'dispatch')
-        const wrapper = shallowMount(ToolSlider, {
+        const wrapper: any = shallowMount(ToolSlider, {
             props: { ...baseProps, hasInputField: true },
             global: { plugins: [store], mocks: { $t: (k: string) => k }, stubs: vuetifyStubs },
         })
-        wrapper.vm.numInput = 200
-        wrapper.vm.submitInput()
+        (wrapper.vm as any).numInput = 200
+        (wrapper.vm as any).submitInput()
         expect(dispatchSpy).toHaveBeenCalled()
     })
 
     it('submitInput with error does not send cmd', () => {
         const store = createStore({ state: { gui: { uiSettings: {} } } })
         const dispatchSpy = vi.spyOn(store, 'dispatch')
-        const wrapper = shallowMount(ToolSlider, {
+        const wrapper: any = shallowMount(ToolSlider, {
             props: { ...baseProps, hasInputField: true, min: 0 },
             global: { plugins: [store], mocks: { $t: (k: string) => k }, stubs: vuetifyStubs },
         })
-        wrapper.vm.numInput = -5
-        wrapper.vm.submitInput()
+        (wrapper.vm as any).numInput = -5
+        (wrapper.vm as any).submitInput()
         expect(dispatchSpy).not.toHaveBeenCalled()
     })
 
     it('lock button locks when lockSliders and isTouchDevice', () => {
         mockIsTouchDevice.value = true
-        const wrapper = mountComponent({}, { gui: { uiSettings: { lockSlidersOnTouchDevices: true } } })
-        expect(wrapper.vm.isLocked).toBe(true)
+        const wrapper: any = mountComponent({}, { gui: { uiSettings: { lockSlidersOnTouchDevices: true } } })
+        expect((wrapper.vm as any).isLocked).toBe(true)
     })
 
     it('checkInvalidChars blocks e/E/+', () => {
-        const wrapper = mountComponent()
+        const wrapper: any = mountComponent()
         const e = new KeyboardEvent('keydown', { key: 'e' })
         const spy = vi.spyOn(e, 'preventDefault')
-        wrapper.vm.checkInvalidChars(e)
+        (wrapper.vm as any).checkInvalidChars(e)
         expect(spy).toHaveBeenCalled()
     })
 })

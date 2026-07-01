@@ -1,13 +1,13 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import type { FarmPrinterState } from '@/store/farm/printer/types'
 import { RootState } from '@/store/types'
 
 export const actions: ActionTree<FarmPrinterState, RootState> = {
-    reset({ commit }) {
+    reset({ commit }: ActionContext<FarmPrinterState, RootState>) {
         commit('reset')
     },
 
-    connect({ state, commit, dispatch, getters, rootGetters }) {
+    connect({ state, commit, dispatch, getters, rootGetters: any }: ActionContext<FarmPrinterState, RootState>) {
         commit('setSocketData', { isConnecting: true })
         const socket = new WebSocket(getters.getSocketUrl)
 
@@ -89,12 +89,12 @@ export const actions: ActionTree<FarmPrinterState, RootState> = {
         }
     },
 
-    reconnect({ state, dispatch }) {
+    reconnect({ state, dispatch }: ActionContext<FarmPrinterState, RootState>) {
         if (state.socket.instance) state.socket.instance.close()
         dispatch('connect')
     },
 
-    sendObj({ state, commit }, payload) {
+    sendObj({ state, commit }: ActionContext<FarmPrinterState, RootState>, payload: any) {
         if (state.socket.instance && state.socket.instance.readyState === WebSocket.OPEN) {
             const id = Math.floor(Math.random() * 10000) + 1
 
@@ -116,21 +116,21 @@ export const actions: ActionTree<FarmPrinterState, RootState> = {
         }
     },
 
-    connectKlippy({ commit, dispatch }) {
+    connectKlippy({ commit, dispatch }: ActionContext<FarmPrinterState, RootState>) {
         commit('setKlippyConnected', true)
         dispatch('initPrinter')
     },
 
-    disconnectKlippy({ commit }) {
+    disconnectKlippy({ commit }: ActionContext<FarmPrinterState, RootState>) {
         commit('setKlippyConnected', false)
     },
 
-    getServerInfo({ commit, dispatch }, payload) {
+    getServerInfo({ commit, dispatch }: ActionContext<FarmPrinterState, RootState>, payload: any) {
         commit('setKlippyConnected', payload.klippy_connected)
         dispatch('initPrinter')
     },
 
-    initPrinter({ state, commit, dispatch }) {
+    initPrinter({ state, commit, dispatch }: ActionContext<FarmPrinterState, RootState>) {
         commit('resetData')
 
         if (state.server.klippy_connected) {
@@ -152,7 +152,7 @@ export const actions: ActionTree<FarmPrinterState, RootState> = {
         })
     },
 
-    getObjectsList({ dispatch }, payload) {
+    getObjectsList({ dispatch }: ActionContext<FarmPrinterState, RootState>, payload: any) {
         const allowed = [
             'webhooks',
             'print_stats',
@@ -186,7 +186,7 @@ export const actions: ActionTree<FarmPrinterState, RootState> = {
             })
     },
 
-    getData({ commit, dispatch }, payload) {
+    getData({ commit, dispatch }: ActionContext<FarmPrinterState, RootState>, payload: any) {
         const data = 'status' in payload ? { ...payload.status } : { ...payload }
         commit('setData', data)
 
@@ -199,7 +199,7 @@ export const actions: ActionTree<FarmPrinterState, RootState> = {
         }
     },
 
-    setSettings({ commit, dispatch, state }, payload) {
+    setSettings({ commit, dispatch, state }: ActionContext<FarmPrinterState, RootState>, payload: any) {
         commit('setSettings', payload)
         dispatch(
             'gui/remoteprinters/updateSettings',
@@ -211,15 +211,15 @@ export const actions: ActionTree<FarmPrinterState, RootState> = {
         )
     },
 
-    getMetadataCurrentFile({ commit }, payload) {
+    getMetadataCurrentFile({ commit }: ActionContext<FarmPrinterState, RootState>, payload: any) {
         commit('setCurrentFile', payload)
     },
 
-    getConfigDir({ commit }, payload) {
+    getConfigDir({ commit }: ActionContext<FarmPrinterState, RootState>, payload: any) {
         commit('setConfigDir', payload)
     },
 
-    getDatabases({ commit, dispatch }, payload) {
+    getDatabases({ commit, dispatch }: ActionContext<FarmPrinterState, RootState>, payload: any) {
         commit('setDatabases', payload.namespaces)
 
         if (payload.namespaces.includes('mainsail')) {
@@ -236,11 +236,11 @@ export const actions: ActionTree<FarmPrinterState, RootState> = {
         })
     },
 
-    getMainsailData({ commit }, payload) {
+    getMainsailData({ commit }: ActionContext<FarmPrinterState, RootState>, payload: any) {
         commit('setMainsailData', payload.value)
     },
 
-    getWebcamsData({ commit }, payload) {
+    getWebcamsData({ commit }: ActionContext<FarmPrinterState, RootState>, payload: any) {
         commit('setWebcamsData', payload.webcams)
     },
 }

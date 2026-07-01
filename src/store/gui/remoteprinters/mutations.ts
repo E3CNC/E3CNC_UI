@@ -3,15 +3,15 @@ import { MutationTree } from 'vuex'
 import { GuiRemoteprintersState } from '@/store/gui/remoteprinters/types'
 
 export const mutations: MutationTree<GuiRemoteprintersState> = {
-    reset(state) {
+    reset(state: GuiRemoteprintersState) {
         Object.assign(state, getDefaultState())
     },
 
-    store(state, payload) {
+    store(state: GuiRemoteprintersState, payload: any) {
         state.printers[payload.id] = payload.values
     },
 
-    update(state, payload) {
+    update(state: GuiRemoteprintersState, payload: any) {
         if (payload.id in state.printers) {
             const preset = { ...state.printers[payload.id] }
             Object.assign(preset, payload.values)
@@ -20,7 +20,7 @@ export const mutations: MutationTree<GuiRemoteprintersState> = {
         }
     },
 
-    delete(state, payload) {
+    delete(state: GuiRemoteprintersState, payload: any) {
         if (payload in state.printers) {
             delete state.printers[payload]
         }

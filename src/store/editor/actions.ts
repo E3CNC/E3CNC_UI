@@ -1,4 +1,4 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { EditorState } from '@/store/editor/types'
 import { RootState } from '@/store/types'
 import axios from 'axios'
@@ -9,7 +9,7 @@ import { getSocket, $toast } from '@/store/runtime'
 import { escapePath, formatFilesize, windowBeforeUnloadFunction } from '@/plugins/helpers'
 
 export const actions: ActionTree<EditorState, RootState> = {
-    reset({ commit }) {
+    reset({ commit }: ActionContext<EditorState, RootState>) {
         commit('reset')
     },
 
@@ -25,7 +25,7 @@ export const actions: ActionTree<EditorState, RootState> = {
         })
     },
 
-    openFile({ state, dispatch, commit, rootGetters }, payload) {
+    openFile({ state, dispatch, commit, rootGetters }: ActionContext<EditorState, RootState>, payload: any) {
         const fullFilepathArray = []
         fullFilepathArray.push(payload.root)
         let path = payload.path
@@ -75,7 +75,7 @@ export const actions: ActionTree<EditorState, RootState> = {
     },
 
     async saveFile(
-        { state, commit, getters, rootGetters, dispatch },
+        { state, commit, getters, rootGetters: any, dispatch },
         payload: { content: string; restartServiceName: string | null }
     ) {
         const content = new Blob([payload.content], { type: 'text/plain' })
@@ -127,7 +127,7 @@ export const actions: ActionTree<EditorState, RootState> = {
         }
     },
 
-    cancelLoad({ state, commit, dispatch }) {
+    cancelLoad({ state, commit, dispatch }: ActionContext<EditorState, RootState>) {
         if (state.cancelToken) {
             state.cancelToken.cancel('User canceled upload/download')
             commit('updateCancelTokenSource', null)
@@ -135,7 +135,7 @@ export const actions: ActionTree<EditorState, RootState> = {
         }
     },
 
-    clearLoader({ commit }) {
+    clearLoader({ commit }: ActionContext<EditorState, RootState>) {
         commit('updateLoaderState', false)
         commit('updateLoader', {
             direction: 'downloading',
@@ -145,13 +145,13 @@ export const actions: ActionTree<EditorState, RootState> = {
         })
     },
 
-    close({ commit }) {
+    close({ commit }: ActionContext<EditorState, RootState>) {
         commit('reset')
 
         window.removeEventListener('beforeunload', windowBeforeUnloadFunction)
     },
 
-    updateSourcecode({ commit }, payload) {
+    updateSourcecode({ commit }: ActionContext<EditorState, RootState>, payload: any) {
         commit('updateSourcecode', payload)
     },
 }

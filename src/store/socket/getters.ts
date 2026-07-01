@@ -3,7 +3,7 @@ import { SocketState } from '@/store/socket/types'
 import { RootState } from '@/store/types'
 
 export const getters: GetterTree<SocketState, RootState> = {
-    getUrl: (state) => {
+    getUrl: (state: SocketState) => {
         const port = state.port !== 80 ? ':' + state.port : ''
         let path = '/' + state.path.replace(/^\/|\/$/g, '')
 
@@ -13,13 +13,13 @@ export const getters: GetterTree<SocketState, RootState> = {
         return `//${state.hostname}${port}${path}`
     },
 
-    getHostUrl: (state) => {
+    getHostUrl: (state: SocketState) => {
         const protocol = state.protocol === 'wss' ? 'https' : 'http'
 
         return `${protocol}://${state.hostname}/`
     },
 
-    getWebsocketUrl: (state, getters) => {
+    getWebsocketUrl: (state: SocketState, getters: any) => {
         return state.protocol + ':' + getters['getUrl'] + '/websocket'
     },
 }

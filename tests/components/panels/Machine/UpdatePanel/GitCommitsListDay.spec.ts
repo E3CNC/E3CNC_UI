@@ -45,7 +45,7 @@ describe('GitCommitsListDay.vue', () => {
     }
 
     it('renders without crashing', () => {
-        const wrapper = mount(GitCommitsListDay, {
+        const wrapper: any = mount(GitCommitsListDay, {
             props: {
                 groupedCommits: mockGroupedCommits,
                 repo: mockRepo,
@@ -58,7 +58,7 @@ describe('GitCommitsListDay.vue', () => {
     })
 
     it('renders the date header', () => {
-        const wrapper = mount(GitCommitsListDay, {
+        const wrapper: any = mount(GitCommitsListDay, {
             props: {
                 groupedCommits: mockGroupedCommits,
                 repo: mockRepo,
@@ -71,7 +71,7 @@ describe('GitCommitsListDay.vue', () => {
     })
 
     it('renders GitCommitsListDayCommit for each commit', () => {
-        const wrapper = mount(GitCommitsListDay, {
+        const wrapper: any = mount(GitCommitsListDay, {
             props: {
                 groupedCommits: mockGroupedCommits,
                 repo: mockRepo,
@@ -85,7 +85,7 @@ describe('GitCommitsListDay.vue', () => {
     })
 
     it('passes commit data to child components', () => {
-        const wrapper = mount(GitCommitsListDay, {
+        const wrapper: any = mount(GitCommitsListDay, {
             props: {
                 groupedCommits: mockGroupedCommits,
                 repo: mockRepo,
@@ -100,7 +100,7 @@ describe('GitCommitsListDay.vue', () => {
     })
 
     it('renders timeline item wrapper', () => {
-        const wrapper = mount(GitCommitsListDay, {
+        const wrapper: any = mount(GitCommitsListDay, {
             props: {
                 groupedCommits: mockGroupedCommits,
                 repo: mockRepo,

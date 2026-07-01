@@ -138,8 +138,14 @@ The type annotation is syntactically valid but `ActionContext` uses index signat
 |------|------------|--------------|-------------|-------|
 | 2026-07-01 | Baseline | 1,690 | 1,638 | -52 |
 | 2026-07-01 | 5 test files + 1 type def | 1,690 | 1,638 | -52 |
-| | | | | |
-| | **Target** | **1,690** | **0** | **-1,690** |
+| 2026-07-01 | **Batch store layer** (ActionContext import, MutationTree state, GetterTree state, payload:any) | **1,611** | **509** | **-1,102** |
+
+### Details of current pass
+- **`gui/actions.ts`**: imported `ActionContext`, typed 18 action handlers
+- **`presets/types.ts`**: created missing file (GuiPresetsState, GuiPresetsStatePreset)
+- **79 store files batch**: Added `ActionContext<State, RootState>` to action destructured params, `: State` to getter/mutation `state` params, `: any` to `payload`/`data`/`name` second params, `: any` to `getters`/`rootGetters` params
+- **27 mutation files**: Fixed method-shorthand `state` param typing
+- **`farm/index.ts`**: Fixed inline module getters (FarmState) and actions (ActionContext)
 
 *Update this table each time fixes are committed.*
 
@@ -149,10 +155,10 @@ The type annotation is syntactically valid but `ActionContext` uses index signat
 
 | Phase | Total files | Fixed | Remaining | Latest batch |
 |-------|------------|-------|-----------|-------------|
-| A (Store) | 82 | 0 | 82 | — |
-| B (Tests) | 14 | 5 | 9 | UpdateHintAlert, SettingsNavigationTabItem, WebcamForm, TheServiceWorker, server.spec + `webrtc-go2rtc` type |
-| C (Components) | 73 | 0 | 73 | — |
-| **Total** | **169** | **6** | **163** | |
+| A (Store) | 82 | ~75 | 7 (93 errors) | ActionContext imports, MutationTree state, GetterTree state, payload:any |
+| B (Tests) | 14 | 5 | 9 (237 errors) | — |
+| C (Components) | 73 | 0 | 73 (179 errors) | — |
+| **Total** | **169** | **80** | **89 (509 errors)** | |
 
 ---
 
@@ -162,4 +168,4 @@ The type annotation is syntactically valid but `ActionContext` uses index signat
 cd /Users/isaaceliape/repos/e3cnc && npx vue-tsc --noEmit 2>&1 | grep -c "error TS"
 ```
 
-Expected output after each fix pass: a decreasing number. Current: **1,638**.
+Expected output after each fix pass: a decreasing number. Current: **509**.

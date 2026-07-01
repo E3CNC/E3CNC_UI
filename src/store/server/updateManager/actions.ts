@@ -1,10 +1,10 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { getSocket } from '@/store/runtime'
 import { ServerUpdateManagerState } from '@/store/server/updateManager/types'
 import { RootState } from '@/store/types'
 
 export const actions: ActionTree<ServerUpdateManagerState, RootState> = {
-    reset({ commit }) {
+    reset({ commit }: ActionContext<ServerUpdateManagerState, RootState>) {
         commit('reset')
     },
 
@@ -12,7 +12,7 @@ export const actions: ActionTree<ServerUpdateManagerState, RootState> = {
         getSocket().emit('machine.update.status', {}, { action: 'server/updateManager/onUpdateStatus' })
     },
 
-    async onUpdateStatus({ commit, dispatch }, payload) {
+    async onUpdateStatus({ commit, dispatch }: ActionContext<ServerUpdateManagerState, RootState>, payload: any) {
         await commit('resetRepos')
 
         for (const key of Object.keys(payload.version_info)) {

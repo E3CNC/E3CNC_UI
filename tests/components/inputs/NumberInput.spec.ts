@@ -94,43 +94,43 @@ describe('NumberInput.vue', () => {
     }
 
     it('renders label and target value', () => {
-        const wrapper = mountComponent()
+        const wrapper: any = mountComponent()
         expect(wrapper.text()).toContain('Speed')
         expect(wrapper.text()).toContain('100')
     })
 
     it('shows suffix when unit is provided', () => {
-        const wrapper = mountComponent({ unit: 'mm/s' })
+        const wrapper: any = mountComponent({ unit: 'mm/s' })
         expect(wrapper.text()).toContain('mm/s')
     })
 
     it('shows spinner buttons when hasSpinner is true', () => {
-        const wrapper = mountComponent({ hasSpinner: true })
+        const wrapper: any = mountComponent({ hasSpinner: true })
         const btns = wrapper.findAll('.v-btn-stub')
         expect(btns.length).toBeGreaterThanOrEqual(2)
     })
 
     it('does not show spinner buttons when hasSpinner is false', () => {
-        const wrapper = mountComponent({ hasSpinner: false })
+        const wrapper: any = mountComponent({ hasSpinner: false })
         const btns = wrapper.findAll('.v-btn-stub')
         // Only the reset button in append slot
         expect(btns.length).toBe(0)
     })
 
     it('resets to default value when reset icon is clicked', async () => {
-        const wrapper = mountComponent({ defaultValue: 50, hasSpinner: false })
-        expect(wrapper.vm.value).toBe('100')
+        const wrapper: any = mountComponent({ defaultValue: 50, hasSpinner: false })
+        expect((wrapper.vm as any).value).toBe('100')
 
-        wrapper.vm.resetToDefault()
+        (wrapper.vm as any).resetToDefault()
         await wrapper.vm.$nextTick()
 
         // After reset, value should be 50 (the default)
-        expect(wrapper.vm.value).toBe('50')
+        expect((wrapper.vm as any).value).toBe('50')
     })
 
     it('emits submit when resetToDefault is called', async () => {
-        const wrapper = mountComponent({ defaultValue: 50 })
-        wrapper.vm.resetToDefault()
+        const wrapper: any = mountComponent({ defaultValue: 50 })
+        (wrapper.vm as any).resetToDefault()
         await wrapper.vm.$nextTick()
 
         expect(wrapper.emitted('submit')).toBeTruthy()
@@ -138,191 +138,191 @@ describe('NumberInput.vue', () => {
     })
 
     it('increments value when increment is called', async () => {
-        const wrapper = mountComponent({ hasSpinner: true })
-        wrapper.vm.incrementValue()
+        const wrapper: any = mountComponent({ hasSpinner: true })
+        (wrapper.vm as any).incrementValue()
         await wrapper.vm.$nextTick()
 
         expect(wrapper.emitted('submit')).toBeTruthy()
-        expect(wrapper.vm.value).toBe('101')
+        expect((wrapper.vm as any).value).toBe('101')
     })
 
     it('does not increment beyond max', async () => {
-        const wrapper = mountComponent({ target: 499, max: 500, hasSpinner: true })
-        wrapper.vm.incrementValue()
+        const wrapper: any = mountComponent({ target: 499, max: 500, hasSpinner: true })
+        (wrapper.vm as any).incrementValue()
         await wrapper.vm.$nextTick()
 
-        expect(wrapper.vm.value).toBe('500')
+        expect((wrapper.vm as any).value).toBe('500')
 
         // Try incrementing again
-        wrapper.vm.incrementValue()
+        (wrapper.vm as any).incrementValue()
         await wrapper.vm.$nextTick()
 
-        expect(wrapper.vm.value).toBe('500')
+        expect((wrapper.vm as any).value).toBe('500')
     })
 
     it('decrements value when decrement is called', async () => {
-        const wrapper = mountComponent({ hasSpinner: true })
-        wrapper.vm.decrementValue()
+        const wrapper: any = mountComponent({ hasSpinner: true })
+        (wrapper.vm as any).decrementValue()
         await wrapper.vm.$nextTick()
 
-        expect(wrapper.vm.value).toBe('99')
+        expect((wrapper.vm as any).value).toBe('99')
     })
 
     it('does not decrement below min', async () => {
-        const wrapper = mountComponent({ target: 1, min: 0, hasSpinner: true })
-        wrapper.vm.decrementValue()
+        const wrapper: any = mountComponent({ target: 1, min: 0, hasSpinner: true })
+        (wrapper.vm as any).decrementValue()
         await wrapper.vm.$nextTick()
 
-        expect(wrapper.vm.value).toBe('0')
+        expect((wrapper.vm as any).value).toBe('0')
 
         // Try decrementing again
-        wrapper.vm.decrementValue()
+        (wrapper.vm as any).decrementValue()
         await wrapper.vm.$nextTick()
 
-        expect(wrapper.vm.value).toBe('0')
+        expect((wrapper.vm as any).value).toBe('0')
     })
 
     it('handles decimal precision correctly', async () => {
-        const wrapper = mountComponent({
+        const wrapper: any = mountComponent({
             target: 10.5,
             dec: 1,
             step: 0.5,
             hasSpinner: true,
         })
-        wrapper.vm.incrementValue()
+        (wrapper.vm as any).incrementValue()
         await wrapper.vm.$nextTick()
 
-        expect(wrapper.vm.value).toBe('11')
+        expect((wrapper.vm as any).value).toBe('11')
     })
 
     it('supports spinnerFactor for larger increments', async () => {
-        const wrapper = mountComponent({
+        const wrapper: any = mountComponent({
             hasSpinner: true,
             spinnerFactor: 10,
             step: 1,
         })
-        wrapper.vm.incrementValue()
+        (wrapper.vm as any).incrementValue()
         await wrapper.vm.$nextTick()
 
         // 100 + 1 * 10 = 110
-        expect(wrapper.vm.value).toBe('110')
+        expect((wrapper.vm as any).value).toBe('110')
     })
 
     it('clamps increment when near max with spinnerFactor', async () => {
-        const wrapper = mountComponent({
+        const wrapper: any = mountComponent({
             target: 495,
             max: 500,
             hasSpinner: true,
             spinnerFactor: 10,
         })
-        wrapper.vm.incrementValue()
+        (wrapper.vm as any).incrementValue()
         await wrapper.vm.$nextTick()
 
-        expect(wrapper.vm.value).toBe('500')
+        expect((wrapper.vm as any).value).toBe('500')
     })
 
     it('clamps decrement when near min', async () => {
-        const wrapper = mountComponent({
+        const wrapper: any = mountComponent({
             target: 3,
             min: 0,
             hasSpinner: true,
             spinnerFactor: 10,
         })
-        wrapper.vm.decrementValue()
+        (wrapper.vm as any).decrementValue()
         await wrapper.vm.$nextTick()
 
-        expect(wrapper.vm.value).toBe('0')
+        expect((wrapper.vm as any).value).toBe('0')
     })
 
     it('provides error messages when outputErrorMsg is true and value is out of range', () => {
         // Value below min
-        const wrapper = mountComponent({
+        const wrapper: any = mountComponent({
             target: -5,
             min: 0,
             max: 100,
             outputErrorMsg: true,
         })
 
-        expect(wrapper.vm.inputErrors.length).toBeGreaterThan(0)
-        expect(wrapper.vm.invalidInput).toBe(true)
+        expect((wrapper.vm as any).inputErrors.length).toBeGreaterThan(0)
+        expect((wrapper.vm as any).invalidInput).toBe(true)
     })
 
     it('provides error messages when value exceeds max', () => {
-        const wrapper = mountComponent({
+        const wrapper: any = mountComponent({
             target: 150,
             min: 0,
             max: 100,
             outputErrorMsg: true,
         })
 
-        expect(wrapper.vm.inputErrors.length).toBeGreaterThan(0)
-        expect(wrapper.vm.inputErrors[0]).toContain('100')
+        expect((wrapper.vm as any).inputErrors.length).toBeGreaterThan(0)
+        expect((wrapper.vm as any).inputErrors[0]).toContain('100')
     })
 
     it('does not provide error messages when outputErrorMsg is false even if out of range', () => {
-        const wrapper = mountComponent({
+        const wrapper: any = mountComponent({
             target: -5,
             min: 0,
             max: 100,
             outputErrorMsg: false,
         })
 
-        expect(wrapper.vm.inputErrors).toEqual([])
-        expect(wrapper.vm.invalidInput).toBe(false)
+        expect((wrapper.vm as any).inputErrors).toEqual([])
+        expect((wrapper.vm as any).invalidInput).toBe(false)
     })
 
     it('blocks invalid characters on keydown', () => {
-        const wrapper = mountComponent()
+        const wrapper: any = mountComponent()
         const event = new KeyboardEvent('keydown', { key: 'e' })
         const preventDefaultSpy = vi.spyOn(event, 'preventDefault')
 
-        wrapper.vm.checkInvalidChars(event)
+        (wrapper.vm as any).checkInvalidChars(event)
 
         expect(preventDefaultSpy).toHaveBeenCalled()
     })
 
     it('blocks minus sign when min >= 0', () => {
-        const wrapper = mountComponent({ min: 0 })
+        const wrapper: any = mountComponent({ min: 0 })
         const event = new KeyboardEvent('keydown', { key: '-' })
         const preventDefaultSpy = vi.spyOn(event, 'preventDefault')
 
-        wrapper.vm.checkInvalidChars(event)
+        (wrapper.vm as any).checkInvalidChars(event)
 
         expect(preventDefaultSpy).toHaveBeenCalled()
     })
 
     it('allows minus sign when min < 0', () => {
-        const wrapper = mountComponent({ min: -100 })
+        const wrapper: any = mountComponent({ min: -100 })
         const event = new KeyboardEvent('keydown', { key: '-' })
         const preventDefaultSpy = vi.spyOn(event, 'preventDefault')
 
-        wrapper.vm.checkInvalidChars(event)
+        (wrapper.vm as any).checkInvalidChars(event)
 
         expect(preventDefaultSpy).not.toHaveBeenCalled()
     })
 
     it('does not emit submit when value is invalid with outputErrorMsg', () => {
-        const wrapper = mountComponent({ target: -5, min: 0, max: 100, outputErrorMsg: true })
-        wrapper.vm.submit()
+        const wrapper: any = mountComponent({ target: -5, min: 0, max: 100, outputErrorMsg: true })
+        (wrapper.vm as any).submit()
         // invalidInput should be true when value is below min and outputErrorMsg is on
         expect(wrapper.emitted('submit')).toBeFalsy()
     })
 
     it('tracks target prop changes', async () => {
-        const wrapper = mountComponent({ target: 100 })
-        expect(wrapper.vm.value).toBe('100')
+        const wrapper: any = mountComponent({ target: 100 })
+        expect((wrapper.vm as any).value).toBe('100')
 
         await wrapper.setProps({ target: 200 })
         await wrapper.vm.$nextTick()
 
-        expect(wrapper.vm.value).toBe('200')
+        expect((wrapper.vm as any).value).toBe('200')
     })
 
     it('resets value to default when defaultValue is null', () => {
-        const wrapper = mountComponent({ defaultValue: null })
-        wrapper.vm.value = '999'
+        const wrapper: any = mountComponent({ defaultValue: null })
+        (wrapper.vm as any).value = '999'
 
         // Not null default = no reset icon shown
-        expect(wrapper.vm.value).toBe('999')
+        expect((wrapper.vm as any).value).toBe('999')
     })
 })

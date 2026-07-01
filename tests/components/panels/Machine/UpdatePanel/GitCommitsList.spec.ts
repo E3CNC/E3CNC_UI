@@ -76,7 +76,7 @@ describe('GitCommitsList.vue', () => {
     }
 
     it('does not render dialog when modelValue is false', () => {
-        const wrapper = mount(GitCommitsList, {
+        const wrapper: any = mount(GitCommitsList, {
             props: { modelValue: false, repo: mockRepo },
             global: {
                 mocks: { $t: (key: string) => key },
@@ -86,7 +86,7 @@ describe('GitCommitsList.vue', () => {
     })
 
     it('renders dialog when modelValue is true', () => {
-        const wrapper = mount(GitCommitsList, {
+        const wrapper: any = mount(GitCommitsList, {
             props: { modelValue: true, repo: mockRepo },
             global: {
                 mocks: { $t: (key: string) => key },
@@ -96,7 +96,7 @@ describe('GitCommitsList.vue', () => {
     })
 
     it('renders with panel title', () => {
-        const wrapper = mount(GitCommitsList, {
+        const wrapper: any = mount(GitCommitsList, {
             props: { modelValue: true, repo: mockRepo },
             global: {
                 mocks: { $t: (key: string) => key },
@@ -106,7 +106,7 @@ describe('GitCommitsList.vue', () => {
     })
 
     it('renders GitCommitsListDay for each group', () => {
-        const wrapper = mount(GitCommitsList, {
+        const wrapper: any = mount(GitCommitsList, {
             props: { modelValue: true, repo: mockRepo },
             global: {
                 mocks: { $t: (key: string) => key },
@@ -117,7 +117,7 @@ describe('GitCommitsList.vue', () => {
     })
 
     it('renders overlay scrollbars component', () => {
-        const wrapper = mount(GitCommitsList, {
+        const wrapper: any = mount(GitCommitsList, {
             props: { modelValue: true, repo: mockRepo },
             global: {
                 mocks: { $t: (key: string) => key },
@@ -127,7 +127,7 @@ describe('GitCommitsList.vue', () => {
     })
 
     it('renders null repo gracefully', () => {
-        const wrapper = mount(GitCommitsList, {
+        const wrapper: any = mount(GitCommitsList, {
             props: { modelValue: true, repo: null },
             global: {
                 mocks: { $t: (key: string) => key },
@@ -137,7 +137,7 @@ describe('GitCommitsList.vue', () => {
     })
 
     it('has close button in buttons slot', () => {
-        const wrapper = mount(GitCommitsList, {
+        const wrapper: any = mount(GitCommitsList, {
             props: { modelValue: true, repo: mockRepo },
             global: {
                 mocks: { $t: (key: string) => key },
@@ -155,7 +155,7 @@ describe('GitCommitsList.vue', () => {
             author: 'dev',
             date: 1700000000 + i * 100,
         }))
-        const wrapper = mount(GitCommitsList, {
+        const wrapper: any = mount(GitCommitsList, {
             props: { modelValue: true, repo: { ...mockRepo, commits_behind: manyCommits } },
             global: {
                 mocks: { $t: (key: string) => key },

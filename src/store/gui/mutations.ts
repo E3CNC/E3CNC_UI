@@ -4,27 +4,27 @@ import type { GuiState, GuiStateDashboard, GuiStateLayoutoption, PanelFloatingSt
 import { setDataDeep } from '@/plugins/helpers'
 
 export const mutations: MutationTree<GuiState> = {
-    reset(state) {
+    reset(state: GuiState) {
         Object.assign(state, getDefaultState())
     },
 
-    setData(state, payload) {
+    setData(state: GuiState, payload: any) {
         setDataDeep(state, payload)
     },
 
-    saveSetting(state, payload: { name: string; value: unknown }) {
+    saveSetting(state: GuiState, payload: { name: string; value: unknown }) {
         const nested = payload.name.split('.').reduceRight<unknown>((value, key) => ({ [key]: value }), payload.value)
         setDataDeep(state, nested)
     },
 
-    setHeaterChartVisibility(state, payload) {
+    setHeaterChartVisibility(state: GuiState, payload: any) {
         const index = state.view.tempchart.hiddenDataset.indexOf(payload.name.toUpperCase())
 
         if (payload.hidden && index === -1) state.view.tempchart.hiddenDataset.push(payload.name.toUpperCase())
         else if (payload.hidden !== true && index > -1) state.view.tempchart.hiddenDataset.splice(index, 1)
     },
 
-    setGcodefilesMetadata(state, data) {
+    setGcodefilesMetadata(state: GuiState, data: any) {
         const array = [...state.view.gcodefiles.hideMetadataColumns]
         const index = array.findIndex((value: string) => value === data.name)
 
@@ -34,15 +34,15 @@ export const mutations: MutationTree<GuiState> = {
         state.view.gcodefiles.hideMetadataColumns = array
     },
 
-    setGcodefilesShowHiddenFiles(state, value) {
+    setGcodefilesShowHiddenFiles(state: GuiState, value) {
         state.view.gcodefiles.showHiddenFiles = value
     },
 
-    setCurrentWebcam(state, payload) {
+    setCurrentWebcam(state: GuiState, payload: any) {
         state.view.webcam.currentCam[payload.page] = payload.value
     },
 
-    setHistoryColumns(state, data) {
+    setHistoryColumns(state: GuiState, data: any) {
         if (data.value && state.view.history.hideColums.includes(data.name)) {
             state.view.history.hideColums.splice(state.view.history.hideColums.indexOf(data.name), 1)
         } else if (!data.value && !state.view.history.hideColums.includes(data.name)) {
@@ -50,11 +50,11 @@ export const mutations: MutationTree<GuiState> = {
         }
     },
 
-    setHistoryHidePrintStatus(state, payload) {
+    setHistoryHidePrintStatus(state: GuiState, payload: any) {
         state.view.history.hidePrintStatus = payload
     },
 
-    addClosePanel(state, payload) {
+    addClosePanel(state: GuiState, payload: any) {
         const nonExpandPanels = [...state.dashboard.nonExpandPanels[payload.viewport]]
 
         if (!nonExpandPanels.includes(payload.name)) {
@@ -64,7 +64,7 @@ export const mutations: MutationTree<GuiState> = {
         }
     },
 
-    removeClosePanel(state, payload) {
+    removeClosePanel(state: GuiState, payload: any) {
         const nonExpandPanels = [...state.dashboard.nonExpandPanels[payload.viewport]]
         const index = nonExpandPanels.indexOf(payload.name)
         if (index > -1) {
@@ -74,7 +74,7 @@ export const mutations: MutationTree<GuiState> = {
         }
     },
 
-    deleteFromDashboardLayout(state, payload) {
+    deleteFromDashboardLayout(state: GuiState, payload: any) {
         const layoutArray = [
             ...(state.dashboard[payload.layoutname as keyof GuiStateDashboard] as GuiStateLayoutoption[]),
         ]
@@ -83,11 +83,11 @@ export const mutations: MutationTree<GuiState> = {
             layoutArray as unknown as GuiStateLayoutoption[]
     },
 
-    setFloatingPanels(state, payload: Record<string, PanelFloatingState>) {
+    setFloatingPanels(state: GuiState, payload: Record<string, PanelFloatingState>) {
         state.dashboard.floatingPanels = payload
     },
 
-    setChartDatasetStatus(state, payload: { objectName: string; dataset: string; value: boolean }) {
+    setChartDatasetStatus(state: GuiState, payload: { objectName: string; dataset: string; value: boolean }) {
         // set new value if object doesn't exist in view.tempchart.datasetSettings
         if (!(payload.objectName in state.view.tempchart.datasetSettings)) {
             const newVal: Record<string, boolean> = {}
@@ -100,7 +100,7 @@ export const mutations: MutationTree<GuiState> = {
         state.view.tempchart.datasetSettings[payload.objectName][payload.dataset] = payload.value
     },
 
-    setDatasetAdditionalSensorStatus(state, payload: { objectName: string; dataset: string; value: boolean }) {
+    setDatasetAdditionalSensorStatus(state: GuiState, payload: { objectName: string; dataset: string; value: boolean }) {
         // set new value if object doesn't exist in view.tempchart.datasetSettings
         if (!(payload.objectName in state.view.tempchart.datasetSettings)) {
             const newVal: { additionalSensors: Record<string, boolean> } = { additionalSensors: {} }

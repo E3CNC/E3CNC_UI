@@ -1,15 +1,15 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { RootState } from '@/store/types'
 import { GuiGcodehistoryState } from '@/store/gui/gcodehistory/types'
 import { getSocket } from '@/store/runtime'
 import { maxGcodeHistory } from '@/store/variables'
 
 export const actions: ActionTree<GuiGcodehistoryState, RootState> = {
-    reset({ commit }) {
+    reset({ commit }: ActionContext<GuiGcodehistoryState, RootState>) {
         commit('reset')
     },
 
-    upload({ state }) {
+    upload({ state }: ActionContext<GuiGcodehistoryState, RootState>) {
         getSocket().emit('server.database.post_item', {
             namespace: 'mainsail',
             key: 'gcodehistory.entries',
@@ -17,7 +17,7 @@ export const actions: ActionTree<GuiGcodehistoryState, RootState> = {
         })
     },
 
-    async addToHistory({ commit, dispatch, state }, payload) {
+    async addToHistory({ commit, dispatch, state }: ActionContext<GuiGcodehistoryState, RootState>, payload: any) {
         const newHistory = [...state.entries]
         newHistory.push(payload)
 

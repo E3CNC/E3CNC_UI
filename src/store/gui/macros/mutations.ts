@@ -3,15 +3,15 @@ import { MutationTree } from 'vuex'
 import { GuiMacrosState, GuiMacrosStateMacrogroupMacro } from '@/store/gui/macros/types'
 
 export const mutations: MutationTree<GuiMacrosState> = {
-    reset(state) {
+    reset(state: GuiMacrosState) {
         Object.assign(state, getDefaultState())
     },
 
-    groupStore(state, payload) {
+    groupStore(state: GuiMacrosState, payload: any) {
         state.macrogroups[payload.id] = payload.values
     },
 
-    groupUpdate(state, payload) {
+    groupUpdate(state: GuiMacrosState, payload: any) {
         if (payload.id in state.macrogroups) {
             const preset = { ...state.macrogroups[payload.id] }
             Object.assign(preset, payload.values)
@@ -20,7 +20,7 @@ export const mutations: MutationTree<GuiMacrosState> = {
         }
     },
 
-    addMacroToMacrogroup(state, payload) {
+    addMacroToMacrogroup(state: GuiMacrosState, payload: any) {
         const macros = [...(state.macrogroups[payload.id]?.macros ?? [])]
 
         const newMacro: GuiMacrosStateMacrogroupMacro = {
@@ -52,7 +52,7 @@ export const mutations: MutationTree<GuiMacrosState> = {
         state.macrogroups[payload.id].macros = macros
     },
 
-    removeMacroFromMacrogroup(state, payload) {
+    removeMacroFromMacrogroup(state: GuiMacrosState, payload: any) {
         const macros = [...(state.macrogroups[payload.id]?.macros ?? [])]
         const deletedMacroIndex = macros.findIndex((m: GuiMacrosStateMacrogroupMacro) => m.name === payload.macro)
         if (deletedMacroIndex !== -1) {
@@ -69,7 +69,7 @@ export const mutations: MutationTree<GuiMacrosState> = {
         state.macrogroups[payload.id].macros = macros
     },
 
-    groupDelete(state, payload) {
+    groupDelete(state: GuiMacrosState, payload: any) {
         if (payload in state.macrogroups) {
             delete state.macrogroups[payload]
         }

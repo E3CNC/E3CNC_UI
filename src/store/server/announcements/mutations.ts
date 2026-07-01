@@ -3,19 +3,19 @@ import { MutationTree } from 'vuex'
 import { ServerAnnouncementsState } from './types'
 
 export const mutations: MutationTree<ServerAnnouncementsState> = {
-    reset(state) {
+    reset(state: ServerAnnouncementsState) {
         Object.assign(state, getDefaultState())
     },
 
-    setEntries(state, payload) {
+    setEntries(state: ServerAnnouncementsState, payload: any) {
         state.entries = payload
     },
 
-    setFeeds(state, payload) {
+    setFeeds(state: ServerAnnouncementsState, payload: any) {
         state.feeds = payload
     },
 
-    setDismissed(state, payload) {
+    setDismissed(state: ServerAnnouncementsState, payload: any) {
         const entries = [...state.entries]
         const index = entries.findIndex((entry) => entry.entry_id === payload.entry_id)
         if (index > -1) {

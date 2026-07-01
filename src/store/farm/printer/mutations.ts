@@ -4,15 +4,15 @@ import type { FarmPrinterState } from '@/store/farm/printer/types'
 import { setDataDeep } from '@/plugins/helpers'
 
 export const mutations: MutationTree<FarmPrinterState> = {
-    reset(state) {
+    reset(state: FarmPrinterState) {
         Object.assign(state, getDefaultState())
     },
 
-    resetData(state) {
+    resetData(state: FarmPrinterState) {
         Object.assign(state.data, getDefaultState().data)
     },
 
-    setSocketData(state, payload) {
+    setSocketData(state: FarmPrinterState, payload: any) {
         if ('status' in payload) payload = payload.status
         if ('requestParams' in payload) delete payload.requestParams
         if ('_namespace' in payload) {
@@ -25,7 +25,7 @@ export const mutations: MutationTree<FarmPrinterState> = {
         })
     },
 
-    setData(state, payload) {
+    setData(state: FarmPrinterState, payload: any) {
         if ('requestParams' in payload) delete payload.requestParams
 
         Object.entries(payload).forEach(([key, value]) => {
@@ -38,37 +38,37 @@ export const mutations: MutationTree<FarmPrinterState> = {
         })
     },
 
-    setSettings(state, payload) {
+    setSettings(state: FarmPrinterState, payload: any) {
         state.settings = {
             ...state.settings,
             ...payload,
         }
     },
 
-    addWsData(state, payload) {
+    addWsData(state: FarmPrinterState, payload: any) {
         const wsData = [...state.socket.wsData]
         wsData.push(payload)
 
         state.socket.wsData = wsData
     },
 
-    removeWsData(state, index) {
+    removeWsData(state: FarmPrinterState, index) {
         const wsData = [...state.socket.wsData]
         wsData.splice(index, 1)
 
         state.socket.wsData = wsData
     },
 
-    setKlippyConnected(state, payload) {
+    setKlippyConnected(state: FarmPrinterState, payload: any) {
         state.server.klippy_connected = payload
     },
 
-    setCurrentFile(state, payload) {
+    setCurrentFile(state: FarmPrinterState, payload: any) {
         if ('requestParams' in payload) delete payload.requestParams
         state.current_file = payload
     },
 
-    setConfigDir(state, payload) {
+    setConfigDir(state: FarmPrinterState, payload: any) {
         Object.values(payload as Record<string, { path?: string }>).forEach((file) => {
             if (file.path?.startsWith('.theme/')) {
                 state.theme_files.push(file.path)
@@ -76,15 +76,15 @@ export const mutations: MutationTree<FarmPrinterState> = {
         })
     },
 
-    setDatabases(state, payload) {
+    setDatabases(state: FarmPrinterState, payload: any) {
         state.databases = payload
     },
 
-    setMainsailData(state, payload) {
+    setMainsailData(state: FarmPrinterState, payload: any) {
         setDataDeep(state.data.gui, payload)
     },
 
-    setWebcamsData(state, payload) {
+    setWebcamsData(state: FarmPrinterState, payload: any) {
         state.data.webcams = payload
     },
 }

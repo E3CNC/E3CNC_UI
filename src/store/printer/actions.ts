@@ -1,16 +1,16 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { getSocket } from '@/store/runtime'
 import { PrinterState } from '@/store/printer/types'
 import { RootState } from '@/store/types'
 
 export const actions: ActionTree<PrinterState, RootState> = {
-    reset({ commit }) {
+    reset({ commit }: ActionContext<PrinterState, RootState>) {
         commit('reset')
         commit('tempHistory/reset')
         commit('socket/clearLoadings', null, { root: true })
     },
 
-    init({ dispatch }) {
+    init({ dispatch }: ActionContext<PrinterState, RootState>) {
         window.console.debug('init printer')
         dispatch('reset')
 
@@ -25,7 +25,7 @@ export const actions: ActionTree<PrinterState, RootState> = {
         dispatch('initSubscripts')
     },
 
-    getInfo({ commit, dispatch }, payload) {
+    getInfo({ commit, dispatch }: ActionContext<PrinterState, RootState>, payload: any) {
         commit(
             'server/setData',
             {
@@ -45,7 +45,7 @@ export const actions: ActionTree<PrinterState, RootState> = {
         dispatch('socket/removeInitModule', 'printer/info', { root: true })
     },
 
-    async initSubscripts({ dispatch }) {
+    async initSubscripts({ dispatch }: ActionContext<PrinterState, RootState>) {
         const payload = await getSocket().emitAndWait('printer.objects.list')
 
         let subscripts = {}
@@ -72,7 +72,7 @@ export const actions: ActionTree<PrinterState, RootState> = {
         dispatch('socket/removeInitModule', 'printer/initSubscripts', { root: true })
     },
 
-    getData({ commit, dispatch }, payload) {
+    getData({ commit, dispatch }: ActionContext<PrinterState, RootState>, payload: any) {
         if ('status' in payload) payload = payload.status
         if ('requestParams' in payload) delete payload.requestParams
 
@@ -118,13 +118,13 @@ export const actions: ActionTree<PrinterState, RootState> = {
         commit('setData', payload)
     },
 
-    async initGcodes({ commit }) {
+    async initGcodes({ commit }: ActionContext<PrinterState, RootState>) {
         const gcodes = await getSocket().emitAndWait('printer.objects.query', { objects: { gcode: ['commands'] } }, {})
 
         commit('setData', gcodes.status)
     },
 
-    async initExtruderCanExtrude({ dispatch, state }) {
+    async initExtruderCanExtrude({ dispatch, state }: ActionContext<PrinterState, RootState>) {
         const extruderList: string[] = Object.keys(state).filter((name) => name.startsWith('extruder'))
         const reInitList: { [key: string]: string[] } = {}
 
@@ -136,15 +136,15 @@ export const actions: ActionTree<PrinterState, RootState> = {
         dispatch('getData', result.status)
     },
 
-    getEndstopStatus({ commit }, payload) {
+    getEndstopStatus({ commit }: ActionContext<PrinterState, RootState>, payload: any) {
         commit('setEndstopStatus', payload)
     },
 
-    removeBedMeshProfile({ commit }, payload) {
+    removeBedMeshProfile({ commit }: ActionContext<PrinterState, RootState>, payload: any) {
         commit('removeBedMeshProfile', payload)
     },
 
-    sendGcode({ dispatch }, payload) {
+    sendGcode({ dispatch }: ActionContext<PrinterState, RootState>, payload: any) {
         dispatch('server/addEvent', { message: payload, type: 'command' }, { root: true })
 
         if (payload.toLowerCase().trim() === 'm112') {

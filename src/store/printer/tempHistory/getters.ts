@@ -14,11 +14,11 @@ export const getters: GetterTree<PrinterTempHistoryState, RootState> = {
         return dataset?.lineStyle?.color ?? null
     },
 
-    getSeries: (state) => (name: string) => {
+    getSeries: (state: PrinterTempHistoryState) => (name: string) => {
         return state.series.find((element) => element.name === name)
     },
 
-    getSerieNames: (state) => (name: string) => {
+    getSerieNames: (state: PrinterTempHistoryState) => (name: string) => {
         const output: string[] = []
         const seriesKeys = state.series
             .map((serie: PrinterTempHistoryStateSerie) => serie.name)
@@ -31,7 +31,7 @@ export const getters: GetterTree<PrinterTempHistoryState, RootState> = {
         return output
     },
 
-    getBoolDisplayPwmAxis: (state, getter) => {
+    getBoolDisplayPwmAxis: (state: PrinterTempHistoryState, getter) => {
         const legends = getter['getSelectedLegends']
 
         return (
@@ -41,7 +41,7 @@ export const getters: GetterTree<PrinterTempHistoryState, RootState> = {
         )
     },
 
-    getAvg: (state) => (name: string, serieName: string) => {
+    getAvg: (state: PrinterTempHistoryState) => (name: string, serieName: string) => {
         const key = serieName && serieName !== 'temperature' ? name + '-' + serieName : name
         const maxTime = new Date().getTime() - 1000 * 60
         let value = 0
@@ -71,7 +71,7 @@ export const getters: GetterTree<PrinterTempHistoryState, RootState> = {
         return getters['getAvg'](name, 'speed')
     },
 
-    getHostMcuSensors: (state, getters, rootState) => {
+    getHostMcuSensors: (state: PrinterTempHistoryState, getters: any, rootState: RootState) => {
         const settings = rootState.printer?.configfile?.settings ?? {}
         const available_heaters = rootState.printer?.heaters?.available_heaters ?? []
         const available_sensors = rootState.printer?.heaters?.available_sensors ?? []
@@ -93,7 +93,7 @@ export const getters: GetterTree<PrinterTempHistoryState, RootState> = {
         })
     },
 
-    getSelectedLegends: (state, getters, rootState) => {
+    getSelectedLegends: (state: PrinterTempHistoryState, getters: any, rootState: RootState) => {
         interface legends {
             [key: string]: boolean
         }
@@ -165,7 +165,7 @@ export const getters: GetterTree<PrinterTempHistoryState, RootState> = {
         return selected
     },
 
-    getTemperatureStoreSize: (state, getters, rootState, rootGetters) => {
+    getTemperatureStoreSize: (state: PrinterTempHistoryState, getters: any, rootState: RootState, rootGetters: any) => {
         const dataStoreSize = rootGetters['server/getConfig']('data_store', 'temperature_store_size')
 
         return dataStoreSize ?? 1200

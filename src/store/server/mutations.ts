@@ -5,67 +5,67 @@ import { formatConsoleMessage } from '@/plugins/helpers'
 import { maxEventHistory } from '@/store/variables'
 
 export const mutations: MutationTree<ServerState> = {
-    reset(state) {
+    reset(state: ServerState) {
         Object.assign(state, getDefaultState())
     },
 
-    setKlippyConnected(state) {
+    setKlippyConnected(state: ServerState) {
         state.klippy_connected = true
     },
 
-    setKlippyState(state, payload) {
+    setKlippyState(state: ServerState, payload: any) {
         state.klippy_state = payload
     },
 
-    setKlippyStateTimer(state, payload) {
+    setKlippyStateTimer(state: ServerState, payload: any) {
         state.klippy_state_timer = payload
     },
 
-    setKlippyMessage(state, payload) {
+    setKlippyMessage(state: ServerState, payload: any) {
         state.klippy_message = payload
     },
 
-    setKlippyDisconnected(state) {
+    setKlippyDisconnected(state: ServerState) {
         state.klippy_connected = false
         state.klippy_state = 'disconnected'
         state.klippy_message = 'Disconnected...'
     },
 
-    setKlippyShutdown(state) {
+    setKlippyShutdown(state: ServerState) {
         state.klippy_state = 'shutdown'
         state.klippy_message = 'Shutdown...'
     },
 
-    setCpuTemp(state, payload) {
+    setCpuTemp(state: ServerState, payload: any) {
         state.cpu_temp = payload
     },
 
-    setMoonrakerStats(state, payload) {
+    setMoonrakerStats(state: ServerState, payload: any) {
         state.moonraker_stats = payload
     },
 
-    setNetworkStats(state, payload) {
+    setNetworkStats(state: ServerState, payload: any) {
         state.network_stats = payload
     },
 
-    setCpuStats(state, payload) {
+    setCpuStats(state: ServerState, payload: any) {
         state.system_cpu_usage = payload
     },
 
-    setKlippyConnectedTimer(state, timer) {
+    setKlippyConnectedTimer(state: ServerState, timer) {
         state.klippy_connected_timer = timer
     },
 
-    setProcStats(state, payload) {
+    setProcStats(state: ServerState, payload: any) {
         state.cpu_temp = payload.cpu_temp
         state.moonraker_stats = payload.moonraker_stats
     },
 
-    setConnectionId(state, payload) {
+    setConnectionId(state: ServerState, payload: any) {
         state.connection_id = payload
     },
 
-    setData(state, payload) {
+    setData(state: ServerState, payload: any) {
         if ('requestParams' in payload) delete payload.requestParams
 
         Object.entries(payload).forEach(([key, value]) => {
@@ -73,23 +73,23 @@ export const mutations: MutationTree<ServerState> = {
         })
     },
 
-    saveDbNamespaces(state, payload) {
+    saveDbNamespaces(state: ServerState, payload: any) {
         state.dbNamespaces = payload
     },
 
-    setConfig(state, payload) {
+    setConfig(state: ServerState, payload: any) {
         state.config = payload
     },
 
-    setConsoleClearedThisSession(state) {
+    setConsoleClearedThisSession(state: ServerState) {
         state.console_cleared_this_session = true
     },
 
-    clearGcodeStore(state) {
+    clearGcodeStore(state: ServerState) {
         state.events = []
     },
 
-    setGcodeStore(state, payload: { time: number; type: string; message: string }[]) {
+    setGcodeStore(state: ServerState, payload: { time: number; type: string; message: string }[]) {
         //const t0 = performance.now()
 
         if (payload.length >= maxEventHistory) {
@@ -119,7 +119,7 @@ export const mutations: MutationTree<ServerState> = {
         //window.console.debug("import events", t1-t0)
     },
 
-    addEvent(state, payload) {
+    addEvent(state: ServerState, payload: any) {
         if (
             ['command', 'autocomplete'].includes(payload.type) &&
             state.events[state.events.length - 1]?.type === 'autocomplete'
@@ -139,38 +139,38 @@ export const mutations: MutationTree<ServerState> = {
         }
     },
 
-    setSystemInfo(state, payload) {
+    setSystemInfo(state: ServerState, payload: any) {
         state.system_info = payload
     },
 
-    setThrottledState(state, payload) {
+    setThrottledState(state: ServerState, payload: any) {
         if (payload && 'bits' in payload) state.throttled_state.bits = payload.bits
 
         if (payload && 'flags' in payload) state.throttled_state.flags = payload.flags
     },
 
-    setSystemBootAt(state, payload) {
+    setSystemBootAt(state: ServerState, payload: any) {
         state.system_boot_at = payload
     },
 
-    addRootDirectory(state, payload) {
+    addRootDirectory(state: ServerState, payload: any) {
         state.registered_directories.push(payload.name)
     },
 
-    updateServiceState(state, payload) {
+    updateServiceState(state: ServerState, payload: any) {
         const name = Object.keys(payload)[0]
 
         if (state.system_info?.service_state) state.system_info.service_state[name] = payload[name]
     },
 
-    addFailedInitComponent(state, payload) {
+    addFailedInitComponent(state: ServerState, payload: any) {
         const failed_init_components = state.failed_init_components
         if (!failed_init_components.includes(payload)) failed_init_components.push(payload)
 
         state.failed_init_components = failed_init_components
     },
 
-    removeComponent(state, payload) {
+    removeComponent(state: ServerState, payload: any) {
         const components = state.components
         const index = components.indexOf(payload)
 

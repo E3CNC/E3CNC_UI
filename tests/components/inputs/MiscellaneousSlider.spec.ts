@@ -93,30 +93,30 @@ describe('MiscellaneousSlider.vue', () => {
     }
 
     it('renders the name', () => {
-        const wrapper = mountComponent({ name: 'my_fan' })
+        const wrapper: any = mountComponent({ name: 'my_fan' })
         // convertName replaces _ with space
         expect(wrapper.text()).toContain('my fan')
     })
 
     it('shows fan icon', () => {
-        const wrapper = mountComponent({ type: 'fan' })
+        const wrapper: any = mountComponent({ type: 'fan' })
         const icons = wrapper.findAll('.v-icon-stub')
         expect(icons.length).toBeGreaterThan(0)
     })
 
     it('shows RPM when provided', () => {
-        const wrapper = mountComponent({ rpm: 3000 })
+        const wrapper: any = mountComponent({ rpm: 3000 })
         expect(wrapper.text()).toContain('3000')
         expect(wrapper.text()).toContain('RPM')
     })
 
     it('shows percentage value when not controllable', () => {
-        const wrapper = mountComponent({ controllable: false })
+        const wrapper: any = mountComponent({ controllable: false })
         expect(wrapper.text()).toContain('50 %')
     })
 
     it('LED type shows bulb icons', () => {
-        const wrapper = mountComponent({ type: 'led', target: 0.5 })
+        const wrapper: any = mountComponent({ type: 'led', target: 0.5 })
         const icons = wrapper.findAll('.v-icon-stub')
         expect(icons.length).toBeGreaterThan(0)
     })
@@ -140,12 +140,12 @@ describe('MiscellaneousSlider.vue', () => {
                 },
             },
         })
-        const wrapper = shallowMount(MiscellaneousSlider, {
+        const wrapper: any = shallowMount(MiscellaneousSlider, {
             props: { target: 0.5, type: 'fan_generic', name: 'my_fan', controllable: true, pwm: true },
             global: { plugins: [store], mocks: { $t: (k: string) => k }, stubs: vuetifyStubs },
         })
         // Use a value different from current (value=0.5) to avoid early return
-        wrapper.vm.sendCmd(0.8)
+        (wrapper.vm as any).sendCmd(0.8)
         expect(mocks.mockSocketEmit).toHaveBeenCalledWith('printer.gcode.script', {
             script: 'SET_FAN_SPEED FAN=my_fan SPEED=0.8',
         })
@@ -159,12 +159,12 @@ describe('MiscellaneousSlider.vue', () => {
                 },
             },
         })
-        const wrapper = shallowMount(MiscellaneousSlider, {
+        const wrapper: any = shallowMount(MiscellaneousSlider, {
             // type must be provided (template uses type.includes())
             props: { target: 0.5, type: 'gpio', name: 'my_pin', controllable: true, pwm: true },
             global: { plugins: [store], mocks: { $t: (k: string) => k }, stubs: vuetifyStubs },
         })
-        wrapper.vm.sendCmd(0.75)
+        (wrapper.vm as any).sendCmd(0.75)
         expect(mocks.mockSocketEmit).toHaveBeenCalledWith('printer.gcode.script', {
             script: 'SET_PIN PIN=my_pin VALUE=0.75',
         })
@@ -178,27 +178,27 @@ describe('MiscellaneousSlider.vue', () => {
                 },
             },
         })
-        const wrapper = shallowMount(MiscellaneousSlider, {
+        const wrapper: any = shallowMount(MiscellaneousSlider, {
             // type must be provided (template uses type.includes())
             props: { target: 1, type: 'gpio', name: 'my_pin', controllable: true, pwm: false },
             global: { plugins: [store], mocks: { $t: (k: string) => k }, stubs: vuetifyStubs },
         })
-        wrapper.vm.switchOutputPin()
+        (wrapper.vm as any).switchOutputPin()
         expect(mocks.mockSocketEmit).toHaveBeenCalledWith('printer.gcode.script', {
             script: 'SET_PIN PIN=my_pin VALUE=0.00',
         })
     })
 
     it('increment and decrement functions exist', () => {
-        const wrapper = mountComponent({ target: 0.5 })
-        expect(typeof wrapper.vm.increment).toBe('function')
-        expect(typeof wrapper.vm.decrement).toBe('function')
+        const wrapper: any = mountComponent({ target: 0.5 })
+        expect(typeof (wrapper.vm as any).increment).toBe('function')
+        expect(typeof (wrapper.vm as any).decrement).toBe('function')
     })
 
     it('inputValue is synced to sliderValue', async () => {
-        const wrapper = mountComponent({ target: 0.75 })
+        const wrapper: any = mountComponent({ target: 0.75 })
         await wrapper.vm.$nextTick()
-        expect(wrapper.vm.inputValue).toBe(75)
+        expect((wrapper.vm as any).inputValue).toBe(75)
     })
 
     it('submitInput sends command', () => {
@@ -209,28 +209,28 @@ describe('MiscellaneousSlider.vue', () => {
                 },
             },
         })
-        const wrapper = shallowMount(MiscellaneousSlider, {
+        const wrapper: any = shallowMount(MiscellaneousSlider, {
             props: { target: 0.5, type: 'fan', name: 'my_fan', controllable: true, pwm: true },
             global: { plugins: [store], mocks: { $t: (k: string) => k }, stubs: vuetifyStubs },
         })
-        wrapper.vm.inputValue = 80
-        wrapper.vm.submitInput()
+        (wrapper.vm as any).inputValue = 80
+        (wrapper.vm as any).submitInput()
         expect(mocks.mockSocketEmit).toHaveBeenCalled()
     })
 
     it('ledChannelName returns WHITE by default', () => {
-        const wrapper = mountComponent({ type: 'led' })
-        expect(wrapper.vm.ledChannelName).toBe('WHITE')
+        const wrapper: any = mountComponent({ type: 'led' })
+        expect((wrapper.vm as any).ledChannelName).toBe('WHITE')
     })
 
     it('ledChannelName returns RED for colorOrder R', () => {
-        const wrapper = mountComponent({ type: 'led', colorOrder: 'R' })
-        expect(wrapper.vm.ledChannelName).toBe('RED')
+        const wrapper: any = mountComponent({ type: 'led', colorOrder: 'R' })
+        expect((wrapper.vm as any).ledChannelName).toBe('RED')
     })
 
     it('error state shows when input is empty', () => {
-        const wrapper = mountComponent({ target: 0.5 })
-        wrapper.vm.inputValue = '' as any
-        expect(wrapper.vm.errors.length).toBeGreaterThan(0)
+        const wrapper: any = mountComponent({ target: 0.5 })
+        (wrapper.vm as any).inputValue = '' as any
+        expect((wrapper.vm as any).errors.length).toBeGreaterThan(0)
     })
 })

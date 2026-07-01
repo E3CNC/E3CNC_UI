@@ -1,10 +1,10 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { RootState } from '@/store/types'
 import type { GuiWebcamState, GuiWebcamStateWebcam } from '@/store/gui/webcams/types'
 import { getSocket } from '@/store/runtime'
 
 export const actions: ActionTree<GuiWebcamState, RootState> = {
-    reset({ commit }) {
+    reset({ commit }: ActionContext<GuiWebcamState, RootState>) {
         commit('reset')
     },
 
@@ -13,13 +13,13 @@ export const actions: ActionTree<GuiWebcamState, RootState> = {
         getSocket().emit('server.webcams.list', {}, { action: 'gui/webcams/initStore' })
     },
 
-    async initStore({ commit, dispatch }, payload) {
+    async initStore({ commit, dispatch }: ActionContext<GuiWebcamState, RootState>, payload: any) {
         await commit('reset')
         await commit('initStore', payload.webcams)
         await dispatch('socket/removeInitModule', 'gui/webcam/init', { root: true })
     },
 
-    store(_, payload) {
+    store(_context: ActionContext<GuiWebcamState, RootState>, payload: any) {
         getSocket().emit('server.webcams.post_item', payload)
     },
 

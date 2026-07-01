@@ -1,14 +1,14 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { GuiNotificationState, GuiNotificationStateDismissEntry } from './types'
 import { RootState } from '../../types'
 import { getSocket } from '@/store/runtime'
 
 export const actions: ActionTree<GuiNotificationState, RootState> = {
-    reset({ commit }) {
+    reset({ commit }: ActionContext<GuiNotificationState, RootState>) {
         commit('reset')
     },
 
-    upload({ state }) {
+    upload({ state }: ActionContext<GuiNotificationState, RootState>) {
         getSocket().emit('server.database.post_item', {
             namespace: 'mainsail',
             key: 'notifications.dismiss',
@@ -16,7 +16,7 @@ export const actions: ActionTree<GuiNotificationState, RootState> = {
         })
     },
 
-    close({ dispatch }, payload) {
+    close({ dispatch }: ActionContext<GuiNotificationState, RootState>, payload: any) {
         const posFirstSlash = payload.id.indexOf('/')
         if (posFirstSlash === -1) return
 
@@ -36,7 +36,7 @@ export const actions: ActionTree<GuiNotificationState, RootState> = {
         })
     },
 
-    dismiss({ dispatch }, payload) {
+    dismiss({ dispatch }: ActionContext<GuiNotificationState, RootState>, payload: any) {
         const posFirstSlash = payload.id.indexOf('/')
         if (posFirstSlash === -1) return
 

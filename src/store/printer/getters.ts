@@ -19,7 +19,7 @@ import { caseInsensitiveSort, formatFrequency, getMacroParams } from '@/plugins/
 import { RootState } from '@/store/types'
 
 export const getters: GetterTree<PrinterState, RootState> = {
-    getPrintPercent: (state, getters, rootState) => {
+    getPrintPercent: (state: PrinterState, getters: any, rootState: RootState) => {
         const type = rootState?.gui?.general?.calcPrintProgress ?? 'file-relative'
         switch (type) {
             case 'file-relative':
@@ -36,7 +36,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         }
     },
 
-    getPrintPercentByFilepositionRelative: (state) => {
+    getPrintPercentByFilepositionRelative: (state: PrinterState) => {
         if (
             state.current_file?.filename &&
             state.current_file?.gcode_start_byte &&
@@ -55,15 +55,15 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return state.virtual_sdcard?.progress ?? 0
     },
 
-    getPrintPercentByFilepositionAbsolute: (state) => {
+    getPrintPercentByFilepositionAbsolute: (state: PrinterState) => {
         return state.virtual_sdcard?.progress ?? 0
     },
 
-    getPrintPercentBySlicer: (state) => {
+    getPrintPercentBySlicer: (state: PrinterState) => {
         return state.display_status?.progress ?? 0
     },
 
-    getPrintPercentByFilament: (state) => {
+    getPrintPercentByFilament: (state: PrinterState) => {
         const filament_used = state.print_stats?.filament_used ?? null
         const filament_total = state.current_file?.filament_total ?? null
 
@@ -79,7 +79,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return state.virtual_sdcard?.progress ?? 0
     },
 
-    getPrintMaxLayers: (state) => {
+    getPrintMaxLayers: (state: PrinterState) => {
         if ((state.print_stats?.info?.total_layer ?? null) !== null) return state.print_stats.info.total_layer
         if (state.current_file?.layer_count) return state.current_file.layer_count
 
@@ -99,7 +99,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return 0
     },
 
-    getPrintCurrentLayer: (state, getters) => {
+    getPrintCurrentLayer: (state: PrinterState, getters: any) => {
         if ((state.print_stats?.info?.current_layer ?? null) !== null) return state.print_stats.info.current_layer
 
         if (
@@ -119,7 +119,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return 0
     },
 
-    getPrinterObjects: (state) => (supportedObjects: string[]) => {
+    getPrinterObjects: (state: PrinterState) => (supportedObjects: string[]) => {
         const outputObjects: PrinterGetterObject[] = []
 
         for (const [key, value] of Object.entries(state)) {
@@ -142,7 +142,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return outputObjects
     },
 
-    getMacros: (state) => {
+    getMacros: (state: PrinterState) => {
         const array: PrinterStateMacro[] = []
         const settings = state.configfile?.settings ?? null
         const printerGcodes = state.gcode?.commands ?? {}
@@ -178,16 +178,16 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return caseInsensitiveSort(array, 'name')
     },
 
-    getMacro: (state, getters) => (name: string) => {
+    getMacro: (state: PrinterState, getters: any) => (name: string) => {
         const nameLower = name.toLowerCase()
         return getters['getMacros'].find((macro: PrinterStateMacro) => macro.name.toLowerCase() === nameLower)
     },
 
-    getPartFanSpeed: (state) => {
+    getPartFanSpeed: (state: PrinterState) => {
         return 'fan' in state ? state.fan.speed : 0
     },
 
-    getFans: (state, getters) => {
+    getFans: (state: PrinterState, getters: any) => {
         const fans: PrinterStateFan[] = []
         const supportedFans = ['temperature_fan', 'controller_fan', 'heater_fan', 'fan_generic', 'fan']
         const objects = getters.getPrinterObjects(supportedFans)
@@ -217,7 +217,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         })
     },
 
-    getMiscellaneous: (state) => {
+    getMiscellaneous: (state: PrinterState) => {
         const output: PrinterStateMiscellaneous[] = []
         const supportedObjects = [
             'controller_fan',
@@ -302,7 +302,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         })
     },
 
-    getMiscellaneousSensors: (state) => {
+    getMiscellaneousSensors: (state: PrinterState) => {
         const output: PrinterStateMiscellaneousSensor[] = []
         const supportedObjects = ['load_cell']
 
@@ -333,19 +333,19 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return caseInsensitiveSort(output, 'type', 'unit', 'name')
     },
 
-    getAvailableHeaters: (state) => {
+    getAvailableHeaters: (state: PrinterState) => {
         return state.heaters?.available_heaters ?? []
     },
 
-    getAvailableSensors: (state) => {
+    getAvailableSensors: (state: PrinterState) => {
         return state.heaters?.available_sensors ?? []
     },
 
-    getAvailableMonitors: (state) => {
+    getAvailableMonitors: (state: PrinterState) => {
         return state.heaters?.available_monitors ?? []
     },
 
-    getFilamentSensors: (state) => {
+    getFilamentSensors: (state: PrinterState) => {
         const sensorObjectNames = ['filament_switch_sensor', 'filament_motion_sensor', 'hall_filament_width_sensor']
         const sensors: PrinterStateFilamentSensors[] = []
 
@@ -366,7 +366,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return caseInsensitiveSort(sensors, 'name')
     },
 
-    getMcus: (state, getters): PrinterStateMcu[] => {
+    getMcus: (state: PrinterState, getters: any): PrinterStateMcu[] => {
         const mcus: PrinterStateMcu[] = []
 
         Object.keys(state).forEach((key) => {
@@ -405,13 +405,13 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return mcus
     },
 
-    getPrinterObject: (state) => (objectName: string) => {
+    getPrinterObject: (state: PrinterState) => (objectName: string) => {
         if (objectName in state) return state[objectName]
 
         return null
     },
 
-    getPrinterConfigObjects: (state) => (objectNames: string[]) => {
+    getPrinterConfigObjects: (state: PrinterState) => (objectNames: string[]) => {
         const settings = state.configfile.settings
         if (!settings) return {}
 
@@ -427,7 +427,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return output
     },
 
-    getHostTempSensor: (state, getters) => {
+    getHostTempSensor: (state: PrinterState, getters: any) => {
         const sensorTypes = ['rpi_temperature', 'temperature_host']
         const checkObjects = ['temperature_sensor', 'temperature_fan']
         let output: null | { temperature: number; measured_min_temp: number; measured_max_temp: number } = null
@@ -455,7 +455,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return output
     },
 
-    getMcuTempSensors: (state, getters) => {
+    getMcuTempSensors: (state: PrinterState, getters: any) => {
         const checkObjects = ['temperature_sensor', 'temperature_fan']
         const output: McuTempSensorEntry[] = []
 
@@ -477,7 +477,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return output
     },
 
-    getMcuTempSensor: (state, getters) => (mcuName: string) => {
+    getMcuTempSensor: (state: PrinterState, getters: any) => (mcuName: string) => {
         let output: {
             temperature: string
             measured_min_temp: string | null
@@ -502,7 +502,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return output
     },
 
-    getExtruders: (state) => {
+    getExtruders: (state: PrinterState) => {
         const extruders: PrinterStateExtruder[] = []
         if (state.configfile?.settings) {
             Object.keys(state.configfile?.settings)
@@ -523,7 +523,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return extruders
     },
 
-    getExtruderSteppers: (state) => {
+    getExtruderSteppers: (state: PrinterState) => {
         const extruderSteppers: PrinterStateExtruderStepper[] = []
         if (state.configfile?.settings) {
             Object.keys(state.configfile?.settings)
@@ -541,13 +541,13 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return extruderSteppers
     },
 
-    getExtrudePossible: (state) => {
+    getExtrudePossible: (state: PrinterState) => {
         const extruderName = state.toolhead?.extruder ?? 'extruder'
 
         return state[extruderName]?.can_extrude ?? false
     },
 
-    getMaxTemp: (state) => {
+    getMaxTemp: (state: PrinterState) => {
         let maxtemp = 0
 
         state.heaters?.available_sensors?.forEach((sensorName: string) => {
@@ -564,20 +564,20 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return maxtemp > 0 ? maxtemp + 10 : 300
     },
 
-    existPrinterConfig: (state) => {
+    existPrinterConfig: (state: PrinterState) => {
         if (state.configfile?.config) return Object.keys(state.configfile.config).length > 0
 
         return false
     },
 
-    checkConfig: (state) => (configName: string) => {
+    checkConfig: (state: PrinterState) => (configName: string) => {
         if (!state.configfile.config) return false
 
         const configObjects = Object.keys(state.configfile.config)
         return configObjects.findIndex((module) => module.toLowerCase() === configName.toLowerCase()) !== -1
     },
 
-    checkNecessaryConfig: (state, getters) => {
+    checkNecessaryConfig: (state: PrinterState, getters: any) => {
         const missingModules: string[] = []
 
         checkKlipperConfigModules.forEach((module: string) => {
@@ -590,7 +590,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return missingModules
     },
 
-    getEstimatedTimeFile: (state, getters) => {
+    getEstimatedTimeFile: (state: PrinterState, getters: any) => {
         if (
             'print_stats' in state &&
             'print_duration' in state.print_stats &&
@@ -606,7 +606,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return 0
     },
 
-    getEstimatedTimeFilament: (state) => {
+    getEstimatedTimeFilament: (state: PrinterState) => {
         if (
             'print_stats' in state &&
             'print_duration' in state.print_stats &&
@@ -627,7 +627,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return 0
     },
 
-    getEstimatedTimeSlicer: (state) => {
+    getEstimatedTimeSlicer: (state: PrinterState) => {
         if (
             'print_stats' in state &&
             'print_duration' in state.print_stats &&
@@ -642,7 +642,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return 0
     },
 
-    getEstimatedTimeAvg: (state, getters, rootState) => {
+    getEstimatedTimeAvg: (state: PrinterState, getters: any, rootState: RootState) => {
         let time = 0
         let timeCount = 0
         const boolFileCalc = rootState.gui?.general?.calcEstimateTime?.includes('file') ?? false
@@ -663,7 +663,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return 0
     },
 
-    getEstimatedTimeETA: (state, getters, rootState) => {
+    getEstimatedTimeETA: (state: PrinterState, getters: any, rootState: RootState) => {
         let time = 0
         let timeCount = 0
         const boolFileCalc = rootState.gui?.general?.calcEtaTime?.includes('file') ?? false
@@ -690,7 +690,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return 0
     },
 
-    getEstimatedTimeETAFormat: (state, getters, rootState, rootGetters) => {
+    getEstimatedTimeETAFormat: (state: PrinterState, getters: any, rootState: RootState, rootGetters: any) => {
         const hours12Format = rootGetters['gui/getHours12Format'] ?? false
         const eta = getters['getEstimatedTimeETA']
 
@@ -721,25 +721,25 @@ export const getters: GetterTree<PrinterState, RootState> = {
         return output
     },
 
-    getKinematics: (state) => {
+    getKinematics: (state: PrinterState) => {
         if (!state.configfile?.settings?.printer) return false
 
         return state.configfile?.settings?.printer.kinematics ?? 'none'
     },
 
-    existsQGL: (state) => {
+    existsQGL: (state: PrinterState) => {
         if (!state.configfile?.settings) return false
 
         return 'quad_gantry_level' in state.configfile.settings
     },
 
-    existsDeltaCalibrate: (state) => {
+    existsDeltaCalibrate: (state: PrinterState) => {
         if (!state.configfile?.settings) return false
 
         return 'delta_calibrate' in state.configfile.settings
     },
 
-    existsFirmwareRetraction: (state) => {
+    existsFirmwareRetraction: (state: PrinterState) => {
         if (!state.configfile?.settings) return false
 
         return 'firmware_retraction' in state.configfile.settings

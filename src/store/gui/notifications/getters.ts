@@ -11,7 +11,7 @@ import { minBrowserVersions } from '@/store/variables'
 import type { GuiMaintenanceStateEntry } from '@/store/gui/maintenance/types'
 
 export const getters: GetterTree<GuiNotificationState, RootState> = {
-    getNotifications: (state, getters) => {
+    getNotifications: (state: GuiNotificationState, getters: any) => {
         let notifications: GuiNotificationStateEntry[] = []
 
         // moonraker announcements
@@ -58,7 +58,7 @@ export const getters: GetterTree<GuiNotificationState, RootState> = {
         })
     },
 
-    getNotificationsAnnouncements: (state, getters, rootState, rootGetters) => {
+    getNotificationsAnnouncements: (state: GuiNotificationState, getters: any, rootState: RootState, rootGetters: any) => {
         const notifications: GuiNotificationStateEntry[] = []
 
         // moonraker announcements
@@ -80,7 +80,7 @@ export const getters: GetterTree<GuiNotificationState, RootState> = {
         return notifications
     },
 
-    getNotificationsFlags: (state, getters, rootState, rootGetters) => {
+    getNotificationsFlags: (state: GuiNotificationState, getters: any, rootState: RootState, rootGetters: any) => {
         const notifications: GuiNotificationStateEntry[] = []
 
         // get all current flags
@@ -114,7 +114,7 @@ export const getters: GetterTree<GuiNotificationState, RootState> = {
         return notifications
     },
 
-    getNotificationsDependencies: (state, getters, rootState, rootGetters) => {
+    getNotificationsDependencies: (state: GuiNotificationState, getters: any, rootState: RootState, rootGetters: any) => {
         const notifications: GuiNotificationStateEntry[] = []
 
         let dependencies = rootGetters['getDependencies']
@@ -157,7 +157,7 @@ export const getters: GetterTree<GuiNotificationState, RootState> = {
         return notifications
     },
 
-    getNotificationsMoonrakerWarnings: (state, getters, rootState, rootGetters) => {
+    getNotificationsMoonrakerWarnings: (state: GuiNotificationState, getters: any, rootState: RootState, rootGetters: any) => {
         const notifications: GuiNotificationStateEntry[] = []
 
         let warnings = rootState.server?.warnings ?? []
@@ -206,7 +206,7 @@ export const getters: GetterTree<GuiNotificationState, RootState> = {
         return notifications
     },
 
-    getNotificationsMoonrakerFailedComponents: (state, getters, rootState, rootGetters) => {
+    getNotificationsMoonrakerFailedComponents: (state: GuiNotificationState, getters: any, rootState: RootState, rootGetters: any) => {
         const notifications: GuiNotificationStateEntry[] = []
 
         let failedCompontents = rootState.server?.failed_components ?? []
@@ -242,7 +242,7 @@ export const getters: GetterTree<GuiNotificationState, RootState> = {
         return notifications
     },
 
-    getNotificationsMoonrakerFailedInitComponents: (state, getters, rootState, rootGetters) => {
+    getNotificationsMoonrakerFailedInitComponents: (state: GuiNotificationState, getters: any, rootState: RootState, rootGetters: any) => {
         const notifications: GuiNotificationStateEntry[] = []
 
         let failedInitCompontents = rootState.server?.failed_init_components ?? []
@@ -280,7 +280,7 @@ export const getters: GetterTree<GuiNotificationState, RootState> = {
         return notifications
     },
 
-    getNotificationsKlipperWarnings: (state, getters, rootState, rootGetters) => {
+    getNotificationsKlipperWarnings: (state: GuiNotificationState, getters: any, rootState: RootState, rootGetters: any) => {
         const notifications: GuiNotificationStateEntry[] = []
 
         let warnings = (rootState.printer?.configfile?.warnings ?? []) as PrinterStateKlipperConfigWarning[]
@@ -336,7 +336,7 @@ export const getters: GetterTree<GuiNotificationState, RootState> = {
         return notifications
     },
 
-    getNotificationsBrowserWarnings: (state, getters, rootState) => {
+    getNotificationsBrowserWarnings: (state: GuiNotificationState, getters: any, rootState: RootState) => {
         const notifications: GuiNotificationStateEntry[] = []
 
         const browser = detect()
@@ -380,7 +380,7 @@ export const getters: GetterTree<GuiNotificationState, RootState> = {
         return notifications
     },
 
-    getNotificationsOverdueMaintenance: (state, getters, rootState, rootGetters) => {
+    getNotificationsOverdueMaintenance: (state: GuiNotificationState, getters: any, rootState: RootState, rootGetters: any) => {
         const notifications: GuiNotificationStateEntry[] = []
         let entries: GuiMaintenanceStateEntry[] = rootGetters['gui/maintenance/getOverdueEntries']
         if (entries.length == 0) return []
@@ -413,7 +413,7 @@ export const getters: GetterTree<GuiNotificationState, RootState> = {
         return notifications
     },
 
-    getNotificationsOverheatDrivers: (state, getters, rootState) => {
+    getNotificationsOverheatDrivers: (state: GuiNotificationState, getters: any, rootState: RootState) => {
         const notifications: GuiNotificationStateEntry[] = []
         const date = rootState.server?.system_boot_at ?? new Date()
 
@@ -461,7 +461,7 @@ export const getters: GetterTree<GuiNotificationState, RootState> = {
         })
     },
 
-    getDismiss: (state, getters, rootState) => {
+    getDismiss: (state: GuiNotificationState, getters: any, rootState: RootState) => {
         const currentTime = new Date()
         const systemBootAt = rootState.server?.system_boot_at ?? new Date()
         let dismisses = [...state.dismiss]
@@ -480,7 +480,7 @@ export const getters: GetterTree<GuiNotificationState, RootState> = {
         return dismisses
     },
 
-    getDismissByCategory: (state, getters) => (category: string) => {
+    getDismissByCategory: (state: GuiNotificationState, getters: any) => (category: string) => {
         let dismisses = getters.getDismiss
         dismisses = dismisses.filter((dismiss: GuiNotificationStateDismissEntry) => dismiss.category === category)
 

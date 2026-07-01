@@ -1,10 +1,10 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { getSocket } from '@/store/runtime'
 import { RootState } from '@/store/types'
 import { ServerAnnouncementsState } from './types'
 
 export const actions: ActionTree<ServerAnnouncementsState, RootState> = {
-    reset({ commit }) {
+    reset({ commit }: ActionContext<ServerAnnouncementsState, RootState>) {
         commit('reset')
     },
 
@@ -12,7 +12,7 @@ export const actions: ActionTree<ServerAnnouncementsState, RootState> = {
         getSocket().emit('server.announcements.list', {}, { action: 'server/announcements/getList' })
     },
 
-    async getList({ commit, dispatch }, payload) {
+    async getList({ commit, dispatch }: ActionContext<ServerAnnouncementsState, RootState>, payload: any) {
         if ('entries' in payload) {
             const entries = payload.entries.map(
                 (entry: { date: number; date_dismissed: number; dismiss_wake: number }) => {
@@ -31,19 +31,19 @@ export const actions: ActionTree<ServerAnnouncementsState, RootState> = {
         await dispatch('socket/removeInitModule', 'server/announcements/init', { root: true })
     },
 
-    getDismissed({ commit }, payload) {
+    getDismissed({ commit }: ActionContext<ServerAnnouncementsState, RootState>, payload: any) {
         commit('setDismissed', { entry_id: payload.entry_id, status: true })
     },
 
-    getWaked({ commit }, payload) {
+    getWaked({ commit }: ActionContext<ServerAnnouncementsState, RootState>, payload: any) {
         commit('setDismissed', { entry_id: payload.entry_id, status: false })
     },
 
-    close(_, payload) {
+    close(_context: ActionContext<ServerAnnouncementsState, RootState>, payload: any) {
         getSocket().emit('server.announcements.dismiss', { entry_id: payload.entry_id })
     },
 
-    dismiss(_, payload) {
+    dismiss(_context: ActionContext<ServerAnnouncementsState, RootState>, payload: any) {
         getSocket().emit('server.announcements.dismiss', { entry_id: payload.entry_id, wake_time: payload.time })
     },
 }

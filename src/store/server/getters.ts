@@ -5,7 +5,7 @@ import { RootState } from '@/store/types'
 
 export const getters: GetterTree<ServerState, RootState> = {
     getConsoleEvents:
-        (state) =>
+        (state: ServerState) =>
         (reverse = true, limit = 500) => {
             const events = [...state.events].slice(limit * -1) ?? []
 
@@ -31,7 +31,7 @@ export const getters: GetterTree<ServerState, RootState> = {
             return reverse ? events.reverse() : events
         },
 
-    getConfig: (state) => (section: string, attribute: string) => {
+    getConfig: (state: ServerState) => (section: string, attribute: string) => {
         const config = state.config?.config ?? {}
 
         if (section in config && attribute in config[section]) return config[section][attribute]
@@ -39,7 +39,7 @@ export const getters: GetterTree<ServerState, RootState> = {
         return null
     },
 
-    getHostStats: (state, getters, rootState, rootGetters) => {
+    getHostStats: (state: ServerState, getters: any, rootState: RootState, rootGetters: any) => {
         interface HostStats {
             cpuName: string | null
             cpuDesc: string | null
@@ -144,7 +144,7 @@ export const getters: GetterTree<ServerState, RootState> = {
         return output
     },
 
-    getCpuUsage: (state) => {
+    getCpuUsage: (state: ServerState) => {
         if ('cpu' in state.system_cpu_usage) {
             return Math.round(state.system_cpu_usage.cpu)
         }
@@ -152,7 +152,7 @@ export const getters: GetterTree<ServerState, RootState> = {
         return null
     },
 
-    getNetworkInterfaces: (state) => {
+    getNetworkInterfaces: (state: ServerState) => {
         const interfaces: { [key: string]: ServerStateNetworkInterface } = {}
 
         Object.keys(state.network_stats).forEach((interfaceName: string) => {
@@ -170,7 +170,7 @@ export const getters: GetterTree<ServerState, RootState> = {
         return interfaces
     },
 
-    getThrottledStateFlags: (state) => {
+    getThrottledStateFlags: (state: ServerState) => {
         let flags = state.throttled_state.flags.filter((flag: string) => flag !== '?')
         /*let flags = [
             'Under-Voltage Detected',

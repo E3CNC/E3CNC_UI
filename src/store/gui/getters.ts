@@ -5,7 +5,7 @@ import { allDashboardPanels, defaultTheme, themes } from '@/store/variables'
 import { RootState, Theme } from '@/store/types'
 
 export const getters: GetterTree<GuiState, RootState> = {
-    theme: (state): string => {
+    theme: (state: GuiState): string => {
         const theme = state.uiSettings.theme
 
         // return defaultTheme, if theme doesnt exists
@@ -14,11 +14,11 @@ export const getters: GetterTree<GuiState, RootState> = {
         return theme
     },
 
-    getTheme: (state, getters): Theme => {
+    getTheme: (state: GuiState, getters: any): Theme => {
         return themes.find((theme: Theme) => theme.name === getters.theme) ?? themes[0]
     },
 
-    getDatasetValue: (state) => (payload: { name: string; type: string }) => {
+    getDatasetValue: (state: GuiState) => (payload: { name: string; type: string }) => {
         if (
             payload.name in state.view.tempchart.datasetSettings &&
             payload.type in state.view.tempchart.datasetSettings[payload.name]
@@ -28,7 +28,7 @@ export const getters: GetterTree<GuiState, RootState> = {
         return ['temperature', 'target'].includes(payload.type)
     },
 
-    getDatasetAdditionalSensorValue: (state) => (payload: { name: string; sensor: string }) => {
+    getDatasetAdditionalSensorValue: (state: GuiState) => (payload: { name: string; sensor: string }) => {
         const entry = state.view.tempchart.datasetSettings[payload.name] ?? null
         if (entry === null || typeof entry !== 'object' || !('additionalSensors' in entry)) return true
 
@@ -36,7 +36,7 @@ export const getters: GetterTree<GuiState, RootState> = {
         return (sensors[payload.sensor] ?? true) as boolean
     },
 
-    getPanelExpand: (state) => (name: string, viewport: string) => {
+    getPanelExpand: (state: GuiState) => (name: string, viewport: string) => {
         if ('dashboard' in state && viewport in state.dashboard.nonExpandPanels) {
             return !state.dashboard.nonExpandPanels[viewport].includes(name)
         }
@@ -44,7 +44,7 @@ export const getters: GetterTree<GuiState, RootState> = {
         return true
     },
 
-    getAllPossiblePanels: (state, getters, rootState, rootGetters) => {
+    getAllPossiblePanels: (state: GuiState, getters: any, rootState: RootState, rootGetters: any) => {
         let allPanels = [...allDashboardPanels]
 
         // remove macros panel and add macrogroups panels if macroMode === expert
@@ -89,7 +89,7 @@ export const getters: GetterTree<GuiState, RootState> = {
     },
 
     getPanels:
-        (state, getters, rootState) =>
+        (state: GuiState, getters: any, rootState: RootState) =>
         (viewport: string, column: number, onlyVisible: boolean = false) => {
             const layoutName = (column ? `${viewport}Layout${column}` : `${viewport}Layout`) as keyof GuiStateDashboard
             let panels = state.dashboard[layoutName] as GuiStateLayoutoption[]
@@ -137,7 +137,7 @@ export const getters: GetterTree<GuiState, RootState> = {
             return panels.filter((element) => allPossiblePanels.includes(element.name))
         },
 
-    getAllPanelsFromViewport: (state) => (viewport: string) => {
+    getAllPanelsFromViewport: (state: GuiState) => (viewport: string) => {
         let panels: GuiStateLayoutoption[] = []
 
         const layoutKey = `${viewport}Layout` as keyof GuiStateDashboard
@@ -155,13 +155,13 @@ export const getters: GetterTree<GuiState, RootState> = {
         return panels
     },
 
-    getDefaultControlActionButton: (state, getters, rootState, rootGetters) => {
+    getDefaultControlActionButton: (state: GuiState, getters: any, rootState: RootState, rootGetters: any) => {
         if (rootGetters['printer/existsQGL']) return 'qgl'
 
         return 'm84'
     },
 
-    getHours12Format: (state) => {
+    getHours12Format: (state: GuiState) => {
         const setting = state.general.timeFormat
         if (setting === '12hours') return true
         if (setting === null) {

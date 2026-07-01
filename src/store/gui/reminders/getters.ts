@@ -3,7 +3,7 @@ import { GuiRemindersState, GuiRemindersStateReminder } from '@/store/gui/remind
 import { RootState } from '@/store/types'
 
 export const getters: GetterTree<GuiRemindersState, RootState> = {
-    getReminders: (state) => {
+    getReminders: (state: GuiRemindersState) => {
         const reminders: GuiRemindersStateReminder[] = []
 
         Object.keys(state.reminders).forEach((id: string) => {
@@ -13,13 +13,13 @@ export const getters: GetterTree<GuiRemindersState, RootState> = {
         return reminders
     },
 
-    getReminder: (state, getters) => (id: string) => {
+    getReminder: (state: GuiRemindersState, getters: any) => (id: string) => {
         const reminders = getters['getReminders'] ?? []
 
         return reminders.find((reminder: GuiRemindersStateReminder) => reminder.id === id)
     },
 
-    getOverdueReminders: (state, getters, rootState) => {
+    getOverdueReminders: (state: GuiRemindersState, getters: any, rootState: RootState) => {
         const currentTotalPrintTime = rootState.server.history.job_totals.total_print_time
         const reminders: GuiRemindersStateReminder[] = getters['getReminders'] ?? []
         return reminders.filter(

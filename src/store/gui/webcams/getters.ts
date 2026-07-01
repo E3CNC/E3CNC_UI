@@ -3,7 +3,7 @@ import type { GuiWebcamState, GuiWebcamStateWebcam } from '@/store/gui/webcams/t
 import { RootState } from '@/store/types'
 
 export const getters: GetterTree<GuiWebcamState, RootState> = {
-    getWebcams: (state) => {
+    getWebcams: (state: GuiWebcamState) => {
         return state.webcams.filter((webcam: GuiWebcamStateWebcam) => webcam.enabled)
     },
 

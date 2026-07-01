@@ -3,11 +3,11 @@ import { MutationTree } from 'vuex'
 import { GuiGcodehistoryState } from '@/store/gui/gcodehistory/types'
 
 export const mutations: MutationTree<GuiGcodehistoryState> = {
-    reset(state) {
+    reset(state: GuiGcodehistoryState) {
         Object.assign(state, getDefaultState())
     },
 
-    updateHistory(state, payload) {
+    updateHistory(state: GuiGcodehistoryState, payload: any) {
         state.entries = payload
     },
 }

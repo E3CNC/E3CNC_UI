@@ -3,18 +3,18 @@ import { MutationTree } from 'vuex'
 import { GuiNotificationState } from './types'
 
 export const mutations: MutationTree<GuiNotificationState> = {
-    reset(state) {
+    reset(state: GuiNotificationState) {
         Object.assign(state, getDefaultState())
     },
 
-    addDismiss(state, payload) {
+    addDismiss(state: GuiNotificationState, payload: any) {
         const dismiss = [...state.dismiss]
         dismiss.push(payload)
 
         state.dismiss = dismiss
     },
 
-    removeDismiss(state, payload) {
+    removeDismiss(state: GuiNotificationState, payload: any) {
         const dismiss = [...state.dismiss]
         const index = dismiss.findIndex(
             (dismiss) =>

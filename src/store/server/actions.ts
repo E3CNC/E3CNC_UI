@@ -1,13 +1,13 @@
 import router from '@/plugins/router'
 import { getSocket, $toast } from '@/store/runtime'
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { ServerState, ServerStateEvent } from '@/store/server/types'
 import { camelize, formatConsoleMessage } from '@/plugins/helpers'
 import { RootState } from '@/store/types'
 import { initableServerComponents } from '@/store/variables'
 
 export const actions: ActionTree<ServerState, RootState> = {
-    reset({ commit, dispatch }) {
+    reset({ commit, dispatch }: ActionContext<ServerState, RootState>) {
         dispatch('stopKlippyConnectedInterval')
         dispatch('stopKlippyStateInterval')
 
@@ -16,7 +16,7 @@ export const actions: ActionTree<ServerState, RootState> = {
         dispatch('updateManager/reset')
     },
 
-    async init({ commit, dispatch, rootState }) {
+    async init({ commit, dispatch, rootState }: ActionContext<ServerState, RootState>) {
         window.console.debug('init Server')
 
         // identify client
@@ -53,7 +53,7 @@ export const actions: ActionTree<ServerState, RootState> = {
         await dispatch('socket/removeInitModule', 'server', { root: true })
     },
 
-    checkDatabases({ dispatch, commit }, payload) {
+    checkDatabases({ dispatch, commit }: ActionContext<ServerState, RootState>, payload: any) {
         if (payload.namespaces?.includes('mainsail')) {
             dispatch('socket/addInitModule', 'gui/init', { root: true })
             dispatch('gui/init', null, { root: true })
@@ -73,7 +73,7 @@ export const actions: ActionTree<ServerState, RootState> = {
         dispatch('socket/removeInitModule', 'server/databaseList', { root: true })
     },
 
-    initServerInfo({ dispatch, commit }, payload) {
+    initServerInfo({ dispatch, commit }: ActionContext<ServerState, RootState>, payload: any) {
         // delete old plugin entries
         if ('plugins' in payload) delete payload.plugins
         if ('failed_plugins' in payload) delete payload.failed_plugins
@@ -97,17 +97,17 @@ export const actions: ActionTree<ServerState, RootState> = {
         dispatch('socket/removeInitModule', 'server/info', { root: true })
     },
 
-    initServerConfig({ commit, dispatch }, payload) {
+    initServerConfig({ commit, dispatch }: ActionContext<ServerState, RootState>, payload: any) {
         commit('setConfig', payload)
         dispatch('socket/removeInitModule', 'server/config', { root: true })
     },
 
-    initSystemInfo({ commit, dispatch }, payload) {
+    initSystemInfo({ commit, dispatch }: ActionContext<ServerState, RootState>, payload: any) {
         commit('setSystemInfo', payload.system_info)
         dispatch('socket/removeInitModule', 'server/systemInfo', { root: true })
     },
 
-    initProcStats({ commit, dispatch }, payload) {
+    initProcStats({ commit, dispatch }: ActionContext<ServerState, RootState>, payload: any) {
         if (payload.throttled_state !== null) {
             commit('setThrottledState', payload.throttled_state)
         }
@@ -120,33 +120,33 @@ export const actions: ActionTree<ServerState, RootState> = {
         dispatch('socket/removeInitModule', 'server/procStats', { root: true })
     },
 
-    updateProcStats({ commit }, payload) {
+    updateProcStats({ commit }: ActionContext<ServerState, RootState>, payload: any) {
         if ('cpu_temp' in payload) commit('setCpuTemp', payload.cpu_temp)
         if ('moonraker_stats' in payload) commit('setMoonrakerStats', payload.moonraker_stats)
         if ('network' in payload) commit('setNetworkStats', payload.network)
         if ('system_cpu_usage' in payload) commit('setCpuStats', payload.system_cpu_usage)
     },
 
-    setKlippyReady({ dispatch }) {
+    setKlippyReady({ dispatch }: ActionContext<ServerState, RootState>) {
         dispatch('stopKlippyConnectedInterval')
         dispatch('stopKlippyStateInterval')
         dispatch('printer/reset', null, { root: true })
         dispatch('printer/init', null, { root: true })
     },
 
-    setKlippyDisconnected({ commit, dispatch }) {
+    setKlippyDisconnected({ commit, dispatch }: ActionContext<ServerState, RootState>) {
         commit('setKlippyDisconnected', null)
         dispatch('stopKlippyStateInterval')
         dispatch('startKlippyConnectedInterval')
     },
 
-    setKlippyShutdown({ commit, dispatch }) {
+    setKlippyShutdown({ commit, dispatch }: ActionContext<ServerState, RootState>) {
         commit('setKlippyShutdown', null)
         dispatch('stopKlippyStateInterval')
         dispatch('startKlippyConnectedInterval')
     },
 
-    startKlippyConnectedInterval({ commit, state }) {
+    startKlippyConnectedInterval({ commit, state }: ActionContext<ServerState, RootState>) {
         if (state.klippy_connected_timer) return
 
         const timer = setInterval(() => {
@@ -155,14 +155,14 @@ export const actions: ActionTree<ServerState, RootState> = {
         commit('setKlippyConnectedTimer', timer)
     },
 
-    stopKlippyConnectedInterval({ commit, state }) {
+    stopKlippyConnectedInterval({ commit, state }: ActionContext<ServerState, RootState>) {
         if (state.klippy_connected_timer === null) return
 
         clearInterval(state.klippy_connected_timer)
         commit('setKlippyConnectedTimer', null)
     },
 
-    checkKlippyConnected({ commit, dispatch }, payload) {
+    checkKlippyConnected({ commit, dispatch }: ActionContext<ServerState, RootState>, payload: any) {
         if (!payload.klippy_connected) {
             dispatch('startKlippyConnectedInterval')
 
@@ -175,7 +175,7 @@ export const actions: ActionTree<ServerState, RootState> = {
         dispatch('checkKlippyState', { state: payload.klippy_state, state_message: null })
     },
 
-    startKlippyStateInterval({ commit, state }) {
+    startKlippyStateInterval({ commit, state }: ActionContext<ServerState, RootState>) {
         if (state.klippy_state_timer) return
 
         const timer = setInterval(() => {
@@ -184,7 +184,7 @@ export const actions: ActionTree<ServerState, RootState> = {
         commit('setKlippyStateTimer', timer)
     },
 
-    stopKlippyStateInterval({ commit, state }) {
+    stopKlippyStateInterval({ commit, state }: ActionContext<ServerState, RootState>) {
         if (state.klippy_state_timer === null) return
 
         clearInterval(state.klippy_state_timer)
@@ -205,11 +205,11 @@ export const actions: ActionTree<ServerState, RootState> = {
         dispatch('printer/init', null, { root: true })
     },
 
-    getData({ commit }, payload) {
+    getData({ commit }: ActionContext<ServerState, RootState>, payload: any) {
         commit('setData', payload)
     },
 
-    getGcodeStore({ commit, dispatch, rootGetters }, payload) {
+    getGcodeStore({ commit, dispatch, rootGetters }: ActionContext<ServerState, RootState>, payload: any) {
         commit('clearGcodeStore')
 
         let events: ServerStateEvent[] = payload.gcode_store
@@ -241,13 +241,13 @@ export const actions: ActionTree<ServerState, RootState> = {
         dispatch('socket/removeInitModule', 'server/gcode_store', { root: true })
     },
 
-    addRootDirectory({ commit, state }, data) {
+    addRootDirectory({ commit, state }: ActionContext<ServerState, RootState>, data: any) {
         if (!state.registered_directories.includes(data.item.root)) {
             commit('addRootDirectory', { name: data.item.root })
         }
     },
 
-    addEvent({ commit, rootGetters }, payload) {
+    addEvent({ commit, rootGetters }: ActionContext<ServerState, RootState>, payload: any) {
         let message = payload
         let type = 'response'
 
@@ -296,11 +296,11 @@ export const actions: ActionTree<ServerState, RootState> = {
         }
     },
 
-    serviceStateChanged({ commit }, payload) {
+    serviceStateChanged({ commit }: ActionContext<ServerState, RootState>, payload: any) {
         commit('updateServiceState', payload)
     },
 
-    addFailedInitComponent({ commit }, payload) {
+    addFailedInitComponent({ commit }: ActionContext<ServerState, RootState>, payload: any) {
         commit('removeComponent', payload)
         commit('addFailedInitComponent', payload)
     },

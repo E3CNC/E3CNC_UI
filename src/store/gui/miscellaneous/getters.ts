@@ -3,7 +3,7 @@ import type { GuiMiscellaneousState, GuiMiscellaneousStateEntry } from '@/store/
 import { RootState } from '@/store/types'
 
 export const getters: GetterTree<GuiMiscellaneousState, RootState> = {
-    getEntries: (state) => {
+    getEntries: (state: GuiMiscellaneousState) => {
         const output: GuiMiscellaneousStateEntry[] = []
 
         Object.entries(state.entries).forEach(([key, values]) => {
@@ -19,13 +19,13 @@ export const getters: GetterTree<GuiMiscellaneousState, RootState> = {
         return output
     },
 
-    getEntry: (state, getters) => (payload: { type: string; name: string }) => {
+    getEntry: (state: GuiMiscellaneousState, getters: any) => (payload: { type: string; name: string }) => {
         return getters.getEntries.find(
             (entry: GuiMiscellaneousStateEntry) => entry.name === payload.name && entry.type === payload.type
         ) as GuiMiscellaneousStateEntry
     },
 
-    getId: (state, getters) => (payload: { type: string; name: string }) => {
+    getId: (state: GuiMiscellaneousState, getters: any) => (payload: { type: string; name: string }) => {
         return getters.getEntry(payload)?.id ?? null
     },
 }

@@ -3,7 +3,7 @@ import type { ServerHistoryState, ServerHistoryStateJob } from '@/store/server/h
 import { RootState } from '@/store/types'
 
 export const getters: GetterTree<ServerHistoryState, RootState> = {
-    getTotalPrintTime(state) {
+    getTotalPrintTime(state: ServerHistoryState) {
         let output = 0
 
         state.jobs.forEach((current) => {
@@ -13,7 +13,7 @@ export const getters: GetterTree<ServerHistoryState, RootState> = {
         return output
     },
 
-    getTotalCompletedPrintTime(state) {
+    getTotalCompletedPrintTime(state: ServerHistoryState) {
         let output = 0
 
         state.jobs.forEach((current) => {
@@ -23,7 +23,7 @@ export const getters: GetterTree<ServerHistoryState, RootState> = {
         return output
     },
 
-    getLongestPrintTime(state) {
+    getLongestPrintTime(state: ServerHistoryState) {
         let output = 0
 
         state.jobs.forEach((current) => {
@@ -33,7 +33,7 @@ export const getters: GetterTree<ServerHistoryState, RootState> = {
         return output
     },
 
-    getTotalFilamentUsed(state) {
+    getTotalFilamentUsed(state: ServerHistoryState) {
         let output = 0
 
         state.jobs.forEach((current) => {
@@ -43,15 +43,15 @@ export const getters: GetterTree<ServerHistoryState, RootState> = {
         return output
     },
 
-    getTotalJobsCount(state) {
+    getTotalJobsCount(state: ServerHistoryState) {
         return state.jobs.length
     },
 
-    getTotalCompletedJobsCount(state) {
+    getTotalCompletedJobsCount(state: ServerHistoryState) {
         return state.jobs.filter((job) => job.status === 'completed').length
     },
 
-    getAvgPrintTime(state, getters) {
+    getAvgPrintTime(state: ServerHistoryState, getters: any) {
         const totalCompletedPrintTime = getters.getTotalCompletedPrintTime
         const totalCompletedJobsCount = getters.getTotalCompletedJobsCount
 
@@ -60,7 +60,7 @@ export const getters: GetterTree<ServerHistoryState, RootState> = {
             : 0
     },
 
-    getPrintStatus: (state) => (jobId: string) => {
+    getPrintStatus: (state: ServerHistoryState) => (jobId: string) => {
         if (state.jobs.length) {
             const job = state.jobs.find((job) => job.job_id === jobId)
 
@@ -70,14 +70,14 @@ export const getters: GetterTree<ServerHistoryState, RootState> = {
         return ''
     },
 
-    getPrintJobById: (state) => (job_id: string) => {
+    getPrintJobById: (state: ServerHistoryState) => (job_id: string) => {
         if (state.jobs.length === 0) return
 
         return state.jobs.find((job) => job.job_id === job_id)
     },
 
     getPrintJobsForGcodes:
-        (state) =>
+        (state: ServerHistoryState) =>
         (
             filename: string,
             modified: number,
@@ -100,7 +100,7 @@ export const getters: GetterTree<ServerHistoryState, RootState> = {
             return []
         },
 
-    getPrintStatusByFilename: (state) => (filename: string, modified: number) => {
+    getPrintStatusByFilename: (state: ServerHistoryState) => (filename: string, modified: number) => {
         if (state.jobs.length) {
             const job = state.jobs.find((job) => {
                 return job.filename === filename && Math.round((job.metadata?.modified ?? 0) * 1000) === modified
@@ -112,7 +112,7 @@ export const getters: GetterTree<ServerHistoryState, RootState> = {
         return ''
     },
 
-    getFilteredJobList: (state, getters, rootState) => {
+    getFilteredJobList: (state: ServerHistoryState, getters: any, rootState: RootState) => {
         const hideStatus = rootState.gui?.view?.history?.hidePrintStatus ?? []
 
         return state.jobs.filter((job: ServerHistoryStateJob) => {

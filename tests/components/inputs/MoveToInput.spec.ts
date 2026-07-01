@@ -8,7 +8,7 @@ describe('MoveToInput.vue', () => {
     })
 
     it('renders the label and current position as suffix placeholder', () => {
-        const wrapper = shallowMount(MoveToInput, {
+        const wrapper: any = shallowMount(MoveToInput, {
             props: {
                 position: '150.0',
                 currentPos: '150.0',
@@ -32,7 +32,7 @@ describe('MoveToInput.vue', () => {
     })
 
     it('emits update:position when v-model changes', async () => {
-        const wrapper = shallowMount(MoveToInput, {
+        const wrapper: any = shallowMount(MoveToInput, {
             props: {
                 position: '100.0',
                 currentPos: '100.0',
@@ -50,7 +50,7 @@ describe('MoveToInput.vue', () => {
         })
 
         // Update the computed position by triggering the setter
-        wrapper.vm.position = '200.0'
+        (wrapper.vm as any).position = '200.0'
         await wrapper.vm.$nextTick()
 
         expect(wrapper.emitted('update:position')).toBeTruthy()
@@ -58,7 +58,7 @@ describe('MoveToInput.vue', () => {
     })
 
     it('emits submit on form submission', async () => {
-        const wrapper = shallowMount(MoveToInput, {
+        const wrapper: any = shallowMount(MoveToInput, {
             props: {
                 position: '150.0',
                 currentPos: '150.0',
@@ -73,14 +73,14 @@ describe('MoveToInput.vue', () => {
             },
         })
 
-        wrapper.vm.submit()
+        (wrapper.vm as any).submit()
         await wrapper.vm.$nextTick()
 
         expect(wrapper.emitted('submit')).toBeTruthy()
     })
 
     it('resets position to currentPos on blur when changed', () => {
-        const wrapper = shallowMount(MoveToInput, {
+        const wrapper: any = shallowMount(MoveToInput, {
             props: {
                 position: '100.0',
                 currentPos: '150.0',
@@ -96,14 +96,14 @@ describe('MoveToInput.vue', () => {
             },
         })
 
-        wrapper.vm.onBlur()
+        (wrapper.vm as any).onBlur()
 
         expect(wrapper.emitted('update:position')).toBeTruthy()
         expect(wrapper.emitted('update:position')![0]).toEqual(['150.0'])
     })
 
     it('does not emit update:position on blur when position matches currentPos', () => {
-        const wrapper = shallowMount(MoveToInput, {
+        const wrapper: any = shallowMount(MoveToInput, {
             props: {
                 position: '150.0',
                 currentPos: '150.0',
@@ -118,13 +118,13 @@ describe('MoveToInput.vue', () => {
             },
         })
 
-        wrapper.vm.onBlur()
+        (wrapper.vm as any).onBlur()
 
         expect(wrapper.emitted('update:position')).toBeFalsy()
     })
 
     it('passes disabled prop to text field', () => {
-        const wrapper = shallowMount(MoveToInput, {
+        const wrapper: any = shallowMount(MoveToInput, {
             props: {
                 position: '0',
                 currentPos: '0',

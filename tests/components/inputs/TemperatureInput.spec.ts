@@ -107,81 +107,81 @@ describe('TemperatureInput.vue', () => {
     }
 
     it('renders the current target value', async () => {
-        const wrapper = mountComponent()
+        const wrapper: any = mountComponent()
         await wrapper.vm.$nextTick()
         expect(wrapper.text()).toContain('200')
         expect(wrapper.text()).toContain('°C')
     })
 
     it('renders presets button when presets are provided', () => {
-        const wrapper = mountComponent({ presets: [180, 200, 220] })
+        const wrapper: any = mountComponent({ presets: [180, 200, 220] })
         const btn = wrapper.find('.v-btn-stub')
         expect(btn.exists()).toBe(true)
     })
 
     it('does not render presets button when presets is not provided', () => {
-        const wrapper = mountComponent()
+        const wrapper: any = mountComponent()
         const btn = wrapper.find('.v-btn-stub')
         expect(btn.exists()).toBe(false)
     })
 
     it('disables presets button when printer is printing or paused', () => {
         mockPrinterState.value = 'printing'
-        const wrapper = mountComponent({ presets: [180, 200] })
+        const wrapper: any = mountComponent({ presets: [180, 200] })
         const btn = wrapper.find('.v-btn-stub')
         expect(btn.attributes('disabled')).toBeDefined()
     })
 
     it('enables presets button when printer is not printing', () => {
         mockPrinterState.value = 'standby'
-        const wrapper = mountComponent({ presets: [180, 200] })
+        const wrapper: any = mountComponent({ presets: [180, 200] })
         const btn = wrapper.find('.v-btn-stub')
         expect(btn.attributes('disabled')).toBeUndefined()
     })
 
     it('sends SET_TEMPERATURE command on submit when value changes', async () => {
-        const wrapper = mountComponent()
+        const wrapper: any = mountComponent()
         // Change the value
-        wrapper.vm.value = 210
+        (wrapper.vm as any).value = 210
         await wrapper.vm.$nextTick()
 
-        wrapper.vm.setTemps()
+        (wrapper.vm as any).setTemps()
         await wrapper.vm.$nextTick()
 
         expect(mockDoSend).toHaveBeenCalledWith('M104 S=extruder TARGET=210')
     })
 
     it('does not send command when value is above maxTemp', async () => {
-        const wrapper = mountComponent()
-        wrapper.vm.value = 350
+        const wrapper: any = mountComponent()
+        (wrapper.vm as any).value = 350
         await wrapper.vm.$nextTick()
 
-        wrapper.vm.setTemps()
+        (wrapper.vm as any).setTemps()
         await wrapper.vm.$nextTick()
 
         expect(mockDoSend).not.toHaveBeenCalled()
         // Value should be reset to target
-        expect(wrapper.vm.value).toBe(200)
+        expect((wrapper.vm as any).value).toBe(200)
     })
 
     it('does not send command when value is below minTemp and non-zero', async () => {
-        const wrapper = mountComponent()
-        wrapper.vm.value = -10
+        const wrapper: any = mountComponent()
+        (wrapper.vm as any).value = -10
         await wrapper.vm.$nextTick()
 
-        wrapper.vm.setTemps()
+        (wrapper.vm as any).setTemps()
         await wrapper.vm.$nextTick()
 
         expect(mockDoSend).not.toHaveBeenCalled()
-        expect(wrapper.vm.value).toBe(200)
+        expect((wrapper.vm as any).value).toBe(200)
     })
 
     it('allows value of 0 even when below minTemp', async () => {
-        const wrapper = mountComponent({ minTemp: 50 })
-        wrapper.vm.value = 0
+        const wrapper: any = mountComponent({ minTemp: 50 })
+        (wrapper.vm as any).value = 0
         await wrapper.vm.$nextTick()
 
-        wrapper.vm.setTemps()
+        (wrapper.vm as any).setTemps()
         await wrapper.vm.$nextTick()
 
         // 0 should be allowed (turn off)
@@ -189,34 +189,34 @@ describe('TemperatureInput.vue', () => {
     })
 
     it('does not send command when value is same as target', async () => {
-        const wrapper = mountComponent({ target: 200 })
-        wrapper.vm.value = 200
+        const wrapper: any = mountComponent({ target: 200 })
+        (wrapper.vm as any).value = 200
         await wrapper.vm.$nextTick()
 
-        wrapper.vm.setTemps()
+        (wrapper.vm as any).setTemps()
         await wrapper.vm.$nextTick()
 
         expect(mockDoSend).not.toHaveBeenCalled()
     })
 
     it('sets value from target prop on mount', async () => {
-        const wrapper = mountComponent({ target: 240 })
+        const wrapper: any = mountComponent({ target: 240 })
         await wrapper.vm.$nextTick()
-        expect(wrapper.vm.value).toBe(240)
+        expect((wrapper.vm as any).value).toBe(240)
     })
 
     it('updates value when target prop changes', async () => {
-        const wrapper = mountComponent({ target: 200 })
-        expect(wrapper.vm.value).toBe(200)
+        const wrapper: any = mountComponent({ target: 200 })
+        expect((wrapper.vm as any).value).toBe(200)
 
         await wrapper.setProps({ target: 220 })
         await wrapper.vm.$nextTick()
 
-        expect(wrapper.vm.value).toBe(220)
+        expect((wrapper.vm as any).value).toBe(220)
     })
 
     it('renders preset items with snowflake icon for 0 value', () => {
-        const wrapper = mountComponent({ presets: [0, 200] })
+        const wrapper: any = mountComponent({ presets: [0, 200] })
         const items = wrapper.findAll('.v-list-item-stub')
         expect(items).toHaveLength(2)
     })

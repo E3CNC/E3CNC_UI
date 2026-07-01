@@ -3,19 +3,19 @@ import { MutationTree } from 'vuex'
 import { PrinterTempHistoryState, PrinterTempHistoryStateSerie } from '@/store/printer/tempHistory/types'
 
 export const mutations: MutationTree<PrinterTempHistoryState> = {
-    reset(state) {
+    reset(state: PrinterTempHistoryState) {
         Object.assign(state, getDefaultState())
     },
 
-    setInitSource(state, payload) {
+    setInitSource(state: PrinterTempHistoryState, payload: any) {
         state.source = payload
     },
 
-    setInitSeries(state, payload) {
+    setInitSeries(state: PrinterTempHistoryState, payload: any) {
         state.series = payload
     },
 
-    addToSource(state, payload) {
+    addToSource(state: PrinterTempHistoryState, payload: any) {
         const newSource = [...state.source]
         newSource.push(payload.data)
         while (newSource.length > payload.maxHistory) newSource.splice(0, 1)
@@ -24,15 +24,15 @@ export const mutations: MutationTree<PrinterTempHistoryState> = {
     },
 
     // function for debugging tempchart update interval (browser sleep)
-    saveLastDate(state, payload) {
+    saveLastDate(state: PrinterTempHistoryState, payload: any) {
         state.timeLastUpdate = payload
     },
 
-    setUpdateSourceInterval(state, payload) {
+    setUpdateSourceInterval(state: PrinterTempHistoryState, payload: any) {
         state.updateSourceInterval = payload
     },
 
-    setColor(state, payload) {
+    setColor(state: PrinterTempHistoryState, payload: any) {
         state.series
             .filter((serie: PrinterTempHistoryStateSerie) => {
                 return payload.name === serie.name || serie.name.startsWith(payload.name + '-')

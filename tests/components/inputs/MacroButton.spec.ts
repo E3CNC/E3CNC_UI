@@ -79,12 +79,12 @@ describe('MacroButton.vue', () => {
     }
 
     it('renders the macro name', () => {
-        const wrapper = mountComponent()
+        const wrapper: any = mountComponent()
         expect(wrapper.exists()).toBe(true)
     })
 
     it('uses alias when provided', () => {
-        const wrapper = mountComponent({ alias: 'My Button' })
+        const wrapper: any = mountComponent({ alias: 'My Button' })
         expect(wrapper.exists()).toBe(true)
     })
 
@@ -92,9 +92,9 @@ describe('MacroButton.vue', () => {
         const store = createStoreWithGetter()
         const dispatchSpy = vi.spyOn(store, 'dispatch')
 
-        const wrapper = mountWithCustomStore(store)
+        const wrapper: any = mountWithCustomStore(store)
 
-        wrapper.vm.doSendMacro('TEST_MACRO')
+        (wrapper.vm as any).doSendMacro('TEST_MACRO')
 
         expect(dispatchSpy).toHaveBeenCalledWith('server/addEvent', {
             message: 'TEST_MACRO',
@@ -109,50 +109,50 @@ describe('MacroButton.vue', () => {
 
     it('mounts with loading state', () => {
         mocks.mockLoadings.value = ['macro_TEST_MACRO']
-        const wrapper = mountComponent()
+        const wrapper: any = mountComponent()
         expect(wrapper.exists()).toBe(true)
     })
 
     it('does not show description tooltip when description is default', () => {
-        const wrapper = mountComponent({}, { description: 'G-Code macro' })
-        expect(wrapper.vm.hasDescription).toBe(false)
+        const wrapper: any = mountComponent({}, { description: 'G-Code macro' })
+        expect((wrapper.vm as any).hasDescription).toBe(false)
     })
 
     it('shows description tooltip for non-default description', () => {
-        const wrapper = mountComponent({}, { description: 'Custom description' })
-        expect(wrapper.vm.hasDescription).toBe(true)
+        const wrapper: any = mountComponent({}, { description: 'Custom description' })
+        expect((wrapper.vm as any).hasDescription).toBe(true)
     })
 
     it('parses parameters from klipper macro data', () => {
-        const wrapper = mountComponent(
+        const wrapper: any = mountComponent(
             {},
             {
                 params: { SPEED: { type: 'int', default: 100 }, FAN: { type: 'string', default: 'off' } },
             }
         )
-        expect(wrapper.vm.paramArray.length).toBeGreaterThan(0)
+        expect((wrapper.vm as any).paramArray.length).toBeGreaterThan(0)
     })
 
     it('skips parameters starting with underscore', () => {
-        const wrapper = mountComponent(
+        const wrapper: any = mountComponent(
             {},
             {
                 params: { SPEED: { type: 'int', default: 100 }, _internal: { type: 'string', default: '' } },
             }
         )
-        expect(wrapper.vm.paramArray).toContain('SPEED')
-        expect(wrapper.vm.paramArray).not.toContain('_internal')
+        expect((wrapper.vm as any).paramArray).toContain('SPEED')
+        expect((wrapper.vm as any).paramArray).not.toContain('_internal')
     })
 
     it('sendWithParams builds gcode with params', () => {
         const store = createStoreWithGetter()
         const dispatchSpy = vi.spyOn(store, 'dispatch')
 
-        const wrapper = mountWithCustomStore(store)
+        const wrapper: any = mountWithCustomStore(store)
 
-        wrapper.vm.paramArray = ['SPEED']
-        wrapper.vm.params = { SPEED: { type: 'int', default: 100, value: '200' } }
-        wrapper.vm.sendWithParams()
+        (wrapper.vm as any).paramArray = ['SPEED']
+        (wrapper.vm as any).params = { SPEED: { type: 'int', default: 100, value: '200' } }
+        (wrapper.vm as any).sendWithParams()
 
         expect(dispatchSpy).toHaveBeenCalledWith('server/addEvent', {
             message: 'TEST_MACRO SPEED=200',
@@ -164,11 +164,11 @@ describe('MacroButton.vue', () => {
         const store = createStoreWithGetter()
         const dispatchSpy = vi.spyOn(store, 'dispatch')
 
-        const wrapper = mountWithCustomStore(store)
+        const wrapper: any = mountWithCustomStore(store)
 
-        wrapper.vm.paramArray = ['MSG']
-        wrapper.vm.params = { MSG: { type: 'string', default: '', value: 'hello world' } }
-        wrapper.vm.sendWithParams()
+        (wrapper.vm as any).paramArray = ['MSG']
+        (wrapper.vm as any).params = { MSG: { type: 'string', default: '', value: 'hello world' } }
+        (wrapper.vm as any).sendWithParams()
 
         expect(dispatchSpy).toHaveBeenCalledWith('server/addEvent', {
             message: 'TEST_MACRO MSG="hello world"',
@@ -178,18 +178,18 @@ describe('MacroButton.vue', () => {
 
     it('isGcodeStyle detects G/M codes', () => {
         const gcodeMacro = { name: 'G28', rename: null }
-        const wrapper = mountComponent({ macro: gcodeMacro })
-        expect(wrapper.vm.isGcodeStyle).toBeTruthy()
+        const wrapper: any = mountComponent({ macro: gcodeMacro })
+        expect((wrapper.vm as any).isGcodeStyle).toBeTruthy()
     })
 
     it('non-G-code macros use = syntax', () => {
-        const wrapper = mountComponent()
-        expect(wrapper.vm.isGcodeStyle).toBeFalsy()
+        const wrapper: any = mountComponent()
+        expect((wrapper.vm as any).isGcodeStyle).toBeFalsy()
     })
 
     it('paramCols returns 1 on mobile', () => {
         mocks.mockIsMobile.value = true
-        const wrapper = mountComponent(
+        const wrapper: any = mountComponent(
             {},
             {
                 params: {
@@ -199,18 +199,18 @@ describe('MacroButton.vue', () => {
                 },
             }
         )
-        expect(wrapper.vm.paramCols).toBe(1)
+        expect((wrapper.vm as any).paramCols).toBe(1)
     })
 
     it('paramCols caps at 4 on desktop', () => {
         mocks.mockIsMobile.value = false
-        const wrapper = mountComponent(
+        const wrapper: any = mountComponent(
             {},
             {
                 params: { A: {}, B: {}, C: {}, D: {}, E: {}, F: {} },
             }
         )
         // 6 params / 5 = 1.2, ceil = 2, min(2,4) = 2
-        expect(wrapper.vm.paramCols).toBe(2)
+        expect((wrapper.vm as any).paramCols).toBe(2)
     })
 })

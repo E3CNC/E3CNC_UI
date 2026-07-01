@@ -4,7 +4,7 @@ import { caseInsensitiveSort } from '@/plugins/helpers'
 import { RootState } from '@/store/types'
 
 export const getters: GetterTree<ServerUpdateManagerState, RootState> = {
-    getUpdateManagerList(state): ServerUpdateManagerStateGuiList[] {
+    getUpdateManagerList(state: ServerUpdateManagerState): ServerUpdateManagerStateGuiList[] {
         const output: ServerUpdateManagerStateGuiList[] = []
 
         state.git_repos.forEach((repo) => {

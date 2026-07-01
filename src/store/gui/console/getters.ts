@@ -5,7 +5,7 @@ import { timelapseConsoleFilters } from '@/store/variables'
 import { RootState } from '@/store/types'
 
 export const getters: GetterTree<GuiConsoleState, RootState> = {
-    getConsolefilters: (state) => {
+    getConsolefilters: (state: GuiConsoleState) => {
         const consolefilters: GuiConsoleStateFilter[] = []
 
         Object.keys(state.consolefilters).forEach((id: string) => {
@@ -15,7 +15,7 @@ export const getters: GetterTree<GuiConsoleState, RootState> = {
         return caseInsensitiveSort(consolefilters, 'name')
     },
 
-    getConsolefilterRules: (state, getters, rootState) => {
+    getConsolefilterRules: (state: GuiConsoleState, getters: any, rootState: RootState) => {
         const output = []
 
         if (rootState.gui?.console?.hideWaitTemperatures) output.push('^(?:ok\\s+)?(B|C|T\\d*):')
@@ -37,7 +37,7 @@ export const getters: GetterTree<GuiConsoleState, RootState> = {
         return output
     },
 
-    getConsoleClearedSince: (state) => {
+    getConsoleClearedSince: (state: GuiConsoleState) => {
         return state.cleared_since
     },
 }

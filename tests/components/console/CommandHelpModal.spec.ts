@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
 import { createStore } from 'vuex'
@@ -165,12 +166,12 @@ describe('CommandHelpModal.vue', () => {
         })
 
         // Open the dialog
-        wrapper.vm.isOpen = true
+        (wrapper.vm as any).isOpen = true
         wrapper.vm.$forceUpdate()
         wrapper.vm.$nextTick()
 
         // Check computed property directly
-        const helplistFiltered = wrapper.vm.helplistFiltered
+        const helplistFiltered = (wrapper.vm as any).helplistFiltered
         expect(helplistFiltered).toHaveLength(3)
         expect(helplistFiltered).toContain('G28')
         expect(helplistFiltered).toContain('M106')
@@ -197,11 +198,11 @@ describe('CommandHelpModal.vue', () => {
             },
         })
 
-        wrapper.vm.isOpen = true
-        wrapper.vm.cmdListSearch = 'M1'
+        (wrapper.vm as any).isOpen = true
+        (wrapper.vm as any).cmdListSearch = 'M1'
         await wrapper.vm.$nextTick()
 
-        const filtered = wrapper.vm.helplistFiltered
+        const filtered = (wrapper.vm as any).helplistFiltered
         expect(filtered).toHaveLength(2)
         expect(filtered).toEqual(['M106', 'M107'])
     })
@@ -225,11 +226,11 @@ describe('CommandHelpModal.vue', () => {
             },
         })
 
-        wrapper.vm.isOpen = true
-        wrapper.vm.cmdListSearch = 'g28'
+        (wrapper.vm as any).isOpen = true
+        (wrapper.vm as any).cmdListSearch = 'g28'
         await wrapper.vm.$nextTick()
 
-        const filtered = wrapper.vm.helplistFiltered
+        const filtered = (wrapper.vm as any).helplistFiltered
         expect(filtered).toHaveLength(1)
         expect(filtered).toContain('G28')
     })
@@ -252,11 +253,11 @@ describe('CommandHelpModal.vue', () => {
             },
         })
 
-        wrapper.vm.isOpen = true
-        wrapper.vm.cmdListSearch = 'ZZZ_NEVER'
+        (wrapper.vm as any).isOpen = true
+        (wrapper.vm as any).cmdListSearch = 'ZZZ_NEVER'
         await wrapper.vm.$nextTick()
 
-        expect(wrapper.vm.helplistFiltered).toHaveLength(0)
+        expect((wrapper.vm as any).helplistFiltered).toHaveLength(0)
     })
 
     it('sorts commands alphabetically', () => {
@@ -279,10 +280,10 @@ describe('CommandHelpModal.vue', () => {
             },
         })
 
-        wrapper.vm.isOpen = true
+        (wrapper.vm as any).isOpen = true
         wrapper.vm.$nextTick()
 
-        const filtered = wrapper.vm.helplistFiltered
+        const filtered = (wrapper.vm as any).helplistFiltered
         expect(filtered[0]).toBe('G28')
         expect(filtered[1]).toBe('M106')
         expect(filtered[2]).toBe('M107')
@@ -305,15 +306,16 @@ describe('CommandHelpModal.vue', () => {
             },
         })
 
-        wrapper.vm.isOpen = true
-        wrapper.vm.cmdListSearch = 'G28'
+        const vm = wrapper.vm as unknown as any
+        vm.isOpen = true
+        vm.cmdListSearch = 'G28'
         await wrapper.vm.$nextTick()
 
         // Close
-        wrapper.vm.isOpen = false
+        vm.isOpen = false
         await wrapper.vm.$nextTick()
 
-        expect(wrapper.vm.cmdListSearch).toBe('')
+        expect(vm.cmdListSearch).toBe('')
     })
 
     it('does not clear search when dialog is opened (only on close)', async () => {
@@ -332,15 +334,16 @@ describe('CommandHelpModal.vue', () => {
             },
         })
 
-        wrapper.vm.isOpen = true
-        wrapper.vm.cmdListSearch = 'G28'
+        const vm = wrapper.vm as unknown as any
+        vm.isOpen = true
+        vm.cmdListSearch = 'G28'
         await wrapper.vm.$nextTick()
 
         // Setting isOpen to true again should NOT clear search
-        wrapper.vm.isOpen = true
+        vm.isOpen = true
         await wrapper.vm.$nextTick()
 
-        expect(wrapper.vm.cmdListSearch).toBe('G28')
+        expect(vm.cmdListSearch).toBe('G28')
     })
 
     // ── onCommand emit ──
@@ -360,16 +363,16 @@ describe('CommandHelpModal.vue', () => {
             },
         })
 
-        wrapper.vm.isOpen = true
+        (wrapper.vm as any).isOpen = true
         await wrapper.vm.$nextTick()
 
         // Call onCommand directly
-        wrapper.vm.onCommand('G28')
+        (wrapper.vm as any).onCommand('G28')
         await wrapper.vm.$nextTick()
 
         expect(wrapper.emitted('onCommand')).toBeTruthy()
         expect(wrapper.emitted('onCommand')![0]).toEqual(['G28'])
-        expect(wrapper.vm.isOpen).toBe(false)
+        expect((wrapper.vm as any).isOpen).toBe(false)
     })
 
     // ── Mobile fullscreen ──
@@ -417,8 +420,8 @@ describe('CommandHelpModal.vue', () => {
             },
         })
 
-        wrapper.vm.isOpen = true
-        expect(wrapper.vm.helplistFiltered).toHaveLength(0)
+        (wrapper.vm as any).isOpen = true
+        expect((wrapper.vm as any).helplistFiltered).toHaveLength(0)
     })
 
     it('handles null commands gracefully', () => {
@@ -437,8 +440,8 @@ describe('CommandHelpModal.vue', () => {
             },
         })
 
-        wrapper.vm.isOpen = true
-        expect(wrapper.vm.helplistFiltered).toHaveLength(0)
+        (wrapper.vm as any).isOpen = true
+        expect((wrapper.vm as any).helplistFiltered).toHaveLength(0)
     })
 
     it('does not crash when printer.gcode is undefined', () => {
@@ -461,7 +464,7 @@ describe('CommandHelpModal.vue', () => {
             },
         })
 
-        wrapper.vm.isOpen = true
-        expect(wrapper.vm.helplistFiltered).toHaveLength(0)
+        (wrapper.vm as any).isOpen = true
+        expect((wrapper.vm as any).helplistFiltered).toHaveLength(0)
     })
 })

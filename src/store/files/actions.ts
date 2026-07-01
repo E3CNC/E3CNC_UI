@@ -1,4 +1,4 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { getSocket, $toast } from '@/store/runtime'
 import {
     ApiGetDirectoryReturn,
@@ -15,11 +15,11 @@ import type { AxiosProgressEvent } from 'axios'
 import { BatchMessage } from '@/plugins/webSocketClient'
 
 export const actions: ActionTree<FileState, RootState> = {
-    reset({ commit }) {
+    reset({ commit }: ActionContext<FileState, RootState>) {
         commit('reset')
     },
 
-    initRootDirs({ state, commit }, dirs) {
+    initRootDirs({ state, commit }: ActionContext<FileState, RootState>, dirs: any) {
         dirs.forEach((dirname: string) => {
             if (state.filetree.findIndex((tmp: FileStateFile) => tmp.filename === dirname) === -1) {
                 commit('createRootDir', {
@@ -184,7 +184,7 @@ export const actions: ActionTree<FileState, RootState> = {
         getSocket().emitBatch(messages)
     },
 
-    getMetadata({ commit, rootState }, payload) {
+    getMetadata({ commit, rootState }: ActionContext<FileState, RootState>, payload: any) {
         if (payload === null || payload === undefined || payload.filename === '') return
 
         if (payload.filename === rootState?.printer?.print_stats?.filename) {
@@ -195,12 +195,12 @@ export const actions: ActionTree<FileState, RootState> = {
         commit('setMetadata', payload)
     },
 
-    getMetadataCurrentFile({ commit }, payload) {
+    getMetadataCurrentFile({ commit }: ActionContext<FileState, RootState>, payload: any) {
         commit('printer/clearCurrentFile', null, { root: true })
         commit('printer/setData', { current_file: payload }, { root: true })
     },
 
-    async filelist_changed({ commit, dispatch }, payload) {
+    async filelist_changed({ commit, dispatch }: ActionContext<FileState, RootState>, payload: any) {
         switch (payload.action) {
             case 'create_file':
                 commit('setCreateFile', payload)
@@ -265,7 +265,7 @@ export const actions: ActionTree<FileState, RootState> = {
         }
     },
 
-    getMove(_, payload) {
+    getMove(_context: ActionContext<FileState, RootState>, payload: any) {
         if (payload.error) {
             $toast.error(payload.error.message)
         } else {
@@ -280,7 +280,7 @@ export const actions: ActionTree<FileState, RootState> = {
         }
     },
 
-    getCreateDir(_, payload) {
+    getCreateDir(_context: ActionContext<FileState, RootState>, payload: any) {
         if (payload.error) {
             $toast.error(payload.error.message)
         } else {
@@ -290,7 +290,7 @@ export const actions: ActionTree<FileState, RootState> = {
         }
     },
 
-    getDeleteDir(_, payload) {
+    getDeleteDir(_context: ActionContext<FileState, RootState>, payload: any) {
         if (payload.error) {
             $toast.error(payload.error.message)
         } else {
@@ -300,7 +300,7 @@ export const actions: ActionTree<FileState, RootState> = {
         }
     },
 
-    getDeleteFile(_, payload) {
+    getDeleteFile(_context: ActionContext<FileState, RootState>, payload: any) {
         if (payload.error) {
             $toast.error(payload.error.message)
         } else {
@@ -352,29 +352,29 @@ export const actions: ActionTree<FileState, RootState> = {
         })
     },
 
-    uploadSetShow({ commit }, payload) {
+    uploadSetShow({ commit }: ActionContext<FileState, RootState>, payload: any) {
         commit('uploadSetShow', payload)
     },
 
-    uploadSetCurrentNumber({ commit }, payload) {
+    uploadSetCurrentNumber({ commit }: ActionContext<FileState, RootState>, payload: any) {
         commit('uploadSetCurrentNumber', payload)
     },
 
-    uploadIncrementCurrentNumber({ state, commit }) {
+    uploadIncrementCurrentNumber({ state, commit }: ActionContext<FileState, RootState>) {
         commit('uploadSetCurrentNumber', state.upload.currentNumber + 1)
     },
 
-    uploadSetMaxNumber({ commit }, payload) {
+    uploadSetMaxNumber({ commit }: ActionContext<FileState, RootState>, payload: any) {
         commit('uploadSetMaxNumber', payload)
     },
 
-    downloadZip({ rootGetters }, payload) {
+    downloadZip({ rootGetters }: ActionContext<FileState, RootState>, payload: any) {
         const apiUrl = rootGetters['socket/getUrl']
         const url = `${apiUrl}/server/files/${payload.destination.root}/${encodeURI(payload.destination.path)}`
         window.open(url)
     },
 
-    rolloverLog(_, payload) {
+    rolloverLog(_context: ActionContext<FileState, RootState>, payload: any) {
         payload.rolled_over.forEach((name: string) => {
             $toast.success(<string>i18n.global.t('Machine.LogfilesPanel.RolloverToastSuccessful', { name }))
         })

@@ -1,10 +1,10 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { getSocket } from '@/store/runtime'
 import { RootState } from '@/store/types'
 import type { ServerJobQueueState, ServerJobQueueStateJob } from '@/store/server/jobQueue/types'
 
 export const actions: ActionTree<ServerJobQueueState, RootState> = {
-    reset({ commit }) {
+    reset({ commit }: ActionContext<ServerJobQueueState, RootState>) {
         commit('reset')
     },
 
@@ -12,12 +12,12 @@ export const actions: ActionTree<ServerJobQueueState, RootState> = {
         getSocket().emit('server.job_queue.status', {}, { action: 'server/jobQueue/getStatus' })
     },
 
-    getEvent({ commit }, payload) {
+    getEvent({ commit }: ActionContext<ServerJobQueueState, RootState>, payload: any) {
         if ('updated_queue' in payload && payload.updated_queue !== null) commit('setQueuedJobs', payload.updated_queue)
         if ('queue_state' in payload) commit('setQueueState', payload.queue_state)
     },
 
-    async getStatus({ commit, dispatch }, payload) {
+    async getStatus({ commit, dispatch }: ActionContext<ServerJobQueueState, RootState>, payload: any) {
         if ('queued_jobs' in payload) commit('setQueuedJobs', payload.queued_jobs)
         if ('queue_state' in payload) commit('setQueueState', payload.queue_state)
 

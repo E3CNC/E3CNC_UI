@@ -1,20 +1,20 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { SocketState } from '@/store/socket/types'
 import { RootState } from '@/store/types'
 import { getSocket } from '@/store/runtime'
 
 export const actions: ActionTree<SocketState, RootState> = {
-    reset({ commit }) {
+    reset({ commit }: ActionContext<SocketState, RootState>) {
         commit('setDisconnected')
         commit('clearLoadings')
         commit('reset')
     },
 
-    setData({ commit }, payload) {
+    setData({ commit }: ActionContext<SocketState, RootState>, payload: any) {
         commit('setData', payload)
     },
 
-    async setSocket({ commit, state }, payload) {
+    async setSocket({ commit, state }: ActionContext<SocketState, RootState>, payload: any) {
         commit('setData', payload)
 
         try {
@@ -30,7 +30,7 @@ export const actions: ActionTree<SocketState, RootState> = {
         }
     },
 
-    onOpen({ commit, dispatch, rootState }) {
+    onOpen({ commit, dispatch, rootState }: ActionContext<SocketState, RootState>) {
         //set socket connection to connected
         commit('setConnected')
 
@@ -41,11 +41,11 @@ export const actions: ActionTree<SocketState, RootState> = {
             commit('server/updateManager/setStatus', { busy: false }, { root: true })
     },
 
-    onClose({ commit }) {
+    onClose({ commit }: ActionContext<SocketState, RootState>) {
         commit('setDisconnected')
     },
 
-    onMessage({ commit, dispatch }, payload) {
+    onMessage({ commit, dispatch }: ActionContext<SocketState, RootState>, payload: any) {
         switch (payload.method) {
             case 'notify_status_update':
                 dispatch('printer/getData', payload.params[0], { root: true })
@@ -149,7 +149,7 @@ export const actions: ActionTree<SocketState, RootState> = {
         commit('removeLoading', payload)
     },
 
-    clearLoadings({ commit }) {
+    clearLoadings({ commit }: ActionContext<SocketState, RootState>) {
         commit('clearLoadings')
     },
 
@@ -167,11 +167,11 @@ export const actions: ActionTree<SocketState, RootState> = {
         commit('removeInitComponent', payload)
     },
 
-    reportDebug(_, payload) {
+    reportDebug(_context: ActionContext<SocketState, RootState>, payload: any) {
         window.console.log(payload)
     },
 
-    setConnectionFailed({ commit }, payload) {
+    setConnectionFailed({ commit }: ActionContext<SocketState, RootState>, payload: any) {
         commit('setDisconnected', payload)
     },
 }

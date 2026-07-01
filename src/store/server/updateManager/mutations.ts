@@ -4,11 +4,11 @@ import { getSocket } from '@/store/runtime'
 import { ServerUpdateManagerState } from '@/store/server/updateManager/types'
 
 export const mutations: MutationTree<ServerUpdateManagerState> = {
-    reset(state) {
+    reset(state: ServerUpdateManagerState) {
         Object.assign(state, getDefaultState())
     },
 
-    resetRepos(state) {
+    resetRepos(state: ServerUpdateManagerState) {
         state.git_repos = []
         state.web_repos = []
         state.system = {
@@ -17,21 +17,21 @@ export const mutations: MutationTree<ServerUpdateManagerState> = {
         }
     },
 
-    storeGitRepo(state, payload) {
+    storeGitRepo(state: ServerUpdateManagerState, payload: any) {
         const newGitRepos = [...state.git_repos]
         newGitRepos.push({ ...payload })
 
         state.git_repos = newGitRepos
     },
 
-    storeWebRepo(state, payload) {
+    storeWebRepo(state: ServerUpdateManagerState, payload: any) {
         const newWebRepos = [...state.web_repos]
         newWebRepos.push({ ...payload })
 
         state.web_repos = newWebRepos
     },
 
-    updateSystem(state, payload) {
+    updateSystem(state: ServerUpdateManagerState, payload: any) {
         const newSystem = { ...state.system }
         newSystem.package_count = payload.package_count
         newSystem.package_list = payload.package_list
@@ -39,7 +39,7 @@ export const mutations: MutationTree<ServerUpdateManagerState> = {
         state.system = newSystem
     },
 
-    addUpdateResponse(state, payload) {
+    addUpdateResponse(state: ServerUpdateManagerState, payload: any) {
         if (state.updateResponse.application !== payload.application)
             state.updateResponse.application = payload.application
 
@@ -58,7 +58,7 @@ export const mutations: MutationTree<ServerUpdateManagerState> = {
         })
     },
 
-    resetUpdateResponse(state) {
+    resetUpdateResponse(state: ServerUpdateManagerState) {
         state.updateResponse = {
             application: '',
             complete: true,

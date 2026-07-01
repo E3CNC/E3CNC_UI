@@ -1,11 +1,11 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { RootState } from '@/store/types'
 import { v4 as uuidv4 } from 'uuid'
 import { GuiRemoteprintersState, GuiRemoteprintersStatePrinter } from '@/store/gui/remoteprinters/types'
 import { getSocket } from '@/store/runtime'
 
 export const actions: ActionTree<GuiRemoteprintersState, RootState> = {
-    reset({ commit, dispatch, state }) {
+    reset({ commit, dispatch, state }: ActionContext<GuiRemoteprintersState, RootState>) {
         Object.keys(state.printers).forEach((printerId) => {
             dispatch('farm/unregisterPrinter', printerId, { root: true })
         })
@@ -13,7 +13,7 @@ export const actions: ActionTree<GuiRemoteprintersState, RootState> = {
         commit('reset')
     },
 
-    initFromLocalstorage({ dispatch, rootState }) {
+    initFromLocalstorage({ dispatch, rootState }: ActionContext<GuiRemoteprintersState, RootState>) {
         let value = rootState.configInstances ?? []
         if (rootState.instancesDB === 'browser') value = JSON.parse(localStorage.getItem('printers') ?? '{}')
         if (Array.isArray(value)) {
@@ -28,7 +28,7 @@ export const actions: ActionTree<GuiRemoteprintersState, RootState> = {
         }
     },
 
-    async initStore({ commit, dispatch }, payload) {
+    async initStore({ commit, dispatch }: ActionContext<GuiRemoteprintersState, RootState>, payload: any) {
         dispatch('reset')
         Object.keys(payload).forEach((printerId: string) => {
             const printer = payload[printerId]
@@ -47,7 +47,7 @@ export const actions: ActionTree<GuiRemoteprintersState, RootState> = {
         })
     },
 
-    upload({ state, rootState }, id) {
+    upload({ state, rootState }: ActionContext<GuiRemoteprintersState, RootState>, id: any) {
         if (rootState.instancesDB === 'browser') {
             const printers: GuiRemoteprintersStatePrinter[] = []
 
@@ -78,7 +78,7 @@ export const actions: ActionTree<GuiRemoteprintersState, RootState> = {
         }
     },
 
-    store({ commit, dispatch }, payload) {
+    store({ commit, dispatch }: ActionContext<GuiRemoteprintersState, RootState>, payload: any) {
         const id = uuidv4()
 
         commit('store', { id, values: payload.values })
@@ -97,14 +97,14 @@ export const actions: ActionTree<GuiRemoteprintersState, RootState> = {
         dispatch('upload', id)
     },
 
-    update({ commit, dispatch }, payload) {
+    update({ commit, dispatch }: ActionContext<GuiRemoteprintersState, RootState>, payload: any) {
         commit('update', payload)
         dispatch('farm/updatePrinter', payload, { root: true })
 
         dispatch('upload', payload.id)
     },
 
-    updateSettings({ commit, dispatch }, payload) {
+    updateSettings({ commit, dispatch }: ActionContext<GuiRemoteprintersState, RootState>, payload: any) {
         commit('update', {
             id: payload.id,
             values: {
@@ -114,7 +114,7 @@ export const actions: ActionTree<GuiRemoteprintersState, RootState> = {
         dispatch('upload', payload.id)
     },
 
-    delete({ commit, dispatch, rootState }, id) {
+    delete({ commit, dispatch, rootState }: ActionContext<GuiRemoteprintersState, RootState>, id: any) {
         commit('delete', id)
         dispatch('farm/unregisterPrinter', id, { root: true })
 

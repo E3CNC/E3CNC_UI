@@ -4,23 +4,23 @@ import { EditorState } from '@/store/editor/types'
 import { sha256 } from 'js-sha256'
 
 export const mutations: MutationTree<EditorState> = {
-    reset(state) {
+    reset(state: EditorState) {
         Object.assign(state, getDefaultState())
     },
 
-    updateCancelTokenSource(state, source) {
+    updateCancelTokenSource(state: EditorState, source) {
         state.cancelToken = source
     },
 
-    updateLoaderState(state, value) {
+    updateLoaderState(state: EditorState, value) {
         state.loaderBool = value
     },
 
-    updateLoader(state, payload) {
+    updateLoader(state: EditorState, payload: any) {
         state.loaderProgress = payload
     },
 
-    openFile(state, payload) {
+    openFile(state: EditorState, payload: any) {
         state.filename = payload.filename
         state.fileroot = payload.fileroot
         state.filepath = payload.filepath
@@ -35,23 +35,23 @@ export const mutations: MutationTree<EditorState> = {
         state.bool = true
     },
 
-    showEditor(state) {
+    showEditor(state: EditorState) {
         state.bool = true
     },
 
-    setFilename(state, filename) {
+    setFilename(state: EditorState, filename) {
         state.filename = filename
     },
 
-    setPermissions(state, filename) {
+    setPermissions(state: EditorState, filename) {
         state.permissions = filename
     },
 
-    hideEditor(state) {
+    hideEditor(state: EditorState) {
         state.bool = false
     },
 
-    updateSourcecode(state, payload) {
+    updateSourcecode(state: EditorState, payload: any) {
         state.sourcecode = payload
 
         // To check if a file has been changed by the user, we need to calculate a hash
@@ -68,7 +68,7 @@ export const mutations: MutationTree<EditorState> = {
         state.changed = sha256(payload) != state.loadedHash
     },
 
-    updateLoadedHash(state, payload) {
+    updateLoadedHash(state: EditorState, payload: any) {
         state.loadedHash = sha256(payload.replace(/(?:\r\n|\r|\n)/g, '\n'))
         state.changed = false
     },

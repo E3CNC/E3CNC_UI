@@ -3,19 +3,19 @@ import { MutationTree } from 'vuex'
 import { GuiConsoleState } from '@/store/gui/console/types'
 
 export const mutations: MutationTree<GuiConsoleState> = {
-    reset(state) {
+    reset(state: GuiConsoleState) {
         Object.assign(state, getDefaultState())
     },
 
-    clear(state, payload) {
+    clear(state: GuiConsoleState, payload: any) {
         state.cleared_since = payload.cleared_since
     },
 
-    filterStore(state, payload) {
+    filterStore(state: GuiConsoleState, payload: any) {
         state.consolefilters[payload.id] = payload.values
     },
 
-    filterUpdate(state, payload) {
+    filterUpdate(state: GuiConsoleState, payload: any) {
         if (!(payload.id in state.consolefilters)) return
 
         const preset = { ...state.consolefilters[payload.id] }
@@ -24,7 +24,7 @@ export const mutations: MutationTree<GuiConsoleState> = {
         state.consolefilters[payload.id] = preset
     },
 
-    filterDelete(state, payload) {
+    filterDelete(state: GuiConsoleState, payload: any) {
         if (!(payload in state.consolefilters)) return
 
         delete state.consolefilters[payload]

@@ -45,7 +45,7 @@ describe('HistoryListPanelExportCsv.vue', () => {
     })
 
     it('renders without crashing', () => {
-        const wrapper = mount(HistoryListPanelExportCsv, {
+        const wrapper: any = mount(HistoryListPanelExportCsv, {
             props: {
                 headers: [{ value: 'filename', visible: true, text: 'Filename' }],
                 tableFields: [{ value: 'status', visible: true, text: 'Status' }],
@@ -60,7 +60,7 @@ describe('HistoryListPanelExportCsv.vue', () => {
     })
 
     it('renders export button with icon', () => {
-        const wrapper = mount(HistoryListPanelExportCsv, {
+        const wrapper: any = mount(HistoryListPanelExportCsv, {
             props: {
                 headers: [],
                 tableFields: [],
@@ -76,7 +76,7 @@ describe('HistoryListPanelExportCsv.vue', () => {
     })
 
     it('renders tooltip with translated text', () => {
-        const wrapper = mount(HistoryListPanelExportCsv, {
+        const wrapper: any = mount(HistoryListPanelExportCsv, {
             props: {
                 headers: [],
                 tableFields: [],

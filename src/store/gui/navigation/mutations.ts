@@ -4,11 +4,11 @@ import { GuiNavigationState, GuiNavigationStateEntry } from './types'
 import type { NaviPoint } from '@/composables/useNavigation'
 
 export const mutations: MutationTree<GuiNavigationState> = {
-    reset(state) {
+    reset(state: GuiNavigationState) {
         Object.assign(state, getDefaultState())
     },
 
-    updatePos(state, payload: GuiNavigationStateEntry) {
+    updatePos(state: GuiNavigationState, payload: GuiNavigationStateEntry) {
         const index = state.entries.findIndex((entry) => {
             return entry.type === payload.type && entry.title === payload.title
         })
@@ -34,7 +34,7 @@ export const mutations: MutationTree<GuiNavigationState> = {
         state.entries = entries
     },
 
-    changeVisibility(state, payload: NaviPoint) {
+    changeVisibility(state: GuiNavigationState, payload: NaviPoint) {
         const title = payload.orgTitle ?? payload.title
 
         const index = state.entries.findIndex((entry) => {

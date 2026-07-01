@@ -3,19 +3,19 @@ import { MutationTree } from 'vuex'
 import { SocketState } from '@/store/socket/types'
 
 export const mutations: MutationTree<SocketState> = {
-    reset(state) {
+    reset(state: SocketState) {
         const defaults = getDefaultState()
 
         state.initializationList = defaults.initializationList
     },
 
-    setConnected(state) {
+    setConnected(state: SocketState) {
         state.isConnected = true
         state.isConnecting = false
         state.connectingFailed = false
     },
 
-    setDisconnected(state, message?: string) {
+    setDisconnected(state: SocketState, message?: string) {
         state.isConnected = false
         state.isConnecting = false
         state.connectingFailed = true
@@ -24,7 +24,7 @@ export const mutations: MutationTree<SocketState> = {
         if (message) state.connectionFailedMessage = message
     },
 
-    setData(state, payload) {
+    setData(state: SocketState, payload: any) {
         if ('socket' in payload) payload = payload.socket
 
         Object.entries(payload).forEach(([key, value]) => {
@@ -32,20 +32,20 @@ export const mutations: MutationTree<SocketState> = {
         })
     },
 
-    addLoading(state, payload) {
+    addLoading(state: SocketState, payload: any) {
         state.loadings.push(payload.name)
     },
 
-    removeLoading(state, payload) {
+    removeLoading(state: SocketState, payload: any) {
         const index = state.loadings.indexOf(payload.name)
         if (index > -1) state.loadings.splice(index, 1)
     },
 
-    clearLoadings(state) {
+    clearLoadings(state: SocketState) {
         if (state.loadings.length) state.loadings = []
     },
 
-    addInitModule(state, payload) {
+    addInitModule(state: SocketState, payload: any) {
         const list = [...state.initializationList]
         const index = list.indexOf(payload)
         if (index > -1) return
@@ -54,7 +54,7 @@ export const mutations: MutationTree<SocketState> = {
         state.initializationList = list
     },
 
-    removeInitModule(state, payload) {
+    removeInitModule(state: SocketState, payload: any) {
         const list = [...state.initializationList]
         const index = list.indexOf(payload)
         if (index === -1) return
@@ -63,7 +63,7 @@ export const mutations: MutationTree<SocketState> = {
         state.initializationList = list
     },
 
-    removeInitComponent(state, payload) {
+    removeInitComponent(state: SocketState, payload: any) {
         // remove all components which start with payload
         state.initializationList = state.initializationList.filter((item: string) => !item.startsWith(payload))
     },

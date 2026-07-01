@@ -68,7 +68,7 @@ function baseItem() {
 
 describe('HistoryListPanelDetailMaintenanceHistoryEntry.vue', () => {
     it('renders without crashing', () => {
-        const wrapper = mount(HistoryListPanelDetailMaintenanceHistoryEntry, {
+        const wrapper: any = mount(HistoryListPanelDetailMaintenanceHistoryEntry, {
             props: { item: baseItem(), current: true, last: false },
             global: {
                 plugins: [makeStore()],
@@ -79,7 +79,7 @@ describe('HistoryListPanelDetailMaintenanceHistoryEntry.vue', () => {
     })
 
     it('renders filament, printtime, and days text', () => {
-        const wrapper = mount(HistoryListPanelDetailMaintenanceHistoryEntry, {
+        const wrapper: any = mount(HistoryListPanelDetailMaintenanceHistoryEntry, {
             props: { item: baseItem(), current: true, last: false },
             global: {
                 plugins: [makeStore()],
@@ -92,7 +92,7 @@ describe('HistoryListPanelDetailMaintenanceHistoryEntry.vue', () => {
     })
 
     it('shows last text when last prop is true', () => {
-        const wrapper = mount(HistoryListPanelDetailMaintenanceHistoryEntry, {
+        const wrapper: any = mount(HistoryListPanelDetailMaintenanceHistoryEntry, {
             props: { item: baseItem(), current: false, last: true },
             global: {
                 plugins: [makeStore()],
@@ -103,7 +103,7 @@ describe('HistoryListPanelDetailMaintenanceHistoryEntry.vue', () => {
     })
 
     it('renders note with line breaks', () => {
-        const wrapper = mount(HistoryListPanelDetailMaintenanceHistoryEntry, {
+        const wrapper: any = mount(HistoryListPanelDetailMaintenanceHistoryEntry, {
             props: { item: baseItem(), current: true, last: false },
             global: {
                 plugins: [makeStore()],

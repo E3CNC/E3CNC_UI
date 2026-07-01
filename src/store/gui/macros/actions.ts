@@ -1,4 +1,4 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { RootState } from '@/store/types'
 import type { GuiStateDashboardLayoutKey, GuiStateLayoutoption } from '@/store/gui/types'
 import { v4 as uuidv4 } from 'uuid'
@@ -6,11 +6,11 @@ import { GuiMacrosState } from '@/store/gui/macros/types'
 import { getSocket } from '@/store/runtime'
 
 export const actions: ActionTree<GuiMacrosState, RootState> = {
-    reset({ commit }) {
+    reset({ commit }: ActionContext<GuiMacrosState, RootState>) {
         commit('reset')
     },
 
-    saveSetting({ dispatch }, payload) {
+    saveSetting({ dispatch }: ActionContext<GuiMacrosState, RootState>, payload: any) {
         dispatch(
             'gui/saveSetting',
             {
@@ -21,7 +21,7 @@ export const actions: ActionTree<GuiMacrosState, RootState> = {
         )
     },
 
-    groupUpload({ state }, id) {
+    groupUpload({ state }: ActionContext<GuiMacrosState, RootState>, id: any) {
         getSocket().emit('server.database.post_item', {
             namespace: 'mainsail',
             key: 'macros.macrogroups.' + id,
@@ -29,7 +29,7 @@ export const actions: ActionTree<GuiMacrosState, RootState> = {
         })
     },
 
-    async groupStore({ commit, dispatch }, payload) {
+    async groupStore({ commit, dispatch }: ActionContext<GuiMacrosState, RootState>, payload: any) {
         const id = uuidv4()
 
         await commit('groupStore', { id, values: payload.values })
@@ -38,27 +38,27 @@ export const actions: ActionTree<GuiMacrosState, RootState> = {
         return id
     },
 
-    groupUpdate({ commit, dispatch }, payload) {
+    groupUpdate({ commit, dispatch }: ActionContext<GuiMacrosState, RootState>, payload: any) {
         commit('groupUpdate', payload)
         dispatch('groupUpload', payload.id)
     },
 
-    addMacroToMacrogroup({ commit, dispatch }, payload) {
+    addMacroToMacrogroup({ commit, dispatch }: ActionContext<GuiMacrosState, RootState>, payload: any) {
         commit('addMacroToMacrogroup', payload)
         dispatch('groupUpload', payload.id)
     },
 
-    updateMacroFromMacrogroup({ commit, dispatch }, payload) {
+    updateMacroFromMacrogroup({ commit, dispatch }: ActionContext<GuiMacrosState, RootState>, payload: any) {
         commit('updateMacroFromMacrogroup', payload)
         dispatch('groupUpload', payload.id)
     },
 
-    removeMacroFromMacrogroup({ commit, dispatch }, payload) {
+    removeMacroFromMacrogroup({ commit, dispatch }: ActionContext<GuiMacrosState, RootState>, payload: any) {
         commit('removeMacroFromMacrogroup', payload)
         dispatch('groupUpload', payload.id)
     },
 
-    groupDelete({ commit, dispatch, rootState }, id) {
+    groupDelete({ commit, dispatch, rootState }: ActionContext<GuiMacrosState, RootState>, id: any) {
         commit('groupDelete', id)
         getSocket().emit('server.database.delete_item', { namespace: 'mainsail', key: 'macros.macrogroups.' + id })
 

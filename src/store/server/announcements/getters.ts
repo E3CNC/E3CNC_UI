@@ -3,7 +3,7 @@ import { ServerAnnouncementsState, ServerAnnouncementsStateEntry } from './types
 import { RootState } from '@/store/types'
 
 export const getters: GetterTree<ServerAnnouncementsState, RootState> = {
-    getAnnouncements: (state) => {
+    getAnnouncements: (state: ServerAnnouncementsState) => {
         return state.entries.filter((entry: ServerAnnouncementsStateEntry) => !entry.dismissed)
     },
 }

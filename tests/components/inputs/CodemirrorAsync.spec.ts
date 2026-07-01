@@ -61,6 +61,6 @@ describe('CodemirrorAsync.vue', () => {
         const wrapper = mount(CodemirrorAsync, {
             props: { modelValue: 'test' },
         })
-        expect(typeof wrapper.vm.gotoLine).toBe('function')
+        expect(typeof (wrapper.vm as any).gotoLine).toBe('function')
     })
 })

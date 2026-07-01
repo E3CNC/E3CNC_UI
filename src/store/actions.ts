@@ -1,5 +1,5 @@
 import router from '@/plugins/router'
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { ConfigJson, RootState } from './types'
 
 export const actions: ActionTree<RootState, RootState> = {
@@ -7,7 +7,7 @@ export const actions: ActionTree<RootState, RootState> = {
         if (router.currentRoute.fullPath !== '/') router.push('/')
     },
 
-    changePrinter({ dispatch, getters }, payload) {
+    changePrinter({ dispatch, getters }: ActionContext<RootState, RootState>, payload: any) {
         dispatch('files/reset')
         dispatch('gui/reset')
         dispatch('printer/reset')
@@ -23,7 +23,7 @@ export const actions: ActionTree<RootState, RootState> = {
         })
     },
 
-    setNaviDrawer({ commit }, payload) {
+    setNaviDrawer({ commit }: ActionContext<RootState, RootState>, payload: any) {
         commit('setNaviDrawer', payload)
     },
 

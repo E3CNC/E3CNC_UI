@@ -3,7 +3,7 @@ import { MutationTree } from 'vuex'
 import { PrinterState } from '@/store/printer/types'
 
 export const mutations: MutationTree<PrinterState> = {
-    reset(state) {
+    reset(state: PrinterState) {
         const defaultState = getDefaultState()
 
         for (const key of Object.keys(state)) {
@@ -17,7 +17,7 @@ export const mutations: MutationTree<PrinterState> = {
         }
     },
 
-    setData(state, payload) {
+    setData(state: PrinterState, payload: any) {
         Object.keys(payload).forEach((key) => {
             const value = payload[key]
 
@@ -34,17 +34,17 @@ export const mutations: MutationTree<PrinterState> = {
         })
     },
 
-    clearCurrentFile(state) {
+    clearCurrentFile(state: PrinterState) {
         state.current_file = {}
     },
 
-    setEndstopStatus(state, payload) {
+    setEndstopStatus(state: PrinterState, payload: any) {
         delete payload.requestParams
 
         state.endstops = payload
     },
 
-    removeBedMeshProfile(state, payload) {
+    removeBedMeshProfile(state: PrinterState, payload: any) {
         if (state.bed_mesh?.profiles && payload in state.bed_mesh.profiles) {
             delete state.bed_mesh.profiles[payload]
             if (state.bed_mesh.profile_name === payload) {

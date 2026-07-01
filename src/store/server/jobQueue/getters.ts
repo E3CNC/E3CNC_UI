@@ -4,7 +4,7 @@ import { RootState } from '@/store/types'
 import { getSocket } from '@/store/runtime'
 
 export const getters: GetterTree<ServerJobQueueState, RootState> = {
-    getJobs: (state, getters, rootState, rootGetters) => {
+    getJobs: (state: ServerJobQueueState, getters: any, rootState: RootState, rootGetters: any) => {
         const jobs: ServerJobQueueStateJob[] = []
 
         state.queued_jobs.forEach((queuedJob) => {
@@ -27,7 +27,7 @@ export const getters: GetterTree<ServerJobQueueState, RootState> = {
         return jobs
     },
 
-    getJobsCount: (state) => {
+    getJobsCount: (state: ServerJobQueueState) => {
         return state.queued_jobs.length
     },
 }

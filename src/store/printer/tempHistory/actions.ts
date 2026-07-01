@@ -6,7 +6,7 @@ import {
     datasetTypes,
     datasetTypesInPercents,
 } from '@/store/variables'
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import {
     PrinterTempHistoryState,
     PrinterTempHistoryStateSerie,
@@ -15,13 +15,13 @@ import {
 import { RootState } from '@/store/types'
 
 export const actions: ActionTree<PrinterTempHistoryState, RootState> = {
-    reset({ commit, state }) {
+    reset({ commit, state }: ActionContext<PrinterTempHistoryState, RootState>) {
         if (state.updateSourceInterval !== null) clearInterval(state.updateSourceInterval)
 
         commit('reset')
     },
 
-    init({ commit, rootGetters, dispatch }, payload) {
+    init({ commit, rootGetters, dispatch }: ActionContext<PrinterTempHistoryState, RootState>, payload: any) {
         window.console.debug('init printer/tempHistory')
         dispatch('reset')
 
@@ -240,7 +240,7 @@ export const actions: ActionTree<PrinterTempHistoryState, RootState> = {
         dispatch('socket/removeInitModule', 'printer/initTempHistory', { root: true })
     },
 
-    async updateSource({ commit, rootState, rootGetters, state }) {
+    async updateSource({ commit, rootState, rootGetters, state }: ActionContext<PrinterTempHistoryState, RootState>) {
         /*if (state.timeLastUpdate !== null) {
             const t0 = performance.now()
             window.console.debug('update Source', t0-state.timeLastUpdate)
@@ -291,7 +291,7 @@ export const actions: ActionTree<PrinterTempHistoryState, RootState> = {
         //commit('saveLastDate', performance.now())
     },
 
-    setColor({ commit }, payload) {
+    setColor({ commit }: ActionContext<PrinterTempHistoryState, RootState>, payload: any) {
         commit('setColor', payload)
     },
 }

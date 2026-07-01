@@ -1,10 +1,10 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { getSocket } from '@/store/runtime'
 import type { ServerHistoryState, ServerHistoryStateJob } from '@/store/server/history/types'
 import { RootState } from '@/store/types'
 
 export const actions: ActionTree<ServerHistoryState, RootState> = {
-    reset({ commit }) {
+    reset({ commit }: ActionContext<ServerHistoryState, RootState>) {
         commit('reset')
     },
 
@@ -17,7 +17,7 @@ export const actions: ActionTree<ServerHistoryState, RootState> = {
         getSocket().emit('server.history.totals', {}, { action: 'server/history/getTotals' })
     },
 
-    getTotals({ commit }, payload) {
+    getTotals({ commit }: ActionContext<ServerHistoryState, RootState>, payload: any) {
         commit('setTotals', payload.job_totals)
 
         const auxiliary_totals = payload.auxiliary_totals ?? []
@@ -26,7 +26,7 @@ export const actions: ActionTree<ServerHistoryState, RootState> = {
         }
     },
 
-    async getHistory({ commit, dispatch, state }, payload) {
+    async getHistory({ commit, dispatch, state }: ActionContext<ServerHistoryState, RootState>, payload: any) {
         if ('requestParams' in payload && (payload.requestParams?.start ?? 0) === 0) commit('resetJobs')
 
         payload.jobs?.forEach((job: ServerHistoryStateJob) => {
@@ -60,7 +60,7 @@ export const actions: ActionTree<ServerHistoryState, RootState> = {
         dispatch('loadHistoryNotes')
     },
 
-    loadHistoryNotes({ dispatch, rootState }) {
+    loadHistoryNotes({ dispatch, rootState }: ActionContext<ServerHistoryState, RootState>) {
         if (rootState.server?.dbNamespaces.includes('history_notes'))
             getSocket().emit(
                 'server.database.get_item',
@@ -70,7 +70,7 @@ export const actions: ActionTree<ServerHistoryState, RootState> = {
         else dispatch('socket/removeInitModule', 'server/history/init', { root: true })
     },
 
-    async initHistoryNotes({ commit, dispatch }, payload) {
+    async initHistoryNotes({ commit, dispatch }: ActionContext<ServerHistoryState, RootState>, payload: any) {
         const job_ids = Object.keys(payload.value)
 
         for (const job_id of job_ids) {
@@ -84,14 +84,14 @@ export const actions: ActionTree<ServerHistoryState, RootState> = {
         await dispatch('socket/removeInitModule', 'server/history/init', { root: true })
     },
 
-    getChanged({ commit }, payload) {
+    getChanged({ commit }: ActionContext<ServerHistoryState, RootState>, payload: any) {
         if (payload.action === 'added') commit('addJob', payload.job)
         else if (payload.action === 'finished') commit('updateJob', payload.job)
 
         getSocket().emit('server.history.totals', {}, { action: 'server/history/getTotals' })
     },
 
-    getDeletedJobs({ commit }, payload) {
+    getDeletedJobs({ commit }: ActionContext<ServerHistoryState, RootState>, payload: any) {
         if ('deleted_jobs' in payload && Array.isArray(payload.deleted_jobs)) {
             payload.deleted_jobs.forEach((jobId: ServerHistoryStateJob) => {
                 commit('destroyJob', jobId)

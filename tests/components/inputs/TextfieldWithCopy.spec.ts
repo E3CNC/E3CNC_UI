@@ -25,7 +25,7 @@ describe('TextfieldWithCopy.vue', () => {
     })
 
     it('renders label and value', () => {
-        const wrapper = shallowMount(TextfieldWithCopy, {
+        const wrapper: any = shallowMount(TextfieldWithCopy, {
             props: { label: 'API Key', value: 'abc123' },
             global: {
                 mocks: { $t: (key: string) => key },
@@ -56,7 +56,7 @@ describe('TextfieldWithCopy.vue', () => {
     it('calls copyToClipboard when copy icon is clicked', async () => {
         const { copyToClipboard } = await import('@/plugins/helpers')
 
-        const wrapper = shallowMount(TextfieldWithCopy, {
+        const wrapper: any = shallowMount(TextfieldWithCopy, {
             props: { label: 'Key', value: 'secret' },
             global: {
                 mocks: { $t: (key: string) => key },
@@ -80,14 +80,14 @@ describe('TextfieldWithCopy.vue', () => {
         })
 
         // Find the copy icon and click it via component method
-        wrapper.vm.copy()
+        (wrapper.vm as any).copy()
         await wrapper.vm.$nextTick()
 
         expect(copyToClipboard).toHaveBeenCalledWith('secret')
     })
 
     it('shows tooltip for 2 seconds after copy', async () => {
-        const wrapper = shallowMount(TextfieldWithCopy, {
+        const wrapper: any = shallowMount(TextfieldWithCopy, {
             props: { label: 'Key', value: 'val' },
             global: {
                 mocks: { $t: (key: string) => key },
@@ -109,24 +109,24 @@ describe('TextfieldWithCopy.vue', () => {
             },
         })
 
-        expect(wrapper.vm.isShowTooltip).toBe(false)
+        expect((wrapper.vm as any).isShowTooltip).toBe(false)
 
-        wrapper.vm.copy()
+        (wrapper.vm as any).copy()
         await wrapper.vm.$nextTick()
 
         // Tooltip should be visible
-        expect(wrapper.vm.isShowTooltip).toBe(true)
+        expect((wrapper.vm as any).isShowTooltip).toBe(true)
 
         // Fast-forward 2 seconds
         vi.advanceTimersByTime(2000)
         await wrapper.vm.$nextTick()
 
         // Tooltip should be hidden
-        expect(wrapper.vm.isShowTooltip).toBe(false)
+        expect((wrapper.vm as any).isShowTooltip).toBe(false)
     })
 
     it('generates a unique CSS class on mount', () => {
-        const wrapper = shallowMount(TextfieldWithCopy, {
+        const wrapper: any = shallowMount(TextfieldWithCopy, {
             props: { label: 'Key', value: 'val' },
             global: {
                 mocks: { $t: (key: string) => key },
@@ -147,6 +147,6 @@ describe('TextfieldWithCopy.vue', () => {
             },
         })
 
-        expect(wrapper.vm.cssClassName).toBe('textfield-with-copy-mocked-uuid')
+        expect((wrapper.vm as any).cssClassName).toBe('textfield-with-copy-mocked-uuid')
     })
 })

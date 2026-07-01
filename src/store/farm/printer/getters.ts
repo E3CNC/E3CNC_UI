@@ -6,27 +6,27 @@ import type { GuiWebcamStateWebcam } from '@/store/gui/webcams/types'
 import { RootState } from '@/store/types'
 
 export const getters: GetterTree<FarmPrinterState, RootState> = {
-    getSocketUrl: (state) => {
+    getSocketUrl: (state: FarmPrinterState) => {
         const normPath = state.socket.path.replaceAll(/(^\/*)|(\/*$)/g, '')
         const path = normPath.length > 0 ? `/${normPath}` : ''
         return state.socket.protocol + '://' + state.socket.hostname + ':' + state.socket.port + path + '/websocket'
     },
 
-    getSocketData: (state) => {
+    getSocketData: (state: FarmPrinterState) => {
         return state.socket
     },
 
-    isCurrentPrinter: (state, getters, rootState) => {
+    isCurrentPrinter: (state: FarmPrinterState, getters: any, rootState: RootState) => {
         return rootState.socket?.hostname === state.socket.hostname && rootState.socket.port === state.socket.port
     },
 
     getSetting:
-        (state) =>
+        (state: FarmPrinterState) =>
         <T>(name: string, fallback: T): T => {
             return (state.settings[name] as T | undefined) ?? fallback
         },
 
-    getPrinterName: (state) => {
+    getPrinterName: (state: FarmPrinterState) => {
         if (
             'gui' in state.data &&
             'general' in state.data.gui &&
@@ -38,15 +38,15 @@ export const getters: GetterTree<FarmPrinterState, RootState> = {
         return state.socket.hostname + (state.socket.port != 80 ? ':' + state.socket.port : '') + state.socket.path
     },
 
-    getPrinterSocketState: (state) => {
+    getPrinterSocketState: (state: FarmPrinterState) => {
         return state.socket
     },
 
-    getLogoColor: (state) => {
+    getLogoColor: (state: FarmPrinterState) => {
         return state.data.gui?.uiSettings?.logo ?? defaultLogoColor
     },
 
-    getStatus: (state, getters) => {
+    getStatus: (state: FarmPrinterState, getters: any) => {
         if (!state.socket.isConnected) {
             return state.socket.isConnecting ? 'Connecting...' : 'Disconnected'
         } else if (!state.server.klippy_connected) {
@@ -64,11 +64,11 @@ export const getters: GetterTree<FarmPrinterState, RootState> = {
         return 'Unknown'
     },
 
-    getCurrentFilename: (state) => {
+    getCurrentFilename: (state: FarmPrinterState) => {
         return state.data.print_stats?.filename ?? ''
     },
 
-    getPrintPercent: (state, getters) => {
+    getPrintPercent: (state: FarmPrinterState, getters: any) => {
         const type = state.data.gui?.general?.calcPrintProgress ?? 'file-relative'
         switch (type) {
             case 'file-relative':
@@ -85,7 +85,7 @@ export const getters: GetterTree<FarmPrinterState, RootState> = {
         }
     },
 
-    getPrintPercentByFilepositionRelative: (state) => {
+    getPrintPercentByFilepositionRelative: (state: FarmPrinterState) => {
         if (
             state.current_file?.filename &&
             state.current_file?.gcode_start_byte &&
@@ -104,15 +104,15 @@ export const getters: GetterTree<FarmPrinterState, RootState> = {
         return state.data.virtual_sdcard?.progress ?? 0
     },
 
-    getPrintPercentByFilepositionAbsolute: (state) => {
+    getPrintPercentByFilepositionAbsolute: (state: FarmPrinterState) => {
         return state.data.virtual_sdcard?.progress ?? 0
     },
 
-    getPrintPercentBySlicer: (state) => {
+    getPrintPercentBySlicer: (state: FarmPrinterState) => {
         return state.data.display_status?.progress ?? 0
     },
 
-    getPrintPercentByFilament: (state) => {
+    getPrintPercentByFilament: (state: FarmPrinterState) => {
         const filament_used = state.data.print_stats?.filament_used ?? null
         const filament_total = state.current_file?.filament_total ?? null
 
@@ -125,7 +125,7 @@ export const getters: GetterTree<FarmPrinterState, RootState> = {
         return state.data.virtual_sdcard?.progress ?? 0
     },
 
-    getImage: (state) => {
+    getImage: (state: FarmPrinterState) => {
         if (state.current_file.filename && state.current_file.thumbnails?.length) {
             const indexLastDir = state.current_file.filename.lastIndexOf('/')
             const dir = indexLastDir !== -1 ? state.current_file.filename.substring(0, indexLastDir) + '/' : ''
@@ -149,7 +149,7 @@ export const getters: GetterTree<FarmPrinterState, RootState> = {
         return null
     },
 
-    getThemeFileUrl: (state) => (acceptName: string, acceptExtensions: string[]) => {
+    getThemeFileUrl: (state: FarmPrinterState) => (acceptName: string, acceptExtensions: string[]) => {
         const file = state.theme_files.find(
             (element: string) =>
                 element.substr(0, element.lastIndexOf('.')) === themeDir + '/' + acceptName &&
@@ -164,20 +164,20 @@ export const getters: GetterTree<FarmPrinterState, RootState> = {
             : null
     },
 
-    getLogo: (state, getters) => {
+    getLogo: (state: FarmPrinterState, getters: any) => {
         const acceptName = 'sidebar-logo'
         const acceptExtensions = ['gif', 'jpg', 'png', 'gif', 'svg']
 
         return getters['getThemeFileUrl'](acceptName, acceptExtensions)
     },
 
-    getPosition: (state) => {
+    getPosition: (state: FarmPrinterState) => {
         if ('toolhead' in state.data && 'position' in state.data.toolhead) return state.data.toolhead.position
 
         return []
     },
 
-    getPrinterPreview: (state, getters, rootState, rootGetters) => {
+    getPrinterPreview: (state: FarmPrinterState, getters: any, rootState: RootState, rootGetters: any) => {
         if (!state.server.klippy_connected) return []
 
         const output = []
@@ -258,7 +258,7 @@ export const getters: GetterTree<FarmPrinterState, RootState> = {
         return output
     },
 
-    estimated_time_file: (state, getters) => {
+    estimated_time_file: (state: FarmPrinterState, getters: any) => {
         if (state.data.print_stats?.print_duration > 0 && getters.getPrintPercent > 0) {
             return (
                 state.data.print_stats.print_duration / getters.getPrintPercent -
@@ -269,7 +269,7 @@ export const getters: GetterTree<FarmPrinterState, RootState> = {
         return 0
     },
 
-    estimated_time_filament: (state) => {
+    estimated_time_filament: (state: FarmPrinterState) => {
         if (
             state.data.print_stats?.print_duration &&
             state.data.print_stats?.filament_used &&
@@ -287,7 +287,7 @@ export const getters: GetterTree<FarmPrinterState, RootState> = {
         return 0
     },
 
-    estimated_time_slicer: (state) => {
+    estimated_time_slicer: (state: FarmPrinterState) => {
         if (
             state.data.print_stats &&
             state.data.print_stats?.print_duration &&
@@ -300,7 +300,7 @@ export const getters: GetterTree<FarmPrinterState, RootState> = {
         return 0
     },
 
-    estimated_time_eta: (state, getters) => {
+    estimated_time_eta: (state: FarmPrinterState, getters: any) => {
         let time = 0
         let timeCount = 0
         const boolFileCalc = state.data.gui?.general?.calcEtaTime?.includes('file') ?? true
@@ -327,7 +327,7 @@ export const getters: GetterTree<FarmPrinterState, RootState> = {
         return 0
     },
 
-    getPrinterWebcams: (state) => {
+    getPrinterWebcams: (state: FarmPrinterState) => {
         return state.data.webcams.filter((webcam: GuiWebcamStateWebcam) => webcam.enabled)
     },
 }

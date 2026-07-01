@@ -1,15 +1,15 @@
-import { ActionTree } from 'vuex'
+import { ActionContext, ActionTree } from 'vuex'
 import { RootState } from '@/store/types'
 import { GuiNavigationState, GuiNavigationStateEntry } from '@/store/gui/navigation/types'
 import { getSocket } from '@/store/runtime'
 import type { NaviPoint } from '@/composables/useNavigation'
 
 export const actions: ActionTree<GuiNavigationState, RootState> = {
-    reset({ commit }) {
+    reset({ commit }: ActionContext<GuiNavigationState, RootState>) {
         commit('reset')
     },
 
-    upload({ state }) {
+    upload({ state }: ActionContext<GuiNavigationState, RootState>) {
         getSocket().emit('server.database.post_item', {
             namespace: 'mainsail',
             key: 'navigation.entries',
