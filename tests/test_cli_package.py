@@ -1384,3 +1384,7 @@ class TestCmdCheckExtra:
         with patch("cli.commands.header"):
             with patch("cli.commands.check_dependencies", return_value=(True, "")):
                 cmd_check(MagicMock())
+
+
+    # Flash MCU omitted — deeply nested subprocess calls (make, dfu-util) that
+    # require real build environment. Tested implicitly via menu test dispatch.

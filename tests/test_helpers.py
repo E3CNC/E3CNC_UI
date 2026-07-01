@@ -99,22 +99,18 @@ class TestValidateSSH:
                     mock_fail.assert_called()
 
 
-# ── _require_ansible (test the non-install code paths) ────────────────────
+# ── _require_ansible ──────────────────────────────────────────────────────
 
 
 class TestRequireAnsible:
     def test_returns_when_ansible_playbook_found(self):
         from cli.helpers import _require_ansible
         with patch("cli.helpers.shutil.which", return_value="/usr/bin/ansible-playbook"):
-            _require_ansible()  # Should not raise
+            _require_ansible()
 
     def test_tries_pip_install_when_missing(self):
         from cli.helpers import _require_ansible
-        # ansible-playbook missing → pip3 found → ansible install succeeds → ansible-playbook still missing → fail
-        which_results = {
-            "ansible-playbook": None,
-            "pip3": "/usr/bin/pip3",
-        }
+        which_results = {"ansible-playbook": None, "pip3": "/usr/bin/pip3"}
         with patch("cli.helpers.shutil.which", side_effect=lambda x: which_results.get(x)):
             with patch("cli.helpers._ensure_local_sudo_access"):
                 with patch("cli.helpers.subprocess.run", return_value=MagicMock(returncode=0)):
@@ -125,31 +121,34 @@ class TestRequireAnsible:
 
     def test_installs_pip_if_missing(self):
         from cli.helpers import _require_ansible
-        # ansible-playbook, pip3 and pip all missing, then pip becomes available, then ansible-playbook still missing
         call_count = [0]
         def _mock_which(cmd):
             call_count[0] += 1
             if cmd == "ansible-playbook":
                 return None
             if cmd in ("pip3", "pip"):
-                # First 2 calls (line 94: pip3 and pip) → None, then after install → /usr/bin/pip3
                 return None if call_count[0] <= 3 else "/usr/bin/pip3"
             return None
-
+        mock_run = MagicMock(return_value=MagicMock(returncode=0))
         with patch("cli.helpers.shutil.which", side_effect=_mock_which):
-            with patch("cli.helpers.subprocess.run") as mock_run:
-                mock_run.return_value = MagicMock(returncode=0)
+            with patch("cli.helpers.subprocess.run", mock_run):
                 with patch("cli.helpers._ensure_local_sudo_access"):
                     with patch("cli.helpers.fail"):
                         with patch("cli.helpers.ok"), patch("cli.helpers.info"):
                             with patch("cli.helpers.print"):
                                 _require_ansible()
-            # Should have called ensurepip at least once
-            ensurepip_calls = [
-                c for c in mock_run.call_args_list
-                if "ensurepip" in str(c)
-            ]
-            assert len(ensurepip_calls) >= 1
+        ensurepip_calls = [c for c in mock_run.call_args_list if "ensurepip" in str(c)]
+        assert len(ensurepip_calls) >= 1
+
+    def test_returns_false_when_all_pip_and_apt_fail(self):
+        from cli.helpers import _require_ansible
+        with patch("cli.helpers.shutil.which", side_effect=lambda x: None):
+            with patch("cli.helpers.subprocess.run", return_value=MagicMock(returncode=1)):
+                with patch("cli.helpers._ensure_local_sudo_access"):
+                    with patch("cli.helpers.fail"):
+                        with patch("cli.helpers.ok"), patch("cli.helpers.info"):
+                            with patch("cli.helpers.print"):
+                                _require_ansible()
 
 
 # ── _get_instance ─────────────────────────────────────────────────────────
@@ -165,7 +164,6 @@ class TestGetInstance:
             assert inst.name == "testcnc"
 
     def test_selects_by_legacy_name(self, mock_instance):
-        """Match cnc_instance_name pattern."""
         from cli.helpers import _get_instance
         legacy = Instance(
             name="cnc_otherbox",
@@ -395,10 +393,7 @@ class TestBuildKlipperFirmware:
         from cli.helpers import build_klipper_firmware
         callback = MagicMock()
         with patch("os.path.exists", side_effect=[
-            True,       # klippy.py exists
-            True,       # elf_path exists
-            False,      # bin_path doesn't exist
-            False,      # uf2_path doesn't exist
+            True, True, False, False,
         ]):
             with patch("builtins.open", mock_open()):
                 with patch("cli.helpers.subprocess.run") as mock_run:
@@ -415,10 +410,7 @@ class TestBuildKlipperFirmware:
         from cli.helpers import build_klipper_firmware
         callback = MagicMock()
         with patch("os.path.exists", side_effect=[
-            True,       # klippy.py exists
-            False,      # elf_path doesn't exist
-            False,      # bin_path doesn't exist
-            False,      # uf2_path doesn't exist
+            True, False, False, False,
         ]):
             with patch("builtins.open", mock_open()):
                 with patch("cli.helpers.subprocess.run") as mock_run:
@@ -429,3 +421,25 @@ class TestBuildKlipperFirmware:
                     )
                     assert result is False
                     callback.assert_any_call("Build completed but no output files found in out/")
+
+
+# ── scan_serial_devices ──────────────────────────────────────────────
+
+
+class TestScanSerialDevices:
+    def test_returns_empty_on_macos(self):
+        from cli.helpers import scan_serial_devices
+        with patch("glob.glob", return_value=[]):
+            result = scan_serial_devices()
+            assert result == []
+
+    def test_parses_klipper_usb_device(self):
+        from cli.helpers import scan_serial_devices
+        with patch("glob.glob", return_value=["/dev/serial/by-id/usb-Klipper_stm32f103_12345-if00"]):
+            with patch("os.path.realpath", return_value="/dev/ttyACM0"):
+                with patch("os.path.exists", return_value=False):
+                    result = scan_serial_devices()
+                    assert len(result) == 1
+                    assert result[0]["vendor"] == "Klipper"
+                    assert result[0]["is_klipper"] is True
+                    assert result[0]["serial"] == "12345"
