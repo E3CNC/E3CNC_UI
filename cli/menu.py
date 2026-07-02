@@ -8,7 +8,7 @@ from _e3cnc_shared import (
     get_active_instance, detect_instances, set_active_instance,
     INSTANCES_DIR, Instance,
 )
-from _e3cnc_deploy import get_current_release, generate_admin_page
+from _e3cnc_deploy import get_current_release, get_active_release_version, generate_admin_page
 
 # ── Terminal menu library (soft dependency) ────────────────────────────
 
@@ -18,6 +18,14 @@ try:
     _has_tui = True
 except ImportError:
     pass
+
+
+def _menu_title() -> str:
+    """Format the menu header with CLI and deployed versions."""
+    deployed = get_active_release_version()
+    if deployed and deployed != VERSION:
+        return f"  {TOOL_NAME} CLI v{VERSION}  |  Stack v{deployed}"
+    return f"  {TOOL_NAME} v{VERSION}"
 
 
 def _interactive_menu() -> None:
@@ -72,7 +80,7 @@ def _tui_menu() -> None:
         cur = get_active_instance()
         label = cur.name if cur and cur.name != "cnc" else "default"
         config = cur.config_dir if cur else ""
-        title = f"  {TOOL_NAME} v{VERSION}  —  Instance: {label}"
+        title = _menu_title() + f"  —  Instance: {label}"
 
         menu = TerminalMenu(
             menu_entries=entries,
@@ -187,7 +195,7 @@ def _numbered_menu() -> None:
 
     while True:
         print_banner()
-        print(f"  {Style.BOLD}{Style.GREEN}{TOOL_NAME} v{VERSION}{Style.RESET}")
+        print(f"  {Style.BOLD}{Style.GREEN}{_menu_title()}{Style.RESET}")
 
         cur = get_active_instance()
         if cur:

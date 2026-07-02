@@ -3,7 +3,15 @@
 import argparse
 
 from _e3cnc_shared import VERSION, TOOL_NAME
-from _e3cnc_deploy import DEFAULT_KEEP_RELEASES
+from _e3cnc_deploy import DEFAULT_KEEP_RELEASES, get_active_release_version
+
+
+def _format_version() -> str:
+    """Show both CLI (repo checkout) and deployed stack version."""
+    deployed = get_active_release_version()
+    if deployed and deployed != VERSION:
+        return f"{TOOL_NAME} CLI v{VERSION}  |  Deployed stack: v{deployed}"
+    return f"{TOOL_NAME} v{VERSION}"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -26,7 +34,8 @@ def build_parser() -> argparse.ArgumentParser:
 """,
     )
 
-    parser.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
+    parser.add_argument("--version", action="version",
+                        version=_format_version())
     parser.add_argument("--verbose", "-v", action="store_true")
 
     shared_remote = argparse.ArgumentParser(add_help=False)
