@@ -1,4 +1,14 @@
 # Changelog
+## v0.9.7 (2026-07-02)
+- **CLI command registry centralization** — all commands registered in a single `COMMAND_HANDLERS` dict in `cli/commands.py`, eliminating 3 separate dispatch dictionaries that had to be kept in sync manually. New commands only need adding in one place.
+- **`menu_args_factory()`** — replaced the bare `_Fake` class with a proper args factory that pre-configures all attributes to safe defaults. Prevents `AttributeError` crashes when command handlers expect missing attributes.
+- **Single menu item list** — TUI and numbered menus now share one `_ALL_COMMANDS` list instead of maintaining duplicate entries.
+- **Numbered menu shortcut keys fixed** — typing a letter like `s` for Status or `i` for Install now dispatches the correct command (was mapping command names to themselves instead of extracting the `[x]` letter).
+- **`prune-backups` added to CLI dispatch** — was registered in the parser but missing from `cli/__init__.py`, so `e3cnc-cli prune-backups` would fail with "Unknown command".
+- **`fix_moonraker_config` merge logic fixed** — now preserves intervening sections (like `[octoprint_compat]`) between duplicate `[file_manager]` blocks instead of dropping them.
+- **Cancel/back options added** — `_switch_instance` numbered fallback now shows an explicit Cancel option; `_create_new_instance` shows "(Enter to cancel)" and prints "Cancelled" on empty input.
+- Tests: 443 passing across 9 test files (+70 from v0.9.6).
+
 ## v0.9.6 (2026-07-02)
 - **bump-version.sh commits before tagging** — the script now creates a git commit with the version bump before creating the tag. Previously the tag pointed at the old commit, so release builds had the wrong version.
 - **Fixed `vv0.9.5` in version display** — `get_active_release_version()` returns versions with a `v` prefix (e.g. `v0.9.5`), which clashed with the hardcoded `v` in `_format_version()`. Stripped the prefix before display.
