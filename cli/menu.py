@@ -236,7 +236,7 @@ def _run_menu_action(cmd: str) -> None:
     """Dispatch a menu action (switch, create-instance, or command)."""
     if cmd == "quit":
         ok("Goodbye")
-        return
+        sys.exit(0)
     if cmd == "switch":
         _switch_instance()
     elif cmd == "create-instance":
