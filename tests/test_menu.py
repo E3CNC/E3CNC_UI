@@ -66,7 +66,8 @@ class TestRunMenuAction:
     def test_quit_calls_ok(self):
         from cli.menu import _run_menu_action
         with patch("cli.menu.ok") as mock_ok:
-            _run_menu_action("quit")
+            with pytest.raises(SystemExit):
+                _run_menu_action("quit")
             mock_ok.assert_called_once_with("Goodbye")
 
     def test_switch_calls_switch_instance(self):
@@ -352,3 +353,43 @@ class TestNumberedMenu:
             with patch("cli.menu.print_banner"):
                 with patch("builtins.input", side_effect=KeyboardInterrupt()):
                     _numbered_menu()  # Should handle gracefully
+
+
+# ── _menu_title ──────────────────────────────────────────────────────
+
+class TestMenuTitle:
+    def test_matching_versions_shows_short_form(self):
+        """When CLI and deployed versions match, show short form."""
+        from cli.menu import _menu_title
+        from _e3cnc_shared import VERSION
+        with patch("cli.menu.get_active_release_version", return_value=VERSION):
+            title = _menu_title()
+            assert VERSION in title
+            assert "|" not in title  # no separator
+
+    def test_different_versions_shows_both(self):
+        """When versions differ, show both CLI and deployed."""
+        from cli.menu import _menu_title
+        from _e3cnc_shared import VERSION
+        with patch("cli.menu.get_active_release_version", return_value="v999.0.0"):
+            title = _menu_title()
+            assert VERSION in title
+            assert "Stack" in title
+            assert "v999.0.0" in title
+
+    def test_strips_v_prefix_from_deployed(self):
+        """Deployed version 'v0.9.5' should not display as 'vv0.9.5'."""
+        from cli.menu import _menu_title
+        with patch("cli.menu.get_active_release_version", return_value="v0.9.5"):
+            title = _menu_title()
+            assert "vv0.9.5" not in title
+            assert "v0.9.5" in title
+
+    def test_none_deployed_falls_back_to_short(self):
+        """When no release is deployed, show short form."""
+        from cli.menu import _menu_title
+        from _e3cnc_shared import VERSION
+        with patch("cli.menu.get_active_release_version", return_value=None):
+            title = _menu_title()
+            assert VERSION in title
+            assert "|" not in title

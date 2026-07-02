@@ -1275,26 +1275,31 @@ def fix_moonraker_config(conf_path: str, dry_run: bool = False) -> bool:
             seen_keys: set[str] = set()
             merged_lines: list[str] = []
 
-            for r_idx, (r_start, r_end) in enumerate(ranges):
-                start = r_start + (1 if r_idx > 0 else 0)
-                for j in range(start, r_end):
-                    l = lines[j]
-                    ls = l.strip()
-                    if ls.startswith("#") or ls.startswith(";") or ls == "":
+            # Scan from line after first header up to the last duplicate's end
+            for j in range(ranges[0][0] + 1, ranges[-1][1]):
+                l = lines[j]
+                ls = l.strip()
+                # Skip duplicate section headers (but keep other sections)
+                if ls.startswith("[") and ls.endswith("]") and ls == stripped:
+                    continue
+                if ls.startswith("#") or ls.startswith(";") or ls == "":
+                    merged_lines.append(l)
+                elif "=" in ls or ":" in ls:
+                    key = ls.split("=", 1)[0].split(":", 1)[0].strip()
+                    if key not in seen_keys:
+                        seen_keys.add(key)
                         merged_lines.append(l)
-                    elif "=" in ls or ":" in ls:
-                        key = ls.split("=", 1)[0].split(":", 1)[0].strip()
-                        if key not in seen_keys:
-                            seen_keys.add(key)
-                            merged_lines.append(l)
-                    else:
-                        merged_lines.append(l)
+                else:
+                    merged_lines.append(l)
 
             result_lines.append(line)
             result_lines.extend(merged_lines)
             merged_count += len(ranges) - 1
+            # Skip every line up to and including the last duplicate's end
             skip_until = ranges[-1][1]
         else:
+            if i < skip_until:
+                continue
             result_lines.append(line)
 
     new_content = "\n".join(result_lines)

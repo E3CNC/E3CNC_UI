@@ -167,7 +167,46 @@ class TestBuildParser:
         assert choices["redeploy"] is choices["update"]
 
 
-# ── Helper tests ──────────────────────────────────────────────────────────────
+# ── _format_version ─────────────────────────────────────────────────
+
+class TestFormatVersion:
+    """Tests for cli.parser._format_version()."""
+
+    def test_matching_versions_shows_short_form(self):
+        """When CLI and deployed versions match, show short form."""
+        from cli.parser import _format_version
+        from _e3cnc_shared import VERSION
+        with patch("cli.parser.get_active_release_version", return_value=VERSION):
+            result = _format_version()
+            assert VERSION in result
+            assert "|" not in result
+
+    def test_different_versions_shows_both(self):
+        """When versions differ, show both CLI and deployed."""
+        from cli.parser import _format_version
+        from _e3cnc_shared import VERSION
+        with patch("cli.parser.get_active_release_version", return_value="v999.0.0"):
+            result = _format_version()
+            assert VERSION in result
+            assert "Deployed" in result
+            assert "v999.0.0" in result
+
+    def test_strips_v_prefix_from_deployed(self):
+        """Deployed version 'v0.9.5' should not display as 'vv0.9.5'."""
+        from cli.parser import _format_version
+        with patch("cli.parser.get_active_release_version", return_value="v0.9.5"):
+            result = _format_version()
+            assert "vv0.9.5" not in result
+            assert "v0.9.5" in result
+
+    def test_none_deployed_falls_back_to_short(self):
+        """When no release is deployed, show short form."""
+        from cli.parser import _format_version
+        from _e3cnc_shared import VERSION
+        with patch("cli.parser.get_active_release_version", return_value=None):
+            result = _format_version()
+            assert VERSION in result
+            assert "|" not in result
 
 
 class TestGetInstance:
