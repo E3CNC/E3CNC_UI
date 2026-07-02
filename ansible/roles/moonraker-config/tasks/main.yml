@@ -26,9 +26,3 @@
     regexp: '^timeout:'
     line: 'timeout: 30.0'
     insertafter: '\[cnc_metadata\]'
-
-- name: Remove legacy [update_manager E3CNC] block from moonraker.conf
-  ansible.builtin.blockinfile:
-    path: '{{ moonraker_conf }}'
-    marker: '# {mark} ANSIBLE MANAGED BLOCK - update_manager E3CNC'
-    state: absent
