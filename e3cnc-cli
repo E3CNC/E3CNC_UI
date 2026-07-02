@@ -1,17 +1,49 @@
 #!/usr/bin/env python3
 """e3cnc-cli — Unified CLI for installing, deploying, and managing E3CNC UI.
 
-Delegates to the cli/ package. Run with --help for full command list.
+If a deployed release exists (~/e3cnc/current), runs the CLI bundled inside
+that release so the CLI version always matches the deployed stack version.
+Otherwise falls back to the repo checkout.
 """
 import sys
 import os
+from pathlib import Path
 
-# Ensure the repo root is on sys.path so cli/ and _e3cnc_shared imports work
-_THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-if _THIS_DIR not in sys.path:
-    sys.path.insert(0, _THIS_DIR)
 
-from cli import main
+def _run_from_release() -> bool:
+    """Try to run the CLI from the current release's bundled copy.
+
+    Returns True if successful, False if no release is deployed.
+    """
+    current_link = Path.home() / "e3cnc" / "current"
+    if not current_link.is_symlink():
+        return False
+
+    release_cli = current_link.resolve() / "cli"
+    if not release_cli.is_dir():
+        return False
+
+    cli_init = release_cli / "__init__.py"
+    if not cli_init.exists():
+        # Create a minimal __init__.py if the bundled CLI doesn't have one
+        cli_init.write_text("")
+
+    if str(release_cli) not in sys.path:
+        sys.path.insert(0, str(release_cli.parent))
+
+    from cli import main
+    main()
+    return True
+
 
 if __name__ == "__main__":
+    if _run_from_release():
+        sys.exit(0)
+
+    # Fallback: run from repo checkout
+    _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+    if _THIS_DIR not in sys.path:
+        sys.path.insert(0, _THIS_DIR)
+
+    from cli import main
     main()
