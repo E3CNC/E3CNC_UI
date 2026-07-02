@@ -10,7 +10,8 @@ def _format_version() -> str:
     """Show both CLI (repo checkout) and deployed stack version."""
     deployed = get_active_release_version()
     if deployed and deployed != VERSION:
-        return f"{TOOL_NAME} CLI v{VERSION}  |  Deployed stack: v{deployed}"
+        disp = deployed.lstrip("v")
+        return f"{TOOL_NAME} CLI v{VERSION}  |  Deployed stack: v{disp}"
     return f"{TOOL_NAME} v{VERSION}"
 
 

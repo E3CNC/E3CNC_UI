@@ -24,7 +24,8 @@ def _menu_title() -> str:
     """Format the menu header with CLI and deployed versions."""
     deployed = get_active_release_version()
     if deployed and deployed != VERSION:
-        return f"  {TOOL_NAME} CLI v{VERSION}  |  Stack v{deployed}"
+        disp = deployed.lstrip("v")
+        return f"  {TOOL_NAME} CLI v{VERSION}  |  Stack v{disp}"
     return f"  {TOOL_NAME} v{VERSION}"
 
 
