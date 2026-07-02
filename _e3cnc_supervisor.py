@@ -200,6 +200,10 @@ def restart_services(inst: Instance) -> bool:
 
     _ensure_sudo(f"restarting services for instance {inst.name}")
 
+    # Pre-flight: merge duplicate sections in moonraker.conf
+    from _e3cnc_deploy import fix_moonraker_config
+    fix_moonraker_config(inst.moonraker_conf)
+
     # Register instance if not already registered
     just_registered = False
     if not _config_path(inst).exists():

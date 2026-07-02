@@ -1220,8 +1220,106 @@ def update_systemd_paths(inst: Optional[Instance] = None, dry_run: bool = False)
     return all_ok
 
 
+# ── Moonraker config fixer ──────────────────────────────────────────────────
+
+def fix_moonraker_config(conf_path: str, dry_run: bool = False) -> bool:
+    """Merge duplicate [section] entries in moonraker.conf into one.
+
+    Moonraker's config parser rejects duplicate sections. If the config file
+    has the same section header twice (e.g. two [file_manager] blocks), this
+    merges all key=value pairs into the first occurrence and removes the
+    duplicate headers. Non-section lines (empty, comments) between duplicates
+    are preserved.
+    """
+    path = Path(conf_path)
+    if not path.exists():
+        warn(f"moonraker.conf not found at {path}")
+        return False
+
+    raw = path.read_text()
+    lines = raw.split("\n")
+
+    # Find section boundaries
+    sections: "list[tuple[int, int, str]]" = []
+    current_start: Optional[int] = None
+    current_name: Optional[str] = None
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith("[") and stripped.endswith("]"):
+            if current_start is not None and current_name is not None:
+                sections.append((current_start, i, current_name))
+            current_start = i
+            current_name = stripped
+    if current_start is not None and current_name is not None:
+        sections.append((current_start, len(lines), current_name))
+
+    # Find duplicates
+    seen: dict[str, list[tuple[int, int]]] = {}
+    for start, end, name in sections:
+        seen.setdefault(name, []).append((start, end))
+
+    dups = {name: ranges for name, ranges in seen.items() if len(ranges) > 1}
+    if not dups:
+        return True  # nothing to fix
+
+    if dry_run:
+        for name, ranges in dups.items():
+            info(f"Would merge {len(ranges)} duplicate [{name}] sections (lines {ranges[0][0]+1}–{ranges[-1][1]})")
+        return True
+
+    # Build new content: keep first occurrence, merge key=values from duplicates
+    result_lines: list[str] = []
+    skip_until = -1
+    merged_count = 0
+
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if i < skip_until:
+            continue
+
+        is_section = stripped.startswith("[") and stripped.endswith("]")
+        if is_section and stripped in dups:
+            ranges = dups[stripped]
+            seen_keys: set[str] = set()
+            merged_lines: list[str] = []
+
+            for r_idx, (r_start, r_end) in enumerate(ranges):
+                start = r_start + (1 if r_idx > 0 else 0)
+                for j in range(start, r_end):
+                    l = lines[j]
+                    ls = l.strip()
+                    if ls.startswith("#") or ls.startswith(";") or ls == "":
+                        merged_lines.append(l)
+                    elif "=" in ls or ":" in ls:
+                        key = ls.split("=", 1)[0].split(":", 1)[0].strip()
+                        if key not in seen_keys:
+                            seen_keys.add(key)
+                            merged_lines.append(l)
+                    else:
+                        merged_lines.append(l)
+
+            result_lines.append(line)
+            result_lines.extend(merged_lines)
+            merged_count += len(ranges) - 1
+            skip_until = ranges[-1][1]
+        else:
+            result_lines.append(line)
+
+    new_content = "\n".join(result_lines)
+    if new_content != raw:
+        path.write_text(new_content)
+        ok(f"Merged {merged_count} duplicate section(s) in {path.name}")
+    return True
+
+
+# ── Service management ─────────────────────────────────────────────────────
+
 def restart_services(inst: Optional[Instance] = None, dry_run: bool = False) -> bool:
-    """Restart services in the correct order: Moonraker first, then Klipper."""
+    """Restart services in the correct order: Moonraker first, then Klipper.
+
+    Before restarting, merges duplicate sections in moonraker.conf (if any)
+    to prevent Moonraker config validation errors on stricter versions.
+    """
     active_inst = inst or get_active_instance()
     if not active_inst:
         warn("No instance detected — cannot restart services")
@@ -1230,6 +1328,9 @@ def restart_services(inst: Optional[Instance] = None, dry_run: bool = False) -> 
     if not shutil.which("systemctl"):
         warn("systemctl not available — cannot restart services")
         return False
+
+    # Pre-flight: merge duplicate sections in moonraker.conf
+    fix_moonraker_config(active_inst.moonraker_conf, dry_run=dry_run)
 
     # Ensure sudo access before attempting restarts
     from _e3cnc_shared import _ensure_local_sudo_access
