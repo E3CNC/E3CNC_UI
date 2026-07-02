@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.9.3 (2026-07-02)
+- **Version centralization** — `package.json` is now the single source of truth for version. New `bump-version.sh` syncs `_e3cnc_shared.py` and inserts a changelog stub on each bump.
+- **WCS restore to saved WCS** — the WCS auto-reset now saves the active WCS at job start and restores it on job end, instead of always defaulting to G54.
+- **Macro safety pass** — all project-owned `.cfg` files now have inline comments on every command.
+
 ## v0.9.2 (2026-07-01)
 - **WCS auto-reset on job end** — when a job finishes or cancels, the UI now auto-selects the previously active WCS (saved at job start) instead of always defaulting to G54. Prevents jog moves in machine coordinates (G53) that caused Z-axis crashes. Closes [issue #18](https://github.com/E3CNC/E3CNC/issues/18).
 - **Safer FINISH_JOB macro** — replaced absolute G53 Z25 lift with relative Z10 lift and removed G53 XY park. Tool now lifts 10mm and stays above the work instead of potentially moving into tall stock or dragging across fixtures.
