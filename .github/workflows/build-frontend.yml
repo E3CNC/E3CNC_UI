@@ -53,11 +53,13 @@ jobs:
         id: trigger
         shell: bash
         run: |
-          # Determine what kind of run this is
-          if [[ "${{ github.event_name }}" == "push" && "${{ github.ref_type }}" == "tag" ]]; then
+          REF='${{ github.ref }}'
+          EVENT='${{ github.event_name }}'
+          # Tag push → release
+          if [[ "$REF" == refs/tags/* ]]; then
             echo "TYPE=release" >> $GITHUB_OUTPUT
-            echo "Trigger: tag push (${{ github.ref_name }}) → full release"
-          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Trigger: tag push (${REF#refs/tags/}) → full release"
+          elif [[ "$EVENT" == "workflow_dispatch" ]]; then
             echo "TYPE=release" >> $GITHUB_OUTPUT
             echo "Trigger: manual dispatch → full release"
           else
