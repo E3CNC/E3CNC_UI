@@ -1312,6 +1312,88 @@ def fix_moonraker_config(conf_path: str, dry_run: bool = False) -> bool:
     return True
 
 
+# ── Sudoers configuration ──────────────────────────────────────────────────
+
+SUDOERS_PATH = "/etc/sudoers.d/e3cnc"
+
+SUDOERS_CONTENT = """# E3CNC — passwordless sudo for process management
+# Installed by e3cnc-cli. Do not edit manually.
+#
+# Allows the owning user to manage E3CNC services without a password prompt.
+# These are the minimum required commands for CLI update/install/restart.
+
+{user} ALL=(root) NOPASSWD: /usr/bin/systemctl restart e3cnc-*
+{user} ALL=(root) NOPASSWD: /usr/bin/systemctl daemon-reload
+{user} ALL=(root) NOPASSWD: /usr/bin/systemctl reload nginx
+{user} ALL=(root) NOPASSWD: /usr/bin/supervisorctl *
+{user} ALL=(root) NOPASSWD: /usr/bin/tee /etc/supervisor/conf.d/e3cnc-*.conf
+{user} ALL=(root) NOPASSWD: /bin/ln -sf /etc/nginx/sites-* /etc/nginx/sites-enabled/*
+{user} ALL=(root) NOPASSWD: /bin/rm /etc/supervisor/conf.d/e3cnc-*.conf
+"""
+
+
+def ensure_sudoers(dry_run: bool = False) -> bool:
+    """Install the E3CNC sudoers drop-in for passwordless process management.
+
+    Checks if the file already exists and is valid. Creates or updates it
+    if needed. Safe to call repeatedly — no-op if already configured.
+    """
+    user = os.environ.get("USER", "")
+    if not user:
+        warn("Could not determine current user — cannot configure sudoers")
+        return False
+
+    content = SUDOERS_CONTENT.format(user=user)
+    path = Path(SUDOERS_PATH)
+
+    if path.exists():
+        existing = path.read_text()
+        if existing.strip() == content.strip():
+            return True  # already up to date
+        info(f"Updating {SUDOERS_PATH}...")
+
+    if dry_run:
+        info(f"Would install sudoers drop-in at {SUDOERS_PATH} for user '{user}'")
+        return True
+
+    # Write via a temp file with visudo validation
+    import tempfile
+    tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".e3cnc-sudoers", delete=False, dir="/tmp")
+    try:
+        tmp.write(content)
+        tmp.close()
+
+        # Validate with visudo
+        result = subprocess.run(
+            ["sudo", "visudo", "-c", "-f", tmp.name],
+            capture_output=True, text=True, timeout=15,
+        )
+        if result.returncode != 0:
+            warn(f"sudoers syntax check failed: {result.stderr.strip()}")
+            return False
+
+        # Install
+        result = subprocess.run(
+            ["sudo", "cp", tmp.name, str(path)],
+            capture_output=True, text=True, timeout=15,
+        )
+        if result.returncode != 0:
+            warn(f"Failed to install sudoers: {result.stderr.strip()}")
+            return False
+
+        subprocess.run(["sudo", "chmod", "0440", str(path)], capture_output=True, timeout=10)
+        ok(f"Sudoers configured for user '{user}' — passwordless E3CNC service management enabled")
+        return True
+    except (OSError, subprocess.SubprocessError) as e:
+        warn(f"Failed to configure sudoers: {e}")
+        return False
+    finally:
+        try:
+            os.unlink(tmp.name)
+        except OSError:
+            pass
+
+
 # ── Service management ─────────────────────────────────────────────────────
 
 def restart_services(inst: Optional[Instance] = None, dry_run: bool = False) -> bool:
@@ -1331,6 +1413,9 @@ def restart_services(inst: Optional[Instance] = None, dry_run: bool = False) -> 
 
     # Pre-flight: merge duplicate sections in moonraker.conf
     fix_moonraker_config(active_inst.moonraker_conf, dry_run=dry_run)
+
+    # Pre-flight: ensure sudoers is configured for passwordless process mgmt
+    ensure_sudoers(dry_run=dry_run)
 
     # Ensure sudo access before attempting restarts
     from _e3cnc_shared import _ensure_local_sudo_access

@@ -56,6 +56,25 @@
   become: true
   when: e3cnc_bootstrap_needed
 
+- name: Install sudoers drop-in for passwordless E3CNC service management
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/e3cnc
+    mode: '0440'
+    owner: root
+    group: root
+    content: |
+      # E3CNC — passwordless sudo for process management
+      # Installed by ansible bootstrap. Do not edit manually.
+      {{ ansible_user_id }} ALL=(root) NOPASSWD: /usr/bin/systemctl restart e3cnc-*
+      {{ ansible_user_id }} ALL=(root) NOPASSWD: /usr/bin/systemctl daemon-reload
+      {{ ansible_user_id }} ALL=(root) NOPASSWD: /usr/bin/systemctl reload nginx
+      {{ ansible_user_id }} ALL=(root) NOPASSWD: /usr/bin/supervisorctl *
+      {{ ansible_user_id }} ALL=(root) NOPASSWD: /usr/bin/tee /etc/supervisor/conf.d/e3cnc-*.conf
+      {{ ansible_user_id }} ALL=(root) NOPASSWD: /bin/ln -sf /etc/nginx/sites-* /etc/nginx/sites-enabled/*
+      {{ ansible_user_id }} ALL=(root) NOPASSWD: /bin/rm /etc/supervisor/conf.d/e3cnc-*.conf
+  become: true
+  when: e3cnc_bootstrap_needed
+
 - name: Ensure base directories exist for fresh single-instance stack
   ansible.builtin.file:
     path: '{{ item }}'
