@@ -9,6 +9,7 @@
 #
 # Source of truth: package.json ("version" field)
 # Synced to: _e3cnc_shared.py (VERSION constant)
+# Also adds a stub entry to CHANGELOG.md.
 
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel 2>/dev/null || echo "$(dirname "$0")")"
@@ -49,6 +50,23 @@ else
     sed -i "s/^VERSION = \"$CURRENT\"/VERSION = \"$NEW\"/" _e3cnc_shared.py
 fi
 echo "  ✓ _e3cnc_shared.py"
+
+# ── add stub entry to CHANGELOG.md ───────────────────────────────────────────
+TODAY=$(date +%Y-%m-%d)
+STUB="## v$NEW ($TODAY)
+- _No changelog entry yet. Describe changes here before releasing._
+
+"
+# Insert after the first line (# Changelog)
+python3 -c "
+import sys
+with open('CHANGELOG.md') as f:
+    lines = f.readlines()
+lines.insert(1, '''$STUB''')
+with open('CHANGELOG.md', 'w') as f:
+    f.writelines(lines)
+"
+echo "  ✓ CHANGELOG.md (stub added — edit before commit)"
 
 # ── done ─────────────────────────────────────────────────────────────────────
 echo ""
