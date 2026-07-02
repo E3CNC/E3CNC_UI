@@ -7,13 +7,15 @@ Otherwise falls back to the repo checkout.
 """
 import sys
 import os
+import traceback
 from pathlib import Path
 
 
 def _run_from_release() -> bool:
     """Try to run the CLI from the current release's bundled copy.
 
-    Returns True if successful, False if no release is deployed.
+    Returns True if successful, False if no release is deployed or if
+    the bundled CLI fails to load (falls back to repo checkout).
     """
     current_link = Path.home() / "e3cnc" / "current"
     if not current_link.is_symlink():
@@ -25,15 +27,35 @@ def _run_from_release() -> bool:
 
     cli_init = release_cli / "__init__.py"
     if not cli_init.exists():
-        # Create a minimal __init__.py if the bundled CLI doesn't have one
         cli_init.write_text("")
 
     if str(release_cli) not in sys.path:
         sys.path.insert(0, str(release_cli.parent))
 
-    from cli import main
-    main()
-    return True
+    try:
+        from cli import main
+        main()
+        return True
+    except Exception:
+        # Bundled CLI failed — fall back to repo checkout
+        # This can happen when a stale release has bugs that were fixed
+        # in the repo. The repo checkout is always the latest code.
+        sys.path.pop(0)  # remove the release path
+        # Re-import will use the repo's version
+        del sys.modules["cli"]
+        for mod in list(sys.modules):
+            if mod.startswith("_e3cnc_") or mod.startswith("cli."):
+                del sys.modules[mod]
+        # Remove any cached .pyc from the stale release
+        if hasattr(cli_init, "parent"):
+            pycache = cli_init.parent / "__pycache__"
+            if pycache.is_dir():
+                import shutil
+                try:
+                    shutil.rmtree(pycache)
+                except OSError:
+                    pass
+        return False
 
 
 if __name__ == "__main__":
