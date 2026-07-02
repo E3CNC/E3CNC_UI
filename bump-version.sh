@@ -2,17 +2,18 @@
 # bump-version.sh — Bump all version strings consistently and create a release tag.
 #
 # Usage:
-#   ./bump-version.sh              # bump patch (0.9.3 → 0.9.4)
+#   ./bump-version.sh              # bump patch (0.9.5 → 0.9.6)
 #   ./bump-version.sh 0.10.0       # set specific version
-#   ./bump-version.sh --minor      # bump minor (0.9.3 → 0.10.0)
-#   ./bump-version.sh --major      # bump major (0.9.3 → 1.0.0)
+#   ./bump-version.sh --minor      # bump minor (0.9.5 → 0.10.0)
+#   ./bump-version.sh --major      # bump major (0.9.5 → 1.0.0)
 #   ./bump-version.sh --no-tag     # bump without creating a git tag
 #
 # Source of truth: package.json ("version" field)
 # Synced to: _e3cnc_shared.py (VERSION constant), package-lock.json
 # Also adds a stub entry to CHANGELOG.md.
-# Creates a git tag ("v<newver>") and optionally pushes it — pushing the tag
-# triggers the GitHub Actions release workflow to build and publish artifacts.
+# Creates a commit with the version bump, then creates a git tag ("v<newver>").
+# Pushing the tag triggers the GitHub Actions release workflow to build
+# and publish artifacts automtically.
 
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel 2>/dev/null || echo "$(dirname "$0")")"
@@ -85,7 +86,11 @@ echo "  ✓ CHANGELOG.md (stub added — edit before commit)"
 # ── done ─────────────────────────────────────────────────────────────────────
 echo ""
 echo "All version files synced to $NEW."
-echo "Run 'git diff' to verify, then commit."
+
+# ── auto-commit ──────────────────────────────────────────────────────────────
+git add package.json _e3cnc_shared.py CHANGELOG.md package-lock.json
+git commit -m "chore: bump v$CURRENT → v$NEW" --no-verify 2>/dev/null || true
+echo "  ✓ Commit created: chore: bump v$CURRENT → v$NEW"
 
 # ── git tag ──────────────────────────────────────────────────────────────────
 TAG="v$NEW"
@@ -97,10 +102,7 @@ if $DO_TAG; then
         git tag "$TAG"
         echo "  ✓ Created git tag: $TAG"
         echo ""
-        echo "To push the tag and trigger the release CI:"
-        echo "    git push origin $TAG"
-        echo ""
-        echo "Or push everything (commit + tag):"
+        echo "To push and trigger the release CI:"
         echo "    git push origin main && git push origin $TAG"
     fi
 else
